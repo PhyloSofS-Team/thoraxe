@@ -1,9 +1,8 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """
 Created on Fri Apr 14 16:32:51 2017
 
-@author: hrichard
+@author: huguesrichard
 
 Un premier jeu de fonctions pour faire des requêtes directement avec
 l'API RESTfull de ENSEMBL afin de récupérer tous les gènes homologues
@@ -405,8 +404,8 @@ if __name__ == '__main__':
     orthologs = get_orthologs(curgene)
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
-    print("Found a total of %d orthologs, of which %d paralogs" % (
-        len(orthologs), nparalogs))
+    print("Found a total of %d orthologs, of which %d paralogs" %
+          (len(orthologs), nparalogs))
     # ['taxonomy_level']
     print("Orthologous species:")
     nt = 0
@@ -466,8 +465,8 @@ if __name__ == '__main__':
         print("  - %d fasta sequences" % (len(exorthofasta)))
         ortho_exontable = get_biomart_exons_annot(
             ortho_ens_dataset, orthoid, header=False)
-        print("  - %d lines in the exon table" % (
-            ortho_exontable.text.count("\n") + 1))
+        print("  - %d lines in the exon table" %
+              (ortho_exontable.text.count("\n") + 1))
         exonstableout.write(ortho_exontable.text)
         for dseq in exorthofasta:
             dictseq2fasta(dseq, ortho_name, fastaout)
