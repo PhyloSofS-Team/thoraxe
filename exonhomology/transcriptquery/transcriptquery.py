@@ -39,7 +39,7 @@ def lodict2csvstring(listofdicts):
     si = io.BytesIO()
     fnames = set([])
     for d in listofdicts:
-        fnames.update(d.keys())
+        fnames.update(list(d.keys()))
     fnames = sorted(fnames)
     cw = csv.DictWriter(si, fieldnames=fnames, restval='NA')
     cw.writeheader()
@@ -58,7 +58,7 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
     if fnames is None:
         fnames = set([])
         for d in listofdicts:
-            fnames.update(d.keys())
+            fnames.update(list(d.keys()))
         fnames = sorted(fnames)
     cw = csv.DictWriter(
         out, fieldnames=fnames, restval='NA', extrasaction='ignore')
@@ -143,7 +143,7 @@ def generic_ensemblREST_request(extension, params, header):
     """
     r = requests.get(server + extension, params=params, headers=header)
     if verbose:
-        print "Trying url:" + r.url
+        print("Trying url:" + r.url)
     if not r.ok:
         r.raise_for_status()
         sys.exit()
@@ -241,7 +241,7 @@ def get_exons_sequences(listensexons, **params):
                 data=json.dumps(dexons))
             # print(r.url)
             if not r.ok:
-                print("FAILED REQUEST: " + str(dexons))
+                print(("FAILED REQUEST: " + str(dexons)))
                 r.raise_for_status()
                 sys.exit()
             res = r.json()
@@ -367,7 +367,7 @@ if __name__ == '__main__':
         species = 'homo_sapiens'
         symbol = sys.argv[1]
     else:
-        print "No parameter given, running with default"
+        print("No parameter given, running with default")
         #species, symbol = 'homo_sapiens', 'DNM2'
         species, symbol = 'homo_sapiens', 'MAPK8'
         #species, symbol = 'homo_sapiens', 'snap25'
@@ -376,43 +376,43 @@ if __name__ == '__main__':
     # binomial names when running the code
 
     # 2-
-    print "Searching ID for gene with name %s in species %s..." % (symbol,
-                                                                   species)
+    print("Searching ID for gene with name %s in species %s..." % (symbol,
+                                                                   species))
     a = get_geneids_from_symbol(species, symbol)
-    print "Found the following list of ids: %s" % (json.dumps(a))
+    print("Found the following list of ids: %s" % (json.dumps(a)))
     if len(a) == 0:
-        raise KeyError, "No gene found, exiting"
+        raise KeyError("No gene found, exiting")
     curgene = a[0]
     gene_name = "%s_%s" % (symbol, curgene)
     cdirectory = gene_name
     TSLsubdir = cdirectory + "/TSL/"
     TEXsubdir = cdirectory + "/TablesExons/"
     Seqsubdir = cdirectory + "/Sequences/"
-    print "Using gene id %s from now on." % (curgene)
-    print "Results will be saved in directory %s" % (cdirectory)
+    print("Using gene id %s from now on." % (curgene))
+    print("Results will be saved in directory %s" % (cdirectory))
     if not os.path.exists(cdirectory):
         os.makedirs(TSLsubdir)
         os.makedirs(TEXsubdir)
         os.makedirs(Seqsubdir)
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
-    print "Writing the gene tree"
+    print("Writing the gene tree")
     tree_text = get_genetree(curgene)
     treeout = open("%s/%s.tree.nh" % (cdirectory, curgene), "w")
     treeout.write(tree_text)
     treeout.close()
-    print "Looking for orthologs :"
+    print("Looking for orthologs :")
     orthologs = get_orthologs(curgene)
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
-    print "Found a total of %d orthologs, of which %d paralogs" % (
-        len(orthologs), nparalogs)
+    print("Found a total of %d orthologs, of which %d paralogs" % (
+        len(orthologs), nparalogs))
     # ['taxonomy_level']
-    print "Orthologous species:"
+    print("Orthologous species:")
     nt = 0
     corthologs = Counter([x['target']['species'] for x in orthologs])
     for tl, c in corthologs.most_common():
-        print "  %-23s: %4d" % (tl, c)
+        print("  %-23s: %4d" % (tl, c))
         # if nt > 5: break
         nt += 1
     ##
@@ -420,31 +420,31 @@ if __name__ == '__main__':
         orthokeep,
         orthologs,
         relation=["ortholog_one2one", "ortholog_one2many"])
-    print "Filtering on %d species, %d matches" % (len(orthokeep),
-                                                   len(orthologs_filtered))
+    print("Filtering on %d species, %d matches" % (len(orthokeep),
+                                                   len(orthologs_filtered)))
     ##
-    print "Getting all the transcripts for preparing a TSL file"
+    print("Getting all the transcripts for preparing a TSL file")
     TSL_cur, TSL_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
     TSL_out = "%s/%s" % (TSLsubdir, gene_name)
     write_TSL_file(TSL_out, [TSL_cur] + TSL_ortho)
 
-    print "**** Query species : %s" % (species)
-    print "Got a total of %d transcripts with biotypes" % (len(TSL_cur))
+    print("**** Query species : %s" % (species))
+    print("Got a total of %d transcripts with biotypes" % (len(TSL_cur)))
     for b, c in Counter([x['biotype'] for x in TSL_cur]).most_common():
-        print "  %-23s: %4d" % (b, c)
-    print "**** Orthologues"
+        print("  %-23s: %4d" % (b, c))
+    print("**** Orthologues")
     for tr_o in TSL_ortho:
-        print "%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o))
+        print("%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
 
-    print "Now getting the exons sequences"
+    print("Now getting the exons sequences")
     # TODO revert to multiple files if it is easier
     ffasta = "%s/%s.fasta" % (Seqsubdir, gene_name)
     fexonstable = "%s/%s_exonstable.tsv" % (TEXsubdir, gene_name)
     fastaout = open(ffasta, "w")
     exonstableout = open(fexonstable, "w")
     dex = get_listofexons(curgene)
-    lexid = list(set([x['exon_id'] for x in dex]))
-    print "Getting the sequences files for %s" % (curgene)
+    lexid = list({x['exon_id'] for x in dex})
+    print("Getting the sequences files for %s" % (curgene))
     curspec_ens_dataset = species2ensembldataset(species)
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(curspec_ens_dataset, curgene)
@@ -457,17 +457,17 @@ if __name__ == '__main__':
         orthospecies = o['target']['species']
         orthotaxon = o['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
-        print "Getting exons information for %s" % (ortho_name)
+        print("Getting exons information for %s" % (ortho_name))
         ortho_ens_dataset = species2ensembldataset(orthospecies)
         dexortho = get_listofexons(orthoid)
-        lexidortho = list(set([x['exon_id'] for x in dexortho]))
-        print "  - %d exons" % (len(lexidortho))
+        lexidortho = list({x['exon_id'] for x in dexortho})
+        print("  - %d exons" % (len(lexidortho)))
         exorthofasta = get_exons_sequences(lexidortho)
-        print "  - %d fasta sequences" % (len(exorthofasta))
+        print("  - %d fasta sequences" % (len(exorthofasta)))
         ortho_exontable = get_biomart_exons_annot(
             ortho_ens_dataset, orthoid, header=False)
-        print "  - %d lines in the exon table" % (
-            ortho_exontable.text.count("\n") + 1)
+        print("  - %d lines in the exon table" % (
+            ortho_exontable.text.count("\n") + 1))
         exonstableout.write(ortho_exontable.text)
         for dseq in exorthofasta:
             dictseq2fasta(dseq, ortho_name, fastaout)
