@@ -327,7 +327,7 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     return source_transcripts, ortho_transcripts
 
 
-if __name__ == '__main__':
+def main():
     # 1- Get gene name and species
     # 2- Match with ensembl gene ID
     # 3- Get the set of orthologous genes as ensembl geneID
@@ -472,3 +472,6 @@ if __name__ == '__main__':
             dictseq2fasta(dseq, ortho_name, fastaout)
     fastaout.close()
     exonstableout.close()
+
+if __name__ == '__main__':
+    main()
