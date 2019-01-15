@@ -473,5 +473,6 @@ def main():
     fastaout.close()
     exonstableout.close()
 
+
 if __name__ == '__main__':
     main()
