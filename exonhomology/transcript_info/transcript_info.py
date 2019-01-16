@@ -14,8 +14,8 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 
-import clusters
-import phases
+from . import clusters
+from . import phases
 
 
 def _check_column_presence(data_frame, column, message=""):
