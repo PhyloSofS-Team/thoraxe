@@ -529,6 +529,28 @@ def delete_incomplete_sequences(data_frame):
         inplace=True)
 
 
+def delete_badquality_sequences(data_frame):
+    "Delete protein sequences with X's in their sequence in place."
+
+    _check_column_presence(data_frame, 'Exon protein sequence',
+                           'You need to run add_protein_seq first.')
+
+    badquality_seqs = data_frame.loc[:, ['Transcript stable ID',
+                                          'Exon protein sequence']]. \
+        groupby('Transcript stable ID'). \
+        agg(lambda df: any('X' in str(s) for s in df))
+
+    badquality_transcripts = set(
+        badquality_seqs.index[badquality_seqs['Exon protein sequence']])
+
+    data_frame.drop(
+        [
+            i for i in data_frame.index if
+            data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
+        ],
+        inplace=True)
+
+
 def find_identical_sequences(data_frame):
     """
     This function tries to find different transcripts with identical sequences.
@@ -590,7 +612,8 @@ def read_transcript_info(tsl_table_file,
                          exon_table_file,
                          exon_sequence_file,
                          max_tsl_level=3.0,
-                         remove_na=True):
+                         remove_na=True,
+                         remove_badquality=True):
     """
     Read and integrate the transcript information.
 
@@ -619,6 +642,9 @@ def read_transcript_info(tsl_table_file,
 
     This protein sequence information is used by this function to delete
     incomplete and identical sequences and to merge identical exons.
+
+    If remove_badquality is True (default), protein sequences with X's are
+    deleted.
     """
     # 1. Read the Transcript Support Level (TSL) table as a pandas' DataFrame:
     tsl_table = read_tsl_file(tsl_table_file, max_tsl_level, remove_na)
@@ -636,6 +662,8 @@ def read_transcript_info(tsl_table_file,
     add_protein_seq(transcript_info)
     # Clean up:
     delete_incomplete_sequences(transcript_info)
+    if remove_badquality:
+        delete_badquality_sequences(transcript_info)
     # Ensure exon order and check the downloaded exon phase information:
     phases.check_order_and_phases(transcript_info)
     # NOTE: delete_incomplete_sequences deletes sequences with incomplete CDSs.
