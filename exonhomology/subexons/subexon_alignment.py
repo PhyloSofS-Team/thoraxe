@@ -47,8 +47,8 @@ def _create_subexon_index(subexon_table):
     unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
     unique_subexons['Order'] = [
-        row['Subexon genomic coding start']
-        if row['Strand'] == 1 else (-1 * row['Subexon genomic coding end'])
+        row['Subexon genomic coding start'] if row['Strand'] == 1 else
+        (-1 * row['Subexon genomic coding end'])
         for _, row in unique_subexons.iterrows()
     ]
 
@@ -76,8 +76,8 @@ def _create_transcript_index(subexon_table):
 
     unique_transcripts = unique_transcripts.loc[:, transcript_id_columns]
 
-    unique_transcripts['Transcript Index'] = list(range(0,
-                                                   unique_transcripts.shape[0]))
+    unique_transcripts['Transcript Index'] = list(
+        range(0, unique_transcripts.shape[0]))
     output = subexon_table.merge(unique_transcripts)
 
     return output
@@ -92,7 +92,7 @@ def create_subexon_matrix(subexon_table):
     # subexon_table with the last merge before return:
     subexon_table = _create_subexon_index(subexon_table)
     subexon_table = _create_transcript_index(subexon_table)
-    
+
     subexon_table = subexon_table.sort_values(
         by=['Transcript Index', 'Subexon Index'])
 
@@ -158,7 +158,7 @@ def create_chimeric_sequences(subexon_table,
         subexon_index = gene_df['Subexon Index'].unique()
         subexon_index.sort()
 
-        transcript_matrix = subexon_matrix[transcript_index,:]
+        transcript_matrix = subexon_matrix[transcript_index, :]
         transcript_matrix = transcript_matrix[:, subexon_index]
 
         subexon = subexon_index[0]
@@ -224,7 +224,9 @@ def sort_species(chimerics, transcript_info, species_order=sp_order):
         transcript_info.Species.values,
         index=transcript_info['Gene stable ID']).to_dict()
     return OrderedDict(
-        sorted(list(chimerics.items()), key=lambda x: species_order[gene2sp[x[0]]]))
+        sorted(
+            list(chimerics.items()),
+            key=lambda x: species_order[gene2sp[x[0]]]))
 
 
 def create_msa_matrix(chimerics, msa_file):  # pylint: disable=too-many-locals

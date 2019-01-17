@@ -23,29 +23,16 @@ setup(
         ],
     },
     install_requires=[
-        'numpy',
-        'pandas',
-        'matplotlib',
-        'seaborn',
-        'biopython',
-        'requests'
-        ],
+        'numpy', 'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests'
+    ],
     license="MIT license",
     include_package_data=True,
-    keywords=[
-        'homologous exons',
-        'protein isoforms',
-        'gene transcripts'
-        ],
+    keywords=['homologous exons', 'protein isoforms', 'gene transcripts'],
     name='exonhomology',
     packages=find_packages(include=['exonhomology']),
-    setup_requires=[
-        'pytest-runner'
-        ],
+    setup_requires=['pytest-runner'],
     test_suite='tests',
-    tests_require=[
-        'pytest'
-        ],
+    tests_require=['pytest'],
     url='https://github.com/PhyloSofS-Team/exonhomology',
     version='0.1.0',
     zip_safe=False,

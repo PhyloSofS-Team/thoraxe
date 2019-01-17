@@ -126,8 +126,8 @@ def _sort_subexons_coordinates(subexon_df):
     id_columns = ['Gene stable ID', 'Transcript stable ID']
     for _, transcript_df in subexon_df.groupby(id_columns):
         transcript_data_frames.append(
-            transcript_df.sort_values(by='Genomic coding start',
-                                      ascending=True))
+            transcript_df.sort_values(
+                by='Genomic coding start', ascending=True))
 
     return pd.concat(transcript_data_frames)
 
@@ -177,8 +177,8 @@ def _subexon_info(gene_df, exon_df, intervals):
     # cDNA coding start and end are only needed for _get_exon_cds
     column_names_to_delete = ['cDNA coding start', 'cDNA coding end']
 
-    subexon_df = pd.DataFrame(columns=list(column_names.keys()) +
-                              column_names_to_delete)
+    subexon_df = pd.DataFrame(
+        columns=list(column_names.keys()) + column_names_to_delete)
 
     for interval_number, interval in enumerate(intervals):
         for exon_id in interval.components:
@@ -191,7 +191,6 @@ def _subexon_info(gene_df, exon_df, intervals):
                 'Exon stable ID': exon_id,
                 'Genomic coding start': interval.start,
                 'Genomic coding end': interval.end,
-
                 'Cluster': exon_row['Cluster'],
 
                 # CDS sequence of the subexon:
@@ -255,7 +254,7 @@ def _add_phases(subexon_df,
     row_number = 0
     while row_number < n_rows:
         row_index = subexon_df.index[row_number]
-        row = subexon_df.loc[row_index,:]
+        row = subexon_df.loc[row_index, :]
 
         cdna_len = len(row[seq_column])
 
