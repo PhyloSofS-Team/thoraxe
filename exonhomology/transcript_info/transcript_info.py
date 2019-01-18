@@ -220,7 +220,7 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
     cdna_len = len(exon_cdna_seq)
     cds_len = cdna_coding_end - cdna_coding_start + 1
 
-    if cds_len == cdna_len:  # if there is not UTR region
+    if cds_len == cdna_len:  # if there isn't UTR percent_identity_cutoffregion
         return exon_cdna_seq
     else:
         if first_exon:
@@ -247,12 +247,10 @@ def _is_first_or_last_exon(data_frame, row_index):
     else:
         row = data_frame.iloc[row_index]
 
-        identical_to_previous = data_frame.iloc[
-            row_index -
-            1]['Transcript stable ID'] == row['Transcript stable ID']
-        identical_to_next = data_frame.iloc[
-            row_index +
-            1]['Transcript stable ID'] == row['Transcript stable ID']
+        identical_to_previous = data_frame.iloc[row_index - 1][
+            'Transcript stable ID'] == row['Transcript stable ID']
+        identical_to_next = data_frame.iloc[row_index + 1][
+            'Transcript stable ID'] == row['Transcript stable ID']
 
         if (not identical_to_previous) or (row['Start phase'] == -1):
             start_exon = True
@@ -299,8 +297,8 @@ def _manage_end_phase(data_frame, row_index, cds_seq, end_exon):
     If the last exon of the transcript as an incomplete codon at the end, it is
     deleted on the returned sequence.
 
-    NOTE: _check_phases_by_position should be used beipt_infore this function to
-    ensure that there are not errors in the input data.
+    NOTE: _check_phases_by_position should be used beipt_infore this function
+    to ensure that there are not errors in the input data.
     """
     end_phase = data_frame.iloc[row_index]['End phase']
     if end_phase in {1, 2}:
@@ -361,8 +359,8 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
     the output of add_exon_sequences when it is applied to the output
     of read_exon_file.
     """
-    _check_column_presence(data_frame, 'Exon sequence',
-                           'You need to run add_exon_sequences first.')
+    _check_column_presence(data_frame, 'Exon sequence', 'You need to run '
+                           'add_exonpercent_identity_cutoff_sequences first.')
     _check_column_absence(data_frame, 'Exon protein sequence',
                           'Values are going to change.')
     _check_column_absence(data_frame, 'Incomplete CDS',
@@ -382,13 +380,13 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
         if (row['Start phase'] == -1) and (row['End phase'] == -1):
             if row['Strand'] == -1:
                 i = row['Exon region end (bp)'] - row['Genomic coding end']
-                j = row['Exon region end (bp)'] - row[
-                    'Genomic coding start'] + 1
+                j = row['Exon region end (bp)'] - row['Genomic coding start']
+                j += 1
             else:
                 # TODO: TEST IT!
                 i = row['Genomic coding start'] - row['Exon region start (bp)']
-                j = row['Genomic coding end'] - row[
-                    'Exon region start (bp)'] + 1
+                j = row['Genomic coding end'] - row['Exon region start (bp)']
+                j += 1
 
             cds_seq = row['Exon sequence'][i:j]
 
@@ -527,11 +525,12 @@ def delete_incomplete_sequences(data_frame):
         incomplete_seqs.index[incomplete_seqs['Exon protein sequence']]).union(
             incomplete_cdss.index[incomplete_cdss['Incomplete CDS']])
 
-    data_frame.drop([
-        i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in incomplete_transcripts
-    ],
-                    inplace=True)
+    data_frame.drop(
+        [
+            i for i in data_frame.index if
+            data_frame.loc[i, 'Transcript stable ID'] in incomplete_transcripts
+        ],
+        inplace=True)
 
 
 def delete_badquality_sequences(data_frame):
@@ -548,11 +547,12 @@ def delete_badquality_sequences(data_frame):
     badquality_transcripts = set(
         badquality_seqs.index[badquality_seqs['Exon protein sequence']])
 
-    data_frame.drop([
-        i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
-    ],
-                    inplace=True)
+    data_frame.drop(
+        [
+            i for i in data_frame.index if
+            data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
+        ],
+        inplace=True)
 
 
 def find_identical_sequences(data_frame):
@@ -593,11 +593,12 @@ def delete_identical_sequences(data_frame):
 
     identical_sequences = find_identical_sequences(data_frame)
     to_delete = clusters.set_to_delete(identical_sequences)
-    data_frame.drop([
-        i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in to_delete
-    ],
-                    inplace=True)
+    data_frame.drop(
+        [
+            i for i in data_frame.index
+            if data_frame.loc[i, 'Transcript stable ID'] in to_delete
+        ],
+        inplace=True)
 
 
 def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):

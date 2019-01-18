@@ -56,9 +56,9 @@ def test_read_transcript_info(mapk8):
     trx_data = transcript_info.read_transcript_info(
         mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
 
-    assert trx_data.loc[trx_data['Transcript stable ID'] ==
-                        'ENST00000374179', 'Flags'].unique(
-                        )[0] == '1 (assigned to previous version 7)'
+    assert trx_data.loc[trx_data['Transcript stable ID'] == 'ENST00000374179',
+                        'Flags'].unique()[
+                            0] == '1 (assigned to previous version 7)'
 
     # Only h. sapiens & m. musculus have TSL information:
     assert all(trx_data.Species.unique() == ['homo_sapiens', 'mus_musculus'])
@@ -96,10 +96,10 @@ def test_non_coding_exons_camk2a(camk2a):
         str(exon)
         for exon in trx_data.loc[trx_data['Transcript stable ID'] ==
                                  'ENSSSCT00000052397', 'Exon protein sequence']
-    ) == 'MLLFLALWALVPCLVLLSLYFYSSAGGKSGGNKKNDGVKKRKSSSSVQLMESSESTNTTI'
-    'EDEDTKVRKQEIIKVTEQLIEAISNGDFESYTKMCDPGMTAFEPEALGNLVEGLDFHRFY'
-    'FENLWSRNSKPVHTTILNPHIHLMGDESACIAYIRITQYLDAGGIPRTAQSEETRVWHRR'
-    'DGKWQIVHFHRSGAPSVLPH*'
+    ) == ('MLLFLALWALVPCLVLLSLYFYSSAGGKSGGNKKNDGVKKRKSSSSVQLMESSESTNTTI'
+          'EDEDTKVRKQEIIKVTEQLIEAISNGDFESYTKMCDPGMTAFEPEALGNLVEGLDFHRFY'
+          'FENLWSRNSKPVHTTILNPHIHLMGDESACIAYIRITQYLDAGGIPRTAQSEETRVWHRR'
+          'DGKWQIVHFHRSGAPSVLPH*')
 
 
 def test_non_coding_exons_grin1(grin1):
@@ -111,20 +111,45 @@ def test_non_coding_exons_grin1(grin1):
     assert ''.join(
         str(exon)
         for exon in trx_data.loc[trx_data['Transcript stable ID'] ==
-                                 'ENSSSCT00000052397', 'Exon protein sequence']
-    ) == 'MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
-    'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
-    'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
-    'VSPGGDNAGSLRKVETISSGKMDPKTENVMHSRRERPGSTGEGDLVSLRENDMKPPDNTD'
-    'SASTKKTDPEFSGKLTPGSSGKTELVSSVTVAPVTSENVNPVCSGGAGPAAVGNSETLSS'
-    'VKKDPQLLGKKEAVSSGEGGSVSVRMAETVSARQPEGMFPAKTDSTSSNSTGPSGRADPV'
-    'SLRNSELVSPVKPERLSSGQAERVSLVKTETLSSGKEDPRSSRRVDHTTVTGNMQTSQKG'
-    'NPESSGKTDLGSSSSGDTRSLGTWGSLSAAKAEVTEGKGDPQPWKKASLPASEKTDPLAS'
-    'SKAGSASQGKAETVSPGEVDAMTLGKTVPTSSGKTALVSPGKVDLMTSERAEGIPELQAS'
-    'EKGNPVNSTRVDTGATGSTEPKSGVKVITQIPGATSPGKVETPSLQKEQPQLSEKTDPSR'
-    'KVDPPTTVEPVSLGKADSASPSPRKAESQTSAKTVPQAPDKATSSLRQSDGTPYSSAQPQ'
-    'RDTRSIGSLPEREPSASTSQKDLAAAAAQKSPSAEAAAPPPGPRTRDNFTKAPSWDAGAP'
-    'PPREDAGTQAGAQACVSVAVSPMSPQDGAGGPAFSFQAAPRAPSPAPRPPSRRDAGLQVS'
-    'LGAAETRSVATGPMTPQAAAPPAVPPVFPEVRVRPGSVLAAALAPQEATEPVRDVSWDEK'
-    'GMTWEVYGASMEVEVLGMAIQKHLERQIEEHGRQGAPAPAPPPAVRAGPGRAGSVRTAPA'
-    'EGAAKRPPGLFRALLQSVRRPRCCSRAGPTAE*'
+                                 'ENSMUST00000099506', 'Exon protein sequence']
+    ) == ('MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
+          'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
+          'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
+          'VSPGGDNAGSLRKVETISSGKMDPKTENVMHSRRERPGSTGEGDLVSLRENDMKPPDNTD'
+          'SASTKKTDPEFSGKLTPGSSGKTELVSSVTVAPVTSENVNPVCSGGAGPAAVGNSETLSS'
+          'VKKDPQLLGKKEAVSSGEGGSVSVRMAETVSARQPEGMFPAKTDSTSSNSTGPSGRADPV'
+          'SLRNSELVSPVKPERLSSGQAERVSLVKTETLSSGKEDPRSSRRVDHTTVTGNMQTSQKG'
+          'NPESSGKTDLGSSSSGDTRSLGTWGSLSAAKAEVTEGKGDPQPWKKASLPASEKTDPLAS'
+          'SKAGSASQGKAETVSPGEVDAMTLGKTVPTSSGKTALVSPGKVDLMTSERAEGIPELQAS'
+          'EKGNPVNSTRVDTGATGSTEPKSGVKVITQIPGATSPGKVETPSLQKEQPQLSEKTDPSR'
+          'KVDPPTTVEPVSLGKADSASPSPRKAESQTSAKTVPQAPDKATSSLRQSDGTPYSSAQPQ'
+          'RDTRSIGSLPEREPSASTSQKDLAAAAAQKSPSAEAAAPPPGPRTRDNFTKAPSWDAGAP'
+          'PPREDAGTQAGAQACVSVAVSPMSPQDGAGGPAFSFQAAPRAPSPAPRPPSRRDAGLQVS'
+          'LGAAETRSVATGPMTPQAAAPPAVPPVFPEVRVRPGSVLAAALAPQEATEPVRDVSWDEK'
+          'GMTWEVYGASMEVEVLGMAIQKHLERQIEEHGRQGAPAPAPPPAVRAGPGRAGSVRTAPA'
+          'EGAAKRPPGLFRALLQSVRRPRCCSRAGPTAE*')
+
+
+def test_exon_clustering(mapk8):
+    trx_data = transcript_info.read_transcript_info(
+        mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
+
+    clustered = transcript_info.exon_clustering(trx_data)
+
+    # Input order doesn't change
+    assert all(clustered['Exon stable ID'] == trx_data['Exon stable ID'])
+
+    # Exon can not have more than one cluster
+    assert all(
+        clustered.groupby('Exon stable ID').apply(
+            lambda df: len(df['Cluster'].unique()) == 1))
+
+    # Non-clustered exons have Cluster == 0 and QueryExon == ''
+    assert all(row.QueryExon == '' for row in clustered.itertuples()
+               if row.Cluster == 0)
+    assert all(row.Cluster == 0 for row in clustered.itertuples()
+               if row.QueryExon == '')
+
+    # Sequences with less than 4 residues are non-clustered by default
+    assert all(clustered.loc[clustered['Exon protein sequence'].map(len) < 4,
+                             'Cluster'] == 0)

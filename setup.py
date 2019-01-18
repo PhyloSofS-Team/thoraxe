@@ -23,7 +23,8 @@ setup(
         ],
     },
     install_requires=[
-        'numpy', 'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests'
+        'numpy', 'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests',
+        'scikit-bio'
     ],
     license="MIT license",
     include_package_data=True,
