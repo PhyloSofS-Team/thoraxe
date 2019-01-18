@@ -220,7 +220,7 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
     cdna_len = len(exon_cdna_seq)
     cds_len = cdna_coding_end - cdna_coding_start + 1
 
-    if cds_len == cdna_len:  # if there isn't UTR percent_identity_cutoffregion
+    if cds_len == cdna_len:  # if there isn't UTR region
         return exon_cdna_seq
     else:
         if first_exon:
