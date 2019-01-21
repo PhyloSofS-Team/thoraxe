@@ -1,26 +1,27 @@
-build: false
-
-# https://pythonhosted.org/CodeChat/appveyor.yml.html
+# https://github.com/coala/coala-quickstart/blob/master/.ci/appveyor.yml
 environment:
+  global:
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\.ci\\run_with_env.cmd"
+    PIP_CACHE_DIR: C:\pip_cache
+
   matrix:
-    - PYTHON: "C:\\Python37"
-      PYTHON_VERSION: 3.7
-      PYTHON_ARCH: 32
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "32"
 
-    - PYTHON: "C:\\Python37"
-      PYTHON_VERSION: 3.7
-      PYTHON_ARCH: 64
-
-init:
-  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
 
 install:
-  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - python --version
-  - python -m easy_install -U setuptools
-  - python -m pip install -U pip
-  - python -m pip install numpy
-  - python -m pip install -e .
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "%CMD_IN_ENV% python -m pip install --upgrade setuptools pip"
+  - "%CMD_IN_ENV% python -m pip install numpy" # for scikit-bio
+  - "%CMD_IN_ENV% python -m pip install -e ."
+
+build: false
 
 test_script:
-  - python setup.py test
+  - "%CMD_IN_ENV% python setup.py test"
