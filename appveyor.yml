@@ -1,14 +1,22 @@
-build: false
-
+# https://pythonhosted.org/CodeChat/appveyor.yml.html
 environment:
   matrix:
-    - PYTHON_VERSION: 3.7
-      MINICONDA: C:\Miniconda
+    - PYTHON: "C:\\Python37"
+      PYTHON_VERSION: 3.7
+      PYTHON_ARCH: 32
+
+    - PYTHON: "C:\\Python37"
+      PYTHON_VERSION: 3.7
+      PYTHON_ARCH: 64
 
 init:
-  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
 
 install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - python -m easy_install -U setuptools
+  - python -m pip install -U pip
   - python -m pip install numpy
   - python -m pip install -e .
 
