@@ -1,0 +1,15 @@
+build: false
+
+environment:
+  matrix:
+    - PYTHON_VERSION: 3.7
+      MINICONDA: C:\Miniconda
+
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+
+install:
+  - pip install -e .
+
+test_script:
+  - python setup.py test

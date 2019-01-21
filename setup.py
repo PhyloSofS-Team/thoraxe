@@ -33,7 +33,7 @@ setup(
     packages=find_packages(include=['exonhomology']),
     setup_requires=['pytest-runner'],
     test_suite='tests',
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-cov', 'coveralls', 'codecov'],
     url='https://github.com/PhyloSofS-Team/exonhomology',
     version='0.1.0',
     zip_safe=False,
