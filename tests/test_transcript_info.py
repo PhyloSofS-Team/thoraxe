@@ -5,9 +5,7 @@ from exonhomology import transcript_info
 
 @pytest.fixture(scope='module')
 def datadir(request):
-    filename = request.module.__file__
-    test_dir = os.path.dirname(filename)
-    return os.path.join(test_dir, 'data')
+    return os.path.join('tests', 'data')
 
 
 @pytest.fixture(scope='module')

@@ -9,6 +9,7 @@ init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
 
 install:
+  - python -m pip install numpy
   - python -m pip install -e .
 
 test_script:

@@ -10,8 +10,6 @@ install:
   - python -m pip install -e .
 
 script:
-  - pwd
-  - tree
   - python setup.py test
 
 after_success:
