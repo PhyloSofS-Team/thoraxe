@@ -9,7 +9,7 @@ init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
 
 install:
-  - pip install -e .
+  - python -m pip install -e .
 
 test_script:
   - python setup.py test
