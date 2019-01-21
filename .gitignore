@@ -1,6 +1,5 @@
-# Test folder
-MAPK8*
-!tests/data/MAPK8_ENSG00000107643
+# transcript_query folder in repo's root
+/MAPK8*/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,3 +1,5 @@
+build: false
+
 # https://pythonhosted.org/CodeChat/appveyor.yml.html
 environment:
   matrix:
