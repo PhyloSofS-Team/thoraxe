@@ -1,9 +1,7 @@
 """
 read_transcript_info: Module for the first step of match_homologous_exons.
-==========================================================================
 
 This module uses pandas to read transcript information.
-
 """
 
 import warnings
@@ -19,18 +17,14 @@ from . import phases
 
 
 def _check_column_presence(data_frame, column, message=""):
-    """
-    Raise an error if column is not in data_frame.
-    """
+    """Raise an error if column is not in data_frame."""
     if column not in data_frame.columns:
         raise ValueError(
             "Input DataFrame hasn't column: %s. %s" % (column, message))
 
 
 def _check_column_absence(data_frame, column, message=""):
-    """
-    Give a warning if the column is already present in the data_frame.
-    """
+    """Give a warning if the column is already present in the data_frame."""
     if column in data_frame.columns:
         warnings.warn(
             "Input DataFrame already has column: %s. %s" % (column, message))
@@ -38,6 +32,8 @@ def _check_column_absence(data_frame, column, message=""):
 
 def _get_flag(flag):
     """
+    Get TSL flag as float.
+
     It takes a Transcript Support Level (TSL) `flag`/value and returns it as
     a float if the input is a str.
 
@@ -56,7 +52,7 @@ def _get_flag(flag):
 
 def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
     """
-    It reads a csv file with the Transcript Support Level (TSL) data.
+    Read a csv file with the Transcript Support Level (TSL) data.
 
     maximum_tsl_level determines the maximum Transcript Support Level (TSL)
     level to keep. The options are:
@@ -116,9 +112,7 @@ def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
 
 
 def read_exon_file(exon_table_file):
-    """
-    This function reads the exon_table_file and returns a pandas' DataFrame.
-    """
+    """Read the exon_table_file and returns a pandas' DataFrame."""
     # Read data :
     # -----------
     int_cols_with_nas = [
@@ -164,7 +158,6 @@ def add_exon_sequences(data_frame, sequence_file):
     an 'Exon sequence' column.
     'Exon stable ID' is going to be used to match the SeqRecord to the row.
     """
-
     _check_column_presence(data_frame, 'Exon stable ID')
     _check_column_absence(data_frame, 'Exon sequence',
                           'Values are going to change.')
@@ -234,7 +227,6 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
 
 def _is_first_or_last_exon(data_frame, row_index):
     """Determine if it is the first or the last coding exon."""
-
     start_exon = False
     end_exon = False
 
@@ -247,10 +239,12 @@ def _is_first_or_last_exon(data_frame, row_index):
     else:
         row = data_frame.iloc[row_index]
 
-        identical_to_previous = data_frame.iloc[row_index - 1][
-            'Transcript stable ID'] == row['Transcript stable ID']
-        identical_to_next = data_frame.iloc[row_index + 1][
-            'Transcript stable ID'] == row['Transcript stable ID']
+        identical_to_previous = data_frame.iloc[
+            row_index -
+            1]['Transcript stable ID'] == row['Transcript stable ID']
+        identical_to_next = data_frame.iloc[
+            row_index +
+            1]['Transcript stable ID'] == row['Transcript stable ID']
 
         if (not identical_to_previous) or (row['Start phase'] == -1):
             start_exon = True
@@ -359,8 +353,9 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
     the output of add_exon_sequences when it is applied to the output
     of read_exon_file.
     """
-    _check_column_presence(data_frame, 'Exon sequence', 'You need to run '
-                           'add_exonpercent_identity_cutoff_sequences first.')
+    _check_column_presence(
+        data_frame, 'Exon sequence', 'You need to run '
+        'add_exonpercent_identity_cutoff_sequences first.')
     _check_column_absence(data_frame, 'Exon protein sequence',
                           'Values are going to change.')
     _check_column_absence(data_frame, 'Incomplete CDS',
@@ -451,7 +446,6 @@ def _different_coordinates(row_i, row_j):
 
 def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     """Check if the sequences in rows i (rowi) and j (rowj) are identical."""
-
     if _different_phases(rowi, rowj):
         return False
 
@@ -525,17 +519,15 @@ def delete_incomplete_sequences(data_frame):
         incomplete_seqs.index[incomplete_seqs['Exon protein sequence']]).union(
             incomplete_cdss.index[incomplete_cdss['Incomplete CDS']])
 
-    data_frame.drop(
-        [
-            i for i in data_frame.index if
-            data_frame.loc[i, 'Transcript stable ID'] in incomplete_transcripts
-        ],
-        inplace=True)
+    data_frame.drop([
+        i for i in data_frame.index
+        if data_frame.loc[i, 'Transcript stable ID'] in incomplete_transcripts
+    ],
+                    inplace=True)
 
 
 def delete_badquality_sequences(data_frame):
-    "Delete protein sequences with X's in their sequence in place."
-
+    """Delete protein sequences with X's in their sequence in place."""
     _check_column_presence(data_frame, 'Exon protein sequence',
                            'You need to run add_protein_seq first.')
 
@@ -547,17 +539,16 @@ def delete_badquality_sequences(data_frame):
     badquality_transcripts = set(
         badquality_seqs.index[badquality_seqs['Exon protein sequence']])
 
-    data_frame.drop(
-        [
-            i for i in data_frame.index if
-            data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
-        ],
-        inplace=True)
+    data_frame.drop([
+        i for i in data_frame.index
+        if data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
+    ],
+                    inplace=True)
 
 
 def find_identical_sequences(data_frame):
     """
-    This function tries to find different transcripts with identical sequences.
+    Find different transcripts with identical sequences.
 
     Input should have the exon sequences as the output of add_exon_sequences.
     It returns a list with the identical sequence clusters (sets).
@@ -586,19 +577,80 @@ def find_identical_sequences(data_frame):
     return seq_clusters
 
 
+def store_cluster(data_frame,
+                  cluster_list,
+                  default_values,
+                  column_name,
+                  item2str=str,
+                  get_item=lambda row, default_idx: row[default_idx],
+                  delim='/'):
+    """
+    Store the string representation of clusters in the data_frame.
+
+    Arguments:
+        data_frame     -- DataFrame that's going to store the cluster column.
+        cluster_list   -- List of sets.
+        default_values -- Name of existing DataFrame column that containts
+                          the default (string) values for the new column.
+        column_name    -- Name of the new column to add with the cluster
+                          information.
+        item2str       -- Function to map from cluster item to its
+                          representation in the DataFrame (default: str)
+        getitem        -- Function to get the cluster item from the DataFrame
+                          row and the index of the default_values column
+                          (default: default value).
+        delim          -- Character delimiting cluster items (default: '/').
+
+
+    >>> cluster_list = [{2, 3}]
+    >>> df = pd.DataFrame(data={'id': [1, 2, 3, 4], 'value': [1, 2, 2, 3]})
+    >>> store_cluster(df, cluster_list, 'id', 'cluster')
+    >>> df
+       id  value cluster
+    0   1      1       1
+    1   2      2     2/3
+    2   3      2     2/3
+    3   4      3       4
+    """
+    _check_column_absence(data_frame, column_name)
+    _check_column_presence(data_frame, default_values)
+
+    cluster_column = []
+    default_idx = data_frame.columns.get_loc(default_values) + 1
+    # + 1 : the first element of the (row) tuple is the index
+    for row in data_frame.itertuples():
+        assigned = False
+        for cluster in cluster_list:
+            if get_item(row, default_idx) in cluster:
+                cluster_column.append(
+                    clusters.cluster2str(
+                        cluster, delim=delim, item2str=item2str))
+                assigned = True
+                break
+
+        if not assigned:
+            cluster_column.append(row[default_idx])
+
+    return data_frame.insert(2, column_name, cluster_column)
+
+
 def delete_identical_sequences(data_frame):
     """Delete identical sequences in place keeping only one."""
     _check_column_presence(data_frame, 'Exon protein sequence',
                            'You need to run add_protein_seq first.')
 
     identical_sequences = find_identical_sequences(data_frame)
+    store_cluster(data_frame, identical_sequences, 'Transcript stable ID',
+                  'Transcript stable ID cluster')
     to_delete = clusters.set_to_delete(identical_sequences)
-    data_frame.drop(
-        [
-            i for i in data_frame.index
-            if data_frame.loc[i, 'Transcript stable ID'] in to_delete
-        ],
-        inplace=True)
+    clusters.inform_about_deletions(
+        to_delete,
+        "Identical isoform sequences were found, keeping only one transcript:")
+    data_frame.drop([
+        i for i in data_frame.index
+        if data_frame.loc[i, 'Transcript stable ID'] in to_delete
+    ],
+                    inplace=True)
 
 
 def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):
@@ -607,6 +659,8 @@ def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):
                            'You need to run add_protein_seq first.')
 
     identical_exons = find_identical_exons(data_frame, exon_id_column)
+    store_cluster(data_frame, identical_exons, exon_id_column,
+                  exon_id_column + ' cluster')
     old2new = dict((exon_id, list(group)[0]) for group in identical_exons
                    for exon_id in list(group)[1:])
     data_frame.replace(to_replace={exon_id_column: old2new}, inplace=True)

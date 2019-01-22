@@ -1,10 +1,9 @@
 """
 clusters: Helper module for work with sets as clusters.
-=======================================================
 
 A cluster is a set of elements and we can have list of clusters.
 """
-
+import logging
 
 def fill_clusters(clusters, element_i, element_j):
     """
@@ -12,11 +11,11 @@ def fill_clusters(clusters, element_i, element_j):
 
     >>> clusters = []
     >>> fill_clusters(clusters, 1, 10)
-    [set([1, 10])]
+    [{1, 10}]
     >>> fill_clusters(clusters, 10, 100)
-    [set([1, 10, 100])]
+    [{1, 10, 100}]
     >>> fill_clusters(clusters, 20, 30)
-    [set([1, 10, 100]), set([20, 30])]
+    [{1, 10, 100}, {20, 30}]
     """
     if not clusters:  # i.e. len(clusters) == 0
         clusters.append({element_i, element_j})
@@ -36,10 +35,42 @@ def fill_clusters(clusters, element_i, element_j):
 
 def set_to_delete(set_list):
     """
-    It returns the set to delete given a list of sets.
+    Return the set to delete given a list of sets.
+
     It keeps the first element of the set.
 
-    >>> set_to_delete([set([1, 2, 3]), set([4, 5])]) # it keeps 1 and 4
-    set([2, 3, 5])
+    >>> set_to_delete([{1, 2, 3}, {4, 5}]) # it keeps 1 and 4
+    {2, 3, 5}
     """
     return {element for group in set_list for element in list(group)[1:]}
+
+
+def inform_about_deletions(set_to_delete, message):
+    """
+    Warning about elements that are going to be deleted.
+
+    >>> inform_about_deletions({1, 2, 3}, "Identical sequences were found:")
+    WARNING:root:Identical sequences were found:
+    WARNING:root:deleting 1
+    WARNING:root:deleting 2
+    WARNING:root:deleting 3
+    """
+    if len(set_to_delete) >= 1:
+        logging.warning(message)
+        for element in set_to_delete:
+            logging.warning('deleting %s' % (element,))
+
+
+def cluster2str(cluster, delim='/', item2str=str):
+    """
+    Take a cluster (set) and return a string representation.
+
+    >>> cluster2str({1, 10, 100})
+    '1/10/100'
+    >>> cluster2str({1, 10, 100}, delim=';')
+    '1;10;100'
+    >>> names = {1 : 'a', 10 : 'b'}
+    >>> cluster2str({1, 10, 100}, item2str=lambda x: names.get(x, str(x)))
+    'a/b/100'
+    """
+    return delim.join(item2str(element) for element in cluster)

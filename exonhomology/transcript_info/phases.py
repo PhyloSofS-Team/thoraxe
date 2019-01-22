@@ -1,7 +1,5 @@
 """
 phases: Calculate exon phases and chack exon order and phases.
-==============================================================
-
 
 This is the code for calculating exon start and end phases that we used before
 downloading that data from ENSEMBL. The code was changed to be use as a checker
@@ -131,7 +129,7 @@ def end_phase_previous_exon(data_frame,
 
 def _equal_phases(downloaded_phase, calculated_phase):
     """
-    Compares calculated and downloaded phases.
+    Compare calculated and downloaded phases.
 
     If the downloaded_phase is -1, this function returns True, otherwise,
     the phases are compared and True is returned if they are equal.
@@ -152,12 +150,11 @@ def _equal_phases(downloaded_phase, calculated_phase):
 
 def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
     """
-    This function check the calculated phases against the downloaded ones.
+    Check the calculated phases against the downloaded ones.
 
     It takes into account that -1 phases cannot be calculated, and therefore
     they are not compared (thanks to _equal_phases).
     """
-
     previous_end_phase = end_phase_previous_exon(data_frame, exon_pos,
                                                  prev_row_index)
 
@@ -222,7 +219,7 @@ def check_order_and_phases(data_frame):
     finished_transcripts = set()
 
     assert data_frame.loc[data_frame.index[0], 'Start phase'] in {-1, 0},\
-        'First exon has start phase of 1 or 2, row: %s' % data_frame.iloc[0,:]
+        'First exon has start phase of 1 or 2, row: %s' % data_frame.iloc[0, :]
 
     n_rows = data_frame.shape[0]
     row_number = 1  # to skip the first row

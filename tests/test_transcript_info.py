@@ -56,9 +56,9 @@ def test_read_transcript_info(mapk8):
     trx_data = transcript_info.read_transcript_info(
         mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
 
-    assert trx_data.loc[trx_data['Transcript stable ID'] == 'ENST00000374179',
-                        'Flags'].unique()[
-                            0] == '1 (assigned to previous version 7)'
+    assert trx_data.loc[trx_data['Transcript stable ID'] ==
+                        'ENST00000374179', 'Flags'].unique(
+                        )[0] == '1 (assigned to previous version 7)'
 
     # Only h. sapiens & m. musculus have TSL information:
     assert all(trx_data.Species.unique() == ['homo_sapiens', 'mus_musculus'])
@@ -109,9 +109,10 @@ def test_non_coding_exons_grin1(grin1):
     # The last two exons of ENSMUST00000099506 are non-coding.
     # The unique coding exon has UTR at both ends.
     assert ''.join(
-        str(exon)
-        for exon in trx_data.loc[trx_data['Transcript stable ID'] ==
-                                 'ENSMUST00000099506', 'Exon protein sequence']
+        str(exon) for exon in trx_data.
+        loc[trx_data['Transcript stable ID cluster'].
+            map(lambda ids: 'ENSMUST00000099506' in ids.split('/')
+                ), 'Exon protein sequence']
     ) == ('MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
           'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
           'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
@@ -151,5 +152,6 @@ def test_exon_clustering(mapk8):
                if row.QueryExon == '')
 
     # Sequences with less than 4 residues are non-clustered by default
-    assert all(clustered.loc[clustered['Exon protein sequence'].map(len) < 4,
-                             'Cluster'] == 0)
+    assert all(
+        clustered.
+        loc[clustered['Exon protein sequence'].map(len) < 4, 'Cluster'] == 0)
