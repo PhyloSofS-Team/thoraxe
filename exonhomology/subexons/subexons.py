@@ -1,17 +1,16 @@
 """
 subexons: Module to identify and cut subexons.
-==============================================
 
 This defines functions that take as input the DataFrame output from
-read_transcript_info.read_transcript_info.
+transcript_info.read_transcript_info.
 """
 
 import collections
 
 import pandas as pd
 
-import phases
-import read_transcript_info
+from exonhomology import transcript_info
+from exonhomology.transcript_info import phases
 
 # A basic interval type, containing start and end coordinates
 # and the set of components that are included on it.
@@ -19,7 +18,7 @@ Interval = collections.namedtuple('Interval', ['start', 'end', 'components'])
 
 
 def _check_disjoint_intervals_inputs(starts, ends, ids):
-    """Function to check the inputs of disjoint_intervals."""
+    """Check the inputs of disjoint_intervals."""
     assert len(starts) == len(ends) == len(ids), 'starts, ends and ids '\
         'should have the same length.'
     assert all(starts[i] <= starts[i + 1] for i in range(len(starts) - 1)),\
@@ -27,7 +26,7 @@ def _check_disjoint_intervals_inputs(starts, ends, ids):
 
 
 def disjoint_intervals(starts, ends, ids):
-    """
+    r"""
     Return list of disjoint intervals.
 
     Produce the set of disjoint intervals from a list of start and end
@@ -38,17 +37,17 @@ def disjoint_intervals(starts, ends, ids):
 
     >>> DisjointIntervals([1,10,20,40], [9,30,30,50], [0,1,2,3])
     [Interval(start=1, end=9, component=set([0])), \
-Interval(start=10, end=19, component=set([1])), \
-Interval(start=20, end=30, component=set([1, 2])), \
-Interval(start=31, end=39, component=set([])), \
-Interval(start=40, end=50, component=set([3]))]
+    Interval(start=10, end=19, component=set([1])), \
+    Interval(start=20, end=30, component=set([1, 2])), \
+    Interval(start=31, end=39, component=set([])), \
+    Interval(start=40, end=50, component=set([3]))]
     >>> DisjointIntervals([1,1], [9,7], [0,1])
     [Interval(start=1, end=7, component=set([0, 1])), \
-Interval(start=8, end=9, component=set([0]))]
+    Interval(start=8, end=9, component=set([0]))]
     >>> DisjointIntervals([1,3], [7,9], [0,1])
     [Interval(start=1, end=2, component=set([0])), \
-Interval(start=3, end=7, component=set([0, 1])), \
-Interval(start=8, end=9, component=set([1]))]
+    Interval(start=3, end=7, component=set([0, 1])), \
+    Interval(start=8, end=9, component=set([1]))]
     >>> DisjointIntervals([3,1], [9,7], [0,1])
     Traceback (most recent call last):
         ...
@@ -154,10 +153,10 @@ def _add_subexon_rank(subexon_df):
 
 def _subexon_info(gene_df, exon_df, intervals):
     """Return a pandas' DataFrame for subexons."""
-    # We are going to use read_transcript_info functions to transcribe and
+    # We are going to use transcript_info functions to transcribe and
     # merge subexons. Therefore, we are going to use the exon table column
     # names (column_names keys) at the beginning, and then we are going to
-    # change this column names by thecolumn_names values before returning
+    # change this column names by the column_names values before returning
     # subexon_df, columns with '' as name won't be in the output :
     column_names = {
         'Subexon ID': 'Subexon ID',
@@ -170,8 +169,10 @@ def _subexon_info(gene_df, exon_df, intervals):
         'Transcript stable ID': 'Transcript stable ID',
         'Strand': 'Strand',
         'Exon rank in transcript': 'Exon rank in transcript',
+        'Transcript stable ID cluster': 'Transcript stable ID cluster',
         # 'Exon stable ID' is kept to merge the exon and subexon tables later
         'Exon stable ID': 'Exon stable ID',
+        'Exon stable ID cluster': 'Exon stable ID cluster',
         'Cluster': 'Cluster'
     }
     # cDNA coding start and end are only needed for _get_exon_cds
@@ -184,9 +185,8 @@ def _subexon_info(gene_df, exon_df, intervals):
         for exon_id in interval.components:
             exon_row = exon_df.loc[exon_id]
             seq = _get_subexon_seq(exon_row, interval)
-            subexon_number = subexon_df.shape[0] + 1  # n_rows + 1
             subexon_info = {
-                'Subexon ID': subexon_number,
+                'Subexon ID': exon_id + '_SE_' + str(interval_number),
                 'Interval number': interval_number,
                 'Exon stable ID': exon_id,
                 'Genomic coding start': interval.start,
@@ -205,9 +205,16 @@ def _subexon_info(gene_df, exon_df, intervals):
             for _, exon_row in gene_df[gene_df['Exon stable ID'] ==
                                        exon_id].iterrows():
                 transcript_row_info = {
-                    'Gene stable ID': exon_row['Gene stable ID'],
-                    'Transcript stable ID': exon_row['Transcript stable ID'],
-                    'Strand': exon_row['Strand'],
+                    'Gene stable ID':
+                    exon_row['Gene stable ID'],
+                    'Transcript stable ID':
+                    exon_row['Transcript stable ID'],
+                    'Transcript stable ID cluster':
+                    exon_row['Transcript stable ID cluster'],
+                    'Exon stable ID cluster':
+                    exon_row['Exon stable ID cluster'],
+                    'Strand':
+                    exon_row['Strand'],
                     'Exon rank in transcript':
                     exon_row['Exon rank in transcript']
                 }
@@ -225,9 +232,9 @@ def _subexon_info(gene_df, exon_df, intervals):
         rank_column='Subexon rank in transcript',
         seq_column='Exon sequence')
 
-    read_transcript_info.add_protein_seq(subexon_df)
+    transcript_info.add_protein_seq(subexon_df)
 
-    read_transcript_info.merge_identical_exons(
+    transcript_info.merge_identical_exons(
         subexon_df, exon_id_column='Subexon ID')
 
     subexon_df.drop(columns=column_names_to_delete, inplace=True)
@@ -276,7 +283,7 @@ def _add_phases(subexon_df,
 
 def _add_transcript_fraction(subexon_df):
     """
-    It adds the fraction of the transcripts in which the subexon is present.
+    Add the fraction of the transcripts in which the subexon is present.
 
     1.0 for constitutive exons, < 1.0 for alternative exons
     """
@@ -323,7 +330,6 @@ def create_subexon_table(transcript_info):
         intervals = sorted(intervals, key=lambda interval: interval.start)
 
         subexon_df = _subexon_info(gene_df, exon_df, intervals)
-
         subexon_data_frames.append(subexon_df)
 
     subexon_table = pd.concat(subexon_data_frames)

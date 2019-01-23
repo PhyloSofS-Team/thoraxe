@@ -5,6 +5,7 @@ A cluster is a set of elements and we can have list of clusters.
 """
 import logging
 
+
 def fill_clusters(clusters, element_i, element_j):
     """
     Fill the list of clusters (sets) with two elements from the same cluster.
@@ -73,4 +74,4 @@ def cluster2str(cluster, delim='/', item2str=str):
     >>> cluster2str({1, 10, 100}, item2str=lambda x: names.get(x, str(x)))
     'a/b/100'
     """
-    return delim.join(item2str(element) for element in cluster)
+    return delim.join(item2str(element) for element in sorted(cluster))
