@@ -33,3 +33,5 @@ def test_subexon_table(clustered_trx_data):
     assert 'ENSMUST00000099506/ENSMUST00000135343' in subexon_table[
         'Transcript stable ID cluster'].values  # .values, otherwise in
     # checks whether the value is in the Series' index.
+
+    assert all(subexon_table['Transcript fraction'] == 1.0)
