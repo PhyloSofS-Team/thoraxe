@@ -308,6 +308,181 @@ def _add_transcript_fraction(subexon_df):
         subexon_df, counts, how='inner', on=['Gene stable ID', 'Subexon ID'])
 
 
+def _find_exon(subexon_table, subexon_id_cluster):
+    """Return a list with the 'Exon stable ID's of a particular subexon."""
+    return subexon_table.loc[subexon_table['Subexon ID cluster'] ==
+                             subexon_id_cluster, 'Exon stable ID'].unique(
+                             ).tolist()
+
+
+def _update_to_merge_list(to_merge, subexon_1, subexon_2):
+    """
+    Add subexon_1 and subexon_2 to the to_merge list.
+
+    >>> _update_to_merge_list([], 1, 2)
+    [{1, 2}]
+    >>> _update_to_merge_list([{1, 2}], 2, 3)
+    [{1, 2, 3}]
+    >>> _update_to_merge_list([{1, 2}], 8, 9)
+    [{1, 2}, {8, 9}]
+    """
+    group = {subexon_1, subexon_2}
+
+    for existing_group in to_merge:
+        if len(existing_group.intersection(group)) > 0:
+            existing_group.update(group)
+            return to_merge
+
+    to_merge.append(group)
+    return to_merge
+
+
+def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
+    """
+    Take the exon information to find subexons to merge.
+
+    The subexons to merge are appended to subexons_to_merge and deleted from
+    the subexons list. This function returns 0 if there are exons to merge,
+    otherwise it returns 1.
+    """
+    exon_table.sort_values(
+        by='Subexon rank in transcript', inplace=True, ascending=True)
+    nrows = exon_table.shape[0]
+    to_merge = []
+    for row_index in range(1, nrows):
+        previous_row = exon_table.iloc[row_index - 1, :]
+        actual_row = exon_table.iloc[row_index, :]
+        if (previous_row['Subexon ID cluster'] in subexons) and (
+                actual_row['Subexon ID cluster'] in subexons) and (
+                    previous_row['Transcript fraction'] ==
+                    actual_row['Transcript fraction']):
+            to_merge = _update_to_merge_list(
+                to_merge, previous_row['Subexon ID cluster'],
+                actual_row['Subexon ID cluster'])
+    if len(to_merge) > 0:
+        for group in to_merge:
+            for subexon in group:
+                subexons.remove(subexon)
+        subexons_to_merge.append(to_merge)
+        return 0
+    else:
+        return 1
+
+
+def _find_subexons_to_merge(subexon_table, delim='/'):
+    """Find non redundant and contiguous subexons."""
+    subexons_to_merge = []
+    subexons = [
+        subexon for subexon in subexon_table['Subexon ID cluster'].unique()
+        if delim not in subexon  # non-redundant subexons
+    ]
+    subexon_index = 0
+    while subexon_index < len(subexons):
+        subexon = subexons[subexon_index]
+        exons = _find_exon(subexon_table, subexon)
+        if len(exons) == 1:
+            exon = exons[0]
+            exon_table = subexon_table[subexon_table['Exon stable ID'] == exon]
+            exon_table = exon_table.drop_duplicates(
+                'Subexon ID cluster')  # keep the first transcript
+            if exon_table.shape[0] > 1:
+                subexon_index += _fill_subexons_to_merge(
+                    subexons_to_merge, subexons, exon_table)
+                continue
+        else:
+            raise Exception(
+                'Non-redundant subexon is present in more than one exon.')
+        subexon_index += 1
+    return subexons_to_merge
+
+
+def _fill_with_new_subexon_data(old2new, rowi, rowj):
+    """Fill a dict from old subexon ID to a dict with the new values."""
+    if rowi['Strand'] == 1:
+        doit = (rowj['Subexon genomic coding start'] -
+                rowi['Subexon genomic coding end'] == 1)
+    else:
+        doit = (rowi['Subexon genomic coding start'] -
+                rowj['Subexon genomic coding end'] == 1)
+
+    if doit:
+        keys = [
+            'Subexon ID', 'Subexon ID cluster', 'Subexon genomic coding start',
+            'Subexon genomic coding end', 'Start phase', 'End phase',
+            'Subexon sequence', 'Exon protein sequence', 'Interval number',
+            'Subexon rank in transcript'
+        ]
+        rowi_subexon = rowi['Subexon ID cluster']
+        rowj_subexon = rowj['Subexon ID cluster']
+        previous = old2new.setdefault(rowi_subexon, rowi[keys].to_dict())
+        actual = old2new.setdefault(rowj_subexon, rowj[keys].to_dict())
+        if rowi['Strand'] == 1:
+            previous['Subexon genomic coding end'] = actual[
+                'Subexon genomic coding end']
+            actual['Subexon genomic coding start'] = previous[
+                'Subexon genomic coding start']
+            previous['End phase'] = actual['End phase']
+            actual['Start phase'] = previous['Start phase']
+        else:
+            actual['Subexon genomic coding end'] = previous[
+                'Subexon genomic coding end']
+            previous['Subexon genomic coding start'] = actual[
+                'Subexon genomic coding start']
+            actual['End phase'] = previous['End phase']
+            previous['Start phase'] = actual['Start phase']
+        merged_protein = previous['Exon protein sequence'] + actual[
+            'Exon protein sequence']
+        previous['Exon protein sequence'] = merged_protein
+        actual['Exon protein sequence'] = merged_protein
+        merged_dna_seq = previous['Subexon sequence'] + actual[
+            'Subexon sequence']
+        previous['Subexon sequence'] = merged_dna_seq
+        actual['Subexon sequence'] = merged_dna_seq
+        subexon_id = rowi_subexon + '_' + rowj_subexon.split('_')[-1]
+        actual['Subexon ID'] = subexon_id
+        previous['Subexon ID'] = subexon_id
+        actual['Subexon ID cluster'] = subexon_id
+        previous['Subexon ID cluster'] = subexon_id
+        previous['Interval number'] = actual['Interval number']
+        previous['Subexon rank in transcript'] = actual[
+            'Subexon rank in transcript']
+
+
+def _merge_subexons(subexon_table, subexons_to_merge):
+    """Merge subexons in the subexon_table."""
+    for groups in subexons_to_merge:
+        for subexon_group in groups:
+            n_subexons = len(subexon_group)
+            group_index = subexon_table.index[
+                subexon_table['Subexon ID cluster'].isin(subexon_group)]
+            group_mask = subexon_table.index.isin(group_index)
+            transcript = subexon_table[group_mask].drop_duplicates(
+                'Subexon ID cluster')  # keep the first transcript
+            transcript.sort_values(
+                by='Subexon rank in transcript', inplace=True, ascending=True)
+            assert transcript.shape[0] == n_subexons
+
+            old2new = {}
+            for index in range(1, n_subexons):
+                previous_row = transcript.iloc[index - 1, :]
+                actual_row = transcript.iloc[index, :]
+                _fill_with_new_subexon_data(old2new, previous_row, actual_row)
+
+            for index in group_index:
+                subexon_id = subexon_table.loc[index, 'Subexon ID cluster']
+                for key, value in old2new[subexon_id].items():
+                    subexon_table.loc[index, key] = value
+
+            subexon_table.drop_duplicates(
+                subset=[
+                    'Gene stable ID', 'Transcript stable ID',
+                    'Transcript stable ID cluster', 'Exon stable ID',
+                    'Exon stable ID cluster', 'Subexon ID',
+                    'Subexon ID cluster'
+                ],
+                inplace=True)
+
+
 def create_subexon_table(transcript_info):
     """Return a subexon table."""
     subexon_data_frames = []
@@ -334,5 +509,8 @@ def create_subexon_table(transcript_info):
 
     subexon_table = pd.concat(subexon_data_frames)
     subexon_table = _add_transcript_fraction(subexon_table)
+
+    subexons_to_merge = _find_subexons_to_merge(subexon_table)
+    _merge_subexons(subexon_table, subexons_to_merge)
 
     return subexon_table
