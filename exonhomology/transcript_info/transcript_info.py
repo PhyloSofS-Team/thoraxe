@@ -661,8 +661,8 @@ def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):
     identical_exons = find_identical_exons(data_frame, exon_id_column)
     store_cluster(data_frame, identical_exons, exon_id_column,
                   exon_id_column + ' cluster')
-    old2new = dict((exon_id, list(group)[0]) for group in identical_exons
-                   for exon_id in list(group)[1:])
+    old2new = dict((exon_id, sorted(group)[0]) for group in identical_exons
+                   for exon_id in sorted(group)[1:])
     data_frame.replace(to_replace={exon_id_column: old2new}, inplace=True)
 
 
