@@ -308,37 +308,6 @@ def _add_transcript_fraction(subexon_df):
         subexon_df, counts, how='inner', on=['Gene stable ID', 'Subexon ID'])
 
 
-def _merge_intervals_with_one_element(intervals):
-    """
-    Merge contigous intervals with the same and unique components.
-
-    Intervals should be sorted.
-    """
-    merged_intervals = []
-    n_intervals = len(intervals)
-    if n_intervals > 1:
-        for index in range(n_intervals):
-            if index == 0:
-                merged_intervals.append(intervals[index])
-            else:
-                previous = merged_intervals[-1]
-                actual = intervals[index]
-                print(previous)
-                print(actual)
-                if len(actual.components) == 1 and len(
-                        previous.components) == 1 and sorted(
-                            actual.components) == sorted(
-                                previous.
-                                components) and actual.start - actual.end == 1:
-                    merged_intervals[-1] = Interval(previous.start, actual.end,
-                                                    actual.components)
-                else:
-                    merged_intervals.append(actual)
-    else:
-        return intervals
-    return merged_intervals
-
-
 def create_subexon_table(transcript_info):
     """Return a subexon table."""
     subexon_data_frames = []
@@ -359,14 +328,6 @@ def create_subexon_table(transcript_info):
         ]
 
         intervals = sorted(intervals, key=lambda interval: interval.start)
-
-        if gene_df['Gene stable ID'].unique()[0] == 'ENSMMUG00000004060':
-            print(intervals)
-
-        intervals = _merge_intervals_with_one_element(intervals)
-
-        if gene_df['Gene stable ID'].unique()[0] == 'ENSMMUG00000004060':
-            print(intervals)
 
         subexon_df = _subexon_info(gene_df, exon_df, intervals)
         subexon_data_frames.append(subexon_df)
