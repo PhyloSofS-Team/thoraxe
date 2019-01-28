@@ -483,8 +483,18 @@ def _merge_subexons(subexon_table, subexons_to_merge):
                 inplace=True)
 
 
-def create_subexon_table(transcript_info):
-    """Return a subexon table."""
+def create_subexon_table(transcript_info, merge_non_redundant=True):
+    """
+    Return a subexon table.
+
+    If merge_non_redundant is True (default), contiguous subexons that
+    appear together in only one exon are merged/joint. This happens
+    because subexons are defined using coordinates at the genomic level
+    to reduce redundancy.
+    However, some subexons does not have the same protein sequence because
+    of different reading frames/phases, giving non-redundant subexons at
+    the protein level.
+    """
     subexon_data_frames = []
     for _, gene_df in transcript_info.groupby('Gene stable ID'):
 
@@ -510,7 +520,8 @@ def create_subexon_table(transcript_info):
     subexon_table = pd.concat(subexon_data_frames)
     subexon_table = _add_transcript_fraction(subexon_table)
 
-    subexons_to_merge = _find_subexons_to_merge(subexon_table)
-    _merge_subexons(subexon_table, subexons_to_merge)
+    if merge_non_redundant:
+        subexons_to_merge = _find_subexons_to_merge(subexon_table)
+        _merge_subexons(subexon_table, subexons_to_merge)
 
     return subexon_table
