@@ -20,8 +20,6 @@ if load_plot:
 
     # import matplotlib.pyplot as plt gives the following ImportError:
     # No module named '_tkinter', please install the python3-tk package
-
-
     def plot_msa_subexons(gene_ids,
                           msa_matrix,
                           subexon_table=None,
@@ -54,15 +52,15 @@ if load_plot:
 
             id2fraction = pd.Series(
                 subexon_table['Transcript fraction'].values,
-                index=subexon_table['Subexon Index']).to_dict()
+                index=subexon_table['SubexonIndex']).to_dict()
 
             subexon_subdf = subexon_table.loc[:, [
                 'Number of transcripts for subexon', 'Transcripts in gene',
-                'Subexon Index', 'Subexon ID'
+                'SubexonIndex', 'Subexon ID'
             ]]
 
             subexon_subdf = subexon_subdf.drop_duplicates().set_index(
-                'Subexon Index')
+                'SubexonIndex')
 
             nrow, ncol = msa_matrix_df.shape
 

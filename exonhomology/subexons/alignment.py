@@ -6,10 +6,12 @@ This module creates a MSA of subexons using MAFFT.
 
 import subprocess
 import tempfile
+import warnings
 
 import numpy as np
 import pandas as pd
 from Bio import AlignIO
+from Bio import BiopythonWarning
 from collections import OrderedDict
 
 # List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
@@ -32,143 +34,160 @@ sp_order = {
 }
 
 
-def _create_subexon_index(subexon_table):
+def subexon_connectivity(subexon_table):
     """
-    Return a pandas' DataFrame with subexon information.
-    """
+    Return a set of connected subexon tuples.
 
+    Each tuple has two elements, 'Subexon ID cluster' (directed) pairs.
+    The first subexon appears before of the second in at least one transcript.
+    """
+    connected_pairs = []
+    col_index = subexon_table.columns.get_loc('Subexon ID cluster')
+    for _, transcript_df in subexon_table.groupby(
+            'Transcript stable ID cluster'):
+        transcript = transcript_df.sort_values(
+            by='Subexon rank in transcript', ascending=True)
+        nrows = transcript.shape[0]
+        if nrows > 1:
+            for row_index in range(1, nrows):
+                connected_pairs.append(
+                    (transcript.iloc[row_index - 1, col_index],
+                     transcript.iloc[row_index, col_index]))
+    return set(connected_pairs)
+
+
+def _create_subexon_index(subexon_table):
+    """Return a pandas' DataFrame with subexon information."""
     # NOTE : Subexon ID is the same for subexons with the same sequence
     # taking phases into account. Being more specific with the subset
     # columns may cause duplicated subexons in the chimeric sequence.
     subset_columns = ['Subexon ID', 'Gene stable ID']
     unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
-    unique_subexons['Order'] = [
-        row['Subexon genomic coding start'] if row['Strand'] == 1 else
-        (-1 * row['Subexon genomic coding end'])
+    unique_subexons = unique_subexons.assign(Order=[
+        row['Subexon genomic coding start'] if row['Strand'] == 1 else (
+            -1 * row['Subexon genomic coding end'])
         for _, row in unique_subexons.iterrows()
-    ]
+    ])
 
     unique_subexons = unique_subexons.sort_values(by=['Order'])
 
     unique_subexons = unique_subexons.loc[:, [
-        'Subexon ID', 'Subexon genomic coding start',
-        'Subexon genomic coding end', 'Exon protein sequence',
-        'Subexon rank in transcript'
+        'Subexon ID', 'Subexon genomic coding start', 'Exon protein sequence',
+        'Subexon genomic coding end', 'Subexon rank in transcript'
     ]]
 
-    unique_subexons['Subexon Index'] = list(range(0, unique_subexons.shape[0]))
-    output = subexon_table.merge(unique_subexons)
+    unique_subexons = unique_subexons.assign(
+        SubexonIndex=list(range(0, unique_subexons.shape[0])))
+
+    with warnings.catch_warnings():
+        # Bio/Seq.py : class Seq : __hash__ : warnings.warn
+        warnings.simplefilter('ignore', BiopythonWarning)
+        output = subexon_table.merge(unique_subexons)
 
     return output
 
 
 def _create_transcript_index(subexon_table):
-    """
-    Return a pandas' DataFrame with the gene and transcript ids.
-    """
+    """Return a pandas' DataFrame with the gene and transcript ids."""
     transcript_id_columns = ['Gene stable ID', 'Transcript stable ID']
     unique_transcripts = subexon_table.drop_duplicates(
         subset=transcript_id_columns)
 
     unique_transcripts = unique_transcripts.loc[:, transcript_id_columns]
 
-    unique_transcripts['Transcript Index'] = list(
-        range(0, unique_transcripts.shape[0]))
+    unique_transcripts = unique_transcripts.assign(
+        TranscriptIndex=list(range(0, unique_transcripts.shape[0])))
     output = subexon_table.merge(unique_transcripts)
 
     return output
 
 
 def create_subexon_matrix(subexon_table):
-    """
-    Return a binary matrix showing subexon presence in transcripts.
-    """
-
+    """Return a binary matrix showing subexon presence in transcripts."""
     # _create_subexon_index and _create_transcript_index change
     # subexon_table with the last merge before return:
     subexon_table = _create_subexon_index(subexon_table)
     subexon_table = _create_transcript_index(subexon_table)
 
     subexon_table = subexon_table.sort_values(
-        by=['Transcript Index', 'Subexon Index'])
+        by=['TranscriptIndex', 'SubexonIndex'])
 
-    n_subexons = len(subexon_table['Subexon Index'].unique())
-    n_transcripts = len(subexon_table['Transcript Index'].unique())
+    n_subexons = len(subexon_table['SubexonIndex'].unique())
+    n_transcripts = len(subexon_table['TranscriptIndex'].unique())
 
     subexon_matrix = np.zeros((n_transcripts, n_subexons), dtype=np.bool)
 
     for _, row in subexon_table.iterrows():
-        subexon_matrix[row['Transcript Index'], row['Subexon Index']] = True
+        subexon_matrix[row['TranscriptIndex'], row['SubexonIndex']] = True
 
     return subexon_table, subexon_matrix
 
 
-def _get_sequence(subexon_seqs,
+def _get_sequence(subexon_info,
                   subexon_column,
                   padding,
                   sequence_column='Exon protein sequence'):
     """
     Return the sequence of the subexon as a string.
 
-    This function takes the subexon_seqs pandas' DataFrame as input, that has
-    'Subexon Index' as the DataFrame index.
+    This function takes the subexon_info pandas' DataFrame as input, that has
+    'SubexonIndex' as the DataFrame index.
 
     This replaces termination codons (*) with the padding.
     """
-    seq = str(subexon_seqs.loc[subexon_column, sequence_column])
+    seq = str(subexon_info.loc[subexon_column, sequence_column])
     return seq.replace('*', padding)
-
-
-def _does_it_need_padding(transcript_matrix, col_index):
-    """
-    Return True if the column doesn't share any transcript with the previous.
-    """
-    answer = not np.any(
-        np.logical_and(transcript_matrix[:, col_index - 1],
-                       transcript_matrix[:, col_index]))
-    return answer
 
 
 def create_chimeric_sequences(subexon_table,
                               subexon_matrix,
+                              connected_subexons,
                               padding='XXXXXXXXXX'):
     """
     Create chimeric sequence for MAFFT.
 
     It returns a Dict from 'Gene stable ID' to a tuple with the chimeric
-    sequence and a Dict from 'Subexon Index' to
+    sequence and a Dict from 'SubexonIndex' to ...
     """
     chimerics = {}
     for gene_id, gene_df in subexon_table.groupby('Gene stable ID'):
 
-        # DataFrame to get a subexon sequence using its 'Subexon Index'
-        subexon_seq_columns = ['Subexon Index', 'Exon protein sequence']
-        subexon_seqs = gene_df.loc[:, subexon_seq_columns]
+        # DataFrame to get a subexon information using its 'SubexonIndex'
+        subexon_info_cols = [
+            'SubexonIndex', 'Subexon ID cluster', 'Exon protein sequence'
+        ]
+        subexon_info = gene_df.loc[:, subexon_info_cols]
         # NOTE: It make copies to not delete subexons inplace:
-        subexon_seqs = subexon_seqs.drop_duplicates(subset=subexon_seq_columns)
-        subexon_seqs = subexon_seqs.set_index('Subexon Index')
-        subexon_seqs = subexon_seqs.sort_index()
+        with warnings.catch_warnings():
+            # Bio/Seq.py : class Seq : __hash__ : warnings.warn
+            warnings.simplefilter('ignore', BiopythonWarning)
+            subexon_info = subexon_info.drop_duplicates(
+                subset=subexon_info_cols)
+        subexon_info = subexon_info.set_index('SubexonIndex')
+        subexon_info = subexon_info.sort_index()
 
-        transcript_index = sorted(gene_df['Transcript Index'].unique())
+        transcript_index = sorted(gene_df['TranscriptIndex'].unique())
 
-        subexon_index = gene_df['Subexon Index'].unique()
+        subexon_index = gene_df['SubexonIndex'].unique()
         subexon_index.sort()
 
         transcript_matrix = subexon_matrix[transcript_index, :]
         transcript_matrix = transcript_matrix[:, subexon_index]
 
         subexon = subexon_index[0]
-        chimeric = _get_sequence(subexon_seqs, subexon, padding)
+        chimeric = _get_sequence(subexon_info, subexon, padding)
         breaks = {subexon: len(chimeric)}
-        for col_index in range(1, len(subexon_index)):
-            subexon = subexon_index[col_index]
-            chimeric += _get_sequence(subexon_seqs, subexon, padding)
-            if _does_it_need_padding(
-                    transcript_matrix,
-                    col_index) and chimeric[-len(padding):] != padding:
+        for idx in range(1, len(subexon_index)):
+            previous_subexon = subexon_index[idx - 1]
+            subexon = subexon_index[idx]
+            # Does it need padding ?
+            if ((subexon_info.loc[previous_subexon, 'Subexon ID cluster'],
+                 subexon_info.loc[subexon, 'Subexon ID cluster']
+                 ) not in connected_subexons
+                    and chimeric[-len(padding):] != padding):
                 chimeric += padding
-
+            chimeric += _get_sequence(subexon_info, subexon, padding)
             breaks.update({subexon: len(chimeric)})
 
         chimerics[gene_id] = (chimeric, breaks)
@@ -177,9 +196,7 @@ def create_chimeric_sequences(subexon_table,
 
 
 def _print_temporal_fasta(chimerics):
-    """
-    Save the chimeric sequences in a temporal fasta file and return its name.
-    """
+    """Save chimeric sequences in a temporal fasta file and return its name."""
     with tempfile.NamedTemporaryFile(
             suffix='.fasta', delete=False) as tmp_fasta:
         for (key, value) in chimerics.items():
@@ -214,9 +231,7 @@ def run_mafft(chimerics,
 
 
 def sort_species(chimerics, transcript_info, species_order=sp_order):
-    """
-    Sort `chimerics` dict using `transcript_info` and `sp_order`
-    """
+    """Sort `chimerics` dict using `transcript_info` and `sp_order`."""
     gene2sp = pd.Series(
         transcript_info.Species.values,
         index=transcript_info['Gene stable ID']).to_dict()
@@ -268,9 +283,7 @@ def create_msa_matrix(chimerics, msa_file):  # pylint: disable=too-many-locals
 
 
 def minimal_regions(msa_matrix):
-    """
-    Return minimal homologous regions (columns) in msa_matrix.
-    """
+    """Return minimal homologous regions (columns) in msa_matrix."""
     non_full_nan_columns = np.where(~np.all(np.isnan(msa_matrix), axis=0))[0]
     msa_matrix = msa_matrix[:, non_full_nan_columns]
     msa_matrix[np.isnan(msa_matrix)] = -1.0
