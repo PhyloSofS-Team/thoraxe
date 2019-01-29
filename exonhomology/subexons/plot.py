@@ -1,11 +1,12 @@
 """plot: Plot the MSA matrix using seaborn."""
 
-
 import platform
-load_plot = False
+import distro
+
+_LOAD_PLOT = False
 try:
     import matplotlib.pyplot as plt
-    load_plot = True
+    _LOAD_PLOT = True
 except ImportError as err:
     print("matplotlib.pyplot loading has failed with ImportError: ", err)
     if 'tkinter' in str(err):
@@ -13,24 +14,19 @@ except ImportError as err:
         print('    You should install tkinter for Python 3 to access the '
               'subexons.plot.plot_msa_subexons function.')
         if platform.system() == 'Linux':
-            _dist = platform.linux_distribution()
-            if len(_dist) == 3:
-                _dist_name = _dist[0].lower()
-                if _dist_name in {'ubuntu', 'debian'}:
-                    print('    In Ubuntu/Debian you can try: '
-                          'sudo apt-get install python3-tk')
-                elif _dist_name == 'fedora':
-                    print('    In Fedora you can try: '
-                          'sudo dnf install python3-tkinter')
+            _DISTRO = distro.id()
+            if _DISTRO in {'ubuntu', 'debian'}:
+                print('    In Ubuntu/Debian you can try: '
+                      'sudo apt-get install python3-tk')
+            elif _DISTRO == 'fedora':
+                print('    In Fedora you can try: '
+                      'sudo dnf install python3-tkinter')
 
-
-if load_plot:
+if _LOAD_PLOT:
     import numpy as np
     import pandas as pd
     import seaborn
 
-    # import matplotlib.pyplot as plt gives the following ImportError:
-    # No module named '_tkinter', please install the python3-tk package
     def plot_msa_subexons(gene_ids,
                           msa_matrix,
                           subexon_table=None,
@@ -40,8 +36,8 @@ if load_plot:
 
         If `subexon_table` is `None`, the binary plot with the constitutive
         exons is not generated. Otherwise, it'll be in the `_constitutive.png`
-        file. The `subexon_table` also allows the coloring by Subexon ID for
-        the `_subexon_id.png` file.
+        file. The `subexon_table` also allows the coloring by
+        'Subexon ID cluster' for the `_subexon_id.png` file.
         """
         # stack... stop-seaborn-plotting-multiple-figures-on-top-of-one-another
         plt.figure()
@@ -67,7 +63,7 @@ if load_plot:
 
             subexon_subdf = subexon_table.loc[:, [
                 'Number of transcripts for subexon', 'Transcripts in gene',
-                'SubexonIndex', 'Subexon ID'
+                'SubexonIndex', 'Subexon ID cluster'
             ]]
 
             subexon_subdf = subexon_subdf.drop_duplicates().set_index(
@@ -84,13 +80,13 @@ if load_plot:
                         if fraction == 1.0:
                             msa_matrix_df_copy.iloc[i, j] = 1.0
                         else:
-                            nt = subexon_subdf.loc[subexon_index][
+                            n_trx = subexon_subdf.loc[subexon_index][
                                 'Number of transcripts for subexon']
-                            n = subexon_subdf.loc[subexon_index][
+                            n_trx_gene = subexon_subdf.loc[subexon_index][
                                 'Transcripts in gene']
-                            if n == 1:
+                            if n_trx_gene == 1:
                                 msa_matrix_df_copy.iloc[i, j] = 0.33
-                            elif n - 1 == nt:
+                            elif n_trx_gene - 1 == n_trx:
                                 msa_matrix_df_copy.iloc[i, j] = 0.66
                             else:
                                 msa_matrix_df_copy.iloc[i, j] = 0.0
@@ -102,14 +98,16 @@ if load_plot:
             sns_const_plot1.get_figure().savefig(
                 outfile_1, bbox_inches='tight')
 
+            subexon_int_index, _ = pd.factorize(
+                subexon_subdf['Subexon ID cluster'])
             msa_matrix_df_copy = msa_matrix_df.copy()
             for i in range(0, nrow):
                 for j in range(0, ncol):
                     subexon_index = msa_matrix_df_copy.iloc[i, j]
                     if not np.isnan(subexon_index):
                         subexon_index = int(subexon_index)
-                        msa_matrix_df_copy.iloc[i, j] = subexon_subdf.loc[
-                            subexon_index]['Subexon ID']
+                        msa_matrix_df_copy.iloc[i, j] = subexon_int_index[
+                            subexon_index]
             plt.figure()
             outfile2 = outfile.replace('.png', '_subexon_id.png')
             sns_const_plot2 = seaborn.heatmap(

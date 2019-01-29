@@ -198,7 +198,7 @@ def create_chimeric_sequences(subexon_table,
 def _print_temporal_fasta(chimerics):
     """Save chimeric sequences in a temporal fasta file and return its name."""
     with tempfile.NamedTemporaryFile(
-            suffix='.fasta', delete=False) as tmp_fasta:
+            suffix='.fasta', delete=False, mode='w') as tmp_fasta:
         for (key, value) in chimerics.items():
             tmp_fasta.write('>%s\n%s\n' % (key, value[0]))
 
@@ -221,7 +221,7 @@ def run_mafft(chimerics,
     if mafft_arguments is not None:
         command.extend(mafft_arguments)
 
-    with open(output_path, 'w') as outfile:
+    with open(output_path, 'wb') as outfile:
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         for line in process.stdout:
             outfile.write(line)
@@ -230,11 +230,15 @@ def run_mafft(chimerics,
     return output_path
 
 
-def sort_species(chimerics, transcript_info, species_order=sp_order):
-    """Sort `chimerics` dict using `transcript_info` and `sp_order`."""
-    gene2sp = pd.Series(
-        transcript_info.Species.values,
-        index=transcript_info['Gene stable ID']).to_dict()
+def gene2species(transcript_data):
+    """Return the a dict from 'Gene stable ID' to 'Species'."""
+    return pd.Series(
+        transcript_data.Species.values,
+        index=transcript_data['Gene stable ID']).to_dict()
+
+
+def sort_species(chimerics, gene2sp, species_order=sp_order):
+    """Sort chimerics dict using the output from gene2species and sp_order."""
     return OrderedDict(
         sorted(
             list(chimerics.items()),
