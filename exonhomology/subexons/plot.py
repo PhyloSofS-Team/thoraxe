@@ -1,5 +1,7 @@
 """plot: Plot the MSA matrix using seaborn."""
 
+
+import platform
 load_plot = False
 try:
     import matplotlib.pyplot as plt
@@ -7,11 +9,20 @@ try:
 except ImportError as err:
     print("matplotlib.pyplot loading has failed with ImportError: ", err)
     if 'tkinter' in str(err):
-        print("""
-            You should install tkinter for Python 3 to access the
-            subexons.plot.plot_msa_subexons function.
-            In Ubuntu/Debian you can do: sudo apt-get install python3-tk
-            """)
+        print()
+        print('    You should install tkinter for Python 3 to access the '
+              'subexons.plot.plot_msa_subexons function.')
+        if platform.system() == 'Linux':
+            _dist = platform.linux_distribution()
+            if len(_dist) == 3:
+                _dist_name = _dist[0].lower()
+                if _dist_name in {'ubuntu', 'debian'}:
+                    print('    In Ubuntu/Debian you can try: '
+                          'sudo apt-get install python3-tk')
+                elif _dist_name == 'fedora':
+                    print('    In Fedora you can try: '
+                          'sudo dnf install python3-tkinter')
+
 
 if load_plot:
     import numpy as np
