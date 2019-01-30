@@ -16,7 +16,7 @@ from collections import OrderedDict
 
 # List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
 # Order from NCBI Taxonomy/CommonTree, but using Human as 1
-sp_order = {
+SPECIES_ORDER = {
     'homo_sapiens': 1,
     'mus_musculus': 6,
     'macaca_mulatta': 3,
@@ -237,8 +237,8 @@ def gene2species(transcript_data):
         index=transcript_data['Gene stable ID']).to_dict()
 
 
-def sort_species(chimerics, gene2sp, species_order=sp_order):
-    """Sort chimerics dict using the output from gene2species and sp_order."""
+def sort_species(chimerics, gene2sp, species_order=SPECIES_ORDER):
+    """Sort chimerics using the output from gene2species and SPECIES_ORDER."""
     return OrderedDict(
         sorted(
             list(chimerics.items()),
