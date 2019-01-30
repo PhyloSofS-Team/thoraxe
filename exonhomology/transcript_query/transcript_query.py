@@ -48,10 +48,10 @@ def lodict2csvstring(listofdicts):
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
     """
-    Wrapper to write a list of dictionnary listofdicst with csv formatting to the
-    stream fout.
-    fnames: when provided as a list, it is used as the column selection, otherwise
-        all keys occuring at least once are used as the
+    Write a list of dictionnary with csv formatting to the stream out.
+
+    fnames: when provided as a list, it is used as the column selection,
+        otherwise all keys occuring at least once are used.
     header: should the header be written
     """
     if fnames is None:
@@ -68,9 +68,7 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
 
 
 def dictseq2fasta(dseq, geneid, out):
-    """
-    Wrapper to write fasta sequences from the exons
-    """
+    """Write fasta sequences from the exons."""
     colw = 80
     out.write(">%s %s %s\n" % (geneid, dseq['id'], dseq['desc']))
     exseq = dseq['seq']
@@ -89,42 +87,44 @@ def species2ensembldataset(speciesname):
 
 
 def get_biomart_exons_annot(dataset, geneid, header=True):
-    '''
-    Return all transcript information from the dataset dataset and the ensembl geneid
-    geneID
+    """
+    Return all transcript information from the dataset and the ensembl geneid.
+
     ex for MAPK8 in human:
         r = get_biomart_exons_annot("hsapiens_gene_ensembl", "ENSG00000107643")
     Return a requests object (use r.text to get the text for the file)
-    '''
+    """
     # TODO: Error control on the call
     ##
     # see http://ensembl.org/biomart/martview/ for the web application
-    biomart_request_url_template = \
-        '''http://ensembl.org/biomart/martservice?query=''' \
-        '''<?xml version="1.0" encoding="UTF-8"?>'''\
-        '''<!DOCTYPE Query>'''\
-        '''<Query  virtualSchemaName = "default" formatter = "TSV" header = "{ish}" uniqueRows = "0" count = "" datasetConfigVersion = "0.6" >'''\
-        '''<Dataset name = "{data}" interface = "default" >'''\
-        '''<Filter name = "ensembl_gene_id" value = "{eid}"/>'''\
-        '''<Attribute name = "ensembl_gene_id" />'''\
-        '''<Attribute name = "ensembl_transcript_id" />'''\
-        '''<Attribute name = "transcript_start" />'''\
-        '''<Attribute name = "transcript_end" />'''\
-        '''<Attribute name = "strand" />'''\
-        '''<Attribute name = "ensembl_exon_id" />'''\
-        '''<Attribute name = "exon_chrom_start" />'''\
-        '''<Attribute name = "exon_chrom_end" />'''\
-        '''<Attribute name = "rank" />'''\
-        '''<Attribute name = "cdna_coding_start" />'''\
-        '''<Attribute name = "cdna_coding_end" />'''\
-        '''<Attribute name = "genomic_coding_start" />'''\
-        '''<Attribute name = "genomic_coding_end" />'''\
-        '''<Attribute name = "cds_start" />'''\
-        '''<Attribute name = "cds_end" />'''\
-        '''<Attribute name = "phase" />'''\
-        '''<Attribute name = "end_phase" />'''\
-        '''</Dataset>'''\
-        '''</Query>'''
+    biomart_request_url_template = """
+    http://ensembl.org/biomart/martservice?query=
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE Query>
+    <Query  virtualSchemaName = "default" formatter = "TSV" header = "{ish}"
+        uniqueRows = "0" count = "" datasetConfigVersion = "0.6">
+    <Dataset name = "{data}" interface = "default">
+    <Filter name = "ensembl_gene_id" value = "{eid}"/>
+    <Attribute name = "ensembl_gene_id" />
+    <Attribute name = "ensembl_transcript_id" />
+    <Attribute name = "transcript_start" />
+    <Attribute name = "transcript_end" />
+    <Attribute name = "strand" />
+    <Attribute name = "ensembl_exon_id" />
+    <Attribute name = "exon_chrom_start" />
+    <Attribute name = "exon_chrom_end" />
+    <Attribute name = "rank" />
+    <Attribute name = "cdna_coding_start" />
+    <Attribute name = "cdna_coding_end" />
+    <Attribute name = "genomic_coding_start" />
+    <Attribute name = "genomic_coding_end" />
+    <Attribute name = "cds_start" />
+    <Attribute name = "cds_end" />
+    <Attribute name = "phase" />
+    <Attribute name = "end_phase" />
+    </Dataset>
+    </Query>
+    """
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
@@ -137,9 +137,7 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
 
 
 def generic_ensemblREST_request(extension, params, header):
-    """
-    generic request
-    """
+    """Perform a generic request."""
     r = requests.get(server + extension, params=params, headers=header)
     if verbose:
         print("Trying url:" + r.url)
@@ -151,7 +149,9 @@ def generic_ensemblREST_request(extension, params, header):
 
 def get_geneids_from_symbol(species, symbol, **params):
     """
-    From a species and a symbol, returns the set of geneids corresponding
+    Return gene ID from symbol.
+
+    From a species and a symbol, return the set of geneids corresponding
     to the gene symbol given.
     Uses the /xrefs/symbol RESTfull command
     exple: get_geneids_from_symbol("human", "MAPK8")
@@ -166,8 +166,10 @@ def get_geneids_from_symbol(species, symbol, **params):
 
 def get_listoftranscripts(ensgeneid, species, **params):
     """
+    Return list of transcripts.
+
     From an ensembl gene id, gets the list of transcripts overlapping
-    this gene
+    this gene.
     """
     # TODO filter on protein coding
     params.setdefault('feature', 'transcript')
@@ -180,9 +182,7 @@ def get_listoftranscripts(ensgeneid, species, **params):
 
 
 def write_TSL_file(gene_name, l_of_sptr):
-    """
-    Writes a TSL file from a list of transcripts
-    """
+    """Write a TSL file from a list of transcripts."""
     fout = "%s_TSL.csv" % (gene_name)
     csvout = open(fout, "w")
 
@@ -206,9 +206,10 @@ def write_TSL_file(gene_name, l_of_sptr):
 
 def get_listofexons(ensgeneid, **params):
     """
+    Return list of exons.
+
     From an ensembl gene id, gets the list of exons that are composing this
-    gene
-    by default restricted to the coding exons
+    gene by default restricted to the coding exons.
     """
     params.setdefault('feature', 'exon')
     # could think about biotype = protein_coding here
@@ -220,8 +221,10 @@ def get_listofexons(ensgeneid, **params):
 
 def get_exons_sequences(listensexons, **params):
     """
-    From a list of ensembl exons id,
-    gets the list of exons with their sequences
+    Return exon sequences.
+
+    From a list of ensembl exons id, it gets the list of exons with their
+    sequences.
     """
     # There cannot be more that 50 elements queried at once
     MAXITEMS = 45
@@ -250,11 +253,13 @@ def get_exons_sequences(listensexons, **params):
 
 
 def get_genetree(ensgeneid, **params):
-    '''
-    Get the gene tree around the gene geneid
-    as of now, the whole tree is returned
-    '''
-    #params.setdefault('object_type',  'gene')
+    """
+    Return the gene tree.
+
+    Get the gene tree around the gene geneid as of now, the whole tree
+    is returned.
+    """
+    # params.setdefault('object_type',  'gene')
     params.setdefault('nh_format', 'full')
     params.setdefault('aligned', '1')
     ext_genetree = '/genetree/member/id/{0}?'.format(ensgeneid)
@@ -263,11 +268,10 @@ def get_genetree(ensgeneid, **params):
 
 
 def get_orthologs(ensgeneid, **params):
-    """
-    Get the orthologs from the gene with id ensgeneid
-    """
+    """Get the orthologs from the gene with id ensgeneid."""
     params.setdefault('object_type', 'gene')
-    # TODO: rajouter des parametres pour séparer les différentes relations d'orthologie:
+    # TODO: rajouter des parametres pour séparer les différentes relations
+    # d'orthologie:
     # -ortholog_one2one,
     # -ortholog_one2many,
     # -within_species_paralog
@@ -287,9 +291,7 @@ def filter_ortho(l_ortho,
                      "ortholog_one2one", "ortholog_one2many",
                      "within_species_paralog"
                  ]):
-    """
-    Filter the dictionary of orthologues according to the list of names
-    """
+    """Filter the dictionary of orthologues according to the list of names."""
     # TODO: rajouter un système de synonymes sur les espèces pour
     # le filtrage
     filtered_list = [
@@ -301,17 +303,21 @@ def filter_ortho(l_ortho,
 
 def get_transcripts_orthologs(ensgeneid, lorthologs):
     """
+    Return transcript list from orthologs.
+
     Wrapper function to call multiple times get_listoftranscripts, given
     a ensembl geneid and a list of orthologs provided by get_orthologs
     Data structure for each ortholog is
     {dn_ds : float, method_link_type : str,
         source : dict(),  target : dict(), taxonomy_level : str,
-        type: Enum(ortholog_one2one, ortholog_one2many, within_species_paralog) }
-    The dicts for source and target store information about gene sequence, data structure:
+        type: Enum(ortholog_one2one,
+                   ortholog_one2many,
+                   within_species_paralog)}
+    The dicts for source and target store information about gene sequence,
+    data structure:
     {"align_seq" : str, "perc_pos" : float, "id" : str, "protein_id" : str,
      "perc_id" : float, "cigar_line" : str,
-     "taxon_id" : int, "species" : str
-    }
+     "taxon_id" : int, "species" : str}
     """
     # First get the list for the source
     source_species = lorthologs[0]['source']['species']
@@ -321,7 +327,7 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     for o in lorthologs:
         orthoid = o['target']['id']
         orthospecies = o['target']['species']
-        orthotaxon = o['target']['taxon_id']
+        # orthotaxon = o['target']['taxon_id']
         ortho_transcripts.append(get_listoftranscripts(orthoid, orthospecies))
 
     return source_transcripts, ortho_transcripts
@@ -367,10 +373,10 @@ def main():
         symbol = sys.argv[1]
     else:
         print("No parameter given, running with default")
-        #species, symbol = 'homo_sapiens', 'DNM2'
+        # species, symbol = 'homo_sapiens', 'DNM2'
         species, symbol = 'homo_sapiens', 'MAPK8'
-        #species, symbol = 'homo_sapiens', 'snap25'
-        #species, symbol = 'homo_sapiens', 'nxnl2'
+        # species, symbol = 'homo_sapiens', 'snap25'
+        # species, symbol = 'homo_sapiens', 'nxnl2'
     # TODO, take care of aliases for species names, always use the
     # binomial names when running the code
 
@@ -454,7 +460,7 @@ def main():
     for o in orthologs_filtered:
         orthoid = o['target']['id']
         orthospecies = o['target']['species']
-        orthotaxon = o['target']['taxon_id']
+        # orthotaxon = o['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
         print("Getting exons information for %s" % (ortho_name))
         ortho_ens_dataset = species2ensembldataset(orthospecies)
