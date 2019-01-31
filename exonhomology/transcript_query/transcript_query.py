@@ -19,36 +19,36 @@ from collections import Counter
 import requests
 
 # REST parameters
-server = "https://rest.ensembl.org"
+SERVER = "https://rest.ensembl.org"
 
-hjson = {"Content-Type": "application/json"}
-hjsonpost = {"Content-Type": "application/json", "Accept": "application/json"}
+HJSON = {"Content-Type": "application/json"}
+HJSONPOST = {"Content-Type": "application/json", "Accept": "application/json"}
 
-nhtree = {"Content-Type": "text/x-nh"}
-biomartHuman = "hsapiens_gene_ensembl"
+NHTREE = {"Content-Type": "text/x-nh"}
+BIOMART_HUMAN = "hsapiens_gene_ensembl"
 
 # Other parameters
 
-verbose = False
+VERBOSE = False
 
 
 ###
 # Utility functions
 def lodict2csvstring(listofdicts):
-    si = io.BytesIO()
+    stream = io.BytesIO()
     fnames = set([])
-    for d in listofdicts:
-        fnames.update(list(d.keys()))
+    for dictionary in listofdicts:
+        fnames.update(list(dictionary.keys()))
     fnames = sorted(fnames)
-    cw = csv.DictWriter(si, fieldnames=fnames, restval='NA')
-    cw.writeheader()
-    cw.writerows(listofdicts)
-    return si.getvalue()
+    csv_writer = csv.DictWriter(stream, fieldnames=fnames, restval='NA')
+    csv_writer.writeheader()
+    csv_writer.writerows(listofdicts)
+    return stream.getvalue()
 
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
     """
-    Write a list of dictionnary with csv formatting to the stream out.
+    Write a dictionary list with csv formatting to the stream out.
 
     fnames: when provided as a list, it is used as the column selection,
         otherwise all keys occuring at least once are used.
@@ -56,14 +56,14 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
     """
     if fnames is None:
         fnames = set([])
-        for d in listofdicts:
-            fnames.update(list(d.keys()))
+        for dictionary in listofdicts:
+            fnames.update(list(dictionary.keys()))
         fnames = sorted(fnames)
-    cw = csv.DictWriter(
+    csv_writer = csv.DictWriter(
         out, fieldnames=fnames, restval='NA', extrasaction='ignore')
     if header:
-        cw.writeheader()
-    cw.writerows(listofdicts)
+        csv_writer.writeheader()
+    csv_writer.writerows(listofdicts)
     return len(listofdicts)
 
 
@@ -136,15 +136,15 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
 # forme de la partie extension
 
 
-def generic_ensemblREST_request(extension, params, header):
+def generic_ensembl_rest_request(extension, params, header):
     """Perform a generic request."""
-    r = requests.get(server + extension, params=params, headers=header)
-    if verbose:
-        print("Trying url:" + r.url)
-    if not r.ok:
-        r.raise_for_status()
+    request = requests.get(SERVER + extension, params=params, headers=header)
+    if VERBOSE:
+        print("Trying url:" + request.url)
+    if not request.ok:
+        request.raise_for_status()
         sys.exit()
-    return r
+    return request
 
 
 def get_geneids_from_symbol(species, symbol, **params):
@@ -158,9 +158,9 @@ def get_geneids_from_symbol(species, symbol, **params):
     """
     params.setdefault('object_type', 'gene')
     ext_geneid = '/xrefs/symbol/{0}/{1}?'.format(species, symbol)
-    r = generic_ensemblREST_request(ext_geneid, params, hjson)
-    dnames = r.json()
-    res = [x["id"] for x in dnames]
+    request = generic_ensembl_rest_request(ext_geneid, params, HJSON)
+    dnames = request.json()
+    res = [dictionary["id"] for dictionary in dnames]
     return res
 
 
@@ -174,20 +174,20 @@ def get_listoftranscripts(ensgeneid, species, **params):
     # TODO filter on protein coding
     params.setdefault('feature', 'transcript')
     ext_listtr = '/overlap/id/{0}?'.format(ensgeneid)
-    r = generic_ensemblREST_request(ext_listtr, params, hjson)
-    dnames = r.json()
-    for x in dnames:
-        x['species'] = species
-    return (dnames)
+    request = generic_ensembl_rest_request(ext_listtr, params, HJSON)
+    dnames = request.json()
+    for dictionary in dnames:
+        dictionary['species'] = species
+    return dnames
 
 
-def write_TSL_file(gene_name, l_of_sptr):
+def write_tsl_file(gene_name, l_of_sptr):
     """Write a TSL file from a list of transcripts."""
     fout = "%s_TSL.csv" % (gene_name)
     csvout = open(fout, "w")
 
     # One trick to get the good names in the header
-    OtherNames = [
+    other_names = [
         "Species", "Name", "Transcript ID", "Source", "Experiment Source",
         "Biotype", "Flags"
     ]
@@ -195,13 +195,12 @@ def write_TSL_file(gene_name, l_of_sptr):
         "species", "external_name", "transcript_id", "source", "logic_name",
         "biotype", "transcript_support_level"
     ]
-    dnewheader = dict(x for x in zip(cfieldnames, OtherNames))
+    dnewheader = dict(x for x in zip(cfieldnames, other_names))
 
     lodict2csv([dnewheader], csvout, fnames=cfieldnames, header=False)
     for sptr in l_of_sptr:
         lodict2csv(sptr, csvout, fnames=cfieldnames, header=False)
     csvout.close()
-    return None
 
 
 def get_listofexons(ensgeneid, **params):
@@ -214,12 +213,12 @@ def get_listofexons(ensgeneid, **params):
     params.setdefault('feature', 'exon')
     # could think about biotype = protein_coding here
     ext_listex = '/overlap/id/{0}?'.format(ensgeneid)
-    r = generic_ensemblREST_request(ext_listex, params, hjson)
-    dexons = r.json()
+    request = generic_ensembl_rest_request(ext_listex, params, HJSON)
+    dexons = request.json()
     return dexons
 
 
-def get_exons_sequences(listensexons, **params):
+def get_exons_sequences(listensexons):  # , **params):
     """
     Return exon sequences.
 
@@ -227,28 +226,28 @@ def get_exons_sequences(listensexons, **params):
     sequences.
     """
     # There cannot be more that 50 elements queried at once
-    MAXITEMS = 45
+    maxitems = 45
     nexons = len(listensexons)
-    niter = 1 + nexons // MAXITEMS
-    s, e = 0, MAXITEMS
+    niter = 1 + nexons // maxitems
+    start, end = 0, maxitems
     list_res = []
-    for i in range(niter):
-        exons = listensexons[s:e]
-        if len(exons) > 0:
+    for _ in range(niter):
+        exons = listensexons[start:end]
+        if exons:
             dexons = {"ids": exons}  # , "type": "cds"}
             ext_exons_seq = '/sequence/id/type=cds'
-            r = requests.post(
-                server + ext_exons_seq,
-                headers=hjsonpost,
+            request = requests.post(
+                SERVER + ext_exons_seq,
+                headers=HJSONPOST,
                 data=json.dumps(dexons))
-            # print(r.url)
-            if not r.ok:
+            # print(request.url)
+            if not request.ok:
                 print(("FAILED REQUEST: " + str(dexons)))
-                r.raise_for_status()
+                request.raise_for_status()
                 sys.exit()
-            res = r.json()
+            res = request.json()
             list_res = list_res + res
-            s, e = e, min(nexons, e + MAXITEMS)
+            start, end = end, min(nexons, end + maxitems)
     return list_res
 
 
@@ -263,8 +262,8 @@ def get_genetree(ensgeneid, **params):
     params.setdefault('nh_format', 'full')
     params.setdefault('aligned', '1')
     ext_genetree = '/genetree/member/id/{0}?'.format(ensgeneid)
-    r = generic_ensemblREST_request(ext_genetree, params, nhtree)
-    return r.text
+    request = generic_ensembl_rest_request(ext_genetree, params, NHTREE)
+    return request.text
 
 
 def get_orthologs(ensgeneid, **params):
@@ -279,24 +278,24 @@ def get_orthologs(ensgeneid, **params):
     # On a besoin de stocker aussi l'info général sur les orthologues
     # pour plus tard
     ext_orthologs = '/homology/id/{0}'.format(ensgeneid)
-    r = generic_ensemblREST_request(ext_orthologs, params, hjson)
-    res = r.json()
+    request = generic_ensembl_rest_request(ext_orthologs, params, HJSON)
+    res = request.json()
     dortho = res['data'][0]['homologies']
     return dortho
 
 
-def filter_ortho(l_ortho,
-                 dortho,
-                 relation=[
-                     "ortholog_one2one", "ortholog_one2many",
-                     "within_species_paralog"
-                 ]):
+def filter_ortho(l_ortho, dortho, relation=None):
     """Filter the dictionary of orthologues according to the list of names."""
     # TODO: rajouter un système de synonymes sur les espèces pour
     # le filtrage
+    if relation is None:
+        relation = [
+            "ortholog_one2one", "ortholog_one2many", "within_species_paralog"
+        ]
     filtered_list = [
-        v for v in dortho
-        if v['target']['species'].lower() in l_ortho and v['type'] in relation
+        value for value in dortho
+        if value['target']['species'].lower() in l_ortho
+        and value['type'] in relation
     ]
     return filtered_list
 
@@ -324,10 +323,10 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     source_transcripts = get_listoftranscripts(ensgeneid, source_species)
 
     ortho_transcripts = []
-    for o in lorthologs:
-        orthoid = o['target']['id']
-        orthospecies = o['target']['species']
-        # orthotaxon = o['target']['taxon_id']
+    for ortho in lorthologs:
+        orthoid = ortho['target']['id']
+        orthospecies = ortho['target']['species']
+        # orthotaxon = ortho['target']['taxon_id']
         ortho_transcripts.append(get_listoftranscripts(orthoid, orthospecies))
 
     return source_transcripts, ortho_transcripts
@@ -367,7 +366,8 @@ def main():
 
     # 1-
     if len(sys.argv) == 3:
-        species, symbol = sys.argv[1:]
+        species = sys.argv[1]
+        symbol = sys.argv[2]
     elif len(sys.argv) == 2:
         species = 'homo_sapiens'
         symbol = sys.argv[1]
@@ -383,22 +383,22 @@ def main():
     # 2-
     print("Searching ID for gene with name %s in species %s..." % (symbol,
                                                                    species))
-    a = get_geneids_from_symbol(species, symbol)
-    print("Found the following list of ids: %s" % (json.dumps(a)))
-    if len(a) == 0:
+    geneids = get_geneids_from_symbol(species, symbol)
+    print("Found the following list of ids: %s" % (json.dumps(geneids)))
+    if not geneids:
         raise KeyError("No gene found, exiting")
-    curgene = a[0]
+    curgene = geneids[0]
     gene_name = "%s_%s" % (symbol, curgene)
     cdirectory = gene_name
-    TSLsubdir = cdirectory + "/TSL/"
-    TEXsubdir = cdirectory + "/TablesExons/"
-    Seqsubdir = cdirectory + "/Sequences/"
+    tsl_subdir = cdirectory + "/TSL/"
+    tex_subdir = cdirectory + "/TablesExons/"
+    seqsubdir = cdirectory + "/Sequences/"
     print("Using gene id %s from now on." % (curgene))
     print("Results will be saved in directory %s" % (cdirectory))
     if not os.path.exists(cdirectory):
-        os.makedirs(TSLsubdir)
-        os.makedirs(TEXsubdir)
-        os.makedirs(Seqsubdir)
+        os.makedirs(tsl_subdir)
+        os.makedirs(tex_subdir)
+        os.makedirs(seqsubdir)
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
     print("Writing the gene tree")
@@ -414,12 +414,13 @@ def main():
           (len(orthologs), nparalogs))
     # ['taxonomy_level']
     print("Orthologous species:")
-    nt = 0
-    corthologs = Counter([x['target']['species'] for x in orthologs])
-    for tl, c in corthologs.most_common():
-        print("  %-23s: %4d" % (tl, c))
+    number = 0
+    corthologs = Counter(
+        [ortholog['target']['species'] for ortholog in orthologs])
+    for i, j in corthologs.most_common():
+        print("  %-23s: %4d" % (i, j))
         # if nt > 5: break
-        nt += 1
+        number += 1
     ##
     orthologs_filtered = filter_ortho(
         orthokeep,
@@ -429,22 +430,22 @@ def main():
                                                    len(orthologs_filtered)))
     ##
     print("Getting all the transcripts for preparing a TSL file")
-    TSL_cur, TSL_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
-    TSL_out = "%s/%s" % (TSLsubdir, gene_name)
-    write_TSL_file(TSL_out, [TSL_cur] + TSL_ortho)
+    tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
+    tsl_out = "%s/%s" % (tsl_subdir, gene_name)
+    write_tsl_file(tsl_out, [tsl_cur] + tsl_ortho)
 
     print("**** Query species : %s" % (species))
-    print("Got a total of %d transcripts with biotypes" % (len(TSL_cur)))
-    for b, c in Counter([x['biotype'] for x in TSL_cur]).most_common():
-        print("  %-23s: %4d" % (b, c))
+    print("Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
+    for i, j in Counter([dic['biotype'] for dic in tsl_cur]).most_common():
+        print("  %-23s: %4d" % (i, j))
     print("**** Orthologues")
-    for tr_o in TSL_ortho:
+    for tr_o in tsl_ortho:
         print("%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
 
     print("Now getting the exons sequences")
     # TODO revert to multiple files if it is easier
-    ffasta = "%s/%s.fasta" % (Seqsubdir, gene_name)
-    fexonstable = "%s/%s_exonstable.tsv" % (TEXsubdir, gene_name)
+    ffasta = "%s/%s.fasta" % (seqsubdir, gene_name)
+    fexonstable = "%s/%s_exonstable.tsv" % (tex_subdir, gene_name)
     fastaout = open(ffasta, "w")
     exonstableout = open(fexonstable, "w")
     dex = get_listofexons(curgene)
@@ -457,10 +458,10 @@ def main():
     exons_name = "%s:%s" % (species, symbol)
     for dseq in exfasta:
         dictseq2fasta(dseq, exons_name, fastaout)
-    for o in orthologs_filtered:
-        orthoid = o['target']['id']
-        orthospecies = o['target']['species']
-        # orthotaxon = o['target']['taxon_id']
+    for ortholog in orthologs_filtered:
+        orthoid = ortholog['target']['id']
+        orthospecies = ortholog['target']['species']
+        # orthotaxon = ortholog['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
         print("Getting exons information for %s" % (ortho_name))
         ortho_ens_dataset = species2ensembldataset(orthospecies)
