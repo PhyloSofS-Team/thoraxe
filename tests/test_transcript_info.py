@@ -72,7 +72,7 @@ def test_remove_na(mapk8):
     assert len(trx_data.Species.unique()) > 2
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
-    assert 0 == sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933')
+    assert sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933') == 0
 
 
 def test_keep_badquality_sequences(mapk8):
@@ -84,7 +84,7 @@ def test_keep_badquality_sequences(mapk8):
         remove_badquality=False)
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
-    assert 5 == sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933')
+    assert sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933') == 5
 
 
 def test_non_coding_exons_camk2a(camk2a):

@@ -2,13 +2,13 @@ from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
 
-def exon_clustering(trx_data,
+def exon_clustering(trx_data,  # pylint: disable=too-many-arguments
                     minimum_len=4,
                     coverage_cutoff=80.0,
                     percent_identity_cutoff=30.0,
                     gap_open_penalty=10,
                     gap_extend_penalty=1,
-                    substitution_matrix=blosum50):
+                    substitution_matrix=None):
     """
     Cluster exons based on their sequence identity after local alignment.
 
@@ -33,7 +33,10 @@ def exon_clustering(trx_data,
     coverage_cutoff and percent_identity_cutoff (default to 80.0 and
     30.0, respectively).
     """
-    nrows, ncols = trx_data.shape
+    if substitution_matrix is None:
+        substitution_matrix = blosum50
+
+    nrows = trx_data.shape[0]
 
     trx_data = trx_data.assign(
         Cluster=0,
