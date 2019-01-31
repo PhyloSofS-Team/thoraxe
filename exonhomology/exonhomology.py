@@ -1,9 +1,80 @@
+import argparse
 import logging
 import os
 import re
 import numpy as np
 from . import transcript_info
 from . import subexons
+
+
+def parse_command_line():
+    """
+    Parse command line.
+
+    It uses argparse to parse exonhomology' command line arguments and returns
+    the argparse parser.
+    """
+    parser = argparse.ArgumentParser(
+        prog="exonhomology",
+        description="""
+        exonhomology is a tool to identify homologous exons in a set of
+        transcripts from the same gene and different species.
+        """,
+        epilog="""
+        It has been developed at LCQB (Laboratory of Computational and
+        Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
+        """,
+    )
+    parser.add_argument(
+        '-i', '--inputdir',
+        help='input directory',
+        default='.'
+    )
+    parser.add_argument(
+        '-g', '--genename',
+        help='gene name using the transcript_query output format '
+        '(e.g. MAPK8_ENSG00000107643). By default, the name of the last '
+        'directory in --inputdir (-i) is used',
+        default=''
+    )
+    parser.add_argument(
+        '-o', '--outputdir',
+        help='output directory',
+        default='.'
+    )
+    parser.add_argument(
+        '-m', '--minlen',
+        help='minimum exon length',
+        type=int,
+        default=4
+    )
+    parser.add_argument(
+        '-c', '--coverage',
+        help='minimum alignment coverage of the shorter exon to include both '
+        'exons in the same cluster',
+        type=float,
+        default=80.0
+    )
+    parser.add_argument(
+        '-p', '--identity',
+        help='minimum percent identity to include exons in the same cluster',
+        type=float,
+        default=30.0
+    )
+    parser.add_argument(
+        '--gapopen',
+        help='penalty for a gap opening',
+        type=int,
+        default=10
+    )
+    parser.add_argument(
+        '--gapextend',
+        help='penalty for gap extensions',
+        type=int,
+        default=1
+    )
+
+    return parser.parse_args()
 
 
 def _get_gene_name(input_folder, gene_name=None):
@@ -17,6 +88,7 @@ def _get_gene_name(input_folder, gene_name=None):
     >>> _get_gene_name('exonhomology/tests/data/MAPK8')
     ('exonhomology/tests/data/MAPK8', 'MAPK8')
     """
+    # TODO: Use pwd if input_folder is '' or '.'
     if gene_name is None:
         gene_name = os.path.basename(os.path.normpath(input_folder))
     # \.?[0-9]* is needed to accept version numbers
@@ -108,3 +180,13 @@ def _get_homologous_subexons(outdir, name, subexon_df, gene2speciesname,
             regfile.write('%s\n' % str(region))
 
     subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
+
+
+def main():
+    """Perform Pipeline."""
+    args = parse_command_line()
+    print(args)
+
+
+if __name__ == '__main___':
+    main()
