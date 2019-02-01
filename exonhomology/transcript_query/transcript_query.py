@@ -401,13 +401,13 @@ def main():
 
     # 2-
     print("Searching ID for gene with name %s in species %s..." %
-          (args['genename'], args['species']))
-    geneids = get_geneids_from_symbol(args['species'], args['genename'])
+          (args.genename, args.species))
+    geneids = get_geneids_from_symbol(args.species, args.genename)
     print("Found the following list of ids: %s" % (json.dumps(geneids)))
     if not geneids:
         raise KeyError("No gene found, exiting")
     curgene = geneids[0]
-    gene_name = "%s_%s" % (args['genename'], curgene)
+    gene_name = "%s_%s" % (args.genename, curgene)
     cdirectory = gene_name
     tsl_subdir = cdirectory + "/TSL/"
     tex_subdir = cdirectory + "/TablesExons/"
@@ -453,7 +453,7 @@ def main():
     tsl_out = "%s/%s" % (tsl_subdir, gene_name)
     write_tsl_file(tsl_out, [tsl_cur] + tsl_ortho)
 
-    print("**** Query species : %s" % (args['species']))
+    print("**** Query species : %s" % (args.species))
     print("Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
     for i, j in Counter([dic['biotype'] for dic in tsl_cur]).most_common():
         print("  %-23s: %4d" % (i, j))
@@ -470,11 +470,11 @@ def main():
     dex = get_listofexons(curgene)
     lexid = list({x['exon_id'] for x in dex})
     print("Getting the sequences files for %s" % (curgene))
-    curspec_ens_dataset = species2ensembldataset(args['species'])
+    curspec_ens_dataset = species2ensembldataset(args.species)
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(curspec_ens_dataset, curgene)
     exonstableout.write(extable.text)
-    exons_name = "%s:%s" % (args['species'], args['genename'])
+    exons_name = "%s:%s" % (args.species, args.genename)
     for dseq in exfasta:
         dictseq2fasta(dseq, exons_name, fastaout)
     for ortholog in orthologs_filtered:
