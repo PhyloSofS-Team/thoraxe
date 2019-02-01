@@ -25,16 +25,19 @@ def parse_command_line():
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
         """)
     parser.add_argument(
-        '-i', '--inputdir', help='input directory', default='.')
+        '-i', '--inputdir', help='input directory', type=str, default='.')
     parser.add_argument(
         '-g',
         '--genename',
         help='gene name using the transcript_query output format '
         '(e.g. MAPK8_ENSG00000107643). By default, the name of the last '
         'directory in --inputdir (-i) is used',
+        type=str,
         default='')
     parser.add_argument(
-        '-o', '--outputdir', help='output directory', default='.')
+        '-o', '--outputdir', help='output directory', type=str, default='.')
+    parser.add_argument(
+        '-t', '--mafft', help='path to MAFFT', type=str, default='mafft')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
@@ -69,7 +72,7 @@ def _get_gene_name(input_folder, gene_name=None):
     >>> _get_gene_name('exonhomology/tests/data/MAPK8')
     ('exonhomology/tests/data/MAPK8', 'MAPK8')
     """
-    # TODO: Use pwd if input_folder is '' or '.'
+    input_folder = os.path.abspath(input_folder)
     if gene_name is None:
         gene_name = os.path.basename(os.path.normpath(input_folder))
     # \.?[0-9]* is needed to accept version numbers
@@ -125,8 +128,13 @@ def _outfile(output_folder, prefix, name, ext):
     return os.path.join(output_folder, prefix + str(name) + ext)
 
 
-def _get_homologous_subexons(outdir, name, subexon_df, gene2speciesname,
-                             connected_subexons):
+def _get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
+        outdir,
+        name,
+        subexon_df,
+        gene2speciesname,
+        connected_subexons,
+        mafft_path='mafft'):
     """Perform almost all the pipeline."""
     subexon_df, subexon_matrix = subexons.alignment.create_subexon_matrix(
         subexon_df)
@@ -135,38 +143,70 @@ def _get_homologous_subexons(outdir, name, subexon_df, gene2speciesname,
     chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname)
 
     msa_file = _outfile(outdir, "chimeric_alignment_", name, ".fasta")
-    subexons.alignment.run_mafft(chimerics, output_path=msa_file)
-    gene_ids, msa_matrix = subexons.alignment.create_msa_matrix(
-        chimerics, msa_file)
+    subexons.alignment.run_mafft(
+        chimerics, mafft_path=mafft_path, output_path=msa_file)
 
-    with open(_outfile(outdir, "gene_ids_", name, ".txt"), 'w') as outfile:
-        for item in gene_ids:
-            outfile.write("%s\n" % item)
+    if os.path.getsize(msa_file) > 0:
+        gene_ids, msa_matrix = subexons.alignment.create_msa_matrix(
+            chimerics, msa_file)
 
-    subexons.plot.plot_msa_subexons(
-        gene_ids,
-        msa_matrix,
-        outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
-        subexon_table=subexon_df)
+        with open(_outfile(outdir, "gene_ids_", name, ".txt"), 'w') as outfile:
+            for item in gene_ids:
+                outfile.write("%s\n" % item)
 
-    np.savetxt(
-        _outfile(outdir, "msa_matrix_", name, ".txt"),
-        msa_matrix,
-        delimiter=",")
+        if subexons.plot._PLOT:  # pylint: disable=protected-access
+            subexons.plot.plot_msa_subexons(
+                gene_ids,
+                msa_matrix,
+                outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
+                subexon_table=subexon_df)
 
-    regions = subexons.alignment.minimal_regions(msa_matrix)
-    with open(_outfile(outdir, "msa_subexon_regions_", name, ".txt"),
-              'w') as regfile:
-        for region in regions:
-            regfile.write('%s\n' % str(region))
+        np.savetxt(
+            _outfile(outdir, "msa_matrix_", name, ".txt"),
+            msa_matrix,
+            delimiter=",")
 
-    subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
+        regions = subexons.alignment.minimal_regions(msa_matrix)
+        with open(_outfile(outdir, "msa_subexon_regions_", name, ".txt"),
+                  'w') as regfile:
+            for region in regions:
+                regfile.write('%s\n' % str(region))
+
+        subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
 
 
 def main():
     """Perform Pipeline."""
     args = parse_command_line()
-    print(args)
+
+    input_folder, gene_name = _get_gene_name(
+        args.inputdir,
+        gene_name=args.genename if args.genename != '' else None)
+    transcript_table = _get_transcripts(input_folder, gene_name)
+    subexon_table = _get_subexons(
+        transcript_table,
+        minimum_len=args.minlen,
+        coverage_cutoff=args.coverage,
+        percent_identity_cutoff=args.identity,
+        gap_open_penalty=args.gapopen,
+        gap_extend_penalty=args.gapextend)
+
+    transcript_table.to_csv(
+        os.path.join(args.outputdir, "transcript_table.csv"))
+    subexon_table.to_csv(os.path.join(args.outputdir, "subexon_table.csv"))
+
+    gene2speciesname = subexons.alignment.gene2species(transcript_table)
+    connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
+
+    for name, subgroup in subexon_table.groupby('Cluster'):
+        if subgroup.shape[0] > 1:
+            _get_homologous_subexons(
+                args.outputdir,
+                name,
+                subgroup,
+                gene2speciesname,
+                connected_subexons,
+                mafft_path=args.mafft)
 
 
 if __name__ == '__main___':

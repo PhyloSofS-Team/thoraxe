@@ -20,6 +20,7 @@ setup(
     entry_points={
         'console_scripts': [
             'transcript_query=exonhomology.transcript_query:main',
+            'exonhomology=exonhomology:main'
         ],
     },
     install_requires=[

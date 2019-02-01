@@ -3,10 +3,10 @@
 import platform
 import distro
 
-_LOAD_PLOT = False
+_PLOT = False
 try:
     import matplotlib.pyplot as plt
-    _LOAD_PLOT = True
+    _PLOT = True
 except ImportError as err:
     print("matplotlib.pyplot loading has failed with ImportError: ", err)
     if 'tkinter' in str(err):
@@ -22,7 +22,7 @@ except ImportError as err:
                 print('    In Fedora you can try: '
                       'sudo dnf install python3-tkinter')
 
-if _LOAD_PLOT:
+if _PLOT:
     import numpy as np
     import pandas as pd
     import seaborn
@@ -41,18 +41,16 @@ if _LOAD_PLOT:
         """
         # stack... stop-seaborn-plotting-multiple-figures-on-top-of-one-another
         plt.figure()
-
         subexon_number = int(msa_matrix[~np.isnan(msa_matrix)].max()) + 1
         cmap = seaborn.color_palette('tab10', subexon_number)
-
         msa_matrix_df = pd.DataFrame(msa_matrix)
         msa_matrix_df['Gene ID'] = gene_ids
         msa_matrix_df.set_index('Gene ID', inplace=True)
         sns_plot = seaborn.heatmap(msa_matrix_df, cmap=cmap)
-
         # This depends on the seaborn version: seaborn-0.8.1
         sns_plot.get_figure().savefig(outfile, bbox_inches='tight')
         # stackoverflow: second-y-axis-label-getting-cut-off
+        plt.close()
 
         if subexon_table is not None:
             msa_matrix_df_copy = msa_matrix_df.copy()
@@ -97,6 +95,7 @@ if _LOAD_PLOT:
                 msa_matrix_df_copy, cmap="RdYlGn")
             sns_const_plot1.get_figure().savefig(
                 outfile_1, bbox_inches='tight')
+            plt.close()
 
             subexon_int_index, _ = pd.factorize(
                 subexon_subdf['Subexon ID cluster'])
@@ -108,10 +107,10 @@ if _LOAD_PLOT:
                         subexon_index = int(subexon_index)
                         msa_matrix_df_copy.iloc[i, j] = subexon_int_index[
                             subexon_index]
+
             plt.figure()
             outfile2 = outfile.replace('.png', '_subexon_id.png')
             sns_const_plot2 = seaborn.heatmap(
                 msa_matrix_df_copy, cmap="Spectral")
             sns_const_plot2.get_figure().savefig(outfile2, bbox_inches='tight')
-
-        return sns_plot
+            plt.close()

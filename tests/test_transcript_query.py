@@ -33,3 +33,11 @@ def test_second_level(example_folder):
     assert any(elem.endswith('_TSL.csv') for elem in content)
     assert any(elem.endswith('.fasta') for elem in content)
     assert any(elem.endswith('_exonstable.tsv') for elem in content)
+
+    # MAPK8_ENSG00000107643/TablesExons/MAPK8_ENSG00000107643_exonstable.tsv
+    # Query ERROR: caught BioMart::Exception: non-BioMart die():
+    for filename in content:
+        if filename.endswith('_exonstable.tsv'):
+            with open(filename, 'r') as file:
+                data = file.read()
+                assert "ERROR" not in data

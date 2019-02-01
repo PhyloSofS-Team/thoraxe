@@ -129,34 +129,34 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
     # TODO: Error control on the call
 
     # see http://ensembl.org/biomart/martview/ for the web application
-    biomart_request_url_template = """
-    http://ensembl.org/biomart/martservice?query=
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE Query>
-    <Query  virtualSchemaName = "default" formatter = "TSV" header = "{ish}"
-        uniqueRows = "0" count = "" datasetConfigVersion = "0.6">
-    <Dataset name = "{data}" interface = "default">
-    <Filter name = "ensembl_gene_id" value = "{eid}"/>
-    <Attribute name = "ensembl_gene_id" />
-    <Attribute name = "ensembl_transcript_id" />
-    <Attribute name = "transcript_start" />
-    <Attribute name = "transcript_end" />
-    <Attribute name = "strand" />
-    <Attribute name = "ensembl_exon_id" />
-    <Attribute name = "exon_chrom_start" />
-    <Attribute name = "exon_chrom_end" />
-    <Attribute name = "rank" />
-    <Attribute name = "cdna_coding_start" />
-    <Attribute name = "cdna_coding_end" />
-    <Attribute name = "genomic_coding_start" />
-    <Attribute name = "genomic_coding_end" />
-    <Attribute name = "cds_start" />
-    <Attribute name = "cds_end" />
-    <Attribute name = "phase" />
-    <Attribute name = "end_phase" />
-    </Dataset>
-    </Query>
-    """
+    biomart_request_url_template = (
+        'http://ensembl.org/biomart/martservice?query='
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<!DOCTYPE Query>'
+        '<Query  virtualSchemaName = "default" formatter = "TSV" '
+        'header = "{ish}" uniqueRows = "0" count = "" '
+        'datasetConfigVersion = "0.6">'
+        '<Dataset name = "{data}" interface = "default">'
+        '<Filter name = "ensembl_gene_id" value = "{eid}"/>'
+        '<Attribute name = "ensembl_gene_id" />'
+        '<Attribute name = "ensembl_transcript_id" />'
+        '<Attribute name = "transcript_start" />'
+        '<Attribute name = "transcript_end" />'
+        '<Attribute name = "strand" />'
+        '<Attribute name = "ensembl_exon_id" />'
+        '<Attribute name = "exon_chrom_start" />'
+        '<Attribute name = "exon_chrom_end" />'
+        '<Attribute name = "rank" />'
+        '<Attribute name = "cdna_coding_start" />'
+        '<Attribute name = "cdna_coding_end" />'
+        '<Attribute name = "genomic_coding_start" />'
+        '<Attribute name = "genomic_coding_end" />'
+        '<Attribute name = "cds_start" />'
+        '<Attribute name = "cds_end" />'
+        '<Attribute name = "phase" />'
+        '<Attribute name = "end_phase" />'
+        '</Dataset>'
+        '</Query>')
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
