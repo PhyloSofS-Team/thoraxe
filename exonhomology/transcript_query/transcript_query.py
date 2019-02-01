@@ -9,6 +9,7 @@ l'API RESTfull de ENSEMBL afin de récupérer tous les gènes homologues
 à un gene donné (par son nom courant)
 """
 
+import argparse
 import csv
 import io
 import json
@@ -34,6 +35,37 @@ VERBOSE = False
 
 ###
 # Utility functions
+def parse_command_line():
+    """
+    Parse command line.
+
+    It uses argparse to parse transcript_query' command line arguments and
+    returns the argparse parser.
+    """
+    parser = argparse.ArgumentParser(
+        prog="transcript_query",
+        description="""
+        transcript_query download from Ensembl the transcript and exon
+        information needed for exonhomology.
+        """,
+        epilog="""
+        It has been developed at LCQB (Laboratory of Computational and
+        Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
+        """,
+    )
+    parser.add_argument(
+        'genename', type=str, help='gene name in Ensembl (e.g. MAPK8)')
+    parser.add_argument(
+        '-s',
+        '--species',
+        help='species to look for the gene name',
+        default='homo_sapiens')
+    # TODO: take care of aliases for species names,symbol always use the
+    # binomial names when running the code
+
+    return parser.parse_args()
+
+
 def lodict2csvstring(listofdicts):
     stream = io.BytesIO()
     fnames = set([])
@@ -95,7 +127,7 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
     Return a requests object (use r.text to get the text for the file)
     """
     # TODO: Error control on the call
-    ##
+
     # see http://ensembl.org/biomart/martview/ for the web application
     biomart_request_url_template = """
     http://ensembl.org/biomart/martservice?query=
@@ -307,7 +339,7 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     Wrapper function to call multiple times get_listoftranscripts, given
     a ensembl geneid and a list of orthologs provided by get_orthologs
     Data structure for each ortholog is
-    {dn_ds : float, method_link_type : str,
+    {dn_ds : float, method_link_type : str,rop in
         source : dict(),  target : dict(), taxonomy_level : str,
         type: Enum(ortholog_one2one,
                    ortholog_one2many,
@@ -365,30 +397,17 @@ def main():
     ]
 
     # 1-
-    if len(sys.argv) == 3:
-        species = sys.argv[1]
-        symbol = sys.argv[2]
-    elif len(sys.argv) == 2:
-        species = 'homo_sapiens'
-        symbol = sys.argv[1]
-    else:
-        print("No parameter given, running with default")
-        # species, symbol = 'homo_sapiens', 'DNM2'
-        species, symbol = 'homo_sapiens', 'MAPK8'
-        # species, symbol = 'homo_sapiens', 'snap25'
-        # species, symbol = 'homo_sapiens', 'nxnl2'
-    # TODO, take care of aliases for species names, always use the
-    # binomial names when running the code
+    args = parse_command_line()
 
     # 2-
-    print("Searching ID for gene with name %s in species %s..." % (symbol,
-                                                                   species))
-    geneids = get_geneids_from_symbol(species, symbol)
+    print("Searching ID for gene with name %s in species %s..." %
+          (args['genename'], args['species']))
+    geneids = get_geneids_from_symbol(args['species'], args['genename'])
     print("Found the following list of ids: %s" % (json.dumps(geneids)))
     if not geneids:
         raise KeyError("No gene found, exiting")
     curgene = geneids[0]
-    gene_name = "%s_%s" % (symbol, curgene)
+    gene_name = "%s_%s" % (args['genename'], curgene)
     cdirectory = gene_name
     tsl_subdir = cdirectory + "/TSL/"
     tex_subdir = cdirectory + "/TablesExons/"
@@ -434,7 +453,7 @@ def main():
     tsl_out = "%s/%s" % (tsl_subdir, gene_name)
     write_tsl_file(tsl_out, [tsl_cur] + tsl_ortho)
 
-    print("**** Query species : %s" % (species))
+    print("**** Query species : %s" % (args['species']))
     print("Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
     for i, j in Counter([dic['biotype'] for dic in tsl_cur]).most_common():
         print("  %-23s: %4d" % (i, j))
@@ -451,11 +470,11 @@ def main():
     dex = get_listofexons(curgene)
     lexid = list({x['exon_id'] for x in dex})
     print("Getting the sequences files for %s" % (curgene))
-    curspec_ens_dataset = species2ensembldataset(species)
+    curspec_ens_dataset = species2ensembldataset(args['species'])
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(curspec_ens_dataset, curgene)
     exonstableout.write(extable.text)
-    exons_name = "%s:%s" % (species, symbol)
+    exons_name = "%s:%s" % (args['species'], args['genename'])
     for dseq in exfasta:
         dictseq2fasta(dseq, exons_name, fastaout)
     for ortholog in orthologs_filtered:

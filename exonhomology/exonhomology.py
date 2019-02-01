@@ -23,56 +23,37 @@ def parse_command_line():
         epilog="""
         It has been developed at LCQB (Laboratory of Computational and
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
-        """,
-    )
+        """)
     parser.add_argument(
-        '-i', '--inputdir',
-        help='input directory',
-        default='.'
-    )
+        '-i', '--inputdir', help='input directory', default='.')
     parser.add_argument(
-        '-g', '--genename',
+        '-g',
+        '--genename',
         help='gene name using the transcript_query output format '
         '(e.g. MAPK8_ENSG00000107643). By default, the name of the last '
         'directory in --inputdir (-i) is used',
-        default=''
-    )
+        default='')
     parser.add_argument(
-        '-o', '--outputdir',
-        help='output directory',
-        default='.'
-    )
+        '-o', '--outputdir', help='output directory', default='.')
     parser.add_argument(
-        '-m', '--minlen',
-        help='minimum exon length',
-        type=int,
-        default=4
-    )
+        '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
-        '-c', '--coverage',
+        '-c',
+        '--coverage',
         help='minimum alignment coverage of the shorter exon to include both '
         'exons in the same cluster',
         type=float,
-        default=80.0
-    )
+        default=80.0)
     parser.add_argument(
-        '-p', '--identity',
+        '-p',
+        '--identity',
         help='minimum percent identity to include exons in the same cluster',
         type=float,
-        default=30.0
-    )
+        default=30.0)
     parser.add_argument(
-        '--gapopen',
-        help='penalty for a gap opening',
-        type=int,
-        default=10
-    )
+        '--gapopen', help='penalty for a gap opening', type=int, default=10)
     parser.add_argument(
-        '--gapextend',
-        help='penalty for gap extensions',
-        type=int,
-        default=1
-    )
+        '--gapextend', help='penalty for gap extensions', type=int, default=1)
 
     return parser.parse_args()
 
