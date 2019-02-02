@@ -4,6 +4,9 @@ subexon_alignment: Module to create the subexon MSA with MAFFT.
 This module creates a MSA of subexons using MAFFT.
 """
 
+import os
+import platform
+import shutil
 import subprocess
 import tempfile
 import warnings
@@ -205,27 +208,102 @@ def _print_temporal_fasta(chimerics):
     return tmp_fasta.name
 
 
-def run_mafft(chimerics,
-              output_path='alignment.fasta',
-              mafft_path='mafft',
-              mafft_arguments=None):
+def _get_wsl_name(executable_path):
+    """
+    Return the name of the 'Windows Subsystem for Linux' executable.
+
+    Return None is the path in not valid.
+
+    >>> _get_wsl_name('bash.exe')
+    'bash.exe'
+    >>> _get_wsl_name('C:\\WINDOWS\\SysNative\\bash.exe')
+    'bash.exe'
+    >>> _get_wsl_name('mafft')
+    """
+    executable_name = os.path.basename(os.path.abspath(executable_path))
+    return executable_name if executable_name.split('.')[0].lower() in {
+        'wsl', 'ubuntu', 'bash'
+    } else None
+
+
+def _get_wsl_path(executable_name):
+    """
+    Return path to the 'Windows Subsystem for Linux' executable.
+
+    Code from stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
+    """
+    is32bit = platform.architecture()[0] == '32bit'
+    system32 = os.path.join(os.environ['SystemRoot'],
+                            'SysNative' if is32bit else 'System32')
+    return os.path.join(system32, executable_name)
+
+
+def _win2wsl(path):
+    """
+    Convert a Windows path to a 'Windows Subsystem for Linux' path.
+
+    This is similar to wslpath.
+    Code from stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
+
+    >>>_win2wsl('C:\\aaa\\bbb\\ccc\\foo.zip')
+    '/mnt/c/aaa/bbb/ccc/foo.zip'
+    """
+    path = os.path.abspath(path)
+    if path[1:2] == ':':
+        drive = path[:1].lower()
+        return '/mnt/' + drive + path[2:].replace('\\', '/')
+
+
+def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
     """
     Run MAFFT in the chimeric sequences and return the output file.
 
-    mafft_arguments should be a list of str arguments for subprocess, e.g.:
-    ['--maxiterate', '100']
+    You can pass arguments using mafft_path (default: 'mafft'), e.g:
+        mafft_path='mafft --maxiterate 100 --auto'
+
+    You need MAFFT installed to run this function. You can install MAFFT from:
+        https://mafft.cbrc.jp/alignment/software/
+
+    If you are using Windows 10 and you have installed MAFFT in Ubuntu using the
+    'Windows Subsystem for Linux', you can try with the following options:
+        mafft_path='ubuntu.exe -c mafft'
+        mafft_path='bash.exe -c mafft'
+        mafft_path='wsl.exe mafft'
     """
     input_fasta = _print_temporal_fasta(chimerics)
 
-    command = [mafft_path, input_fasta]
-    if mafft_arguments is not None:
-        command.extend(mafft_arguments)
+    command = mafft_path.split()
 
-    with open(output_path, 'wb') as outfile:
-        process = subprocess.Popen(command, stdout=subprocess.PIPE)
-        for line in process.stdout:
-            outfile.write(line)
-        process.wait()
+    wsl = _get_wsl_name(command[0])
+    is_wsl = platform.system() == 'Windows' and wsl is not None
+
+    if is_wsl:
+        command[0] = _get_wsl_path(wsl)
+        command.append(_win2wsl(input_fasta))
+        command.append('>')
+        command.append(_win2wsl(output_path))
+        if wsl.lower().startswith('wsl'):
+            subprocess.call(command)
+        else:
+            assert command[1] == '-c'
+            subprocess.call("{} -c '{}'".format(command[0],
+                                                ' '.join(command[2:])))
+    else:
+        try:
+            command.append(input_fasta)
+            with open(output_path, 'wb') as outfile:
+                process = subprocess.Popen(command, stdout=subprocess.PIPE)
+                for line in process.stdout:
+                    outfile.write(line)
+                process.wait()
+        except (OSError, FileNotFoundError) as err:
+            if shutil.which(command[0]) is None:
+                raise OSError(
+                    ('{} not found. Please indicate a correct mafft_path or '
+                     'install it: https://mafft.cbrc.jp/alignment/software/'
+                     ).format(mafft_path))
+            else:
+                raise err
 
     return output_path
 

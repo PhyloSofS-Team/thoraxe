@@ -37,7 +37,7 @@ def parse_command_line():
     parser.add_argument(
         '-o', '--outputdir', help='output directory', type=str, default='.')
     parser.add_argument(
-        '-t', '--mafft', help='path to MAFFT', type=str, default='mafft')
+        '-t', '--mafft_path', help='path to MAFFT', type=str, default='mafft')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
@@ -84,7 +84,7 @@ def _get_gene_name(input_folder, gene_name=None):
     return input_folder, gene_name
 
 
-def _get_transcripts(input_folder, gene_name):
+def get_transcripts(input_folder, gene_name):
     """Return a DataFrame with the transcript information."""
     return transcript_info.read_transcript_info(
         os.path.join(input_folder, 'TSL', gene_name + '_TSL.csv'),
@@ -94,7 +94,7 @@ def _get_transcripts(input_folder, gene_name):
         remove_na=False)
 
 
-def _get_subexons(  # pylint: disable=too-many-arguments
+def get_subexons(  # pylint: disable=too-many-arguments
         transcript_table,
         minimum_len=4,
         coverage_cutoff=80.0,
@@ -128,7 +128,7 @@ def _outfile(output_folder, prefix, name, ext):
     return os.path.join(output_folder, prefix + str(name) + ext)
 
 
-def _get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
+def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         outdir,
         name,
         subexon_df,
@@ -171,8 +171,14 @@ def _get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-man
                   'w') as regfile:
             for region in regions:
                 regfile.write('%s\n' % str(region))
+    else:
+        gene_ids = None
+        msa_matrix = None
+        regions = None
 
-        subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
+    subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
+
+    return (subexon_df, subexon_matrix, gene_ids, msa_matrix, regions)
 
 
 def main():
@@ -182,8 +188,8 @@ def main():
     input_folder, gene_name = _get_gene_name(
         args.inputdir,
         gene_name=args.genename if args.genename != '' else None)
-    transcript_table = _get_transcripts(input_folder, gene_name)
-    subexon_table = _get_subexons(
+    transcript_table = get_transcripts(input_folder, gene_name)
+    subexon_table = get_subexons(
         transcript_table,
         minimum_len=args.minlen,
         coverage_cutoff=args.coverage,
@@ -200,13 +206,13 @@ def main():
 
     for name, subgroup in subexon_table.groupby('Cluster'):
         if subgroup.shape[0] > 1:
-            _get_homologous_subexons(
+            get_homologous_subexons(
                 args.outputdir,
                 name,
                 subgroup,
                 gene2speciesname,
                 connected_subexons,
-                mafft_path=args.mafft)
+                mafft_path=args.mafft_path)
 
 
 if __name__ == '__main___':
