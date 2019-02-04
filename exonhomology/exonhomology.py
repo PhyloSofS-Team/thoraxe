@@ -154,6 +154,14 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             for item in gene_ids:
                 outfile.write("%s\n" % item)
 
+        np.savetxt(
+            _outfile(outdir, "msa_matrix_", name, ".txt"),
+            msa_matrix,
+            delimiter=",")
+
+        colclusters = subexons.alignment.column_clusters(
+            subexons.alignment.column_patterns(msa_matrix))
+
         if subexons.plot._PLOT:  # pylint: disable=protected-access
             subexons.plot.plot_msa_subexons(
                 gene_ids,
@@ -161,24 +169,15 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
                 outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
                 subexon_table=subexon_df)
 
-        np.savetxt(
-            _outfile(outdir, "msa_matrix_", name, ".txt"),
-            msa_matrix,
-            delimiter=",")
-
-        regions = subexons.alignment.minimal_regions(msa_matrix)
-        with open(_outfile(outdir, "msa_subexon_regions_", name, ".txt"),
-                  'w') as regfile:
-            for region in regions:
-                regfile.write('%s\n' % str(region))
     else:
         gene_ids = None
         msa_matrix = None
-        regions = None
+        colclusters = None
 
     subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
 
-    return (subexon_df, subexon_matrix, gene_ids, msa_matrix, regions)
+    return (subexon_df, chimerics, subexon_matrix, gene_ids, msa_matrix,
+            msa_file, colclusters)
 
 
 def main():

@@ -4,6 +4,7 @@ subexon_alignment: Module to create the subexon MSA with MAFFT.
 This module creates a MSA of subexons using MAFFT.
 """
 
+import collections
 import os
 import platform
 import shutil
@@ -15,7 +16,7 @@ import numpy as np
 import pandas as pd
 from Bio import AlignIO
 from Bio import BiopythonWarning
-from collections import OrderedDict
+from recordclass import recordclass
 
 # List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
 # Order from NCBI Taxonomy/CommonTree, but using Human as 1
@@ -35,6 +36,11 @@ SPECIES_ORDER = {
     'gorilla_gorilla': 2,
     'sus_scrofa': 8
 }
+
+ColPattern = collections.namedtuple('ColPattern', ['pattern', 'start', 'end'])
+
+ColCluster = recordclass(  # pylint: disable=invalid-name
+    'ColCluster', ['patterns', 'consensus', 'start', 'end'])
 
 
 def subexon_connectivity(subexon_table):
@@ -209,7 +215,7 @@ def _print_temporal_fasta(chimerics):
 
 
 def _get_wsl_name(executable_path):
-    """
+    r"""
     Return the name of the 'Windows Subsystem for Linux' executable.
 
     Return None is the path in not valid.
@@ -230,7 +236,7 @@ def _get_wsl_path(executable_name):
     """
     Return path to the 'Windows Subsystem for Linux' executable.
 
-    Code from stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
+    Stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
     """
     is32bit = platform.architecture()[0] == '32bit'
     system32 = os.path.join(os.environ['SystemRoot'],
@@ -239,19 +245,22 @@ def _get_wsl_path(executable_name):
 
 
 def _win2wsl(path):
-    """
+    r"""
     Convert a Windows path to a 'Windows Subsystem for Linux' path.
 
     This is similar to wslpath.
-    Code from stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
+    Stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
 
     >>>_win2wsl('C:\\aaa\\bbb\\ccc\\foo.zip')
     '/mnt/c/aaa/bbb/ccc/foo.zip'
     """
     path = os.path.abspath(path)
-    if path[1:2] == ':':
+    if len(path) > 3 and path[1:2] == ':':
         drive = path[:1].lower()
         return '/mnt/' + drive + path[2:].replace('\\', '/')
+
+    raise ValueError(
+        '{} is not an absolute Windows path to a file.'.format(path))
 
 
 def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
@@ -264,8 +273,8 @@ def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
     You need MAFFT installed to run this function. You can install MAFFT from:
         https://mafft.cbrc.jp/alignment/software/
 
-    If you are using Windows 10 and you have installed MAFFT in Ubuntu using the
-    'Windows Subsystem for Linux', you can try with the following options:
+    If you are using Windows 10 and you have installed MAFFT in Ubuntu using
+    the 'Windows Subsystem for Linux', you can try with the following options:
         mafft_path='ubuntu.exe -c mafft'
         mafft_path='bash.exe -c mafft'
         mafft_path='wsl.exe mafft'
@@ -315,9 +324,12 @@ def gene2species(transcript_data):
         index=transcript_data['Gene stable ID']).to_dict()
 
 
-def sort_species(chimerics, gene2sp, species_order=SPECIES_ORDER):
+def sort_species(chimerics, gene2sp, species_order=None):
     """Sort chimerics using the output from gene2species and SPECIES_ORDER."""
-    return OrderedDict(
+    if species_order is None:
+        species_order = SPECIES_ORDER
+
+    return collections.OrderedDict(
         sorted(
             list(chimerics.items()),
             key=lambda x: species_order[gene2sp[x[0]]]))
@@ -337,7 +349,6 @@ def create_msa_matrix(chimerics, msa_file):  # pylint: disable=too-many-locals
 
     msa_matrix = np.zeros((n_seq, n_col))
     msa_matrix.fill(np.nan)
-
     gene_ids = []
     for seq_index in range(0, n_seq):
         record = msa[seq_index]
@@ -354,31 +365,66 @@ def create_msa_matrix(chimerics, msa_file):  # pylint: disable=too-many-locals
             if seq_len > subexon2len[subexons[subexon_index]]:
                 subexon_index += 1
 
-            if residue in {'-', 'X'}:
-                value = np.nan
-            else:
-                value = subexons[subexon_index]
-
-            msa_matrix[seq_index, col_index] = value
+            if residue not in {'-', 'X'}:
+                msa_matrix[seq_index, col_index] = subexons[subexon_index]
 
     return gene_ids, msa_matrix
 
 
-def minimal_regions(msa_matrix):
-    """Return minimal homologous regions (columns) in msa_matrix."""
-    non_full_nan_columns = np.where(~np.all(np.isnan(msa_matrix), axis=0))[0]
-    msa_matrix = msa_matrix[:, non_full_nan_columns]
-    msa_matrix[np.isnan(msa_matrix)] = -1.0
-    n_seq, n_col = msa_matrix.shape
+def column_patterns(msa_matrix):
+    """Return a ColPattern list from the msa_matrix."""
+    colpatterns = []
+    for i in range(msa_matrix.shape[1]):
+        col = msa_matrix[:, i].copy()
+        if i == 0:
+            colpatterns.append(ColPattern(col, i, i))
+        else:
+            previous_pattern = colpatterns[-1]
+            if np.allclose(col, previous_pattern.pattern, equal_nan=True):
+                colpatterns[-1] = ColPattern(col, previous_pattern.start, i)
+            else:
+                colpatterns.append(ColPattern(col, i, i))
+    return colpatterns
 
-    column = msa_matrix[:, 0]
-    clusters = [list(column)]
-    for col_index in range(1, n_col):
-        previous_column = msa_matrix[:, col_index - 1]
-        column = msa_matrix[:, col_index]
-        if np.any(column != previous_column) and not (
-                sum(column) == -1 * n_seq
-                or sum(previous_column) == -1 * n_seq):
-            clusters.append(list(column))
 
+def _equal_without_nans(col_i, col_j):
+    """
+    Return True if the columns are equal without comparing rows with nans.
+
+    Returns False otherwise or if there are no elements in common between the
+    columns.
+    """
+    nans = np.isnan(col_i) | np.isnan(col_j)
+    elements_i = col_i[~nans]
+    elements_j = col_j[~nans]
+    if elements_i.size > 0:
+        return np.array_equal(elements_i, elements_j)
+    return False
+
+
+def _colcluster(colpattern):
+    """Return a ColCluster with colpattern as the unique element."""
+    return ColCluster([colpattern], colpattern.pattern.copy(),
+                      colpattern.start, colpattern.end)
+
+
+def column_clusters(colpatterns):
+    """Return a ColCluster liste from a ColPattern list."""
+    n_patterns = len(colpatterns)
+    colpattern = colpatterns[0]
+    clusters = [_colcluster(colpattern)]
+    if n_patterns > 1:
+        for i in range(1, n_patterns):
+            colpattern = colpatterns[i]
+            if not np.all(np.isnan(colpattern.pattern)):
+                cluster = clusters[-1]
+                if (colpattern.start - cluster.end == 1
+                        and _equal_without_nans(cluster.consensus,
+                                                colpattern.pattern)):
+                    nans = np.isnan(cluster.consensus)
+                    cluster.consensus[nans] = colpattern.pattern[nans]
+                    cluster.patterns.append(colpattern)
+                    cluster.end = colpattern.end
+                else:
+                    clusters.append(_colcluster(colpattern))
     return clusters
