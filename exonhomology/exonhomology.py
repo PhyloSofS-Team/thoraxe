@@ -23,7 +23,8 @@ def parse_command_line():
         epilog="""
         It has been developed at LCQB (Laboratory of Computational and
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
-        """)
+        """,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         '-i', '--inputdir', help='input directory', type=str, default='.')
     parser.add_argument(
@@ -57,6 +58,11 @@ def parse_command_line():
         '--gapopen', help='penalty for a gap opening', type=int, default=10)
     parser.add_argument(
         '--gapextend', help='penalty for gap extensions', type=int, default=1)
+    parser.add_argument(
+        '--padding',
+        help='length of padding, Xs, in the chimeric alignment',
+        type=int,
+        default=10)
 
     return parser.parse_args()
 
@@ -134,21 +140,25 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         subexon_df,
         gene2speciesname,
         connected_subexons,
-        mafft_path='mafft'):
+        mafft_path='mafft',
+        padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
     subexon_df, subexon_matrix = subexons.alignment.create_subexon_matrix(
         subexon_df)
     chimerics = subexons.alignment.create_chimeric_sequences(
-        subexon_df, subexon_matrix, connected_subexons)
+        subexon_df, subexon_matrix, connected_subexons, padding=padding)
     chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname)
 
     msa_file = _outfile(outdir, "chimeric_alignment_", name, ".fasta")
     subexons.alignment.run_mafft(
         chimerics, mafft_path=mafft_path, output_path=msa_file)
 
-    if os.path.getsize(msa_file) > 0:
+    msa = subexons.alignment.read_msa_fasta(msa_file)
+
+    if msa is not None and len(msa) > 1 and len(msa[0]) > 1:
+
         gene_ids, msa_matrix = subexons.alignment.create_msa_matrix(
-            chimerics, msa_file)
+            chimerics, msa)
 
         with open(_outfile(outdir, "gene_ids_", name, ".txt"), 'w') as outfile:
             for item in gene_ids:
@@ -169,6 +179,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
                 outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
                 subexon_table=subexon_df)
 
+        subexon_df = subexons.alignment.save_homologous_subexons(
+            name, msa, subexon_df, gene_ids, colclusters, outdir, padding)
     else:
         gene_ids = None
         msa_matrix = None
@@ -176,8 +188,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
 
     subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
 
-    return (subexon_df, chimerics, subexon_matrix, gene_ids, msa_matrix,
-            msa_file, colclusters)
+    return subexon_df, chimerics, msa_file, gene_ids, msa_matrix, colclusters
 
 
 def main():
@@ -205,13 +216,15 @@ def main():
 
     for name, subgroup in subexon_table.groupby('Cluster'):
         if subgroup.shape[0] > 1:
-            get_homologous_subexons(
-                args.outputdir,
-                name,
-                subgroup,
-                gene2speciesname,
-                connected_subexons,
-                mafft_path=args.mafft_path)
+            (subexon_df, chimerics, msa_file, gene_ids, msa_matrix,
+             colclusters) = get_homologous_subexons(
+                 args.outputdir,
+                 name,
+                 subgroup,
+                 gene2speciesname,
+                 connected_subexons,
+                 mafft_path=args.mafft_path,
+                 padding='X' * args.padding)
 
 
 if __name__ == '__main___':

@@ -52,7 +52,7 @@ def parse_command_line():
         It has been developed at LCQB (Laboratory of Computational and
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
         """,
-    )
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         'genename', type=str, help='gene name in Ensembl (e.g. MAPK8)')
     parser.add_argument(

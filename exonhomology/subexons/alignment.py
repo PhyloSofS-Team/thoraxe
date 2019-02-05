@@ -5,6 +5,7 @@ This module creates a MSA of subexons using MAFFT.
 """
 
 import collections
+import logging
 import os
 import platform
 import shutil
@@ -335,18 +336,34 @@ def sort_species(chimerics, gene2sp, species_order=None):
             key=lambda x: species_order[gene2sp[x[0]]]))
 
 
-def create_msa_matrix(chimerics, msa_file):  # pylint: disable=too-many-locals
+def read_msa_fasta(msa_file):
     """
-    Convert a msa_file from chimerics to a matrix.
+    Return a BioPython's alignment object from the fasta msa_file.
+
+    Return None if the file is empty.
+    """
+    if os.path.getsize(msa_file) > 0:
+        msa = AlignIO.read(msa_file, 'fasta')
+        n_seq = len(msa)
+        if n_seq < 2:
+            logging.warning('There are few (%s) sequences in %s', n_seq,
+                            msa_file)
+        n_col = len(msa[0])
+        if n_col < 2:
+            logging.warning('There are few (%s) columns in %s', n_col,
+                            msa_file)
+        return msa
+    return None
+
+
+def create_msa_matrix(chimerics, msa):  # pylint: disable=too-many-locals
+    """
+    Convert a msa from chimerics to a matrix.
 
     Each cell has the subexon number (Index) or nan for gaps and padding.
     """
-    msa = AlignIO.read(msa_file, 'fasta')
-    n_seq = len(msa[:, 0])
-    assert n_seq > 1, 'There are few sequences in %s' % msa_file
+    n_seq = len(msa)
     n_col = len(msa[0])
-    assert n_col > 1, 'There are few columns in %s' % msa_file
-
     msa_matrix = np.zeros((n_seq, n_col))
     msa_matrix.fill(np.nan)
     gene_ids = []
@@ -428,3 +445,65 @@ def column_clusters(colpatterns):
                 else:
                     clusters.append(_colcluster(colpattern))
     return clusters
+
+
+def msa2sequences(msa, gene_ids, padding):
+    """
+    Return str sequences from msa.
+
+    It also checks gene_ids and replaces padding by gaps.
+    """
+    sequences = []
+    for i in range(0, len(msa)):
+        seq = msa[i]
+        assert seq.id == gene_ids[i]
+        sequences.append(str(seq.seq).replace(padding, '-' * len(padding)))
+    return sequences
+
+
+def save_homologous_subexons(index, msa, subexon_df, gene_ids, colclusters,
+                             output_folder, padding):
+    """
+    Use the msa to define homologous exons.
+
+    Return subexon_df with the homologous exon information.
+    For each homologous exon saves a fasta MSA in the output_folder.
+    index is the 'Cluster'.
+    """
+    subexon_df = subexon_df.assign(
+        HomologousExons=subexon_df['Cluster'].astype(str),
+        HomologousExonLengths="",
+        HomologousExonSequences="")
+    sequences = msa2sequences(msa, gene_ids, padding)
+    for (i, colcluster) in enumerate(colclusters):
+        for (j, subexon) in enumerate(colcluster.consensus):
+            if not np.isnan(subexon):
+                gene = gene_ids[j]
+                seq = sequences[j][colcluster.start:colcluster.end + 1]
+                with open(
+                        os.path.join(
+                            output_folder,
+                            'msa_homologous_exon_{}_{}.fasta'.format(
+                                index, i)), 'w') as file:
+                    file.write('>{}\n{}'.format(gene, seq))
+                seq_without_gaps = seq.replace('-', '')
+                length = len(seq_without_gaps)
+                query = (subexon_df['SubexonIndex'] == subexon) & (
+                    subexon_df['Gene stable ID'] == gene)
+                value = subexon_df.loc[query, 'HomologousExons'].unique()[0]
+                if '_' in value:
+                    subexon_df.loc[
+                        query, 'HomologousExons'] += '-{}_{}'.format(index, i)
+                    subexon_df.loc[
+                        query, 'HomologousExonLengths'] += '-{}'.format(length)
+                    subexon_df.loc[query,
+                                   'HomologousExonSequences'] += '-{}'.format(
+                                       seq_without_gaps)
+                else:
+                    subexon_df.loc[query, 'HomologousExons'] = '{}_{}'.format(
+                        index, i)
+                    subexon_df.loc[query, 'HomologousExonLengths'] = str(
+                        length)
+                    subexon_df.loc[
+                        query, 'HomologousExonSequences'] = seq_without_gaps
+    return subexon_df
