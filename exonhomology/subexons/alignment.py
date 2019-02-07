@@ -136,7 +136,6 @@ def create_subexon_matrix(subexon_table):
 
 def _get_sequence(subexon_info,
                   subexon_column,
-                  padding,
                   sequence_column='Exon protein sequence'):
     """
     Return the sequence of the subexon as a string.
@@ -144,10 +143,10 @@ def _get_sequence(subexon_info,
     This function takes the subexon_info pandas' DataFrame as input, that has
     'SubexonIndex' as the DataFrame index.
 
-    This replaces termination codons (*) with the padding.
+    This deletes termination codons (*).
     """
     seq = str(subexon_info.loc[subexon_column, sequence_column])
-    return seq.replace('*', padding)
+    return seq.replace('*', '')
 
 
 def create_chimeric_sequences(subexon_table,
@@ -186,31 +185,39 @@ def create_chimeric_sequences(subexon_table,
         transcript_matrix = transcript_matrix[:, subexon_index]
 
         subexon = subexon_index[0]
-        chimeric = _get_sequence(subexon_info, subexon, padding)
+        chimeric = _get_sequence(subexon_info, subexon)
         breaks = {subexon: len(chimeric)}
         for idx in range(1, len(subexon_index)):
             previous_subexon = subexon_index[idx - 1]
             subexon = subexon_index[idx]
             # Does it need padding ?
-            if ((subexon_info.loc[previous_subexon, 'Subexon ID cluster'],
-                 subexon_info.loc[subexon, 'Subexon ID cluster']
-                 ) not in connected_subexons
-                    and chimeric[-len(padding):] != padding):
+            if chimeric and not chimeric.endswith(padding) and (
+                    subexon_info.loc[previous_subexon, 'Subexon ID cluster'],
+                    subexon_info.loc[subexon, 'Subexon ID cluster']
+            ) not in connected_subexons:
                 chimeric += padding
-            chimeric += _get_sequence(subexon_info, subexon, padding)
+            chimeric += _get_sequence(subexon_info, subexon)
             breaks.update({subexon: len(chimeric)})
 
-        chimerics[gene_id] = (chimeric, breaks)
+        if chimeric:
+            chimerics[gene_id] = (chimeric, breaks)
 
     return chimerics
+
+
+def _print_fasta(chimerics, stream):
+    """Write chimeric sequences in fasta format."""
+    for (key, value) in chimerics.items():
+        chimeric = value[0]
+        if chimeric:
+            stream.write('>{}\n{}\n'.format(key, chimeric))
 
 
 def _print_temporal_fasta(chimerics):
     """Save chimeric sequences in a temporal fasta file and return its name."""
     with tempfile.NamedTemporaryFile(
             suffix='.fasta', delete=False, mode='w') as tmp_fasta:
-        for (key, value) in chimerics.items():
-            tmp_fasta.write('>%s\n%s\n' % (key, value[0]))
+        _print_fasta(chimerics, tmp_fasta)
 
     return tmp_fasta.name
 
@@ -280,7 +287,12 @@ def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
         mafft_path='bash.exe -c mafft'
         mafft_path='wsl.exe mafft'
     """
-    input_fasta = _print_temporal_fasta(chimerics)
+    if len(chimerics) == 1:
+        with open(output_path, 'w') as outfile:
+            _print_fasta(chimerics, outfile)
+        return output_path
+    else:
+        input_fasta = _print_temporal_fasta(chimerics)
 
     command = mafft_path.split()
 
@@ -454,8 +466,7 @@ def msa2sequences(msa, gene_ids, padding):
     It also checks gene_ids and replaces padding by gaps.
     """
     sequences = []
-    for i in range(0, len(msa)):
-        seq = msa[i]
+    for i, seq in enumerate(msa):
         assert seq.id == gene_ids[i]
         sequences.append(str(seq.seq).replace(padding, '-' * len(padding)))
     return sequences

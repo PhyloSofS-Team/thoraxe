@@ -4,6 +4,7 @@ read_transcript_info: Module for the first step of match_homologous_exons.
 This module uses pandas to read transcript information.
 """
 
+import re
 import warnings
 
 import numpy as np
@@ -565,6 +566,8 @@ def find_identical_sequences(data_frame):
     for _, subdf in seqs_df.groupby('Gene stable ID'):
         n_rows = subdf.shape[0]
         if n_rows > 1:
+            # Sort by 'Transcript stable ID' to ensure reproducibility
+            subdf = subdf.sort_index(level=1)
             for i in range(0, n_rows - 1):
                 row_i = subdf.iloc[i]
                 for j in range(i + 1, n_rows):

@@ -59,7 +59,7 @@ def inform_about_deletions(set_to_delete, message):
     if len(set_to_delete) >= 1:
         logging.warning(message)
         for element in set_to_delete:
-            logging.warning('deleting %s' % (element,))
+            logging.warning('deleting %s', element)
 
 
 def cluster2str(cluster, delim='/', item2str=str):

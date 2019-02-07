@@ -155,8 +155,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
 
     msa = subexons.alignment.read_msa_fasta(msa_file)
 
-    if msa is not None and len(msa) > 1 and len(msa[0]) > 1:
-
+    if msa is not None:
         gene_ids, msa_matrix = subexons.alignment.create_msa_matrix(
             chimerics, msa)
 
@@ -215,16 +214,15 @@ def main():
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
     for name, subgroup in subexon_table.groupby('Cluster'):
-        if subgroup.shape[0] > 1:
-            (subexon_df, chimerics, msa_file, gene_ids, msa_matrix,
-             colclusters) = get_homologous_subexons(
-                 args.outputdir,
-                 name,
-                 subgroup,
-                 gene2speciesname,
-                 connected_subexons,
-                 mafft_path=args.mafft_path,
-                 padding='X' * args.padding)
+        (subexon_df, chimerics, msa_file, gene_ids, msa_matrix,
+         colclusters) = get_homologous_subexons(
+             args.outputdir,
+             name,
+             subgroup,
+             gene2speciesname,
+             connected_subexons,
+             mafft_path=args.mafft_path,
+             padding='X' * args.padding)
 
 
 if __name__ == '__main___':

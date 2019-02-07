@@ -2,13 +2,14 @@ from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
 
-def exon_clustering(trx_data,  # pylint: disable=too-many-arguments
-                    minimum_len=4,
-                    coverage_cutoff=80.0,
-                    percent_identity_cutoff=30.0,
-                    gap_open_penalty=10,
-                    gap_extend_penalty=1,
-                    substitution_matrix=None):
+def exon_clustering(
+        trx_data,  # pylint: disable=too-many-arguments
+        minimum_len=4,
+        coverage_cutoff=80.0,
+        percent_identity_cutoff=30.0,
+        gap_open_penalty=10,
+        gap_extend_penalty=1,
+        substitution_matrix=None):
     """
     Cluster exons based on their sequence identity after local alignment.
 
@@ -52,7 +53,11 @@ def exon_clustering(trx_data,  # pylint: disable=too-many-arguments
     trx_data = trx_data.assign(
         SeqLength=lambda df: df['ProteinSequences'].map(len).values)
 
-    trx_data.sort_values('SeqLength', inplace=True, ascending=False)
+    # Sort by 'SeqLength'. We then sort by 'Exon stable ID' sequences with
+    # equal length to ensure reproducibility:
+    trx_data.sort_values(['SeqLength', 'Exon stable ID'],
+                         inplace=True,
+                         ascending=False)
 
     cluster_count = 0
     for i in range(nrows):
@@ -114,7 +119,8 @@ def exon_clustering(trx_data,  # pylint: disable=too-many-arguments
                 trx_data.at[j_index, 'QueryExon'] = query_exon
 
     trx_data.sort_values('InputOrder', inplace=True)
-    trx_data.drop(
-        ['InputOrder', 'ProteinSequences', 'SeqLength'], axis=1, inplace=True)
+    trx_data.drop(['InputOrder', 'ProteinSequences', 'SeqLength'],
+                  axis=1,
+                  inplace=True)
 
     return trx_data
