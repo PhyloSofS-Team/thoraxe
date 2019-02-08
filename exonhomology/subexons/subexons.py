@@ -144,35 +144,49 @@ def _add_subexon_rank(subexon_df):
     return subexon_df
 
 
+def _get_info_from_row(row, columns):
+    """Return a dict with from column to value."""
+    return {col: row[col] for col in columns}
+
+
 def _subexon_info(gene_df, exon_df, intervals):
     """Return a pandas' DataFrame for subexons."""
     # We are going to use transcript_info functions to transcribe and
     # merge subexons. Therefore, we are going to use the exon table column
-    # names (column_names keys) at the beginning, and then we are going to
-    # change this column names by the column_names values before returning
-    # subexon_df, columns with '' as name won't be in the output :
-    column_names = {
+    # names at the beginning, and then we are going to change these column
+    # names by the columns_to_rename values before returning subexon_df:
+    columns_to_rename = {
         'Subexon ID': 'Subexon ID',
-        'Interval number': 'Interval number',
         'Exon sequence': 'Subexon sequence',
         'Genomic coding start': 'Subexon genomic coding start',
         'Genomic coding end': 'Subexon genomic coding end',
-        # Transcript information
-        'Gene stable ID': 'Gene stable ID',
-        'Transcript stable ID': 'Transcript stable ID',
-        'Strand': 'Strand',
-        'Exon rank in transcript': 'Exon rank in transcript',
-        'Transcript stable ID cluster': 'Transcript stable ID cluster',
-        # 'Exon stable ID' is kept to merge the exon and subexon tables later
-        'Exon stable ID': 'Exon stable ID',
-        'Exon stable ID cluster': 'Exon stable ID cluster',
-        'Cluster': 'Cluster'
+        'Interval number': 'Interval number'
     }
+
+    columns_to_keep = [
+        # Transcript information
+        'Gene stable ID',
+        'Transcript stable ID',
+        'Strand',
+        'Exon rank in transcript',
+        'Transcript stable ID cluster',
+        # 'Exon stable ID' is kept to merge the exon and subexon tables later
+        'Exon stable ID',
+        'Exon stable ID cluster',
+        'Cluster',
+        'QueryExon',
+        'TargetCoverage',
+        'PercentIdentity',
+        'AlignedQuery',
+        'AlignedTarget'
+    ]
+
     # cDNA coding start and end are only needed for _get_exon_cds
-    column_names_to_delete = ['cDNA coding start', 'cDNA coding end']
+    column_to_delete = ['cDNA coding start', 'cDNA coding end']
 
     subexon_df = pd.DataFrame(
-        columns=list(column_names.keys()) + column_names_to_delete)
+        columns=list(columns_to_rename.keys()) + columns_to_keep +
+        column_to_delete)
 
     for interval_number, interval in enumerate(intervals):
         for exon_id in interval.components:
@@ -195,22 +209,9 @@ def _subexon_info(gene_df, exon_df, intervals):
                 'cDNA coding start': 0,
                 'cDNA coding end': len(seq) - 1
             }
-            for _, exon_row in gene_df[gene_df['Exon stable ID'] ==
-                                       exon_id].iterrows():
-                transcript_row_info = {
-                    'Gene stable ID':
-                    exon_row['Gene stable ID'],
-                    'Transcript stable ID':
-                    exon_row['Transcript stable ID'],
-                    'Transcript stable ID cluster':
-                    exon_row['Transcript stable ID cluster'],
-                    'Exon stable ID cluster':
-                    exon_row['Exon stable ID cluster'],
-                    'Strand':
-                    exon_row['Strand'],
-                    'Exon rank in transcript':
-                    exon_row['Exon rank in transcript']
-                }
+            for _, row in gene_df[gene_df['Exon stable ID'] ==
+                                  exon_id].iterrows():
+                transcript_row_info = _get_info_from_row(row, columns_to_keep)
                 transcript_row_info.update(subexon_info)
                 subexon_df = subexon_df.append(
                     transcript_row_info, ignore_index=True)
@@ -230,8 +231,8 @@ def _subexon_info(gene_df, exon_df, intervals):
     transcript_info.merge_identical_exons(
         subexon_df, exon_id_column='Subexon ID')
 
-    subexon_df.drop(columns=column_names_to_delete, inplace=True)
-    subexon_df.rename(columns=column_names, inplace=True)
+    subexon_df.drop(columns=column_to_delete, inplace=True)
+    subexon_df.rename(columns=columns_to_rename, inplace=True)
 
     return subexon_df
 
