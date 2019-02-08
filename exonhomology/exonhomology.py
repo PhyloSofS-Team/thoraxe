@@ -178,8 +178,9 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
                 outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
                 subexon_table=subexon_df)
 
+        sequences = subexons.alignment.msa2sequences(msa, gene_ids, padding)
         subexon_df = subexons.alignment.save_homologous_subexons(
-            name, msa, subexon_df, gene_ids, colclusters, outdir, padding)
+            subexon_df, sequences, gene_ids, colclusters, outdir)
     else:
         gene_ids = None
         msa_matrix = None
