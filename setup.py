@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-try:
-    import numpy
-except ImportError:
-    # numpy should be installed before scikit-bio
-    setup(name='exonhomology', install_requires=['numpy'])
-
 setup(
     name='exonhomology',
     description="Disentangle homology relationships between exons.",

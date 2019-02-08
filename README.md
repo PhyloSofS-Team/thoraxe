@@ -9,3 +9,15 @@ Windows: [![Build status](https://ci.appveyor.com/api/projects/status/0j9necy8bd
 Code Coverage:
 [![codecov](https://codecov.io/gh/PhyloSofS-Team/exonhomology/branch/master/graph/badge.svg)](https://codecov.io/gh/PhyloSofS-Team/exonhomology)
 [![coveralls](https://coveralls.io/repos/github/PhyloSofS-Team/exonhomology/badge.svg?branch=master)](https://coveralls.io/github/PhyloSofS-Team/exonhomology?branch=master)  
+
+
+Installation
+============
+
+You need to install `numpy` before installing this package, it's a requirement
+to `scikit-bio`.  
+
+```
+pip install numpy
+pip install exonhomology
+```
