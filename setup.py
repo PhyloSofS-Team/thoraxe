@@ -1,10 +1,21 @@
 #!/usr/bin/env python
-
 from setuptools import setup, find_packages
 
+try:
+    import numpy
+except ImportError:
+    # numpy should be installed before scikit-bio
+    setup(name='exonhomology', install_requires=['numpy'])
+
 setup(
+    name='exonhomology',
+    description="Disentangle homology relationships between exons.",
+    keywords=['homologous exons', 'protein isoforms', 'gene transcripts'],
     author="Diego Javier Zea, Hugues Richard & Elodie Laine",
     author_email='diegozea@gmail.com',
+    url='https://github.com/PhyloSofS-Team/exonhomology',
+    version='0.1.0',
+    packages=find_packages(include=['exonhomology']),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -16,28 +27,21 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description="Disentangle homology relationships between exons.",
     entry_points={
         'console_scripts': [
             'transcript_query=exonhomology.transcript_query:main',
             'exonhomology=exonhomology:main'
         ],
     },
-    install_requires=[
-        'numpy', 'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests',
-        'scikit-bio', 'distro', 'recordclass'
-    ],
-    license="MIT license",
-    include_package_data=True,
-    keywords=['homologous exons', 'protein isoforms', 'gene transcripts'],
-    name='exonhomology',
-    packages=find_packages(include=['exonhomology']),
     setup_requires=['pytest-runner'],
+    install_requires=[
+        'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests', 'numpy',
+        'distro', 'recordclass', 'scikit-bio'
+    ],
     test_suite='tests',
     tests_require=[
         'pytest', 'pytest-cov', 'coveralls', 'codecov', 'pytest-pylint'
     ],
-    url='https://github.com/PhyloSofS-Team/exonhomology',
-    version='0.1.0',
+    include_package_data=True,
     zip_safe=False,
-)
+    license="MIT license")
