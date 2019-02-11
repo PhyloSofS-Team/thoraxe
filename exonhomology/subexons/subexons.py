@@ -136,7 +136,7 @@ def _add_subexon_rank(subexon_df):
     id_columns = ['Gene stable ID', 'Transcript stable ID']
     for _, transcript_df in subexon_df.groupby(id_columns):
         strand = transcript_df.loc[transcript_df.index[0], 'Strand']
-        transcript_len = transcript_df.shape[0]
+        transcript_len = len(transcript_df)
         ranks.extend(_subexon_ranks(strand, transcript_len))
 
     subexon_df['Subexon rank in transcript'] = ranks
@@ -342,7 +342,7 @@ def _add_phases(subexon_df,
     subexon_df['Start phase'] = -99
     subexon_df['End phase'] = -99
 
-    n_rows = subexon_df.shape[0]
+    n_rows = len(subexon_df)
     row_number = 0
     while row_number < n_rows:
         row_index = subexon_df.index[row_number]
@@ -432,11 +432,12 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
     """
     exon_table.sort_values(
         by='Subexon rank in transcript', inplace=True, ascending=True)
-    nrows = exon_table.shape[0]
+    row_list = exon_table.to_dict('records')
+    nrows = len(row_list)
     to_merge = []
     for row_index in range(1, nrows):
-        previous_row = exon_table.iloc[row_index - 1, :]
-        actual_row = exon_table.iloc[row_index, :]
+        previous_row = row_list[row_index - 1]
+        actual_row = row_list[row_index]
         if (previous_row['Subexon ID cluster'] in subexons) and (
                 actual_row['Subexon ID cluster'] in subexons) and (
                     previous_row['Transcript fraction'] ==
@@ -444,14 +445,14 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
             to_merge = _update_to_merge_list(
                 to_merge, previous_row['Subexon ID cluster'],
                 actual_row['Subexon ID cluster'])
-    if len(to_merge) > 0:
+    if to_merge:
         for group in to_merge:
             for subexon in group:
                 subexons.remove(subexon)
         subexons_to_merge.append(to_merge)
         return 0
-    else:
-        return 1
+
+    return 1
 
 
 def _find_subexons_to_merge(subexon_table, delim='/'):
@@ -545,7 +546,7 @@ def _merge_subexons(subexon_table, subexons_to_merge):
                 'Subexon ID cluster')  # keep the first transcript
             transcript.sort_values(
                 by='Subexon rank in transcript', inplace=True, ascending=True)
-            assert transcript.shape[0] == n_subexons
+            assert len(transcript) == n_subexons
 
             old2new = {}
             for index in range(1, n_subexons):

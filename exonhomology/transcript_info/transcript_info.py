@@ -100,7 +100,7 @@ def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
         row.Biotype in ['protein_coding', 'Protein coding']
         # explicit convert to float, sometimes Flags are read as str
         and _get_flag(row.Flags) <= maximum_tsl_level
-        for _, row in tsl_data.iterrows()
+        for row in tsl_data.itertuples()
     ]  # NOTE : single list
     # comprehension for performance.
     if remove_na:
@@ -216,34 +216,33 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
 
     if cds_len == cdna_len:  # if there isn't UTR region
         return exon_cdna_seq
-    else:
-        if first_exon:
-            return exon_cdna_seq[-cds_len:]
-        elif last_exon:
-            return exon_cdna_seq[:cds_len]
-        else:
-            raise ValueError(
-                'exon has %d bases instead of %d' % (cdna_len, cds_len))
+    if first_exon:
+        return exon_cdna_seq[-cds_len:]
+    if last_exon:
+        return exon_cdna_seq[:cds_len]
+
+    raise ValueError('exon has {} bases instead of {}'.format(
+        cdna_len, cds_len))
 
 
-def _is_first_or_last_exon(data_frame, row_index):
+def _is_first_or_last_exon(row_list, row_index):
     """Determine if it is the first or the last coding exon."""
     start_exon = False
     end_exon = False
 
-    n_rows = data_frame.shape[0]
+    n_rows = len(row_list)
 
     if row_index == 0:
         start_exon = True
     elif row_index == (n_rows - 1):
         end_exon = True
     else:
-        row = data_frame.iloc[row_index]
+        row = row_list[row_index]
 
-        identical_to_previous = data_frame.iloc[
+        identical_to_previous = row_list[
             row_index -
             1]['Transcript stable ID'] == row['Transcript stable ID']
-        identical_to_next = data_frame.iloc[
+        identical_to_next = row_list[
             row_index +
             1]['Transcript stable ID'] == row['Transcript stable ID']
 
@@ -274,13 +273,13 @@ def _manage_start_phase(cds_seq, start_phase):
     """
     if start_phase == 1:
         return cds_seq[2:]
-    elif start_phase == 2:
+    if start_phase == 2:
         return cds_seq[1:]
 
     return cds_seq  # do not change CDS sequence if exon start phase is 0 or -1
 
 
-def _manage_end_phase(data_frame, row_index, cds_seq, end_exon):
+def _manage_end_phase(row_list, row_index, cds_seq, end_exon):
     """
     Complete the last codon of the CDS sequence depending on the end phase.
 
@@ -295,13 +294,12 @@ def _manage_end_phase(data_frame, row_index, cds_seq, end_exon):
     NOTE: _check_phases_by_position should be used beipt_infore this function
     to ensure that there are not errors in the input data.
     """
-    end_phase = data_frame.iloc[row_index]['End phase']
+    end_phase = row_list[row_index]['End phase']
     if end_phase in {1, 2}:
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
         else:
-            next_exon_sequence = data_frame.iloc[row_index +
-                                                 1]['Exon sequence']
+            next_exon_sequence = row_list[row_index + 1]['Exon sequence']
             n_bases = phases.bases_to_complete_previous_codon(end_phase)
             cds_seq = cds_seq + next_exon_sequence[0:n_bases]
 
@@ -327,10 +325,10 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
         if end_phase == -1:
             if row['Start phase'] != -1:
                 raise ValueError('Exon end phase -1 is not in the last exon, '
-                                 'row: %s' % row)
+                                 'row: {}'.format(row))
             else:
                 warnings.warn('Exon start and end phases are -1, possible '
-                              'unique exon in row: %s' % row)
+                              'unique exon in row: {}'.format(row))
 
 
 def _is_incomplete_cds(row, start_exon, end_exon):
@@ -365,13 +363,14 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
     sequences = []
     incomplete_cds = []
 
-    n_rows = data_frame.shape[0]
+    row_list = data_frame.to_dict('records')
+    n_rows = len(row_list)
     row_index = 0
     while row_index < n_rows:
-        start_exon, end_exon = _is_first_or_last_exon(data_frame, row_index)
+        start_exon, end_exon = _is_first_or_last_exon(row_list, row_index)
 
         # Copy of the actual row to have easier access :
-        row = data_frame.iloc[row_index]
+        row = row_list[row_index]
 
         if (row['Start phase'] == -1) and (row['End phase'] == -1):
             if row['Strand'] == -1:
@@ -398,8 +397,7 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
             _check_phases_by_position(row, end_exon, allow_incomplete_cds)
 
             cds_seq = _manage_start_phase(cds_seq, row['Start phase'])
-            cds_seq = _manage_end_phase(data_frame, row_index, cds_seq,
-                                        end_exon)
+            cds_seq = _manage_end_phase(row_list, row_index, cds_seq, end_exon)
 
         # Add the translated CDS :
         if isinstance(cds_seq, str):
@@ -482,11 +480,12 @@ def find_identical_exons(data_frame, exon_id_column='Exon stable ID'):
             exon_id_column, 'Start phase', 'End phase', 'Genomic coding start',
             'Genomic coding end'
         ])
-        n_rows = subdf.shape[0]
+        row_list = subdf.to_dict('records')
+        n_rows = len(row_list)
         for i in range(0, n_rows - 1):
-            row_i = subdf.iloc[i]
+            row_i = row_list[i]
             for j in range(i + 1, n_rows):
-                row_j = subdf.iloc[j]
+                row_j = row_list[j]
                 if _identical_seqs(row_i, row_j):
                     clusters.fill_clusters(exon_clusters,
                                            row_i[exon_id_column],
@@ -564,14 +563,15 @@ def find_identical_sequences(data_frame):
     seq_clusters = []
     # Find duplicated sequences in each gene transcript :
     for _, subdf in seqs_df.groupby('Gene stable ID'):
-        n_rows = subdf.shape[0]
+        n_rows = len(subdf)
         if n_rows > 1:
             # Sort by 'Transcript stable ID' to ensure reproducibility
             subdf = subdf.sort_index(level=1)
+            row_list = subdf.to_dict('records')
             for i in range(0, n_rows - 1):
-                row_i = subdf.iloc[i]
+                row_i = row_list[i]
                 for j in range(i + 1, n_rows):
-                    row_j = subdf.iloc[j]
+                    row_j = row_list[j]
                     if row_i['Exon protein sequence'] == row_j[
                             'Exon protein sequence']:
                         clusters.fill_clusters(seq_clusters, subdf.index[i][1],
