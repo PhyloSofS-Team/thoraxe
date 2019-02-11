@@ -115,7 +115,8 @@ def exon_clustering(  # pylint: disable=too-many-arguments
         for j in range(i + 1, nrows):
             j_index = trx_data.index[j]
             len_j = trx_data.at[j_index, 'SeqLength']
-            if len_j < minimum_len:
+            cluster_j = trx_data.at[j_index, 'Cluster']
+            if len_j < minimum_len or cluster_j != 0:
                 continue
             seq_j = trx_data.at[j_index, 'ProteinSequences']
 
