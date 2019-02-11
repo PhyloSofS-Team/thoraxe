@@ -19,7 +19,7 @@ def _check_disjoint_intervals_inputs(starts, ends, ids):
 
 
 def disjoint_intervals(starts, ends, ids):
-    r"""
+    """
     Return list of disjoint intervals.
 
     Produce the set of disjoint intervals from a list of start and end
@@ -28,24 +28,24 @@ def disjoint_intervals(starts, ends, ids):
     !!! The intervals need to be sorted by start and end position before
     calling the function and the coordinates should be inclusive.
 
-    >>> DisjointIntervals([1,10,20,40], [9,30,30,50], [0,1,2,3])
-    [Interval(start=1, end=9, component=set([0])), \
-    Interval(start=10, end=19, component=set([1])), \
-    Interval(start=20, end=30, component=set([1, 2])), \
-    Interval(start=31, end=39, component=set([])), \
-    Interval(start=40, end=50, component=set([3]))]
-    >>> DisjointIntervals([1,1], [9,7], [0,1])
-    [Interval(start=1, end=7, component=set([0, 1])), \
-    Interval(start=8, end=9, component=set([0]))]
-    >>> DisjointIntervals([1,3], [7,9], [0,1])
-    [Interval(start=1, end=2, component=set([0])), \
-    Interval(start=3, end=7, component=set([0, 1])), \
-    Interval(start=8, end=9, component=set([1]))]
-    >>> DisjointIntervals([3,1], [9,7], [0,1])
+    >>> disjoint_intervals([1,10,20,40], [9,30,30,50], [0,1,2,3])
+    [Interval(start=1, end=9, components={0}), \
+Interval(start=10, end=19, components={1}), \
+Interval(start=20, end=30, components={1, 2}), \
+Interval(start=31, end=39, components=set()), \
+Interval(start=40, end=50, components={3})]
+    >>> disjoint_intervals([1,1], [9,7], [0,1])
+    [Interval(start=1, end=7, components={0, 1}), \
+Interval(start=8, end=9, components={0})]
+    >>> disjoint_intervals([1,3], [7,9], [0,1])
+    [Interval(start=1, end=2, components={0}), \
+Interval(start=3, end=7, components={0, 1}), \
+Interval(start=8, end=9, components={1})]
+    >>> disjoint_intervals([3,1], [9,7], [0,1])
     Traceback (most recent call last):
         ...
     AssertionError: starts should be sorted.
-    >>> DisjointIntervals([3,1], [9,7,10], [0,1])
+    >>> disjoint_intervals([3,1], [9,7,10], [0,1])
     Traceback (most recent call last):
         ...
     AssertionError: starts, ends and ids should have the same length.

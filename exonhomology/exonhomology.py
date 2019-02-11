@@ -74,9 +74,9 @@ def _get_gene_name(input_folder, gene_name=None):
     It gives a warning if the gene_name hasn't the correct format.
 
     >>> _get_gene_name('exonhomology/tests/data/MAPK8_ENSG00000107643')
-    ('exonhomology/tests/data/MAPK8_ENSG00000107643', 'MAPK8_ENSG00000107643')
+    (..., 'MAPK8_ENSG00000107643')
     >>> _get_gene_name('exonhomology/tests/data/MAPK8')
-    ('exonhomology/tests/data/MAPK8', 'MAPK8')
+    (..., 'MAPK8')
     """
     input_folder = os.path.abspath(input_folder)
     if gene_name is None:

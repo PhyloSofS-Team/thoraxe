@@ -50,7 +50,9 @@ def inform_about_deletions(set_to_delete, message):
     """
     Warning about elements that are going to be deleted.
 
-    >>> inform_about_deletions({1, 2, 3}, "Identical sequences were found:")
+    inform_about_deletions({1, 2, 3}, "Identical sequences were found:") will
+    inform:
+
     WARNING:root:Identical sequences were found:
     WARNING:root:deleting 1
     WARNING:root:deleting 2

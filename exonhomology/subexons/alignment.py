@@ -228,11 +228,14 @@ def _get_wsl_name(executable_path):
 
     Return None is the path in not valid.
 
-    >>> _get_wsl_name('bash.exe')
-    'bash.exe'
-    >>> _get_wsl_name('C:\\WINDOWS\\SysNative\\bash.exe')
-    'bash.exe'
-    >>> _get_wsl_name('mafft')
+    >>> import platform
+    >>> nwin = platform.system() != 'Windows'
+    >>> nwin or _get_wsl_name('bash.exe') == 'bash.exe'
+    True
+    >>> nwin or _get_wsl_name('C:\\WINDOWS\\SysNative\\bash.exe') == 'bash.exe'
+    True
+    >>> nwin or _get_wsl_name('mafft') is None
+    True
     """
     executable_name = os.path.basename(os.path.abspath(executable_path))
     return executable_name if executable_name.split('.')[0].lower() in {
@@ -259,8 +262,10 @@ def _win2wsl(path):
     This is similar to wslpath.
     Stackoverflow: python-subprocess-call-cannot-find-windows-bash-exe
 
-    >>>_win2wsl('C:\\aaa\\bbb\\ccc\\foo.zip')
-    '/mnt/c/aaa/bbb/ccc/foo.zip'
+    >>> import platform
+    >>> nowindows = platform.system() != 'Windows'
+    >>> nowindows or _win2wsl('C:\\aa\\bb\\foo.zip') == '/mnt/c/aa/bb/foo.zip'
+    True
     """
     path = os.path.abspath(path)
     if len(path) > 3 and path[1:2] == ':':
