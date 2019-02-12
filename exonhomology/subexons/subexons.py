@@ -1,3 +1,5 @@
+"""Functions to create the subexon table."""
+
 import collections
 
 import pandas as pd
@@ -414,7 +416,7 @@ def _update_to_merge_list(to_merge, subexon_1, subexon_2):
     group = {subexon_1, subexon_2}
 
     for existing_group in to_merge:
-        if len(existing_group.intersection(group)) > 0:
+        if existing_group.intersection(group):
             existing_group.update(group)
             return to_merge
 
@@ -569,7 +571,7 @@ def _merge_subexons(subexon_table, subexons_to_merge):
                 inplace=True)
 
 
-def create_subexon_table(transcript_info, merge_non_redundant=True):
+def create_subexon_table(transcript_data, merge_non_redundant=True):
     """
     Return a subexon table.
 
@@ -582,7 +584,7 @@ def create_subexon_table(transcript_info, merge_non_redundant=True):
     the protein level.
     """
     subexon_data_frames = []
-    for _, gene_df in transcript_info.groupby('Gene stable ID'):
+    for _, gene_df in transcript_data.groupby('Gene stable ID'):
 
         # We need the genomic coding coordinates and the sequence of each exon
         exon_df = gene_df.drop_duplicates(subset='Exon stable ID')

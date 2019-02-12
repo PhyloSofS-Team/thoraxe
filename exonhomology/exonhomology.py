@@ -1,3 +1,5 @@
+"""exonhomology pipeline functions."""
+
 import argparse
 import logging
 import os
@@ -215,15 +217,14 @@ def main():
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
     for name, subgroup in subexon_table.groupby('Cluster'):
-        (subexon_df, chimerics, msa_file, gene_ids, msa_matrix,
-         colclusters) = get_homologous_subexons(
-             args.outputdir,
-             name,
-             subgroup,
-             gene2speciesname,
-             connected_subexons,
-             mafft_path=args.mafft_path,
-             padding='X' * args.padding)
+        get_homologous_subexons(
+            args.outputdir,
+            name,
+            subgroup,
+            gene2speciesname,
+            connected_subexons,
+            mafft_path=args.mafft_path,
+            padding='X' * args.padding)
 
 
 if __name__ == '__main___':

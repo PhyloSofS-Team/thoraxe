@@ -1,3 +1,4 @@
+"""Functions to cluster exons."""
 import numpy as np
 
 from skbio.alignment import StripedSmithWaterman

@@ -1,5 +1,5 @@
 """
-subexon_alignment: Module to create the subexon MSA with MAFFT.
+alignment: Module to create the subexon MSA with MAFFT.
 
 This module creates a MSA of subexons using MAFFT.
 """
@@ -296,8 +296,8 @@ def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
         with open(output_path, 'w') as outfile:
             _print_fasta(chimerics, outfile)
         return output_path
-    else:
-        input_fasta = _print_temporal_fasta(chimerics)
+
+    input_fasta = _print_temporal_fasta(chimerics)
 
     command = mafft_path.split()
 

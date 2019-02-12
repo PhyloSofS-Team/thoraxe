@@ -46,7 +46,7 @@ def set_to_delete(set_list):
     return {element for group in set_list for element in list(group)[1:]}
 
 
-def inform_about_deletions(set_to_delete, message):
+def inform_about_deletions(todelete, message):
     """
     Warning about elements that are going to be deleted.
 
@@ -58,9 +58,9 @@ def inform_about_deletions(set_to_delete, message):
     WARNING:root:deleting 2
     WARNING:root:deleting 3
     """
-    if len(set_to_delete) >= 1:
+    if len(todelete) >= 1:
         logging.warning(message)
-        for element in set_to_delete:
+        for element in todelete:
             logging.warning('deleting %s', element)
 
 

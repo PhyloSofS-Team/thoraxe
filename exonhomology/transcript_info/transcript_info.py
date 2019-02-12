@@ -1,10 +1,5 @@
-"""
-read_transcript_info: Module for the first step of match_homologous_exons.
+"""Functions that use pandas to read transcript information."""
 
-This module uses pandas to read transcript information.
-"""
-
-import re
 import warnings
 
 import numpy as np

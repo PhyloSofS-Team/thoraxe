@@ -59,12 +59,12 @@ def bases_to_complete_previous_codon(phase):  # pylint: disable=invalid-name
     """
     if phase == 0:
         return 0
-    elif phase == 1:
+    if phase == 1:
         return 2
-    elif phase == 2:
+    if phase == 2:
         return 1
-    else:
-        raise ValueError("Only phases 0, 1 and 2 are allowed.")
+
+    raise ValueError("Only phases 0, 1 and 2 are allowed.")
 
 
 def calculate_phase(cdna_len, previous_end_phase):
