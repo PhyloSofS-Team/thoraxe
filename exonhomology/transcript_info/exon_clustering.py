@@ -5,27 +5,34 @@ from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
 
-def _aln_stats(query, target, len_target):
-    """Return coverage of the target sequence and percent identity."""
-    aln_len = 0
-    aln_len_i = 0
-    aln_len_j = 0
+def _coverage(seq, seq_len):
+    """
+    Return coverage of the sequence in the alignment.
+
+    >>> _coverage("AAAA----", 8)
+    50.0
+    """
+    return 100.0 * (len(seq) - seq.count('-')) / seq_len
+
+
+def _percent_identity(query, target):
+    """
+    Return percent identity of the aligned sequnces.
+
+    >>> _percent_identity("AA---", "AAAA-")
+    50.0
+    """
+    aln_len = len(query)
+    assert aln_len == len(target)
     identical = 0
     for res_i, res_j in zip(query, target):
-        aln_len += 1
-        if res_i != '-':
-            aln_len_i += 1
-        if res_j != '-':
-            aln_len_j += 1
         if res_i == res_j:
             if res_i != '-':
                 identical += 1
             else:
                 aln_len -= 1
 
-    percent_identity = 100.0 * (identical / aln_len)
-    coverage = 100.0 * (aln_len_j / len_target)
-    return coverage, percent_identity
+    return 100.0 * (identical / aln_len)
 
 
 def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
@@ -102,30 +109,32 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             substitution_matrix=substitution_matrix)
 
         query_exon = row_list[i]['Exon stable ID']
-        cluster = row_list[i]['Cluster']
+        i_index = trx_data.index[i]
+        cluster = trx_data.at[i_index, 'Cluster']
         if cluster == 0:
             cluster_count += 1
-            i_index = trx_data.index[i]
             trx_data.at[i_index, 'Cluster'] = cluster_count
             trx_data.at[i_index, 'QueryExon'] = query_exon
             cluster = cluster_count
 
         for j in range(i + 1, nrows):
-            if row_list[j]['SeqLength'] < minimum_len or row_list[j][
-                    'Cluster'] != 0:
+            j_index = trx_data.index[j]
+            if row_list[j]['SeqLength'] < minimum_len or trx_data.at[
+                    j_index, 'Cluster'] != 0:
                 continue
 
             aln = query(row_list[j]['ProteinSequences'])
 
             # Because of the sort by SeqLength with ascending=False, the target
             # j is always <= i, i.e. j is the shortest sequence of the pair.
-            coverage, percent_identity = _aln_stats(
-                aln.aligned_query_sequence, aln.aligned_target_sequence,
-                row_list[j]['SeqLength'])
+            coverage = _coverage(aln.aligned_target_sequence,
+                                 row_list[j]['SeqLength'])
+
+            percent_identity = _percent_identity(aln.aligned_query_sequence,
+                                                 aln.aligned_target_sequence)
 
             if (coverage >= coverage_cutoff
                     and percent_identity >= percent_identity_cutoff):
-                j_index = trx_data.index[j]
                 trx_data.at[j_index, 'Cluster'] = cluster
                 trx_data.at[j_index, 'QueryExon'] = query_exon
                 trx_data.at[j_index, 'TargetCoverage'] = coverage
