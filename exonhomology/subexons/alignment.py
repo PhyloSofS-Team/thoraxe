@@ -19,6 +19,8 @@ from Bio import AlignIO
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
+from ..transcript_info import exon_clustering
+
 # List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
 # Order from NCBI Taxonomy/CommonTree, but using Human as 1
 SPECIES_ORDER = {
@@ -365,7 +367,7 @@ def read_msa_fasta(msa_file):
         if n_seq < 2:
             logging.warning('There are few (%s) sequences in %s', n_seq,
                             msa_file)
-        n_col = len(msa[0])
+        n_col = msa.get_alignment_length()
         if n_col < 2:
             logging.warning('There are few (%s) columns in %s', n_col,
                             msa_file)
@@ -373,36 +375,89 @@ def read_msa_fasta(msa_file):
     return None
 
 
-def create_msa_matrix(chimerics, msa):  # pylint: disable=too-many-locals
+def get_gene_ids(msa):
+    """Take a biopython MSA and return a list with the gene (sequence) ids."""
+    return [record.id for record in msa]
+
+
+def _fill_msa_matrix(msa_matrix,
+                     chimerics,
+                     msa,
+                     seq_index,
+                     transform_subexon_index=lambda index: index):
+    """Function to fill msa_matrix with msa data."""
+    record = msa[seq_index]
+    subexon2len = chimerics[record.id][1]
+    subexons = sorted(subexon2len, key=subexon2len.get)
+    seq_len = 0
+    subexon_index = 0
+    for col_index in range(0, msa_matrix.shape[1]):
+        residue = record.seq[col_index]
+
+        if residue != '-':
+            seq_len += 1
+
+        if seq_len > subexon2len[subexons[subexon_index]]:
+            subexon_index += 1
+
+        if residue not in {'-', 'X'}:
+            msa_matrix[seq_index, col_index] = transform_subexon_index(
+                subexons[subexon_index])
+
+
+def _get_msa_exon_matrix(subexon_df, chimerics, msa):
+    """Return the msa as a matrix of 'Exon stable ID cluster'."""
+    n_seq = len(msa)
+    n_col = msa.get_alignment_length()
+    msa_matrix = np.empty((n_seq, n_col), dtype=object)
+    msa_matrix.fill('')
+    index2cluster = {
+        index: cluster
+        for index, cluster in zip(subexon_df['SubexonIndex'],
+                                  subexon_df['Exon stable ID cluster'])
+    }
+    for seq_index in range(0, n_seq):
+        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index,
+                         lambda index: index2cluster[index])
+
+    return msa_matrix
+
+
+def exon_identities(subexon_df, chimerics, msa):
+    """Return the percent identity of each exon against others in the msa."""
+    msa_matrix = np.array([list(record) for record in msa])
+    exon_matrix = _get_msa_exon_matrix(subexon_df, chimerics, msa)
+    identities = {}
+    for exon in np.unique(exon_matrix):
+        if exon == '':
+            continue
+        col_mask = (exon_matrix == exon).any(axis=0)
+        exon_msa = msa_matrix[:, col_mask]
+        seq_indexes = np.where(np.logical_not((exon_msa == '-').all(axis=1)))
+        n_seqs = len(seq_indexes)
+        for i in range(0, n_seqs - 1):
+            query = msa_matrix[seq_indexes[i], :]
+            for j in range(i + 1, n_seqs):
+                target = msa_matrix[seq_indexes[j], :]
+                identities.setdefault(exon, []).append(
+                    exon_clustering.percent_identity(query, target))
+    return identities
+
+
+def create_msa_matrix(chimerics, msa):
     """
     Convert a msa from chimerics to a matrix.
 
     Each cell has the subexon number (Index) or nan for gaps and padding.
     """
     n_seq = len(msa)
-    n_col = len(msa[0])
+    n_col = msa.get_alignment_length()
     msa_matrix = np.zeros((n_seq, n_col))
     msa_matrix.fill(np.nan)
-    gene_ids = []
     for seq_index in range(0, n_seq):
-        record = msa[seq_index]
-        gene_ids.append(record.id)
-        subexon2len = chimerics[record.id][1]
-        subexons = sorted(subexon2len, key=subexon2len.get)
-        seq_len = 0
-        subexon_index = 0
-        for col_index in range(0, n_col):
-            residue = record.seq[col_index]
-            if residue != '-':
-                seq_len += 1
+        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index)
 
-            if seq_len > subexon2len[subexons[subexon_index]]:
-                subexon_index += 1
-
-            if residue not in {'-', 'X'}:
-                msa_matrix[seq_index, col_index] = subexons[subexon_index]
-
-    return gene_ids, msa_matrix
+    return msa_matrix
 
 
 def column_patterns(msa_matrix):

@@ -158,8 +158,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
     msa = subexons.alignment.read_msa_fasta(msa_file)
 
     if msa is not None:
-        gene_ids, msa_matrix = subexons.alignment.create_msa_matrix(
-            chimerics, msa)
+        gene_ids = subexons.alignment.get_gene_ids(msa)
+        msa_matrix = subexons.alignment.create_msa_matrix(chimerics, msa)
 
         with open(_outfile(outdir, "gene_ids_", name, ".txt"), 'w') as outfile:
             for item in gene_ids:

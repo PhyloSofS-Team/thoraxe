@@ -170,3 +170,12 @@ def test_exon_clustering(mapk8):
                 exon in group.loc[np.logical_not(nans), 'QueryExon'].values
                 for exon in group.loc[nans, 'QueryExon'].unique()
             ])
+
+            # The aligned seq should be in the exon
+            subset = group[np.logical_not(nans)]
+            for _, exon in subset.groupby('Exon stable ID cluster'):
+                assert np.any([
+                    row['AlignedTarget'].replace(
+                        '-', '') in row['Exon protein sequence']
+                    for _, row in exon.iterrows()
+                ])

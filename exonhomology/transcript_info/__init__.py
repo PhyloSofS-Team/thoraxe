@@ -5,7 +5,7 @@ It performs the first exon clustering of the pipeline.
 """
 
 from .transcript_info import *
-from .exon_clustering import exon_clustering
+from .exon_clustering import *
 
 from . import clusters
 from . import phases

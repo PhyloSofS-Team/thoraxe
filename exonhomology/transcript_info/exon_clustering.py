@@ -15,11 +15,11 @@ def _coverage(seq, seq_len):
     return 100.0 * (len(seq) - seq.count('-')) / seq_len
 
 
-def _percent_identity(query, target):
+def percent_identity(query, target):
     """
     Return percent identity of the aligned sequnces.
 
-    >>> _percent_identity("AA---", "AAAA-")
+    >>> percent_identity("AA---", "AAAA-")
     50.0
     """
     aln_len = len(query)
@@ -130,15 +130,15 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             coverage = _coverage(aln.aligned_target_sequence,
                                  row_list[j]['SeqLength'])
 
-            percent_identity = _percent_identity(aln.aligned_query_sequence,
-                                                 aln.aligned_target_sequence)
+            pid = percent_identity(aln.aligned_query_sequence,
+                                   aln.aligned_target_sequence)
 
             if (coverage >= coverage_cutoff
-                    and percent_identity >= percent_identity_cutoff):
+                    and pid >= percent_identity_cutoff):
                 trx_data.at[j_index, 'Cluster'] = cluster
                 trx_data.at[j_index, 'QueryExon'] = query_exon
                 trx_data.at[j_index, 'TargetCoverage'] = coverage
-                trx_data.at[j_index, 'PercentIdentity'] = percent_identity
+                trx_data.at[j_index, 'PercentIdentity'] = pid
                 trx_data.at[j_index,
                             'AlignedQuery'] = aln.aligned_query_sequence
                 trx_data.at[j_index,
