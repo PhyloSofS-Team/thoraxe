@@ -1,5 +1,6 @@
 import os
 import pytest
+import numpy as np
 from exonhomology import transcript_info
 
 
@@ -155,3 +156,17 @@ def test_exon_clustering(mapk8):
     assert all(
         clustered.
         loc[clustered['Exon protein sequence'].map(len) < 4, 'Cluster'] == 0)
+
+    for _, group in clustered.groupby('Cluster'):
+        nans = np.isnan(group['PercentIdentity'])
+        # There is a nan in PercentIdentity when a sequence initialize its own
+        # cluster, so the QueryExon and the Exon stable ID should be the same
+        assert np.all(
+            group.loc[nans, 'QueryExon'] == group.loc[nans, 'Exon stable ID'])
+        # Also, if there are more exons, the exons with nan should be the
+        # QueryExon of other exon in the cluster. It can not be alone.
+        if len(group) > 1:
+            assert np.all([
+                exon in group.loc[np.logical_not(nans), 'QueryExon'].values
+                for exon in group.loc[nans, 'QueryExon'].unique()
+            ])
