@@ -19,7 +19,7 @@ from Bio import AlignIO
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
-from ..transcript_info import exon_clustering
+from exonhomology import transcript_info
 
 # List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
 # Order from NCBI Taxonomy/CommonTree, but using Human as 1
@@ -417,31 +417,83 @@ def _get_msa_exon_matrix(subexon_df, chimerics, msa):
                                   subexon_df['Exon stable ID cluster'])
     }
     for seq_index in range(0, n_seq):
-        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index,
-                         lambda index: index2cluster[index])
+        _fill_msa_matrix(msa_matrix, chimerics, msa,
+                         seq_index, lambda index: index2cluster[index])
 
     return msa_matrix
 
 
-def exon_identities(subexon_df, chimerics, msa):
-    """Return the percent identity of each exon against others in the msa."""
+def msa_matrices(subexon_df, chimerics, msa):
+    """Return msa (residues) and exon (exon cluster id) matrices from msa."""
     msa_matrix = np.array([list(record) for record in msa])
     exon_matrix = _get_msa_exon_matrix(subexon_df, chimerics, msa)
-    identities = {}
+    return msa_matrix, exon_matrix
+
+
+def compare_exons(msa_matrix, exon_matrix, function, *args, **kwargs):
+    """
+    Compare each exon against others in the msa using function.
+
+    function should take an empty dictionary to update, the (query) exon id
+    and the msa matrix (numpy matrix of strings/chars) of with the sequences
+    to compare.
+
+    This function iterates each exon of the msa, and creates a sub msa that
+    only contains the columns where that exon is present and the sequences
+    that have residues in those columns.
+
+    compare_exons takes 3 arguments: msa_matrix, exon_matrix, function.
+    Other arguments and keyword arguments are passed to function.
+
+    This function returns the dictionary.
+    """
+    result = {}
     for exon in np.unique(exon_matrix):
         if exon == '':
             continue
-        col_mask = (exon_matrix == exon).any(axis=0)
-        exon_msa = msa_matrix[:, col_mask]
+        # np.where returns an (rows, columns) tuple for a matrix
+        start, stop = np.where((exon_matrix == exon).any(axis=0))[0][[0, -1]]
+        exon_msa = msa_matrix[:, start:stop + 1]
         seq_indexes = np.where(np.logical_not((exon_msa == '-').all(axis=1)))
-        n_seqs = len(seq_indexes)
-        for i in range(0, n_seqs - 1):
-            query = msa_matrix[seq_indexes[i], :]
-            for j in range(i + 1, n_seqs):
-                target = msa_matrix[seq_indexes[j], :]
-                identities.setdefault(exon, []).append(
-                    exon_clustering.percent_identity(query, target))
-    return identities
+        exon_msa = exon_msa[seq_indexes]
+        function(result, exon, exon_msa, *args, **kwargs)
+
+    return result
+
+
+def _should_keep_exon(msa_matrix, cutoff=30.0):
+    n_seqs = msa_matrix.shape[0]
+    if n_seqs == 1:
+        return False
+    for i in range(0, n_seqs - 1):
+        query = msa_matrix[i, :]
+        for j in range(i + 1, n_seqs):
+            target = msa_matrix[j, :]
+            pid = transcript_info.percent_identity(query, target)
+            if pid >= cutoff:
+                return True
+    return False
+
+
+def _add_exon_to_delete(result, exon, exon_msa, cutoff=30.0):
+    """Update result keys with the exon cluster id to keep."""
+    if not _should_keep_exon(exon_msa, cutoff=cutoff):
+        result[exon] = True
+
+
+def exons_to_delete(msa_matrix, exon_matrix, cutoff=30.0):
+    """Return a dict from exon cluster id to keep to percent identity."""
+    return compare_exons(
+        msa_matrix, exon_matrix, _add_exon_to_delete, cutoff=cutoff)
+
+
+def delete_exons(exons, msa_matrix, exon_matrix):
+    """Replace an exon by '' or '-' in exon_matrix and msa_matrix."""
+    for exon in exons:
+        mask = exon_matrix == exon
+        exon_matrix[mask] = ''
+        msa_matrix[mask] = '-'
+    return msa_matrix, exon_matrix
 
 
 def create_msa_matrix(chimerics, msa):
