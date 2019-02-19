@@ -136,8 +136,73 @@ def _outfile(output_folder, prefix, name, ext):
     return os.path.join(output_folder, prefix + str(name) + ext)
 
 
+def _create_chimeric_msa(  # pylint: disable=too-many-arguments
+        out_folder,
+        cluster,
+        subexon_df,
+        gene2speciesname,
+        connected_subexons,
+        mafft_path='mafft',
+        padding='XXXXXXXXXX'):
+    """Return a modified subexon_df, the dict of chimerics and the msa."""
+    subexon_df, subexon_matrix = subexons.alignment.create_subexon_matrix(
+        subexon_df)
+    chimerics = subexons.alignment.create_chimeric_sequences(
+        subexon_df, subexon_matrix, connected_subexons, padding=padding)
+    chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname)
+    msa_file = _outfile(out_folder, "chimeric_alignment_", cluster, ".fasta")
+    subexons.alignment.run_mafft(
+        chimerics, mafft_path=mafft_path, output_path=msa_file)
+    msa = subexons.alignment.read_msa_fasta(msa_file)
+    return subexon_df, chimerics, msa
+
+
+def create_chimeric_msa(  # pylint: disable=too-many-arguments
+        out_folder,
+        subexon_table,
+        gene2speciesname,
+        connected_subexons,
+        cutoff=30.0,
+        mafft_path='mafft',
+        padding='XXXXXXXXXX'):
+    """TO DO: DOC!"""
+    for cluster in subexon_table['Cluster'].unique():
+        cluster_index = subexon_table.index[subexon_table['Cluster'] ==
+                                            cluster]
+        subexon_df = subexon_table.loc[cluster_index, :]
+        subexon_df, chimerics, msa = _create_chimeric_msa(
+            out_folder,
+            cluster,
+            subexon_df,
+            gene2speciesname,
+            connected_subexons,
+            mafft_path=mafft_path,
+            padding=padding)
+
+        if msa is not None:  # clean up cluster:
+            to_delete = subexons.alignment.delete_exons(
+                subexon_df, chimerics, msa, cutoff=cutoff)
+            if to_delete:
+                index_to_delete = [
+                    subexon_df.loc[index, 'Exon stable ID cluster'] in
+                    to_delete for index in cluster_index
+                ]
+                for index in index_to_delete:
+                    subexon_table.at[index, 'Cluster'] = -1
+                subexon_df = subexon_df.loc[np.logical_not(index_to_delete)]
+                subexon_df, chimerics, msa = _create_chimeric_msa(
+                    out_folder,
+                    cluster,
+                    subexon_df,
+                    gene2speciesname,
+                    connected_subexons,
+                    mafft_path=mafft_path,
+                    padding=padding)
+        return subexon_df, chimerics, msa
+
+
 def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
-        outdir,
+        out_folder,
         name,
         subexon_df,
         gene2speciesname,
@@ -151,22 +216,25 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         subexon_df, subexon_matrix, connected_subexons, padding=padding)
     chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname)
 
-    msa_file = _outfile(outdir, "chimeric_alignment_", name, ".fasta")
+    msa_file = _outfile(out_folder, "chimeric_alignment_", name, ".fasta")
     subexons.alignment.run_mafft(
         chimerics, mafft_path=mafft_path, output_path=msa_file)
 
     msa = subexons.alignment.read_msa_fasta(msa_file)
 
+    # TO DO : Replace some of this for create_chimeric_msa
+
     if msa is not None:
         gene_ids = subexons.alignment.get_gene_ids(msa)
         msa_matrix = subexons.alignment.create_msa_matrix(chimerics, msa)
 
-        with open(_outfile(outdir, "gene_ids_", name, ".txt"), 'w') as outfile:
+        with open(_outfile(out_folder, "gene_ids_", name, ".txt"),
+                  'w') as outfile:
             for item in gene_ids:
                 outfile.write("%s\n" % item)
 
         np.savetxt(
-            _outfile(outdir, "msa_matrix_", name, ".txt"),
+            _outfile(out_folder, "msa_matrix_", name, ".txt"),
             msa_matrix,
             delimiter=",")
 
@@ -177,18 +245,19 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             subexons.plot.plot_msa_subexons(
                 gene_ids,
                 msa_matrix,
-                outfile=_outfile(outdir, "chimeric_alignment_", name, ".png"),
+                outfile=_outfile(out_folder, "chimeric_alignment_", name,
+                                 ".png"),
                 subexon_table=subexon_df)
 
         sequences = subexons.alignment.msa2sequences(msa, gene_ids, padding)
         subexon_df = subexons.alignment.save_homologous_subexons(
-            subexon_df, sequences, gene_ids, colclusters, outdir)
+            subexon_df, sequences, gene_ids, colclusters, out_folder)
     else:
         gene_ids = None
         msa_matrix = None
         colclusters = None
 
-    subexon_df.to_csv(_outfile(outdir, "subexon_table_", name, ".csv"))
+    subexon_df.to_csv(_outfile(out_folder, "subexon_table_", name, ".csv"))
 
     return subexon_df, chimerics, msa_file, gene_ids, msa_matrix, colclusters
 

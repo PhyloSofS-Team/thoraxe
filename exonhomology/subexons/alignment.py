@@ -430,7 +430,7 @@ def msa_matrices(subexon_df, chimerics, msa):
     return msa_matrix, exon_matrix
 
 
-def compare_exons(msa_matrix, exon_matrix, function, *args, **kwargs):
+def _compare_exons(msa_matrix, exon_matrix, function, *args, **kwargs):
     """
     Compare each exon against others in the msa using function.
 
@@ -442,7 +442,7 @@ def compare_exons(msa_matrix, exon_matrix, function, *args, **kwargs):
     only contains the columns where that exon is present and the sequences
     that have residues in those columns.
 
-    compare_exons takes 3 arguments: msa_matrix, exon_matrix, function.
+    _compare_exons takes 3 arguments: msa_matrix, exon_matrix, function.
     Other arguments and keyword arguments are passed to function.
 
     This function returns the dictionary.
@@ -481,19 +481,45 @@ def _add_exon_to_delete(result, exon, exon_msa, cutoff=30.0):
         result[exon] = True
 
 
-def exons_to_delete(msa_matrix, exon_matrix, cutoff=30.0):
+def _exons_to_delete(msa_matrix, exon_matrix, cutoff=30.0):
     """Return a dict from exon cluster id to keep to percent identity."""
-    return compare_exons(
+    return _compare_exons(
         msa_matrix, exon_matrix, _add_exon_to_delete, cutoff=cutoff)
 
 
-def delete_exons(exons, msa_matrix, exon_matrix):
+def _delete_exons(exons, msa_matrix, exon_matrix):
     """Replace an exon by '' or '-' in exon_matrix and msa_matrix."""
     for exon in exons:
         mask = exon_matrix == exon
         exon_matrix[mask] = ''
         msa_matrix[mask] = '-'
     return msa_matrix, exon_matrix
+
+
+def delete_exons(subexon_df, chimerics, msa, cutoff=30.0):
+    """Return the list of 'Exon stable ID cluster' to delete from 'Cluster'."""
+    complete_set = set([])
+    msa_matrix, exon_matrix = msa_matrices(subexon_df, chimerics, msa)
+    to_delete = _exons_to_delete(msa_matrix, exon_matrix, cutoff=cutoff)
+    while to_delete:
+        exon_ids = to_delete.keys()
+        complete_set.update(exon_ids)
+        _delete_exons(exon_ids, msa_matrix, exon_matrix)
+        to_delete = _exons_to_delete(msa_matrix, exon_matrix, cutoff=cutoff)
+    return complete_set
+
+
+# def delete_exons_from_cluster(subexon_df, chimerics, msa, cutoff=30.0):
+#     """
+#     Delete exon from cluster.
+#
+#     It deletes the exon from msa and chimerics, and the cluster number from
+#     subexon_df if the exon percent identity is lower to cutoff for all its
+#     aligned sequences.
+#     """
+#
+#     if to_delete:
+#         pass
 
 
 def create_msa_matrix(chimerics, msa):
