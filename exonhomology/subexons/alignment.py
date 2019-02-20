@@ -130,8 +130,8 @@ def create_subexon_matrix(subexon_table):
 
     subexon_matrix = np.zeros((n_transcripts, n_subexons), dtype=np.bool)
 
-    for _, row in subexon_table.iterrows():
-        subexon_matrix[row['TranscriptIndex'], row['SubexonIndex']] = True
+    for row in subexon_table.itertuples():
+        subexon_matrix[row.TranscriptIndex, row.SubexonIndex] = True
 
     return subexon_table, subexon_matrix
 
@@ -507,19 +507,6 @@ def delete_exons(subexon_df, chimerics, msa, cutoff=30.0):
         _delete_exons(exon_ids, msa_matrix, exon_matrix)
         to_delete = _exons_to_delete(msa_matrix, exon_matrix, cutoff=cutoff)
     return complete_set
-
-
-# def delete_exons_from_cluster(subexon_df, chimerics, msa, cutoff=30.0):
-#     """
-#     Delete exon from cluster.
-#
-#     It deletes the exon from msa and chimerics, and the cluster number from
-#     subexon_df if the exon percent identity is lower to cutoff for all its
-#     aligned sequences.
-#     """
-#
-#     if to_delete:
-#         pass
 
 
 def create_msa_matrix(chimerics, msa):
