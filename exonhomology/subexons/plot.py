@@ -32,10 +32,10 @@ def _constitutive_value(values):
     n_trx_gene, n_trx_subexon, fraction = values
     if np.isnan(fraction):
         return np.nan
-    if fraction == 1.0:
-        return 1.0
     if n_trx_gene == 1:
         return 0.33
+    if fraction == 1.0:
+        return 1.0
     if n_trx_gene - 1 == n_trx_subexon:
         return 0.66
     return 0.0
