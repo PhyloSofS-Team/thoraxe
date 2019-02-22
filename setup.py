@@ -29,8 +29,8 @@ setup(
     },
     setup_requires=['pytest-runner'],
     install_requires=[
-        'pandas', 'matplotlib', 'seaborn', 'biopython', 'requests', 'numpy',
-        'distro', 'recordclass', 'scikit-bio'
+        'pandas', 'plotly', 'biopython', 'requests', 'numpy', 'recordclass',
+        'scikit-bio'
     ],
     test_suite='tests',
     tests_require=[

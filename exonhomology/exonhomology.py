@@ -65,6 +65,10 @@ def parse_command_line():
         help='length of padding, Xs, in the chimeric alignment',
         type=int,
         default=10)
+    parser.add_argument(
+        '--plot',
+        help='save plotly/html plot for the chimeric alignments',
+        action='store_true')
 
     return parser.parse_args()
 
@@ -251,6 +255,7 @@ def get_homologous_subexons(output_folder,
                             gene2speciesname,
                             connected_subexons,
                             cutoff=30.0,
+                            plot=False,
                             mafft_path='mafft',
                             padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
@@ -282,13 +287,13 @@ def get_homologous_subexons(output_folder,
             colclusters = subexons.alignment.column_clusters(
                 subexons.alignment.column_patterns(msa_matrix))
 
-            if subexons.plot._PLOT:  # pylint: disable=protected-access
+            if plot:
                 subexons.plot.plot_msa_subexons(
-                    gene_ids,
+                    msa,
                     msa_matrix,
+                    subexon_table=subexon_df,
                     outfile=_outfile(output_folder, "chimeric_alignment_",
-                                     cluster, ".png"),
-                    subexon_table=subexon_df)
+                                     cluster, ".html"))
 
             sequences = subexons.alignment.msa2sequences(
                 msa, gene_ids, padding)
@@ -336,6 +341,7 @@ def main():
         gene2speciesname,
         connected_subexons,
         cutoff=30.0,
+        plot=args.plot,
         mafft_path=args.mafft_path,
         padding='X' * args.padding)
 
