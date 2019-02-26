@@ -255,7 +255,6 @@ def get_homologous_subexons(output_folder,
                             gene2speciesname,
                             connected_subexons,
                             cutoff=30.0,
-                            plot=False,
                             mafft_path='mafft',
                             padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
@@ -286,14 +285,6 @@ def get_homologous_subexons(output_folder,
 
             colclusters = subexons.alignment.column_clusters(
                 subexons.alignment.column_patterns(msa_matrix))
-
-            if plot:
-                subexons.plot.plot_msa_subexons(
-                    msa,
-                    msa_matrix,
-                    subexon_table=subexon_df,
-                    outfile=_outfile(output_folder, "chimeric_alignment_",
-                                     cluster, ".html"))
 
             sequences = subexons.alignment.msa2sequences(
                 msa, gene_ids, padding)
@@ -335,15 +326,17 @@ def main():
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
-    return get_homologous_subexons(
+    cluster2updated_data = get_homologous_subexons(
         args.outputdir,
         subexon_table,
         gene2speciesname,
         connected_subexons,
         cutoff=30.0,
-        plot=args.plot,
         mafft_path=args.mafft_path,
         padding='X' * args.padding)
+
+    if args.plot:
+        subexons.plot.plot_msa_subexons(cluster2updated_data, args.outputdir)
 
 
 if __name__ == '__main___':

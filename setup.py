@@ -9,7 +9,6 @@ setup(
     author_email='diegozea@gmail.com',
     url='https://github.com/PhyloSofS-Team/exonhomology',
     version='0.1.0',
-    packages=find_packages(include=['exonhomology']),
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
@@ -27,10 +26,11 @@ setup(
             'exonhomology=exonhomology:main'
         ],
     },
+    packages=find_packages(include=['exonhomology']),
+    package_data={'exonhomology': ['subexons/assets/cluster_plots.html']},
     setup_requires=['pytest-runner'],
     install_requires=[
-        'pandas', 'plotly', 'biopython', 'requests', 'numpy', 'recordclass',
-        'scikit-bio'
+        'pandas', 'biopython', 'requests', 'numpy', 'recordclass', 'scikit-bio'
     ],
     test_suite='tests',
     tests_require=[

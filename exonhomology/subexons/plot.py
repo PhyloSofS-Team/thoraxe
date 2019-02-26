@@ -1,25 +1,15 @@
-"""plot: Plot the MSA matrix using plotly."""
+"""plot: Generate js data for plotting the MSA matrix using plotly."""
 
+import codecs
+import os
+import json
+from shutil import copyfile
+import pkg_resources
 import numpy as np
 import pandas as pd
-import plotly.figure_factory as ff
-from plotly.offline import plot
 
-
-def _create_heatmap(color_values, text_values, gene_ids):
-    """Create a good looking and interactive plotly heatmap."""
-    figure = ff.create_annotated_heatmap(
-        color_values, y=gene_ids, annotation_text=text_values, xgap=2, ygap=2)
-    layout = figure['layout']
-    xaxis = layout['xaxis']
-    yaxis = layout['yaxis']
-    xaxis['showgrid'] = False
-    xaxis['zeroline'] = False
-    yaxis['showgrid'] = False
-    yaxis['zeroline'] = False
-    yaxis['automargin'] = True
-    yaxis['autorange'] = 'reversed'
-    return figure
+_HTML_FILE = pkg_resources.resource_filename(
+    'exonhomology', 'subexons/assets/cluster_plots.html')
 
 
 def _constitutive_value(values):
@@ -41,42 +31,56 @@ def _constitutive_value(values):
     return 0.0
 
 
-def plot_msa_subexons(msa,
-                      msa_matrix,
-                      subexon_table=None,
-                      outfile='alignment.html'):
-    """
-    Save a plot from the msa matrix, color indicates subexons.
+def create_python_structure(cluster2data):
+    """Python structured data to be translated to JavaScript."""
+    structured_data = {}
+    for cluster, data in cluster2data.items():
+        msa = data[2]
+        if msa is None:
+            continue
 
-    If `subexon_table` is `None`, the binary plot with the constitutive
-    exons is not generated. Otherwise, it'll be in the `_constitutive.html`
-    file.
-    """
-    assert outfile.endswith('.html')
-    seq_ids = [seq.id for seq in msa]
-    figure = _create_heatmap(msa_matrix, msa, seq_ids)
-    figure['data'][0]['colorscale'] = 'Portland'
-    plot(figure, filename=outfile, auto_open=False)
-    if subexon_table is not None:
+        subexon_table = data[0]
+        gene_ids = data[3]
+        msa_matrix = data[4]
+
         fraction_data = pd.Series(
             zip(subexon_table['Transcripts in gene'].values,
                 subexon_table['Number of transcripts for subexon'].values,
                 subexon_table['Transcript fraction'].values),
             index=subexon_table['SubexonIndex']).to_dict()
-
-        figure['data'][0]['z'] = [[
+        z_constitutive = [[
             _constitutive_value(
                 fraction_data.get(subexon, (np.nan, np.nan, np.nan)))
             for subexon in row
         ] for row in msa_matrix]
 
-        figure['data'][0]['colorscale'] = [
-            [0.2, 'rgb(167, 219, 148)'],  # light
-            [0.4, 'rgb(76, 147, 50)'],  # 0.33
-            [0.7, 'rgb(44, 111, 19)'],  # 0.66
-            [1.0, 'rgb(21, 74, 1)']  # dark
-        ]
-        plot(
-            figure,
-            filename=outfile.replace('.html', '_constitutive.html'),
-            auto_open=False)
+        structured_data['cluster_{}'.format(cluster)] = {
+            'x': list(range(0, msa.get_alignment_length())),
+            'y': gene_ids,
+            'z_cluster': msa_matrix.tolist(),
+            'z_constitutive': z_constitutive,
+            'text': [list(record) for record in msa]
+        }
+
+    return structured_data
+
+
+def plot_msa_subexons(cluster2data, output_folder):
+    """Save html and js data in the output_folder."""
+    structured_data = create_python_structure(cluster2data)
+
+    js_file = os.path.join(output_folder, 'cluster_data.js')
+    with open(js_file, 'w') as file:
+        file.write('var clusterData = ')
+
+    json.dump(
+        structured_data,
+        codecs.open(js_file, 'a', encoding='utf-8'),
+        separators=(',', ':'),
+        sort_keys=True,
+        indent=4)
+
+    with open(js_file, 'a') as file:
+        file.write(';')
+
+    copyfile(_HTML_FILE, os.path.join(output_folder, 'cluster_plots.html'))

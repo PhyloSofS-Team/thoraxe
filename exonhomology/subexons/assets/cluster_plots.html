@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Exon cluster plots</title>
+  <script
+  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+</script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+href=
+"https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+integrity=
+"sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
+crossorigin="anonymous">
+<!-- Latest compiled and minified JavaScript -->
+<script src=
+"https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+integrity=
+"sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+crossorigin="anonymous"></script>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!-- Cluster data -->
+<script src="cluster_data.js"></script>
+</head>
+
+<body>
+  <div class="container" id="heatmap">
+    <div class="row" id="heatmaps">
+      <div class="col">
+        <div class="heatmap" data-num="0">
+          <div class="form-group">
+            <strong>Cluster:</strong>
+            <select id="clusterdata" class="form-control"></select>
+            <strong>Color:</strong>
+            <select id="colordata" class="form-control"></select>
+          </div>
+          <div class="plot" id="plotdiv"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  if (typeof clusterData !== 'undefined') {
+    function makePlot(chosenCluster, colorType) {
+      chosenData = clusterData[chosenCluster]
+      if(colorType == 'cluster'){
+        z = chosenData.z_cluster
+      }else{
+        z = chosenData.z_constitutive
+      };
+      var data = [{
+        x: chosenData.x,
+        y: chosenData.y,
+        z: z,
+        type: 'heatmap',
+        // http://colorbrewer2.org/#type=sequential&scheme=YlOrBr&n=9
+        colorscale: [
+          [0, 'rgb(255,255,229)'],
+          [1, 'rgb(236,112,20)']
+        ],
+        showscale: false
+      }]
+
+      var layout = {
+        annotations: [],
+        xaxis: {
+          ticks: '',
+          side: 'top'
+        },
+        yaxis: {
+          ticks: '',
+          ticksuffix: ' ',
+          width: 700,
+          height: 700,
+          autosize: false
+        }
+      };
+
+      for ( var i = 0; i < chosenData.y.length; i++ ) {
+        for ( var j = 0; j < chosenData.x.length; j++ ) {
+          var result = {
+            xref: 'x1',
+            yref: 'y1',
+            x: chosenData.x[j],
+            y: chosenData.y[i],
+            text: chosenData.text[i][j],
+            font: {
+              family: 'Arial',
+              size: 12,
+              color: 'rgb(50, 171, 96)'
+            },
+            showarrow: false,
+            font: {
+              color: 'black'
+            }
+          };
+          layout.annotations.push(result);
+        }
+      }
+
+      layout.xaxis.showgrid = false;
+      layout.yaxis.showgrid = false;
+      layout.xaxis.zeroline = false;
+      layout.yaxis.zeroline = false;
+      layout.yaxis.automargin = true;
+      layout.yaxis.autorange = 'reversed';
+      Plotly.newPlot('plotdiv', data, layout);
+    };
+
+    makePlot(Object.keys(clusterData)[0], 'cluster');
+
+    var innerContainer = document.querySelector('[data-num="0"'),
+    plotEl = innerContainer.querySelector('.plot'),
+    clusterSelector = innerContainer.querySelector('#clusterdata');
+
+    var innerContainerColor = document.querySelector('[data-num="0"'),
+    plotEl = innerContainerColor.querySelector('.plot'),
+    colorSelector = innerContainerColor.querySelector('#colordata');
+
+    function assignOptions(textArray, selector) {
+      for (var i = 0; i < textArray.length;  i++) {
+        var currentOption = document.createElement('option');
+        currentOption.text = textArray[i];
+        selector.appendChild(currentOption);
+      }
+    }
+
+    assignOptions(Object.keys(clusterData), clusterSelector);
+    assignOptions(['cluster', 'constitutive'], colorSelector);
+
+    function updateCluster(){
+      makePlot(clusterSelector.value, colorSelector.value);
+    }
+
+    clusterSelector.addEventListener('change', updateCluster, false);
+    colorSelector.addEventListener('change', updateCluster, false);
+  }
+  </script>
+</body>
+</html>
