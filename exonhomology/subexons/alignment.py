@@ -46,7 +46,7 @@ ColCluster = recordclass(  # pylint: disable=invalid-name
     'ColCluster', ['patterns', 'consensus', 'start', 'end'])
 
 
-def subexon_connectivity(subexon_table):
+def subexon_connectivity(subexon_table, id_column='Subexon ID cluster'):
     """
     Return a set of connected subexon tuples.
 
@@ -54,7 +54,7 @@ def subexon_connectivity(subexon_table):
     The first subexon appears before of the second in at least one transcript.
     """
     connected_pairs = []
-    col_index = subexon_table.columns.get_loc('Subexon ID cluster')
+    col_index = subexon_table.columns.get_loc(id_column)
     for _, transcript_df in subexon_table.groupby(
             'Transcript stable ID cluster'):
         transcript = transcript_df.sort_values(

@@ -249,7 +249,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
     return cluster2data
 
 
-# noqa pylint: disable=too-many-arguments,too-many-locals
+# pylint: disable=too-many-arguments,too-many-locals
 def get_homologous_subexons(output_folder,
                             subexon_table,
                             gene2speciesname,
@@ -303,6 +303,35 @@ def get_homologous_subexons(output_folder,
     return cluster2updated_data
 
 
+def update_subexon_table(subexon_table, cluster2data):
+    """."""
+    columns_to_add = [
+        'HomologousExonLengths', 'HomologousExonSequences', 'HomologousExons',
+        'SubexonIndex'
+    ]
+    key_col = 'Subexon ID cluster'
+    subexon2data = {}
+    for (_, data) in cluster2data.items():
+        cluster_df = data[0]
+        if cluster_df.shape[0] > 0:
+            subexon2data.update(
+                cluster_df.loc[:, [key_col] + columns_to_add].drop_duplicates(
+                ).set_index(key_col).to_dict('index'))
+
+    columns = {colname: [] for colname in columns_to_add}
+    for subexon in subexon_table[key_col]:
+        for colname in columns_to_add:
+            if subexon in subexon2data:
+                columns[colname].append(subexon2data[subexon][colname])
+            else:
+                columns[colname].append('')
+
+    for (colname, values) in columns.items():
+        subexon_table[colname] = values
+
+    return subexon_table
+
+
 def main():
     """Perform Pipeline."""
     args = parse_command_line()
@@ -326,7 +355,7 @@ def main():
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
-    cluster2updated_data = get_homologous_subexons(
+    cluster2data = get_homologous_subexons(
         args.outputdir,
         subexon_table,
         gene2speciesname,
@@ -336,7 +365,9 @@ def main():
         padding='X' * args.padding)
 
     if args.plot:
-        subexons.plot.plot_msa_subexons(cluster2updated_data, args.outputdir)
+        subexons.plot.plot_msa_subexons(cluster2data, args.outputdir)
+
+    subexon_table = update_subexon_table(subexon_table, cluster2data)
 
 
 if __name__ == '__main___':
