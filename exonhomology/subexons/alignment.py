@@ -405,8 +405,8 @@ def _fill_msa_matrix(msa_matrix,
                 subexons[subexon_index])
 
 
-def _get_msa_exon_matrix(subexon_df, chimerics, msa):
-    """Return the msa as a matrix of 'Exon stable ID cluster'."""
+def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
+    """Return the msa as a matrix of 'Subexon ID cluster'."""
     n_seq = len(msa)
     n_col = msa.get_alignment_length()
     msa_matrix = np.empty((n_seq, n_col), dtype=object)
@@ -414,7 +414,7 @@ def _get_msa_exon_matrix(subexon_df, chimerics, msa):
     index2cluster = {
         index: cluster
         for index, cluster in zip(subexon_df['SubexonIndex'],
-                                  subexon_df['Exon stable ID cluster'])
+                                  subexon_df['Subexon ID cluster'])
     }
     for seq_index in range(0, n_seq):
         _fill_msa_matrix(msa_matrix, chimerics, msa,
@@ -424,44 +424,47 @@ def _get_msa_exon_matrix(subexon_df, chimerics, msa):
 
 
 def msa_matrices(subexon_df, chimerics, msa):
-    """Return msa (residues) and exon (exon cluster id) matrices from msa."""
+    """Return msa (residues) and subexon id cluster matrices from msa."""
     msa_matrix = np.array([list(record) for record in msa])
-    exon_matrix = _get_msa_exon_matrix(subexon_df, chimerics, msa)
-    return msa_matrix, exon_matrix
+    subexon_matrix = _get_msa_subexon_matrix(subexon_df, chimerics, msa)
+    return msa_matrix, subexon_matrix
 
 
-def _compare_exons(msa_matrix, exon_matrix, function, *args, **kwargs):
+def _compare_subexons(msa_matrix, subexon_matrix, function, *args, **kwargs):
     """
-    Compare each exon against others in the msa using function.
+    Compare each subexon against others in the msa using function.
 
-    function should take an empty dictionary to update, the (query) exon id
+    function should take an empty dictionary to update, the (query) subexon id
     and the msa matrix (numpy matrix of strings/chars) of with the sequences
     to compare.
 
-    This function iterates each exon of the msa, and creates a sub msa that
-    only contains the columns where that exon is present and the sequences
+    This function iterates each subexon of the msa, and creates a sub msa that
+    only contains the columns where that subexon is present and the sequences
     that have residues in those columns.
 
-    _compare_exons takes 3 arguments: msa_matrix, exon_matrix, function.
+    _compare_subexons takes 3 arguments: msa_matrix, subexon_matrix, function.
     Other arguments and keyword arguments are passed to function.
 
     This function returns the dictionary.
     """
     result = {}
-    for exon in np.unique(exon_matrix):
-        if exon == '':
+    for subexon in np.unique(subexon_matrix):
+        if subexon == '':
             continue
         # np.where returns an (rows, columns) tuple for a matrix
-        start, stop = np.where((exon_matrix == exon).any(axis=0))[0][[0, -1]]
-        exon_msa = msa_matrix[:, start:stop + 1]
-        seq_indexes = np.where(np.logical_not((exon_msa == '-').all(axis=1)))
-        exon_msa = exon_msa[seq_indexes]
-        function(result, exon, exon_msa, *args, **kwargs)
+        start, stop = np.where(
+            (subexon_matrix == subexon).any(axis=0))[0][[0, -1]]
+        subexon_msa = msa_matrix[:, start:stop + 1]
+        seq_indexes = np.where(
+            np.logical_not((subexon_msa == '-').all(axis=1)))
+        exon_msa = subexon_msa[seq_indexes]
+        function(result, subexon, exon_msa, *args, **kwargs)
 
     return result
 
 
-def _should_keep_exon(msa_matrix, cutoff=30.0):
+def _should_keep_subexon(msa_matrix, cutoff=30.0):
+    """Return True if the subexon is aligned to a similar sequence."""
     n_seqs = msa_matrix.shape[0]
     if n_seqs == 1:
         return False
@@ -475,37 +478,38 @@ def _should_keep_exon(msa_matrix, cutoff=30.0):
     return False
 
 
-def _add_exon_to_delete(result, exon, exon_msa, cutoff=30.0):
-    """Update result keys with the exon cluster id to keep."""
-    if not _should_keep_exon(exon_msa, cutoff=cutoff):
-        result[exon] = True
+def _add_subexon_to_delete(result, subexon, subexon_msa, cutoff=30.0):
+    """Update result keys with the subexon cluster id to keep."""
+    if not _should_keep_subexon(subexon_msa, cutoff=cutoff):
+        result[subexon] = True
 
 
-def _exons_to_delete(msa_matrix, exon_matrix, cutoff=30.0):
-    """Return a dict from exon cluster id to keep to percent identity."""
-    return _compare_exons(
-        msa_matrix, exon_matrix, _add_exon_to_delete, cutoff=cutoff)
+def _subexons_to_delete(msa_matrix, subexon_matrix, cutoff=30.0):
+    """Return a dict from subexon cluster id to keep to percent identity."""
+    return _compare_subexons(
+        msa_matrix, subexon_matrix, _add_subexon_to_delete, cutoff=cutoff)
 
 
-def _delete_exons(exons, msa_matrix, exon_matrix):
-    """Replace an exon by '' or '-' in exon_matrix and msa_matrix."""
-    for exon in exons:
-        mask = exon_matrix == exon
-        exon_matrix[mask] = ''
+def _delete_subexons(subexons, msa_matrix, subexon_matrix):
+    """Replace an subexon by '' or '-' in subexon_matrix and msa_matrix."""
+    for subexon in subexons:
+        mask = subexon_matrix == subexon
+        subexon_matrix[mask] = ''
         msa_matrix[mask] = '-'
-    return msa_matrix, exon_matrix
+    return msa_matrix, subexon_matrix
 
 
-def delete_exons(subexon_df, chimerics, msa, cutoff=30.0):
-    """Return the list of 'Exon stable ID cluster' to delete from 'Cluster'."""
+def delete_subexons(subexon_df, chimerics, msa, cutoff=30.0):
+    """Return the list of 'Subexon ID cluster' to delete from 'Cluster'."""
     complete_set = set([])
-    msa_matrix, exon_matrix = msa_matrices(subexon_df, chimerics, msa)
-    to_delete = _exons_to_delete(msa_matrix, exon_matrix, cutoff=cutoff)
+    msa_matrix, subexon_matrix = msa_matrices(subexon_df, chimerics, msa)
+    to_delete = _subexons_to_delete(msa_matrix, subexon_matrix, cutoff=cutoff)
     while to_delete:
-        exon_ids = to_delete.keys()
-        complete_set.update(exon_ids)
-        _delete_exons(exon_ids, msa_matrix, exon_matrix)
-        to_delete = _exons_to_delete(msa_matrix, exon_matrix, cutoff=cutoff)
+        subexon_ids = to_delete.keys()
+        complete_set.update(subexon_ids)
+        _delete_subexons(subexon_ids, msa_matrix, subexon_matrix)
+        to_delete = _subexons_to_delete(
+            msa_matrix, subexon_matrix, cutoff=cutoff)
     return complete_set
 
 
@@ -599,7 +603,7 @@ def msa2sequences(msa, gene_ids, padding):
 
 def _store_homologous_subexons(subexon_df, seq, subexon, gene, exon_id):
     """
-    Store homologous exon information in subexon_df.
+    Store homologous subexon information in subexon_df.
 
     exon_id is the Homologous Exons ID created by Cluster_ColCluster.
     """
@@ -624,8 +628,8 @@ def save_homologous_subexons(subexon_df, sequences, gene_ids, colclusters,
     It saves the information about homologous exons.
 
     It takes a list of sequences, like the one returned by msa2sequences.
-    Return subexon_df with the homologous exon information.
-    For each homologous exon saves a fasta MSA in the output_folder.
+    Return subexon_df with the homologous subexon information.
+    For each homologous subexon saves a fasta MSA in the output_folder.
     """
     cluster = str(subexon_df['Cluster'][0])
     subexon_df = subexon_df.assign(

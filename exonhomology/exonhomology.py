@@ -191,7 +191,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
     cluster2data[cluster] = (subexon_df, chimerics, msa)
     if msa is None:
         return {}
-    return subexons.alignment.delete_exons(
+    return subexons.alignment.delete_subexons(
         subexon_df, chimerics, msa, cutoff=cutoff)
 
 
@@ -229,11 +229,12 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
             padding=padding)
         while to_delete:
             delete = [
-                subexon_table.loc[index, 'Exon stable ID cluster'] in to_delete
+                subexon_table.loc[index, 'Subexon ID cluster'] in to_delete
                 for index in cluster_index
             ]
             for index in cluster_index[delete]:
-                subexon_table.at[index, 'Cluster'] = -1
+                subexon_table.at[index, 'Cluster'] = -1 * subexon_table.loc[
+                    index, 'Cluster']
             cluster_index = cluster_index[np.logical_not(delete)]
             to_delete = _create_and_test_chimeric_msa(
                 cluster2data,
