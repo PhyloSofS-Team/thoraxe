@@ -430,7 +430,8 @@ def msa_matrices(subexon_df, chimerics, msa):
     return msa_matrix, subexon_matrix
 
 
-def _compare_subexons(msa_matrix, subexon_matrix, function, *args, **kwargs):
+def _compare_subexons(function, msa_matrix, subexon_matrix, min_col_number,
+                      *args, **kwargs):
     """
     Compare each subexon against others in the msa using function.
 
@@ -442,8 +443,9 @@ def _compare_subexons(msa_matrix, subexon_matrix, function, *args, **kwargs):
     only contains the columns where that subexon is present and the sequences
     that have residues in those columns.
 
-    _compare_subexons takes 3 arguments: msa_matrix, subexon_matrix, function.
-    Other arguments and keyword arguments are passed to function.
+    _compare_subexons takes 4 arguments: function, msa_matrix, subexon_matrix,
+    min_col_number. Other arguments and keyword arguments are passed to
+    function.
 
     This function returns the dictionary.
     """
@@ -458,6 +460,9 @@ def _compare_subexons(msa_matrix, subexon_matrix, function, *args, **kwargs):
         seq_indexes = np.where(
             np.logical_not((subexon_msa == '-').all(axis=1)))
         exon_msa = subexon_msa[seq_indexes]
+        n_seq, n_col = exon_msa.shape
+        if n_col < min_col_number or n_seq == 1:
+            continue
         function(result, subexon, exon_msa, *args, **kwargs)
 
     return result
@@ -484,10 +489,17 @@ def _add_subexon_to_delete(result, subexon, subexon_msa, cutoff=30.0):
         result[subexon] = True
 
 
-def _subexons_to_delete(msa_matrix, subexon_matrix, cutoff=30.0):
+def _subexons_to_delete(msa_matrix,
+                        subexon_matrix,
+                        cutoff=30.0,
+                        min_col_number=4):
     """Return a dict from subexon cluster id to keep to percent identity."""
     return _compare_subexons(
-        msa_matrix, subexon_matrix, _add_subexon_to_delete, cutoff=cutoff)
+        _add_subexon_to_delete,
+        msa_matrix,
+        subexon_matrix,
+        min_col_number,
+        cutoff=cutoff)
 
 
 def _delete_subexons(subexons, msa_matrix, subexon_matrix):
@@ -499,17 +511,24 @@ def _delete_subexons(subexons, msa_matrix, subexon_matrix):
     return msa_matrix, subexon_matrix
 
 
-def delete_subexons(subexon_df, chimerics, msa, cutoff=30.0):
+def delete_subexons(subexon_df, chimerics, msa, cutoff=30.0, min_col_number=4):
     """Return the list of 'Subexon ID cluster' to delete from 'Cluster'."""
     complete_set = set([])
     msa_matrix, subexon_matrix = msa_matrices(subexon_df, chimerics, msa)
-    to_delete = _subexons_to_delete(msa_matrix, subexon_matrix, cutoff=cutoff)
+    to_delete = _subexons_to_delete(
+        msa_matrix,
+        subexon_matrix,
+        cutoff=cutoff,
+        min_col_number=min_col_number)
     while to_delete:
         subexon_ids = to_delete.keys()
         complete_set.update(subexon_ids)
         _delete_subexons(subexon_ids, msa_matrix, subexon_matrix)
         to_delete = _subexons_to_delete(
-            msa_matrix, subexon_matrix, cutoff=cutoff)
+            msa_matrix,
+            subexon_matrix,
+            cutoff=cutoff,
+            min_col_number=min_col_number)
     return complete_set
 
 

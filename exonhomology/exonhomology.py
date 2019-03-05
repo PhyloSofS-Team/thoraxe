@@ -171,6 +171,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         gene2speciesname,
         connected_subexons,
         cutoff=30.0,
+        min_col_number=4,
         mafft_path='mafft',
         padding='XXXXXXXXXX'):
     """
@@ -192,7 +193,11 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
     if msa is None:
         return {}
     return subexons.alignment.delete_subexons(
-        subexon_df, chimerics, msa, cutoff=cutoff)
+        subexon_df,
+        chimerics,
+        msa,
+        cutoff=cutoff,
+        min_col_number=min_col_number)
 
 
 def create_chimeric_msa(  # pylint: disable=too-many-arguments
@@ -201,6 +206,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
         gene2speciesname,
         connected_subexons,
         cutoff=30.0,
+        min_col_number=4,
         mafft_path='mafft',
         padding='XXXXXXXXXX'):
     """
@@ -225,6 +231,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
             gene2speciesname,
             connected_subexons,
             cutoff=cutoff,
+            min_col_number=min_col_number,
             mafft_path=mafft_path,
             padding=padding)
         while to_delete:
@@ -245,6 +252,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
                 gene2speciesname,
                 connected_subexons,
                 cutoff=cutoff,
+                min_col_number=min_col_number,
                 mafft_path=mafft_path,
                 padding=padding)
     return cluster2data
@@ -256,6 +264,7 @@ def get_homologous_subexons(output_folder,
                             gene2speciesname,
                             connected_subexons,
                             cutoff=30.0,
+                            min_col_number=4,
                             mafft_path='mafft',
                             padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
@@ -266,6 +275,7 @@ def get_homologous_subexons(output_folder,
         gene2speciesname,
         connected_subexons,
         cutoff=cutoff,
+        min_col_number=min_col_number,
         mafft_path=mafft_path,
         padding=padding)
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
@@ -362,6 +372,7 @@ def main():
         gene2speciesname,
         connected_subexons,
         cutoff=30.0,
+        min_col_number=4,
         mafft_path=args.mafft_path,
         padding='X' * args.padding)
 
