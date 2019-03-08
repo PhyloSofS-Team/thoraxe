@@ -278,6 +278,7 @@ def get_homologous_subexons(output_folder,
         min_col_number=min_col_number,
         mafft_path=mafft_path,
         padding=padding)
+    # TO DO: rescue phase
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if msa is not None:
             gene_ids = subexons.alignment.get_gene_ids(msa)
