@@ -258,15 +258,15 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
     return cluster2data
 
 
-# pylint: disable=too-many-arguments,too-many-locals
-def get_homologous_subexons(output_folder,
-                            subexon_table,
-                            gene2speciesname,
-                            connected_subexons,
-                            cutoff=30.0,
-                            min_col_number=4,
-                            mafft_path='mafft',
-                            padding='XXXXXXXXXX'):
+def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
+        output_folder,
+        subexon_table,
+        gene2speciesname,
+        connected_subexons,
+        cutoff=30.0,
+        min_col_number=4,
+        mafft_path='mafft',
+        padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(

@@ -7,4 +7,5 @@ transcript_info.read_transcript_info.
 
 from .subexons import *
 from . import alignment
+from . import rescue
 from . import plot

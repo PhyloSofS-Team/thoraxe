@@ -5,11 +5,11 @@ from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
 
-def _coverage(seq, seq_len):
+def coverage(seq, seq_len):
     """
     Return coverage of the sequence in the alignment.
 
-    >>> _coverage("AAAA----", 8)
+    >>> coverage("AAAA----", 8)
     50.0
     """
     return 100.0 * (len(seq) - seq.count('-')) / seq_len
@@ -81,9 +81,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
         AlignedTarget='',
         InputOrder=range(nrows),
         ProteinSequences=lambda df: df['Exon protein sequence'].map(
-            lambda seq: str(seq).replace('*', '')
-            ).values
-    )
+            lambda seq: str(seq).replace('*', '')).values)
     # ?assign: For Python 3.5 and below, the order of keyword arguments is not
     # specified, you cannot refer to newly created or modified columns. All
     # items are computed first, and then assigned in alphabetical order.
@@ -127,17 +125,17 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
             # Because of the sort by SeqLength with ascending=False, the target
             # j is always <= i, i.e. j is the shortest sequence of the pair.
-            coverage = _coverage(aln.aligned_target_sequence,
-                                 row_list[j]['SeqLength'])
+            target_coverage = coverage(aln.aligned_target_sequence,
+                                       row_list[j]['SeqLength'])
 
             pid = percent_identity(aln.aligned_query_sequence,
                                    aln.aligned_target_sequence)
 
-            if (coverage >= coverage_cutoff
+            if (target_coverage >= coverage_cutoff
                     and pid >= percent_identity_cutoff):
                 trx_data.at[j_index, 'Cluster'] = cluster
                 trx_data.at[j_index, 'QueryExon'] = query_exon
-                trx_data.at[j_index, 'TargetCoverage'] = coverage
+                trx_data.at[j_index, 'TargetCoverage'] = target_coverage
                 trx_data.at[j_index, 'PercentIdentity'] = pid
                 trx_data.at[j_index,
                             'AlignedQuery'] = aln.aligned_query_sequence
