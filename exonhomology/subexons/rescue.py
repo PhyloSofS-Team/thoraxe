@@ -2,13 +2,15 @@
 Functions for the rescue phase.
 """
 
-from collections import namedtuple, defaultdict
+import collections
+
 import pandas as pd
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
-from .. import transcript_info
 
-ClusterChange = namedtuple('ClusterChange', ['from', 'to'])
+from exonhomology import transcript_info
+
+ClusterChange = collections.namedtuple('ClusterChange', ['origin', 'destiny'])
 
 
 def _to_rescue(subexon_table):
@@ -64,7 +66,7 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments
         query, query_len, origin_cluster, cluster2sequence, coverage_cutoff,
         percent_identity_cutoff):
     """Helper function to get a dict with the aln stats of the matches."""
-    aln_stats = defaultdict(list)
+    aln_stats = collections.defaultdict(list)
     for cluster, sequences in cluster2sequence.items():
         if cluster == origin_cluster:
             continue
