@@ -5,15 +5,15 @@ Functions for the rescue phase.
 import collections
 
 import pandas as pd
+import numpy as np
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
+from . import alignment
 from exonhomology import transcript_info
 
-ClusterChange = collections.namedtuple('ClusterChange', ['origin', 'destiny'])
 
-
-def _to_rescue(subexon_table):
+def _get_subexons_to_rescue(subexon_table):
     """Return a DataFrame with the subexons to rescue."""
     return subexon_table.loc[subexon_table['Cluster'] < 0, [
         'Subexon ID cluster', 'Cluster', 'Exon protein sequence'
@@ -112,7 +112,58 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
                                    cluster2sequence, coverage_cutoff,
                                    percent_identity_cutoff)
         if aln_stats:
-            subexon2cluster[row['Subexon ID cluster']] = ClusterChange(
-                origin_cluster, _get_cluster_number(aln_stats))
+            subexon2cluster[row['Subexon ID cluster']] = _get_cluster_number(
+                aln_stats)
 
     return subexon2cluster
+
+
+def modify_subexon_cluster(subexon_table, subexon2cluster):
+    """Modify subexon_table using the mapping in subexon2cluster."""
+    for subexon, cluster in subexon2cluster.items():
+        subexon_index = subexon_table.index[subexon_table['Subexon ID cluster']
+                                            == subexon]
+        for i in subexon_index:
+            subexon_table.at[i, 'Cluster'] = cluster
+            subexon_table.at[i, 'QueryExon'] = ''
+            subexon_table.at[i, 'AlignedQuery'] = ''
+            subexon_table.at[i, 'AlignedTarget'] = ''
+            subexon_table.at[i, 'TargetCoverage'] = np.nan
+            subexon_table.at[i, 'PercentIdentity'] = np.nan
+
+    return subexon_table
+
+
+def subexon_rescue_phase(  # pylint: disable=too-many-arguments
+        subexon_table,
+        minimum_len=4,
+        coverage_cutoff=80.0,
+        percent_identity_cutoff=30.0,
+        gap_open_penalty=10,
+        gap_extend_penalty=1,
+        substitution_matrix=None):
+    """
+    Execute the subexon rescue phase.
+
+    This function looks the subexons to rescues in the subexon_table by
+    looking at the 'Cluster' numbers that are lower than 0, i.e. -1 means that
+    the subexon has been cleaned up from 'Cluster' 1.
+    Then, each subexon to rescue is aligned against the subexons in other
+    'Cluster's, different from the original one. If it is nicely aligned
+    against another cluster, the 'Cluster' number is modified in the
+    subexon_table to match the new proposed 'Cluster' and the data relative to
+    the original pairwise alignment are cleaned up.
+    This function returns the list of 'Cluster's that have been modified.
+    """
+    to_rescue = _get_subexons_to_rescue(subexon_table)
+    cluster2sequence = _get_cluster2sequence(subexon_table, minimum_len)
+    subexon2cluster = _get_subexon2cluster(
+        to_rescue,
+        cluster2sequence,
+        coverage_cutoff=coverage_cutoff,
+        percent_identity_cutoff=percent_identity_cutoff,
+        gap_open_penalty=gap_open_penalty,
+        gap_extend_penalty=gap_extend_penalty,
+        substitution_matrix=substitution_matrix)
+    modify_subexon_cluster(subexon_table, subexon2cluster)
+    return list(subexon2cluster.values())

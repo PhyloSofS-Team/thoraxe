@@ -1,4 +1,7 @@
 """Functions to cluster exons."""
+
+import warnings
+
 import numpy as np
 
 from skbio.alignment import StripedSmithWaterman
@@ -23,7 +26,10 @@ def percent_identity(query, target):
     50.0
     """
     aln_len = len(query)
-    assert aln_len == len(target)
+    if aln_len != len(target):
+        warnings.warn('{} and {} have different lengths'.format(query, target))
+        return np.nan
+
     identical = 0
     for res_i, res_j in zip(query, target):
         if res_i == res_j:

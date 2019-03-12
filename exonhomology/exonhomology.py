@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import re
+from ast import literal_eval
 import numpy as np
 from . import transcript_info
 from . import subexons
@@ -127,7 +128,25 @@ def get_subexons(  # pylint: disable=too-many-arguments
         percent_identity_cutoff=percent_identity_cutoff,
         gap_open_penalty=gap_open_penalty,
         gap_extend_penalty=gap_extend_penalty)
-    return subexons.create_subexon_table(clustered)
+    subexon_table = subexons.create_subexon_table(clustered)
+    return merge_clusters(subexon_table)
+
+
+def merge_clusters(subexon_table):
+    """Merge 'Cluster's that share subexons."""
+    clusters_df = subexon_table.groupby('Subexon ID cluster').agg(
+        {'Cluster': lambda col: set(val for val in col if val != 0)})
+    cluster_lists = clusters_df.loc[map(lambda x: len(
+        x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
+            repr).drop_duplicates().apply(lambda x: sorted(literal_eval(x)))
+    for clusters in cluster_lists:
+        cluster_id = clusters[0]
+        for cluster in clusters[1:]:
+            cluster_index = subexon_table.index[subexon_table['Cluster'] ==
+                                                cluster]
+            for i in cluster_index:
+                subexon_table.at[i, 'Cluster'] = cluster_id
+    return subexon_table
 
 
 def _outfile(output_folder, prefix, name, ext):
@@ -205,6 +224,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
         subexon_table,
         gene2speciesname,
         connected_subexons,
+        clusters=None,
         cutoff=30.0,
         min_col_number=4,
         mafft_path='mafft',
@@ -214,12 +234,19 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
 
     For each cluster, there is a tuple with the subexon dataframe, the
     chimeric sequences and the msa.
+
+    This function can take a clusters argument with the list of 'Cluster'
+    identifiers to use. If that list is not given, all the positive 'Cluster'
+    identifiers from subexon_table are used.
     """
-    cluster2data = {}
-    for cluster in {
+    if clusters is None:
+        clusters = {
             cluster
             for cluster in subexon_table['Cluster'] if cluster > 0
-    }:
+        }
+
+    cluster2data = {}
+    for cluster in clusters:
         cluster_index = subexon_table.index[subexon_table['Cluster'] ==
                                             cluster]
         to_delete = _create_and_test_chimeric_msa(
@@ -263,8 +290,11 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         subexon_table,
         gene2speciesname,
         connected_subexons,
-        cutoff=30.0,
-        min_col_number=4,
+        minimum_len=4,
+        coverage_cutoff=80.0,
+        percent_identity_cutoff=30.0,
+        gap_open_penalty=10,
+        gap_extend_penalty=1,
         mafft_path='mafft',
         padding='XXXXXXXXXX'):
     """Perform almost all the pipeline."""
@@ -274,11 +304,29 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         subexon_table,
         gene2speciesname,
         connected_subexons,
-        cutoff=cutoff,
-        min_col_number=min_col_number,
+        cutoff=percent_identity_cutoff,
+        min_col_number=minimum_len,
         mafft_path=mafft_path,
         padding=padding)
-    # TO DO: rescue phase
+    modified_clusters = subexons.rescue.subexon_rescue_phase(
+        subexon_table,
+        minimum_len=minimum_len,
+        coverage_cutoff=coverage_cutoff,
+        percent_identity_cutoff=percent_identity_cutoff,
+        gap_open_penalty=gap_open_penalty,
+        gap_extend_penalty=gap_extend_penalty,
+        substitution_matrix=None)
+    cluster2data.update(
+        create_chimeric_msa(
+            output_folder,
+            subexon_table,
+            gene2speciesname,
+            connected_subexons,
+            clusters=modified_clusters,
+            cutoff=percent_identity_cutoff,
+            min_col_number=minimum_len,
+            mafft_path=mafft_path,
+            padding=padding))
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if msa is not None:
             gene_ids = subexons.alignment.get_gene_ids(msa)
@@ -316,7 +364,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
 
 
 def update_subexon_table(subexon_table, cluster2data):
-    """."""
+    """TO DO DOCS."""
     columns_to_add = [
         'HomologousExonLengths', 'HomologousExonSequences', 'HomologousExons',
         'SubexonIndex'
@@ -372,8 +420,11 @@ def main():
         subexon_table,
         gene2speciesname,
         connected_subexons,
-        cutoff=30.0,
-        min_col_number=4,
+        minimum_len=args.minlen,
+        coverage_cutoff=args.coverage,
+        percent_identity_cutoff=args.identity,
+        gap_open_penalty=args.gapopen,
+        gap_extend_penalty=args.gapextend,
         mafft_path=args.mafft_path,
         padding='X' * args.padding)
 
