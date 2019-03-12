@@ -151,7 +151,8 @@ def _get_info_from_row(row, columns):
     return {col: row[col] for col in columns}
 
 
-def _subexon_info(gene_df, exon_df, intervals):
+def _subexon_info(  # pylint: disable=too-many-locals
+        gene_df, exon_df, intervals):
     """Return a pandas' DataFrame for subexons."""
     # We are going to use transcript_info functions to transcribe and
     # merge subexons. Therefore, we are going to use the exon table column

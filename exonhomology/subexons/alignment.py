@@ -151,10 +151,11 @@ def _get_sequence(subexon_info,
     return seq.replace('*', '')
 
 
-def create_chimeric_sequences(subexon_table,
-                              subexon_matrix,
-                              connected_subexons,
-                              padding='XXXXXXXXXX'):
+def create_chimeric_sequences(  # pylint: disable=too-many-locals
+        subexon_table,
+        subexon_matrix,
+        connected_subexons,
+        padding='XXXXXXXXXX'):
     """
     Create chimeric sequence for MAFFT.
 

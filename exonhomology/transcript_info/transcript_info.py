@@ -373,7 +373,7 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
                 j = row['Exon region end (bp)'] - row['Genomic coding start']
                 j += 1
             else:
-                # TODO: TEST IT!
+                # TO DO: TEST IT!
                 i = row['Genomic coding start'] - row['Exon region start (bp)']
                 j = row['Genomic coding end'] - row['Exon region start (bp)']
                 j += 1
@@ -575,13 +575,14 @@ def find_identical_sequences(data_frame):
     return seq_clusters
 
 
-def store_cluster(data_frame,
-                  cluster_list,
-                  default_values,
-                  column_name,
-                  item2str=str,
-                  get_item=lambda row, default_idx: row[default_idx],
-                  delim='/'):
+def store_cluster(  # pylint: disable=too-many-arguments
+        data_frame,
+        cluster_list,
+        default_values,
+        column_name,
+        item2str=str,
+        get_item=lambda row, default_idx: row[default_idx],
+        delim='/'):
     """
     Store the string representation of clusters in the data_frame.
 
@@ -664,12 +665,13 @@ def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):
     data_frame.replace(to_replace={exon_id_column: old2new}, inplace=True)
 
 
-def read_transcript_info(tsl_table_file,
-                         exon_table_file,
-                         exon_sequence_file,
-                         max_tsl_level=3.0,
-                         remove_na=True,
-                         remove_badquality=True):
+def read_transcript_info(  # pylint: disable=too-many-arguments
+        tsl_table_file,
+        exon_table_file,
+        exon_sequence_file,
+        max_tsl_level=3.0,
+        remove_na=True,
+        remove_badquality=True):
     """
     Read and integrate the transcript information.
 

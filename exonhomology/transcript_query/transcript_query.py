@@ -10,7 +10,6 @@ l'API RESTfull de ENSEMBL afin de récupérer tous les gènes homologues
 
 import argparse
 import csv
-import io
 import json
 import os
 import sys
@@ -59,22 +58,10 @@ def parse_command_line():
         '--species',
         help='species to look for the gene name',
         default='homo_sapiens')
-    # TODO: take care of aliases for species names,symbol always use the
+    # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
     return parser.parse_args()
-
-
-def lodict2csvstring(listofdicts):
-    stream = io.BytesIO()
-    fnames = set([])
-    for dictionary in listofdicts:
-        fnames.update(list(dictionary.keys()))
-    fnames = sorted(fnames)
-    csv_writer = csv.DictWriter(stream, fieldnames=fnames, restval='NA')
-    csv_writer.writeheader()
-    csv_writer.writerows(listofdicts)
-    return stream.getvalue()
 
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
@@ -108,6 +95,7 @@ def dictseq2fasta(dseq, geneid, out):
 
 
 def species2ensembldataset(speciesname):
+    """Return hsapiens_gene_ensembl from homo_sapiens."""
     binname = speciesname.split("_")
     assert len(binname) == 2, "Error for the species name"
     biomartname = binname[0][0] + binname[1] + "_gene_ensembl"
@@ -125,7 +113,7 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
         r = get_biomart_exons_annot("hsapiens_gene_ensembl", "ENSG00000107643")
     Return a requests object (use r.text to get the text for the file)
     """
-    # TODO: Error control on the call
+    # TO DO: Error control on the call
 
     # see http://ensembl.org/biomart/martview/ for the web application
     biomart_request_url_template = (
@@ -163,7 +151,7 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
     return req
 
 
-# TODO : passer toutes les fonctions avec un conteneur générique sur la
+# TO DO : passer toutes les fonctions avec un conteneur générique sur la
 # forme de la partie extension
 
 
@@ -202,7 +190,7 @@ def get_listoftranscripts(ensgeneid, species, **params):
     From an ensembl gene id, gets the list of transcripts overlapping
     this gene.
     """
-    # TODO filter on protein coding
+    # TO DO filter on protein coding
     params.setdefault('feature', 'transcript')
     ext_listtr = '/overlap/id/{0}?'.format(ensgeneid)
     request = generic_ensembl_rest_request(ext_listtr, params, HJSON)
@@ -300,7 +288,7 @@ def get_genetree(ensgeneid, **params):
 def get_orthologs(ensgeneid, **params):
     """Get the orthologs from the gene with id ensgeneid."""
     params.setdefault('object_type', 'gene')
-    # TODO: rajouter des parametres pour séparer les différentes relations
+    # TO DO: rajouter des parametres pour séparer les différentes relations
     # d'orthologie:
     # -ortholog_one2one,
     # -ortholog_one2many,
@@ -317,7 +305,7 @@ def get_orthologs(ensgeneid, **params):
 
 def filter_ortho(l_ortho, dortho, relation=None):
     """Filter the dictionary of orthologues according to the list of names."""
-    # TODO: rajouter un système de synonymes sur les espèces pour
+    # TO DO: rajouter un système de synonymes sur les espèces pour
     # le filtrage
     if relation is None:
         relation = [
@@ -363,7 +351,10 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     return source_transcripts, ortho_transcripts
 
 
-def main():
+# TO DO : Refactor main to avoid pylint statements if possible:
+# Too many local variables (42/15) and Too many statements (75/50).
+def main():  # pylint: disable=too-many-locals,too-many-statements
+    """Main script function to download transcript data from ENSEMBL."""
     # 1- Get gene name and species
     # 2- Match with ensembl gene ID
     # 3- Get the set of orthologous genes as ensembl geneID
@@ -461,7 +452,7 @@ def main():
         print("%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
 
     print("Now getting the exons sequences")
-    # TODO revert to multiple files if it is easier
+    # TO DO revert to multiple files if it is easier
     ffasta = "%s/%s.fasta" % (seqsubdir, gene_name)
     fexonstable = "%s/%s_exonstable.tsv" % (tex_subdir, gene_name)
     fastaout = open(ffasta, "w")

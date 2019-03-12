@@ -8,8 +8,6 @@ import pandas as pd
 import numpy as np
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
-
-from . import alignment
 from exonhomology import transcript_info
 
 
