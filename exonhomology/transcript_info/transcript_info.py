@@ -600,6 +600,7 @@ def store_cluster(  # pylint: disable=too-many-arguments
         delim          -- Character delimiting cluster items (default: '/').
 
 
+    >>> import pandas as pd
     >>> cluster_list = [{2, 3}]
     >>> df = pd.DataFrame(data={'id': [1, 2, 3, 4], 'value': [1, 2, 2, 3]})
     >>> store_cluster(df, cluster_list, 'id', 'cluster')

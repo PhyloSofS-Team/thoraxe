@@ -16,4 +16,4 @@ install:
 build: false
 
 test_script:
-  - "python setup.py test"
+  - "python setup.py test "
