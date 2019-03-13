@@ -332,8 +332,7 @@ def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
                     ('{} not found. Please indicate a correct mafft_path or '
                      'install it: https://mafft.cbrc.jp/alignment/software/'
                      ).format(mafft_path))
-            else:
-                raise err
+            raise err
 
     return output_path
 

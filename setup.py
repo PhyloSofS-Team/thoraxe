@@ -34,7 +34,8 @@ setup(
     ],
     test_suite='tests',
     tests_require=[
-        'pytest', 'pytest-cov', 'coveralls', 'codecov', 'pytest-pylint'
+        'pytest', 'pytest-cov', 'coveralls', 'codecov', 'pytest-pylint',
+        'pylint'
     ],
     include_package_data=True,
     zip_safe=False,

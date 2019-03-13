@@ -321,9 +321,8 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
             if row['Start phase'] != -1:
                 raise ValueError('Exon end phase -1 is not in the last exon, '
                                  'row: {}'.format(row))
-            else:
-                warnings.warn('Exon start and end phases are -1, possible '
-                              'unique exon in row: {}'.format(row))
+            warnings.warn('Exon start and end phases are -1, possible '
+                          'unique exon in row: {}'.format(row))
 
 
 def _is_incomplete_cds(row, start_exon, end_exon):
