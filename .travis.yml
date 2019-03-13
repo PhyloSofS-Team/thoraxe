@@ -11,7 +11,8 @@ install:
   - python -m pip install -e .
 
 script:
-  - python setup.py test --pylint
+  - export PYTEST_ADDOPTS="--pylint"
+  - python setup.py test
 
 after_success:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then coveralls; fi
