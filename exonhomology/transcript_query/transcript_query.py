@@ -12,6 +12,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 from collections import Counter
 
@@ -58,10 +59,83 @@ def parse_command_line():
         '--species',
         help='species to look for the gene name',
         default='homo_sapiens')
+    parser.add_argument(
+        '-o',
+        '--orthology',
+        help='Orthology relationship to use; 1:1, 1:n or m:n',
+        default='1:n')
+    parser.add_argument(
+        '-l',
+        '--specieslist',
+        help='It could be a list of more than one species separated by commas '
+        'and without spaces, e.g. homo_sapiens,mus_musculus, or a single file '
+        'with the species list (one species per line). If nothing is '
+        'indicated, all the available species are used.',
+        default='')
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
     return parser.parse_args()
+
+
+def _check_species_name(species_name):
+    """
+    Return True if the species_name has the correct format.
+
+    The expected name is binomial but it can also include the subspecies name
+    (trinomial). If the species_name doesn't conform the expected format an
+    error is raised.
+
+    >>> _check_species_name('homo_sapiens')
+    True
+    >>> _check_species_name('colobus_angolensis_palliatus')
+    True
+    >>> _check_species_name('cricetulus_griseus_chok1gshd')
+    True
+    """
+    result = re.match('^[a-z]+_[a-z]+(_[0-9a-z]+)?$', species_name)
+    if result is None:
+        raise ValueError(
+            'The species name should be the binomial/trinomial name lowercased'
+            ' with spaces replaced by underscores e.g. Homo sapiens should be '
+            'homo_sapiens. {} do not conform the format.'.format(species_name))
+    return True
+
+
+def _read_species_list(file):
+    """Return the species list from the file."""
+    species = []
+    with open(file, 'r') as stream:
+        for line in stream:
+            species_name = line.strip()
+            if _check_species_name(species_name):
+                species.append(species_name)
+    return species
+
+
+def _get_species_list(specieslist):
+    """
+    Return a list of species names (str).
+
+    >>> _get_species_list('')
+    >>> _get_species_list('homo_sapiens,mus_musculus')
+    ['homo_sapiens', 'mus_musculus']
+    """
+    if specieslist == '':
+        return None
+
+    fields = specieslist.split(',')
+
+    if len(fields) == 1:
+        filename = fields[0]
+        if os.path.isfile(filename):
+            return _read_species_list(filename)
+        raise ValueError('{} is not a file.'.format(filename))
+
+    for species_name in fields:
+        _check_species_name(species_name)
+
+    return fields
 
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
@@ -94,11 +168,18 @@ def dictseq2fasta(dseq, geneid, out):
     out.write(exseq + "\n")
 
 
-def species2ensembldataset(speciesname):
-    """Return hsapiens_gene_ensembl from homo_sapiens."""
-    binname = speciesname.split("_")
-    assert len(binname) == 2, "Error for the species name"
-    biomartname = binname[0][0] + binname[1] + "_gene_ensembl"
+def species2ensembldataset(species_name):
+    """
+    Return the name of the ENSEMBL dataset in biomart.
+
+    >>> species2ensembldataset('homo_sapiens')
+    'hsapiens_gene_ensembl'
+    >>> species2ensembldataset('cebus_capucinus_imitator')
+    'ccapucinus_gene_ensembl'
+    """
+    _check_species_name(species_name)
+    names = species_name.split("_")
+    biomartname = names[0][0] + names[1] + "_gene_ensembl"
     return biomartname
 
 
@@ -303,20 +384,15 @@ def get_orthologs(ensgeneid, **params):
     return dortho
 
 
-def filter_ortho(l_ortho, dortho, relation=None):
+def filter_ortho(dortho, species=None, relationship='1:n'):
     """Filter the dictionary of orthologues according to the list of names."""
-    # TO DO: rajouter un système de synonymes sur les espèces pour
-    # le filtrage
-    if relation is None:
-        relation = [
-            "ortholog_one2one", "ortholog_one2many", "within_species_paralog"
-        ]
-    filtered_list = [
-        value for value in dortho
-        if value['target']['species'].lower() in l_ortho
-        and value['type'] in relation
+    # TO DO: rajouter un système de synonymes sur les espèces pour le filtrage
+    relationships = _get_relationships(relationship)
+    return [
+        value for value in dortho if value['type'] in relationships and (
+            True if species is None else value['target']['species'].lower() in
+            species)
     ]
-    return filtered_list
 
 
 def get_transcripts_orthologs(ensgeneid, lorthologs):
@@ -351,6 +427,31 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     return source_transcripts, ortho_transcripts
 
 
+def _get_relationships(notation):
+    """
+    Return the list of orthology relationships to keep.
+
+    ENSEMBL homology relationships are defined in:
+    https://www.ensembl.org/info/genome/compara/homology_types.html
+
+    Posible values to this function are '1:1', '1:n' and 'm:n'.
+
+    >>> _get_relationships('1:1')
+    ['ortholog_one2one']
+    >>> _get_relationships('1:n')
+    ['ortholog_one2one', 'ortholog_one2many']
+    >>> _get_relationships('m:n')
+    ['ortholog_one2one', 'ortholog_one2many', 'ortholog_many2many']
+    """
+    if notation == '1:1':
+        return ['ortholog_one2one']
+    if notation == '1:n':
+        return ['ortholog_one2one', 'ortholog_one2many']
+    if notation == 'm:n':
+        return ['ortholog_one2one', 'ortholog_one2many', 'ortholog_many2many']
+    raise ValueError('Orthology should be 1:1, 1:n or m:n')
+
+
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
 def main():  # pylint: disable=too-many-locals,too-many-statements
@@ -365,31 +466,34 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 5-  Get the gene tree for the selected species
 
     # We fix the list of orthologues to a small list inspired from MAPK8
-    orthokeep = [
-        # "homo_sapiens", "felix_catus", "gallus_gallus",
-        # "drosophila_melanogaster", "mus_musculus", "caenorhabditis_elegans",
-        # "xenopus_tropicalis", "danio_rerio", "oryctolagus_cuniculus",
-        # "pan_troglodytes"
-        'homo_sapiens',
-        'mus_musculus',
-        'macaca_mulatta',
-        'danio_rerio',
-        'xenopus_tropicalis',
-        'caenorhabditis_elegans',
-        'gallus_gallus',
-        'rattus_norvegicus',
-        'bos_taurus',
-        'monodelphis_domestica',
-        'ornithorhynchus_anatinus',
-        'drosophila_melanogaster',
-        'gorilla_gorilla',
-        'sus_scrofa'
-    ]
+    # orthokeep = [
+    #     # "homo_sapiens", "felix_catus", "gallus_gallus",
+    #     # "drosophila_melanogaster", "mus_musculus",
+    #     # "caenorhabditis_elegans",
+    #     # "xenopus_tropicalis", "danio_rerio", "oryctolagus_cuniculus",
+    #     # "pan_troglodytes"
+    #     'homo_sapiens',
+    #     'mus_musculus',
+    #     'macaca_mulatta',
+    #     'danio_rerio',
+    #     'xenopus_tropicalis',
+    #     'caenorhabditis_elegans',
+    #     'gallus_gallus',
+    #     'rattus_norvegicus',
+    #     'bos_taurus',
+    #     'monodelphis_domestica',
+    #     'ornithorhynchus_anatinus',
+    #     'drosophila_melanogaster',
+    #     'gorilla_gorilla',
+    #     'sus_scrofa'
+    # ]
 
     # 1-
     args = parse_command_line()
 
     # 2-
+    orthokeep = _get_species_list(args.specieslist)
+
     print("Searching ID for gene with name %s in species %s..." %
           (args.genename, args.species))
     geneids = get_geneids_from_symbol(args.species, args.genename)
@@ -432,12 +536,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         number += 1
     ##
     orthologs_filtered = filter_ortho(
-        orthokeep,
-        orthologs,
-        relation=["ortholog_one2one", "ortholog_one2many"])
-    print("Filtering on %d species, %d matches" % (len(orthokeep),
-                                                   len(orthologs_filtered)))
-    ##
+        orthologs, orthokeep, relationship=args.orthology)
+    # TO DO print : orthokeep can be None
+    # print("Filtering on %d species, %d matches" % (len(orthokeep),
+    #                                                len(orthologs_filtered)))
+
     print("Getting all the transcripts for preparing a TSL file")
     tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
     tsl_out = "%s/%s" % (tsl_subdir, gene_name)
