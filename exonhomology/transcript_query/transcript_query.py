@@ -17,6 +17,8 @@ import sys
 from collections import Counter
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # REST parameters
 SERVER = "https://rest.ensembl.org"
@@ -168,31 +170,75 @@ def dictseq2fasta(dseq, geneid, out):
     out.write(exseq + "\n")
 
 
-def species2ensembldataset(species_name):
+def _requests_retry(retries=5,
+                    backoff_factor=0.4,
+                    status_forcelist=(500, 502, 504),
+                    session=None):
+    """
+    Request with retry and wait.
+
+    Code taking from Sandilya Bhamidipati blog post at
+    https://dev.to/ssbozy/python-requests-with-retries-4p03
+    """
+    if session is None:
+        session = requests.Session()
+
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
+def _species2ensembldataset(species_name):
     """
     Return the name of the ENSEMBL dataset in biomart.
 
-    >>> species2ensembldataset('homo_sapiens')
-    'hsapiens_gene_ensembl'
-    >>> species2ensembldataset('cebus_capucinus_imitator')
-    'ccapucinus_gene_ensembl'
+    >>> _species2ensembldataset('homo_sapiens')
+    ['hsapiens_gene_ensembl']
+    >>> _species2ensembldataset('cebus_capucinus_imitator')
+    ['ccapucinus_gene_ensembl', 'cimitator_gene_ensembl']
     """
     _check_species_name(species_name)
     names = species_name.split("_")
-    biomartname = names[0][0] + names[1] + "_gene_ensembl"
-    return biomartname
+    return [
+        names[0][0] + names[i] + "_gene_ensembl" for i in range(1, len(names))
+    ]
+
+
+def _check_biomart_response(response):
+    """
+    Return True if the response doesn't look like an query ERROR or 404 page.
+
+    >>> _check_biomart_response('<html>\n')
+    False
+    >>> _check_biomart_response('Query ERROR: caught BioMart::Exception')
+    False
+    >>> _check_biomart_response('ENSG00000107643	ENST00000432379	48306655')
+    True
+    """
+    response = response.strip()
+    if response.startswith('<html') or response.startswith('Query ERROR:'):
+        return False
+    return True
 
 
 # Small biomart function from keithshep
 
 
-def get_biomart_exons_annot(dataset, geneid, header=True):
+def _biomart_exons_annot_request(dataset, geneid, header=True):
     """
     Return all transcript information from the dataset and the ensembl geneid.
 
-    ex for MAPK8 in human:
-        r = get_biomart_exons_annot("hsapiens_gene_ensembl", "ENSG00000107643")
-    Return a requests object (use r.text to get the text for the file)
+    For example, MAPK8 in human:
+    _biomart_exons_annot_request("hsapiens_gene_ensembl", "ENSG00000107643")
     """
     # TO DO: Error control on the call
 
@@ -228,8 +274,18 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
-    req = requests.get(biomart_request_url)
-    return req
+    req = _requests_retry().get(biomart_request_url)
+    return req.text
+
+
+def get_biomart_exons_annot(species_name, geneid, header=True):
+    """Return transcript information from a ensembl geneid and species name."""
+    dataset_names = _species2ensembldataset(species_name)
+    for dataset in dataset_names:
+        response = _biomart_exons_annot_request(dataset, geneid, header=header)
+        if _check_biomart_response(response):
+            return response
+    raise Exception('It can not found {} in biomart.'.format(species_name))
 
 
 # TO DO : passer toutes les fonctions avec un conteneur générique sur la
@@ -238,7 +294,8 @@ def get_biomart_exons_annot(dataset, geneid, header=True):
 
 def generic_ensembl_rest_request(extension, params, header):
     """Perform a generic request."""
-    request = requests.get(SERVER + extension, params=params, headers=header)
+    request = _requests_retry().get(
+        SERVER + extension, params=params, headers=header)
     if VERBOSE:
         print("Trying url:" + request.url)
     if not request.ok:
@@ -563,10 +620,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     dex = get_listofexons(curgene)
     lexid = list({x['exon_id'] for x in dex})
     print("Getting the sequences files for %s" % (curgene))
-    curspec_ens_dataset = species2ensembldataset(args.species)
     exfasta = get_exons_sequences(lexid)
-    extable = get_biomart_exons_annot(curspec_ens_dataset, curgene)
-    exonstableout.write(extable.text)
+    extable = get_biomart_exons_annot(args.species, curgene)
+    exonstableout.write(extable)
     exons_name = "%s:%s" % (args.species, args.genename)
     for dseq in exfasta:
         dictseq2fasta(dseq, exons_name, fastaout)
@@ -576,17 +632,16 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         # orthotaxon = ortholog['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
         print("Getting exons information for %s" % (ortho_name))
-        ortho_ens_dataset = species2ensembldataset(orthospecies)
         dexortho = get_listofexons(orthoid)
         lexidortho = list({x['exon_id'] for x in dexortho})
         print("  - %d exons" % (len(lexidortho)))
         exorthofasta = get_exons_sequences(lexidortho)
         print("  - %d fasta sequences" % (len(exorthofasta)))
         ortho_exontable = get_biomart_exons_annot(
-            ortho_ens_dataset, orthoid, header=False)
+            orthospecies, orthoid, header=False)
         print("  - %d lines in the exon table" %
-              (ortho_exontable.text.count("\n") + 1))
-        exonstableout.write(ortho_exontable.text)
+              (ortho_exontable.count("\n") + 1))
+        exonstableout.write(ortho_exontable)
         for dseq in exorthofasta:
             dictseq2fasta(dseq, ortho_name, fastaout)
     fastaout.close()

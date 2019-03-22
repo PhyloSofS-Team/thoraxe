@@ -30,7 +30,8 @@ setup(
     package_data={'exonhomology': ['subexons/assets/cluster_plots.html']},
     setup_requires=['pytest-runner'],
     install_requires=[
-        'pandas', 'biopython', 'requests', 'numpy', 'recordclass', 'scikit-bio'
+        'pandas', 'biopython', 'requests', 'numpy', 'recordclass',
+        'scikit-bio', 'urllib3'
     ],
     test_suite='tests',
     tests_require=[
