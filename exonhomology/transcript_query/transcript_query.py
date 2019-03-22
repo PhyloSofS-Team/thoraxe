@@ -217,7 +217,7 @@ def _check_biomart_response(response):
     """
     Return True if the response doesn't look like an query ERROR or 404 page.
 
-    >>> _check_biomart_response('<html>\n')
+    >>> _check_biomart_response('<html>')
     False
     >>> _check_biomart_response('Query ERROR: caught BioMart::Exception')
     False
