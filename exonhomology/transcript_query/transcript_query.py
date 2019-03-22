@@ -285,7 +285,9 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         response = _biomart_exons_annot_request(dataset, geneid, header=header)
         if _check_biomart_response(response):
             return response
-    raise Exception('It can not found {} in biomart.'.format(species_name))
+    raise Exception(
+        'It can not found {} in biomart.\nLast response:\n{}'.format(
+            species_name, response))
 
 
 # TO DO : passer toutes les fonctions avec un conteneur générique sur la
