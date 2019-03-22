@@ -15,7 +15,14 @@ def example_folder():
 
 
 def test_download():
-    assert subprocess.call(["transcript_query", "MAPK8"]) == 0
+    assert subprocess.call([
+        'transcript_query', 'MAPK8', '-l',
+        'homo_sapiens,mus_musculus,pan_troglodytes,'
+        'panthera_tigris_altaica,cebus_capucinus_imitator,'
+        'colobus_angolensis_palliatus,cricetulus_griseus_chok1gshd,'
+        'cricetulus_griseus_crigri,canis_lupus_dingo,mustela_putorius_furo,'
+        'heterocephalus_glaber_female,heterocephalus_glaber_male'
+    ]) == 0
 
 
 def test_first_level(example_folder):

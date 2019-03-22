@@ -274,7 +274,7 @@ def _biomart_exons_annot_request(dataset, geneid, header=True):
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
-    req = _requests_retry().get(biomart_request_url)
+    req = _requests_retry().get(biomart_request_url, allow_redirects=False)
     return req.text
 
 
