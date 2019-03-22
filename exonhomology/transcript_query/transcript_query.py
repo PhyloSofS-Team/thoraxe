@@ -172,7 +172,7 @@ def dictseq2fasta(dseq, geneid, out):
 
 def _requests_retry(retries=5,
                     backoff_factor=0.4,
-                    status_forcelist=(500, 502, 504),
+                    status_forcelist=(500, 502, 504, 404),
                     session=None):
     """
     Request with retry and wait.
@@ -286,8 +286,8 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         if _check_biomart_response(response):
             return response
     raise Exception(
-        'It can not found {} in biomart.\nLast response:\n{}'.format(
-            species_name, response))
+        'It can not found {} in biomart (tried: {}).\nLast response:\n{}'.
+        format(species_name, dataset_names, response))
 
 
 # TO DO : passer toutes les fonctions avec un conteneur générique sur la
