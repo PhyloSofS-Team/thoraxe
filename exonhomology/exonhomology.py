@@ -232,7 +232,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         min_col_number=min_col_number)
 
 
-def create_chimeric_msa(  # pylint: disable=too-many-arguments
+def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
         gene2speciesname,
