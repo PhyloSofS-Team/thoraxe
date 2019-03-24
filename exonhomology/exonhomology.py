@@ -6,9 +6,9 @@ import os
 import re
 from ast import literal_eval
 import numpy as np
-from . import transcript_info
-from . import subexons
-from . import utils
+from exonhomology import transcript_info
+from exonhomology import subexons
+from exonhomology import utils
 
 
 def parse_command_line():
