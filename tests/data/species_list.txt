@@ -1,0 +1,14 @@
+homo_sapiens
+gorilla_gorilla
+macaca_mulatta
+monodelphis_domestica
+rattus_norvegicus
+mus_musculus
+bos_taurus
+sus_scrofa
+ornithorhynchus_anatinus
+gallus_gallus
+xenopus_tropicalis
+danio_rerio
+drosophila_melanogaster
+caenorhabditis_elegans

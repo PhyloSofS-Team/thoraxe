@@ -21,25 +21,6 @@ from recordclass import recordclass
 
 from exonhomology import transcript_info
 
-# List from `orthokeep` in `EnsemblRESTTranscriptQueries.py`
-# Order from NCBI Taxonomy/CommonTree, but using Human as 1
-SPECIES_ORDER = {
-    'homo_sapiens': 1,
-    'mus_musculus': 6,
-    'macaca_mulatta': 3,
-    'danio_rerio': 12,
-    'xenopus_tropicalis': 11,
-    'caenorhabditis_elegans': 14,
-    'gallus_gallus': 10,
-    'rattus_norvegicus': 5,
-    'bos_taurus': 7,
-    'monodelphis_domestica': 4,
-    'ornithorhynchus_anatinus': 9,
-    'drosophila_melanogaster': 13,
-    'gorilla_gorilla': 2,
-    'sus_scrofa': 8
-}
-
 ColPattern = collections.namedtuple('ColPattern', ['pattern', 'start', 'end'])
 
 ColCluster = recordclass(  # pylint: disable=invalid-name
@@ -344,10 +325,12 @@ def gene2species(transcript_data):
         index=transcript_data['Gene stable ID']).to_dict()
 
 
-def sort_species(chimerics, gene2sp, species_order=None):
-    """Sort chimerics using the output from gene2species and SPECIES_ORDER."""
-    if species_order is None:
-        species_order = SPECIES_ORDER
+def sort_species(chimerics, gene2sp, species_list=None):
+    """Sort chimerics using the gene2species output and the species_list."""
+    if species_list is None:
+        return chimerics
+
+    species_order = {name: i for (i, name) in enumerate(species_list)}
 
     return collections.OrderedDict(
         sorted(

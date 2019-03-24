@@ -8,6 +8,7 @@ from ast import literal_eval
 import numpy as np
 from . import transcript_info
 from . import subexons
+from . import utils
 
 
 def parse_command_line():
@@ -70,6 +71,14 @@ def parse_command_line():
         '--plot',
         help='save plotly/html plot for the chimeric alignments',
         action='store_true')
+    parser.add_argument(
+        '-l',
+        '--specieslist',
+        help='It could be a list of more than one species separated by commas '
+        'and without spaces, e.g. homo_sapiens,mus_musculus, or a single file '
+        'with the species list (one species per line). If nothing is '
+        'indicated, all the available species are used.',
+        default='')
 
     return parser.parse_args()
 
@@ -166,13 +175,15 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
         gene2speciesname,
         connected_subexons,
         mafft_path='mafft',
-        padding='XXXXXXXXXX'):
+        padding='XXXXXXXXXX',
+        species_list=None):
     """Return a modified subexon_df, the dict of chimerics and the msa."""
     subexon_df, subexon_matrix = subexons.alignment.create_subexon_matrix(
         subexon_df)
     chimerics = subexons.alignment.create_chimeric_sequences(
         subexon_df, subexon_matrix, connected_subexons, padding=padding)
-    chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname)
+    chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname,
+                                                species_list)
     msa_file = _outfile(output_folder, "chimeric_alignment_", cluster,
                         ".fasta")
     subexons.alignment.run_mafft(
@@ -192,7 +203,8 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         cutoff=30.0,
         min_col_number=4,
         mafft_path='mafft',
-        padding='XXXXXXXXXX'):
+        padding='XXXXXXXXXX',
+        species_list=None):
     """
     Update cluster2data and return a set of exons to delete.
 
@@ -207,7 +219,8 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         gene2speciesname,
         connected_subexons,
         mafft_path=mafft_path,
-        padding=padding)
+        padding=padding,
+        species_list=species_list)
     cluster2data[cluster] = (subexon_df, chimerics, msa)
     if msa is None:
         return {}
@@ -228,7 +241,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
         cutoff=30.0,
         min_col_number=4,
         mafft_path='mafft',
-        padding='XXXXXXXXXX'):
+        padding='XXXXXXXXXX',
+        species_list=None):
     """
     Return a dict from cluster to cluster data.
 
@@ -260,7 +274,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
             cutoff=cutoff,
             min_col_number=min_col_number,
             mafft_path=mafft_path,
-            padding=padding)
+            padding=padding,
+            species_list=species_list)
         while to_delete:
             delete = [
                 subexon_table.loc[index, 'Subexon ID cluster'] in to_delete
@@ -281,7 +296,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments
                 cutoff=cutoff,
                 min_col_number=min_col_number,
                 mafft_path=mafft_path,
-                padding=padding)
+                padding=padding,
+                species_list=species_list)
     return cluster2data
 
 
@@ -296,7 +312,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         gap_open_penalty=10,
         gap_extend_penalty=1,
         mafft_path='mafft',
-        padding='XXXXXXXXXX'):
+        padding='XXXXXXXXXX',
+        species_list=None):
     """Perform almost all the pipeline."""
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(
@@ -307,7 +324,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         cutoff=percent_identity_cutoff,
         min_col_number=minimum_len,
         mafft_path=mafft_path,
-        padding=padding)
+        padding=padding,
+        species_list=species_list)
     modified_clusters = subexons.rescue.subexon_rescue_phase(
         subexon_table,
         minimum_len=minimum_len,
@@ -326,7 +344,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             cutoff=percent_identity_cutoff,
             min_col_number=minimum_len,
             mafft_path=mafft_path,
-            padding=padding))
+            padding=padding,
+            species_list=species_list))
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if msa is not None:
             gene_ids = subexons.alignment.get_gene_ids(msa)
@@ -415,6 +434,8 @@ def main():
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
+    species_list = utils.species.get_species_list(args.specieslist)
+
     cluster2data = get_homologous_subexons(
         args.outputdir,
         subexon_table,
@@ -426,7 +447,8 @@ def main():
         gap_open_penalty=args.gapopen,
         gap_extend_penalty=args.gapextend,
         mafft_path=args.mafft_path,
-        padding='X' * args.padding)
+        padding='X' * args.padding,
+        species_list=species_list)
 
     if args.plot:
         subexons.plot.plot_msa_subexons(cluster2data, args.outputdir)

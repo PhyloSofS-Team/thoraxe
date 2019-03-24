@@ -12,13 +12,14 @@ import argparse
 import csv
 import json
 import os
-import re
 import sys
 from collections import Counter
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+from .. import utils
 
 # REST parameters
 SERVER = "https://rest.ensembl.org"
@@ -78,66 +79,6 @@ def parse_command_line():
     # binomial names when running the code
 
     return parser.parse_args()
-
-
-def _check_species_name(species_name):
-    """
-    Return True if the species_name has the correct format.
-
-    The expected name is binomial but it can also include the subspecies name
-    (trinomial). If the species_name doesn't conform the expected format an
-    error is raised.
-
-    >>> _check_species_name('homo_sapiens')
-    True
-    >>> _check_species_name('colobus_angolensis_palliatus')
-    True
-    >>> _check_species_name('cricetulus_griseus_chok1gshd')
-    True
-    """
-    result = re.match('^[a-z]+_[a-z]+(_[0-9a-z]+)?$', species_name)
-    if result is None:
-        raise ValueError(
-            'The species name should be the binomial/trinomial name lowercased'
-            ' with spaces replaced by underscores e.g. Homo sapiens should be '
-            'homo_sapiens. {} do not conform the format.'.format(species_name))
-    return True
-
-
-def _read_species_list(file):
-    """Return the species list from the file."""
-    species = []
-    with open(file, 'r') as stream:
-        for line in stream:
-            species_name = line.strip()
-            if _check_species_name(species_name):
-                species.append(species_name)
-    return species
-
-
-def _get_species_list(specieslist):
-    """
-    Return a list of species names (str).
-
-    >>> _get_species_list('')
-    >>> _get_species_list('homo_sapiens,mus_musculus')
-    ['homo_sapiens', 'mus_musculus']
-    """
-    if specieslist == '':
-        return None
-
-    fields = specieslist.split(',')
-
-    if len(fields) == 1:
-        filename = fields[0]
-        if os.path.isfile(filename):
-            return _read_species_list(filename)
-        raise ValueError('{} is not a file.'.format(filename))
-
-    for species_name in fields:
-        _check_species_name(species_name)
-
-    return fields
 
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
@@ -206,7 +147,7 @@ def _species2ensembldataset(species_name):
     >>> _species2ensembldataset('cebus_capucinus_imitator')
     ['ccapucinus_gene_ensembl', 'cimitator_gene_ensembl']
     """
-    _check_species_name(species_name)
+    utils.species.check_species_name(species_name)
     names = species_name.split("_")
     return [
         names[0][0] + names[i] + "_gene_ensembl" for i in range(1, len(names))
@@ -551,7 +492,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     args = parse_command_line()
 
     # 2-
-    orthokeep = _get_species_list(args.specieslist)
+    orthokeep = utils.species.get_species_list(args.specieslist)
 
     print("Searching ID for gene with name %s in species %s..." %
           (args.genename, args.species))
