@@ -112,9 +112,9 @@ def dictseq2fasta(dseq, geneid, out):
     out.write(exseq + "\n")
 
 
-def _requests_retry(retries=5,
-                    backoff_factor=0.4,
-                    status_forcelist=(500, 502, 504, 404),
+def _requests_retry(retries=6,
+                    backoff_factor=0.5,
+                    status_forcelist=(500, 502, 503, 504, 404),
                     session=None):
     """
     Request with retry and wait.
@@ -248,7 +248,7 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         if _check_biomart_response(response):
             return response
         # Try without redirect. It avoids the test_download error in Travis CI
-        time.sleep(2)
+        time.sleep(3)
         response = _try_biomart_request(
             dataset, geneid, header=header, allow_redirects=False)
         if _check_biomart_response(response):
