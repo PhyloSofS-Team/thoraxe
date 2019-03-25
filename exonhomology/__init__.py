@@ -8,3 +8,5 @@ from exonhomology import utils
 from exonhomology import transcript_query
 from exonhomology import transcript_info
 from exonhomology import subexons
+
+from exonhomology.exonhomology import *
