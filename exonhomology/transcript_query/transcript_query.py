@@ -178,7 +178,10 @@ def _check_biomart_response(response):
 # Small biomart function from keithshep
 
 
-def _biomart_exons_annot_request(dataset, geneid, header=True):
+def _biomart_exons_annot_request(dataset,
+                                 geneid,
+                                 header=True,
+                                 allow_redirects=True):
     """
     Return all transcript information from the dataset and the ensembl geneid.
 
@@ -219,15 +222,33 @@ def _biomart_exons_annot_request(dataset, geneid, header=True):
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
-    req = _requests_retry().get(biomart_request_url)
+
+    req = _requests_retry().get(
+        biomart_request_url, allow_redirects=allow_redirects)
     return req.text
+
+
+def _try_biomart_request(dataset, geneid, header=True, allow_redirects=True):
+    """To do not fail to be able to try again with another parameter."""
+    try:
+        response = _biomart_exons_annot_request(
+            dataset, geneid, header=header, allow_redirects=allow_redirects)
+    except Exception:  # pylint: disable=broad-except
+        response = ''
+    return response
 
 
 def get_biomart_exons_annot(species_name, geneid, header=True):
     """Return transcript information from a ensembl geneid and species name."""
     dataset_names = _species2ensembldataset(species_name)
     for dataset in dataset_names:
-        response = _biomart_exons_annot_request(dataset, geneid, header=header)
+        response = _try_biomart_request(
+            dataset, geneid, header=header, allow_redirects=True)
+        if _check_biomart_response(response):
+            return response
+        # Try without redirect. It avoids the test_download error in Travis CI
+        response = _try_biomart_request(
+            dataset, geneid, header=header, allow_redirects=False)
         if _check_biomart_response(response):
             return response
     raise Exception(
