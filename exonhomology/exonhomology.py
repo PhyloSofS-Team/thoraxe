@@ -106,14 +106,15 @@ def _get_gene_name(input_folder, gene_name=None):
     return input_folder, gene_name
 
 
-def get_transcripts(input_folder, gene_name):
+def get_transcripts(input_folder, gene_name, species_list=None):
     """Return a DataFrame with the transcript information."""
     return transcript_info.read_transcript_info(
         os.path.join(input_folder, 'TSL', gene_name + '_TSL.csv'),
         os.path.join(input_folder, 'TablesExons',
                      gene_name + '_exonstable.tsv'),
         os.path.join(input_folder, 'Sequences', gene_name + '.fasta'),
-        remove_na=False)
+        remove_na=False,
+        species_list=species_list)
 
 
 def get_subexons(  # pylint: disable=too-many-arguments
@@ -415,10 +416,13 @@ def main():
     """Perform Pipeline."""
     args = parse_command_line()
 
+    species_list = utils.species.get_species_list(args.specieslist)
+
     input_folder, gene_name = _get_gene_name(
         args.inputdir,
         gene_name=args.genename if args.genename != '' else None)
-    transcript_table = get_transcripts(input_folder, gene_name)
+    transcript_table = get_transcripts(
+        input_folder, gene_name, species_list=species_list)
     subexon_table = get_subexons(
         transcript_table,
         minimum_len=args.minlen,
@@ -433,8 +437,6 @@ def main():
 
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
-
-    species_list = utils.species.get_species_list(args.specieslist)
 
     cluster2data = get_homologous_subexons(
         args.outputdir,

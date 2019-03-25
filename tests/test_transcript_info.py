@@ -70,10 +70,34 @@ def test_remove_na(mapk8):
         mapk8['tsl'], mapk8['exontable'], mapk8['seqs'], remove_na=False)
 
     # I keep other species, not only h. sapiens & m. musculus:
-    assert len(trx_data.Species.unique()) > 2
+    assert sorted(trx_data.Species.unique()) == [
+        'bos_taurus', 'danio_rerio', 'gallus_gallus', 'gorilla_gorilla',
+        'homo_sapiens', 'macaca_mulatta', 'monodelphis_domestica',
+        'mus_musculus', 'rattus_norvegicus', 'sus_scrofa', 'xenopus_tropicalis'
+    ]
+    # ornithorhynchus_anatinus is not in the table because ENSOANT00000041772
+    # doesn't end with '*' (i.e. incomplete transcripts)
+    assert 'ENSOANT00000041772' not in trx_data['Transcript stable ID']
+
+    # remove_na doesn't interfere with selecting the correct biotype
+    assert sum(value not in ['Protein coding', 'protein_coding']
+               for value in trx_data.Biotype.unique()) == 0
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
     assert sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933') == 0
+
+
+def test_species_list(mapk8):
+    species_list = ['bos_taurus', 'danio_rerio', 'homo_sapiens']
+
+    trx_data = transcript_info.read_transcript_info(
+        mapk8['tsl'],
+        mapk8['exontable'],
+        mapk8['seqs'],
+        remove_na=False,
+        species_list=species_list)
+
+    assert sorted(trx_data.Species.unique()) == species_list
 
 
 def test_keep_badquality_sequences(mapk8):
@@ -110,10 +134,10 @@ def test_non_coding_exons_grin1(grin1):
     # The last two exons of ENSMUST00000099506 are non-coding.
     # The unique coding exon has UTR at both ends.
     assert ''.join(
-        str(exon) for exon in trx_data.
-        loc[trx_data['Transcript stable ID cluster'].
-            map(lambda ids: 'ENSMUST00000099506' in ids.split('/')
-                ), 'Exon protein sequence']
+        str(exon) for exon in
+        trx_data.loc[trx_data['Transcript stable ID cluster'].
+                     map(lambda ids: 'ENSMUST00000099506' in ids.split('/')
+                         ), 'Exon protein sequence']
     ) == ('MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
           'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
           'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
@@ -143,8 +167,8 @@ def test_exon_clustering(mapk8):
 
     # Exon can not have more than one cluster
     assert all(
-        clustered.groupby('Exon stable ID').apply(
-            lambda df: len(df['Cluster'].unique()) == 1))
+        clustered.groupby('Exon stable ID').apply(lambda df: len(df[
+            'Cluster'].unique()) == 1))
 
     # Non-clustered exons have Cluster == 0 and QueryExon == ''
     assert all(row.QueryExon == '' for row in clustered.itertuples()

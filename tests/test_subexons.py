@@ -45,11 +45,11 @@ def test_subexon_clusters(clustered_trx_data):
                           'ENSMMUE00000040028_SE_0/ENSMMUE00000387789_SE_0',
                           'Subexon ID'].unique()) == 1
 
-    # 422 rows with before merging non-redundant contiguous subexons
+    # 416 rows with before merging non-redundant contiguous subexons
     not_merged = subexons.create_subexon_table(data, merge_non_redundant=False)
-    assert not_merged.shape[0] == 422
-    # 397 after merging
-    assert subexon_table.shape[0] == 397
+    assert not_merged.shape[0] == 416
+    # 395 after merging
+    assert subexon_table.shape[0] == 395
 
     # QVQQ
     assert len(

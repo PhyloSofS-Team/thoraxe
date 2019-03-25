@@ -46,7 +46,26 @@ def _get_flag(flag):
     return flag
 
 
-def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
+def _in_species_list(species, species_list=None):
+    """
+    Return True if species_list is None or if species is in species_list.
+
+    >>> _in_species_list('homo_sapiens')
+    True
+    >>> _in_species_list('homo_sapiens', ['homo_sapiens', 'mus_musculus'])
+    True
+    >>> _in_species_list('pan_paniscus', ['homo_sapiens', 'mus_musculus'])
+    False
+    """
+    if species_list is None:
+        return True
+    return species in species_list
+
+
+def read_tsl_file(tsl_file,
+                  maximum_tsl_level,
+                  remove_na=False,
+                  species_list=None):
     """
     Read a csv file with the Transcript Support Level (TSL) data.
 
@@ -68,9 +87,6 @@ def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
     """
     assert maximum_tsl_level in {1.0, 2.0, 3.0, 4.0, 5.0}
 
-    # Read TSL file :
-    # ---------------
-
     # TO DO : Modify EnsemblRESTTranscriptQueries.py to make stable the input
     #         of this function:
     # TO DO :     1 - To ensure column names,
@@ -79,30 +95,30 @@ def read_tsl_file(tsl_file, maximum_tsl_level, remove_na=False):
 
     tsl_data = pd.read_csv(tsl_file)
 
-    # QUESTION : Can the input do not have the Species column?
-
     # Select only protein coding transcrits :
     # ---------------------------------------
-
     # QUESTION : Can Biotype be 'Protein coding' or any other thing rather
     # than 'protein_coding'?
     # ANSWER : Until now we only saw 'Protein coding' or 'protein_coding'
     # in the ENSEMBL annotation but there will be surely other variations
     # on those words.
 
-    # OPPORTUNITY : This list comprehension can be used to do more filtering.
-    selection = [
-        row.Biotype in ['protein_coding', 'Protein coding']
-        # explicit convert to float, sometimes Flags are read as str
-        and _get_flag(row.Flags) <= maximum_tsl_level
+    tsl_data = tsl_data[[
+        _in_species_list(row.Species, species_list)
+        and row.Biotype in ['protein_coding', 'Protein coding']
         for row in tsl_data.itertuples()
-    ]  # NOTE : single list
-    # comprehension for performance.
+    ]]
+
+    selected_flags = [
+        # explicit convert to float, sometimes Flags are read as str
+        _get_flag(row.Flags) <= maximum_tsl_level
+        for row in tsl_data.itertuples()
+    ]
     if remove_na:
-        tsl_data = tsl_data[selection]
+        tsl_data = tsl_data[selected_flags]
     else:
         missing_tsl = tsl_data.Flags.isna()
-        tsl_data = tsl_data[selection | missing_tsl]
+        tsl_data = tsl_data[selected_flags | missing_tsl]
 
     return tsl_data
 
@@ -671,7 +687,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
         exon_sequence_file,
         max_tsl_level=3.0,
         remove_na=True,
-        remove_badquality=True):
+        remove_badquality=True,
+        species_list=None):
     """
     Read and integrate the transcript information.
 
@@ -705,7 +722,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     deleted.
     """
     # 1. Read the Transcript Support Level (TSL) table as a pandas' DataFrame:
-    tsl_table = read_tsl_file(tsl_table_file, max_tsl_level, remove_na)
+    tsl_table = read_tsl_file(
+        tsl_table_file, max_tsl_level, remove_na, species_list=species_list)
     # 2. Read the exon table as a pandas' DataFrame:
     exon_table = read_exon_file(exon_table_file)
     # Merge both tables to have all the transcript information in one
