@@ -13,6 +13,7 @@ import csv
 import json
 import os
 import sys
+import time
 from collections import Counter
 
 import requests
@@ -247,6 +248,7 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         if _check_biomart_response(response):
             return response
         # Try without redirect. It avoids the test_download error in Travis CI
+        time.sleep(2)
         response = _try_biomart_request(
             dataset, geneid, header=header, allow_redirects=False)
         if _check_biomart_response(response):
