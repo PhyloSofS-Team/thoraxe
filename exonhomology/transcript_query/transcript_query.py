@@ -158,6 +158,8 @@ def _check_biomart_response(response):
     """
     Return True if the response doesn't look like an query ERROR or 404 page.
 
+    >>> _check_biomart_response('')
+    False
     >>> _check_biomart_response('<html>')
     False
     >>> _check_biomart_response('Query ERROR: caught BioMart::Exception')
@@ -166,7 +168,9 @@ def _check_biomart_response(response):
     True
     """
     response = response.strip()
-    if response.startswith('<html') or response.startswith('Query ERROR:'):
+    if response.startswith('<html') or response.startswith(
+            'Query ERROR:') or not response:
+
         return False
     return True
 
@@ -215,7 +219,7 @@ def _biomart_exons_annot_request(dataset, geneid, header=True):
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
-    req = _requests_retry().get(biomart_request_url, allow_redirects=False)
+    req = _requests_retry().get(biomart_request_url)
     return req.text
 
 
