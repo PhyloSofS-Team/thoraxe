@@ -6,6 +6,11 @@ import subprocess
 import unittest
 
 
+def _is_travis():
+    """Return True in Travis CI."""
+    return "TRAVIS" in os.environ and os.environ["TRAVIS"] == "true"
+
+
 @pytest.fixture(scope='module')
 def example_folder():
     folders = glob.glob('MAPK8*')
@@ -15,6 +20,7 @@ def example_folder():
         shutil.rmtree(folder)
 
 
+@unittest.skipIf(_is_travis(), "Skipping this test on Travis CI.")
 def test_download():
     assert subprocess.call([
         'transcript_query', 'MAPK8', '-l',
@@ -26,6 +32,7 @@ def test_download():
     ]) == 0
 
 
+@unittest.skipIf(_is_travis(), "Skipping this test on Travis CI.")
 def test_first_level(example_folder):
     content = glob.glob(os.path.join(example_folder, '*'))
     assert len(content) == 4
@@ -35,6 +42,7 @@ def test_first_level(example_folder):
     assert any(elem.endswith('TablesExons') for elem in content)
 
 
+@unittest.skipIf(_is_travis(), "Skipping this test on Travis CI.")
 def test_second_level(example_folder):
     content = glob.glob(os.path.join(example_folder, '*', '*'))
     assert len(content) == 3
