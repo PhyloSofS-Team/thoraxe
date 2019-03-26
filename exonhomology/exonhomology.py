@@ -406,13 +406,14 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         cluster2updated_data[cluster] = (subexon_df, chimerics, msa, gene_ids,
                                          msa_matrix, colclusters)
         subexon_df.to_csv(
-            _outfile(output_folder, "subexon_table_", cluster, ".csv"))
+            _outfile(intermediate_output_path, "subexon_table_", cluster,
+                     ".csv"))
 
     return cluster2updated_data
 
 
 def update_subexon_table(subexon_table, cluster2data):
-    """TO DO DOCS."""
+    """Update the subexon table by adding the homologous exon information."""
     columns_to_add = [
         'HomologousExonLengths', 'HomologousExonSequences', 'HomologousExons',
         'SubexonIndex'
@@ -489,6 +490,8 @@ def main():
         subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)
 
     subexon_table = update_subexon_table(subexon_table, cluster2data)
+    subexon_table.to_csv(
+        os.path.join(output_folder, "homologous_subexons.csv"))
 
 
 if __name__ == '__main___':
