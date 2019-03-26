@@ -194,7 +194,7 @@ def _biomart_exons_annot_request(dataset,
 
     # see http://ensembl.org/biomart/martview/ for the web application
     biomart_request_url_template = (
-        'http://ensembl.org/biomart/martservice?query='
+        'https://ensembl.org/biomart/martservice?query='
         '<?xml version="1.0" encoding="UTF-8"?>'
         '<!DOCTYPE Query>'
         '<Query  virtualSchemaName = "default" formatter = "TSV" '
