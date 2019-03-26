@@ -40,7 +40,12 @@ def parse_command_line():
         type=str,
         default='')
     parser.add_argument(
-        '-o', '--outputdir', help='output directory', type=str, default='.')
+        '-o',
+        '--outputdir',
+        help='output directory, the indicated input directory is used '
+        'by default',
+        type=str,
+        default='')
     parser.add_argument(
         '-t', '--mafft_path', help='path to MAFFT', type=str, default='mafft')
     parser.add_argument(
@@ -68,8 +73,9 @@ def parse_command_line():
         type=int,
         default=10)
     parser.add_argument(
-        '--plot',
-        help='save plotly/html plot for the chimeric alignments',
+        '--plot_chimerics',
+        help='save plotly/html plot for the chimeric alignments in the '
+        '_exonhomology_intermediate_outputs folder',
         action='store_true')
     parser.add_argument(
         '-l',
@@ -103,6 +109,10 @@ def _get_gene_name(input_folder, gene_name=None):
             'The gene_name %s does not have the proper format. %s', gene_name,
             'It should be the gene name followed by _ and the '
             'Ensembl stable ID (e.g. MAPK8_ENSG00000107643).')
+
+    if re.match(r'^[_0-9a-zA-Z\.]+$', gene_name) is None:
+        raise ValueError('gene_name does not have the expected format.')
+
     return input_folder, gene_name
 
 
@@ -302,6 +312,19 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
     return cluster2data
 
 
+def _intermediate_output_folder(output_folder):
+    """
+    Return path to _exonhomology_intermediate_outputs folder.
+
+    This function creates the folder if it doesn't exist.
+    """
+    intermediate_output_path = os.path.join(
+        output_folder, '_exonhomology_intermediate_outputs')
+    if not os.path.exists(intermediate_output_path):
+        os.makedirs(intermediate_output_path, exist_ok=True)  # Python 3.2+
+    return intermediate_output_path
+
+
 def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
@@ -316,9 +339,12 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         padding='XXXXXXXXXX',
         species_list=None):
     """Perform almost all the pipeline."""
+
+    intermediate_output_path = _intermediate_output_folder(output_folder)
+
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(
-        output_folder,
+        intermediate_output_path,
         subexon_table,
         gene2speciesname,
         connected_subexons,
@@ -337,7 +363,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         substitution_matrix=None)
     cluster2data.update(
         create_chimeric_msa(
-            output_folder,
+            intermediate_output_path,
             subexon_table,
             gene2speciesname,
             connected_subexons,
@@ -347,19 +373,21 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             mafft_path=mafft_path,
             padding=padding,
             species_list=species_list))
+
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if msa is not None:
             gene_ids = subexons.alignment.get_gene_ids(msa)
             msa_matrix = subexons.alignment.create_msa_matrix(chimerics, msa)
 
             with open(
-                    _outfile(output_folder, "gene_ids_", cluster, ".txt"),
-                    'w') as outfile:
+                    _outfile(intermediate_output_path, "gene_ids_", cluster,
+                             ".txt"), 'w') as outfile:
                 for item in gene_ids:
                     outfile.write("%s\n" % item)
 
             np.savetxt(
-                _outfile(output_folder, "msa_matrix_", cluster, ".txt"),
+                _outfile(intermediate_output_path, "msa_matrix_", cluster,
+                         ".txt"),
                 msa_matrix,
                 delimiter=",")
 
@@ -421,6 +449,10 @@ def main():
     input_folder, gene_name = _get_gene_name(
         args.inputdir,
         gene_name=args.genename if args.genename != '' else None)
+    output_folder = input_folder if args.outputdir == '' else args.outputdir
+
+    intermediate_output_path = _intermediate_output_folder(output_folder)
+
     transcript_table = get_transcripts(
         input_folder, gene_name, species_list=species_list)
     subexon_table = get_subexons(
@@ -432,14 +464,15 @@ def main():
         gap_extend_penalty=args.gapextend)
 
     transcript_table.to_csv(
-        os.path.join(args.outputdir, "transcript_table.csv"))
-    subexon_table.to_csv(os.path.join(args.outputdir, "subexon_table.csv"))
+        os.path.join(intermediate_output_path, "transcript_table.csv"))
+    subexon_table.to_csv(
+        os.path.join(intermediate_output_path, "subexon_table.csv"))
 
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
     cluster2data = get_homologous_subexons(
-        args.outputdir,
+        output_folder,
         subexon_table,
         gene2speciesname,
         connected_subexons,
@@ -452,8 +485,8 @@ def main():
         padding='X' * args.padding,
         species_list=species_list)
 
-    if args.plot:
-        subexons.plot.plot_msa_subexons(cluster2data, args.outputdir)
+    if args.plot_chimerics:
+        subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)
 
     subexon_table = update_subexon_table(subexon_table, cluster2data)
 
