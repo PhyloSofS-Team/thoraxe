@@ -260,21 +260,29 @@ def _win2wsl(path):
         '{} is not an absolute Windows path to a file.'.format(path))
 
 
-def run_mafft(chimerics, output_path='alignment.fasta', mafft_path='mafft'):
+def run_mafft(
+        chimerics,
+        output_path='alignment.fasta',
+        mafft_path='mafft --maxiterate 1000 --globalpair --amino --quiet'):
     """
     Run MAFFT in the chimeric sequences and return the output file.
 
     You can pass arguments using mafft_path (default: 'mafft'), e.g:
-        mafft_path='mafft --maxiterate 100 --auto'
+        mafft_path='mafft --maxiterate 1000 --globalpair --bl 50'
+
+    By default, the following line is used:
+        mafft_path='mafft --maxiterate 1000 --globalpair --amino --quiet'
+
+    We use globalpair to obtain accurate alignments.
 
     You need MAFFT installed to run this function. You can install MAFFT from:
         https://mafft.cbrc.jp/alignment/software/
 
     If you are using Windows 10 and you have installed MAFFT in Ubuntu using
     the 'Windows Subsystem for Linux', you can try with the following options:
-        mafft_path='ubuntu.exe -c mafft'
-        mafft_path='bash.exe -c mafft'
-        mafft_path='wsl.exe mafft'
+        mafft_path='ubuntu.exe -c mafft --maxiterate 1000 --globalpair'
+        mafft_path='bash.exe -c mafft --maxiterate 1000 --globalpair'
+        mafft_path='wsl.exe mafft --maxiterate 1000 --globalpair'
     """
     if len(chimerics) == 1:
         with open(output_path, 'w') as outfile:
