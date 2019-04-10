@@ -8,6 +8,7 @@ import collections
 import logging
 import os
 import platform
+import re
 import shutil
 import subprocess
 import tempfile
@@ -20,6 +21,8 @@ from Bio import BiopythonWarning
 from recordclass import recordclass
 
 from exonhomology import transcript_info
+
+ORTHO_GROUP_PATTERN = re.compile("^[0-9]+_[0-9]+")
 
 ColPattern = collections.namedtuple('ColPattern', ['pattern', 'start', 'end'])
 
@@ -611,6 +614,37 @@ def msa2sequences(msa, gene_ids, padding):
     return sequences
 
 
+def _is_orthologous_exon_group(exon):
+    """
+    Return True if the string has the shape number_number at the beginning.
+
+    >>> _is_orthologous_exon_group('1_1-1_0')
+    True
+    >>> _is_orthologous_exon_group('2_0')
+    True
+    >>> _is_orthologous_exon_group('')
+    False
+    >>> _is_orthologous_exon_group('nan')
+    False
+    >>> _is_orthologous_exon_group('NaN')
+    False
+    """
+    return ORTHO_GROUP_PATTERN.match(str(exon)) is not None
+
+
+def impute_orthologous_exon_group(table, column='HomologousExons'):
+    """
+    Replace column values that do not conform to the naming by 0_number.
+    """
+    number = 1
+    for i in table.index:
+        name = table.loc[i, column]
+        if not _is_orthologous_exon_group(name):
+            table.at[i, column] = '0_' + str(number)
+            number += 1
+    return table
+
+
 def _store_homologous_subexons(subexon_df, seq, subexon, gene, exon_id):
     """
     Store homologous subexon information in subexon_df.
@@ -642,10 +676,12 @@ def save_homologous_subexons(subexon_df, sequences, gene_ids, colclusters,
     For each homologous subexon saves a fasta MSA in the output_folder.
     """
     cluster = str(subexon_df['Cluster'][0])
+
     subexon_df = subexon_df.assign(
         HomologousExons=cluster,
         HomologousExonLengths="",
         HomologousExonSequences="")
+
     for (i, colcluster) in enumerate(colclusters):
         with open(
                 os.path.join(

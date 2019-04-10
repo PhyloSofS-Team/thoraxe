@@ -47,7 +47,11 @@ def parse_command_line():
         type=str,
         default='')
     parser.add_argument(
-        '-t', '--mafft_path', help='path to MAFFT', type=str, default='mafft')
+        '-t',
+        '--mafft_path',
+        help='path to MAFFT',
+        type=str,
+        default='mafft --maxiterate 1000 --globalpair --amino --quiet')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
@@ -490,6 +494,8 @@ def main():
         subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)
 
     subexon_table = update_subexon_table(subexon_table, cluster2data)
+    subexon_table = subexons.alignment.impute_orthologous_exon_group(
+        subexon_table)
     subexon_table.to_csv(
         os.path.join(output_folder, "homologous_subexons.csv"))
 
