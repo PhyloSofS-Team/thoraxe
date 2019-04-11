@@ -391,8 +391,8 @@ def get_genetree(ensgeneid, **params):
     Get the gene tree around the gene geneid as of now, the whole tree
     is returned.
     """
-    # params.setdefault('object_type',  'gene')
-    params.setdefault('nh_format', 'full')
+    params.setdefault('object_type', 'gene')
+    params.setdefault('nh_format', 'species')  # 'full'
     params.setdefault('aligned', '1')
     ext_genetree = '/genetree/member/id/{0}?'.format(ensgeneid)
     request = generic_ensembl_rest_request(ext_genetree, params, NHTREE)

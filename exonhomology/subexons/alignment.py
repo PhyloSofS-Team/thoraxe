@@ -263,10 +263,10 @@ def _win2wsl(path):
         '{} is not an absolute Windows path to a file.'.format(path))
 
 
-def run_mafft(
-        chimerics,
-        output_path='alignment.fasta',
-        mafft_path='mafft --maxiterate 1000 --globalpair --amino --quiet'):
+def run_mafft(chimerics,
+              output_path='alignment.fasta',
+              mafft_path='mafft --op 10 --ep 1 --maxiterate 1000 --globalpair '
+              '--amino --quiet'):
     """
     Run MAFFT in the chimeric sequences and return the output file.
 

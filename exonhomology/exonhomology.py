@@ -51,7 +51,8 @@ def parse_command_line():
         '--mafft_path',
         help='path to MAFFT',
         type=str,
-        default='mafft --maxiterate 1000 --globalpair --amino --quiet')
+        default=
+        'mafft --op 10 --ep 1 --maxiterate 1000 --globalpair --amino --quiet')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
