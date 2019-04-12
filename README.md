@@ -1,7 +1,7 @@
-# thoraxe
+# ThorAxe
 Disentangle homology relationships between exons.
 
-thoraxe is under development at the moment: [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)  
+ThorAxe is under development at the moment: [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)  
 
 Linux, OSX: [![Build Status](https://travis-ci.com/PhyloSofS-Team/thoraxe.svg?branch=master)](https://travis-ci.com/PhyloSofS-Team/thoraxe)  
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/0j9necy8bdtl5kcb?svg=true)](https://ci.appveyor.com/project/diegozea/thoraxe)  
