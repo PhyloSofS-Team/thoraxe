@@ -47,11 +47,11 @@ def parse_command_line():
         type=str,
         default='')
     parser.add_argument(
-        '-t',
-        '--mafft_path',
-        help='path to MAFFT',
+        '-a',
+        '--aligner',
+        help='path to Clustal Omega',
         type=str,
-        default='mafft --maxiterate 1000 --globalpair --quiet')
+        default='clustalo')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
@@ -189,7 +189,7 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
         subexon_df,
         gene2speciesname,
         connected_subexons,
-        mafft_path='mafft',
+        aligner='clustalo',
         padding='XXXXXXXXXX',
         species_list=None):
     """Return a modified subexon_df, the dict of chimerics and the msa."""
@@ -201,8 +201,8 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
                                                 species_list)
     msa_file = _outfile(output_folder, "chimeric_alignment_", cluster,
                         ".fasta")
-    subexons.alignment.run_mafft(
-        chimerics, mafft_path=mafft_path, output_path=msa_file)
+    subexons.alignment.run_aligner(
+        chimerics, aligner=aligner, output_path=msa_file)
     msa = subexons.alignment.read_msa_fasta(msa_file)
     return subexon_df, chimerics, msa
 
@@ -217,7 +217,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         connected_subexons,
         cutoff=30.0,
         min_col_number=4,
-        mafft_path='mafft',
+        aligner='clustalo',
         padding='XXXXXXXXXX',
         species_list=None):
     """
@@ -233,7 +233,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         subexon_df,
         gene2speciesname,
         connected_subexons,
-        mafft_path=mafft_path,
+        aligner=aligner,
         padding=padding,
         species_list=species_list)
     cluster2data[cluster] = (subexon_df, chimerics, msa)
@@ -255,7 +255,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         clusters=None,
         cutoff=30.0,
         min_col_number=4,
-        mafft_path='mafft',
+        aligner='clustalo',
         padding='XXXXXXXXXX',
         species_list=None):
     """
@@ -288,7 +288,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
             connected_subexons,
             cutoff=cutoff,
             min_col_number=min_col_number,
-            mafft_path=mafft_path,
+            aligner=aligner,
             padding=padding,
             species_list=species_list)
         while to_delete:
@@ -310,7 +310,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
                 connected_subexons,
                 cutoff=cutoff,
                 min_col_number=min_col_number,
-                mafft_path=mafft_path,
+                aligner=aligner,
                 padding=padding,
                 species_list=species_list)
     return cluster2data
@@ -322,8 +322,8 @@ def _intermediate_output_folder(output_folder):
 
     This function creates the folder if it doesn't exist.
     """
-    intermediate_output_path = os.path.join(
-        output_folder, '_thoraxe_intermediate_outputs')
+    intermediate_output_path = os.path.join(output_folder,
+                                            '_thoraxe_intermediate_outputs')
     if not os.path.exists(intermediate_output_path):
         os.makedirs(intermediate_output_path, exist_ok=True)  # Python 3.2+
     return intermediate_output_path
@@ -339,7 +339,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         percent_identity_cutoff=30.0,
         gap_open_penalty=10,
         gap_extend_penalty=1,
-        mafft_path='mafft',
+        aligner='clustalo',
         padding='XXXXXXXXXX',
         species_list=None):
     """Perform almost all the pipeline."""
@@ -354,7 +354,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         connected_subexons,
         cutoff=percent_identity_cutoff,
         min_col_number=minimum_len,
-        mafft_path=mafft_path,
+        aligner=aligner,
         padding=padding,
         species_list=species_list)
     modified_clusters = subexons.rescue.subexon_rescue_phase(
@@ -374,7 +374,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             clusters=modified_clusters,
             cutoff=percent_identity_cutoff,
             min_col_number=minimum_len,
-            mafft_path=mafft_path,
+            aligner=aligner,
             padding=padding,
             species_list=species_list))
 
@@ -486,7 +486,7 @@ def main():
         percent_identity_cutoff=args.identity,
         gap_open_penalty=args.gapopen,
         gap_extend_penalty=args.gapextend,
-        mafft_path=args.mafft_path,
+        aligner=args.aligner,
         padding='X' * args.padding,
         species_list=species_list)
 

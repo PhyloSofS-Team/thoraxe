@@ -1,7 +1,7 @@
 """
-alignment: Module to create the subexon MSA with MAFFT.
+alignment: Module to create the subexon MSA with Clustal Omega.
 
-This module creates a MSA of subexons using MAFFT.
+This module creates a MSA of subexons using Clustal Omega.
 """
 
 import collections
@@ -141,7 +141,7 @@ def create_chimeric_sequences(  # pylint: disable=too-many-locals
         connected_subexons,
         padding='XXXXXXXXXX'):
     """
-    Create chimeric sequence for MAFFT.
+    Create chimeric sequence for Clustal Omega.
 
     It returns a Dict from 'Gene stable ID' to a tuple with the chimeric
     sequence and a Dict from 'SubexonIndex' to ...
@@ -221,7 +221,7 @@ def _get_wsl_name(executable_path):
     True
     >>> nwin or _get_wsl_name('C:\\WINDOWS\\SysNative\\bash.exe') == 'bash.exe'
     True
-    >>> nwin or _get_wsl_name('mafft') is None
+    >>> nwin or _get_wsl_name('clustalo') is None
     True
     """
     executable_name = os.path.basename(os.path.abspath(executable_path))
@@ -263,28 +263,22 @@ def _win2wsl(path):
         '{} is not an absolute Windows path to a file.'.format(path))
 
 
-def run_mafft(chimerics,
-              output_path='alignment.fasta',
-              mafft_path='mafft --maxiterate 1000 --globalpair --quiet'):
+def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     """
-    Run MAFFT in the chimeric sequences and return the output file.
+    Run Clustal Omega in the chimeric sequences and return the output file.
 
-    You can pass arguments using mafft_path (default: 'mafft'), e.g:
-        mafft_path='mafft --maxiterate 1000 --globalpair --bl 50'
+    You can pass arguments using aligner (default: 'clustalo'), e.g:
+        aligner='clustalo --threads=4'
 
-    By default, the following line is used:
-        mafft_path='mafft --maxiterate 1000 --globalpair --amino --quiet'
+    You need Clustal Omega installed to run this function. You can install it
+    from: http://www.clustal.org/omega/
 
-    We use globalpair to obtain accurate alignments.
-
-    You need MAFFT installed to run this function. You can install MAFFT from:
-        https://mafft.cbrc.jp/alignment/software/
-
-    If you are using Windows 10 and you have installed MAFFT in Ubuntu using
-    the 'Windows Subsystem for Linux', you can try with the following options:
-        mafft_path='ubuntu.exe -c mafft --maxiterate 1000 --globalpair'
-        mafft_path='bash.exe -c mafft --maxiterate 1000 --globalpair'
-        mafft_path='wsl.exe mafft --maxiterate 1000 --globalpair'
+    If you are using Windows 10 and you have installed Clustal Omega in
+    Ubuntu using the 'Windows Subsystem for Linux', you can try with the
+    following options:
+        aligner='ubuntu.exe -c clustalo'
+        aligner='bash.exe -c clustalo'
+        aligner='wsl.exe clustalo'
     """
     if len(chimerics) == 1:
         with open(output_path, 'w') as outfile:
@@ -293,10 +287,12 @@ def run_mafft(chimerics,
 
     input_fasta = _print_temporal_fasta(chimerics)
 
-    command = mafft_path.split()
+    command = aligner.split()
 
     wsl = _get_wsl_name(command[0])
     is_wsl = platform.system() == 'Windows' and wsl is not None
+
+    command.append('--in')
 
     if is_wsl:
         command[0] = _get_wsl_path(wsl)
@@ -320,12 +316,12 @@ def run_mafft(chimerics,
         except (OSError, FileNotFoundError) as err:
             if shutil.which(command[0]) is None:
                 raise OSError(
-                    ('{} not found. Please indicate a correct mafft_path or '
-                     'install it: https://mafft.cbrc.jp/alignment/software/'
-                     ).format(mafft_path))
+                    ('{} not found. Please indicate a correct aligner or '
+                     'install it: http://www.clustal.org/omega/'
+                     ).format(aligner))
             raise err
 
-    print('run_mafft command: {}'.format(command))
+    print('run_aligner command: {}'.format(command))
 
     return output_path
 
