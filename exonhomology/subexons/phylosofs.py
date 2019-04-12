@@ -16,7 +16,7 @@ def get_exon2char(exons):
     """
     Return a dictionary from orthologous exon group to a single character.
 
-    >>> result = exon2char(['1_0-1_1', '2_0'])
+    >>> result = get_exon2char(['1_0-1_1', '2_0'])
     >>> sorted(result)
     ['1_0', '1_1', '2_0']
     >>> [result[exon] for exon in sorted(result)]
