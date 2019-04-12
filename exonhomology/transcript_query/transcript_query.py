@@ -21,7 +21,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from exonhomology import utils
+from thoraxe import utils
 
 # REST parameters
 SERVER = "https://rest.ensembl.org"
@@ -50,7 +50,7 @@ def parse_command_line():
         prog="transcript_query",
         description="""
         transcript_query download from Ensembl the transcript and exon
-        information needed for exonhomology.
+        information needed for thoraxe.
         """,
         epilog="""
         It has been developed at LCQB (Laboratory of Computational and

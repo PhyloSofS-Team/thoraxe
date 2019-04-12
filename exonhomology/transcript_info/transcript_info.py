@@ -8,8 +8,8 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 
-from exonhomology.transcript_info import clusters
-from exonhomology.transcript_info import phases
+from thoraxe.transcript_info import clusters
+from thoraxe.transcript_info import phases
 
 
 def _check_column_presence(data_frame, column, message=""):

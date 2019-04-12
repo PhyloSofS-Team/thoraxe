@@ -1,4 +1,4 @@
-"""exonhomology pipeline functions."""
+"""thoraxe pipeline functions."""
 
 import argparse
 import logging
@@ -6,22 +6,22 @@ import os
 import re
 from ast import literal_eval
 import numpy as np
-from exonhomology import transcript_info
-from exonhomology import subexons
-from exonhomology import utils
+from thoraxe import transcript_info
+from thoraxe import subexons
+from thoraxe import utils
 
 
 def parse_command_line():
     """
     Parse command line.
 
-    It uses argparse to parse exonhomology' command line arguments and returns
+    It uses argparse to parse thoraxe' command line arguments and returns
     the argparse parser.
     """
     parser = argparse.ArgumentParser(
-        prog="exonhomology",
+        prog="thoraxe",
         description="""
-        exonhomology is a tool to identify homologous exons in a set of
+        thoraxe is a tool to identify homologous exons in a set of
         transcripts from the same gene and different species.
         """,
         epilog="""
@@ -51,8 +51,7 @@ def parse_command_line():
         '--mafft_path',
         help='path to MAFFT',
         type=str,
-        default=
-        'mafft --op 10 --ep 1 --maxiterate 1000 --globalpair --amino --quiet')
+        default='mafft --maxiterate 1000 --globalpair --quiet')
     parser.add_argument(
         '-m', '--minlen', help='minimum exon length', type=int, default=4)
     parser.add_argument(
@@ -80,7 +79,7 @@ def parse_command_line():
     parser.add_argument(
         '--plot_chimerics',
         help='save plotly/html plot for the chimeric alignments in the '
-        '_exonhomology_intermediate_outputs folder',
+        '_thoraxe_intermediate_outputs folder',
         action='store_true')
     parser.add_argument(
         '-l',
@@ -100,9 +99,9 @@ def _get_gene_name(input_folder, gene_name=None):
 
     It gives a warning if the gene_name hasn't the correct format.
 
-    >>> _get_gene_name('exonhomology/tests/data/MAPK8_ENSG00000107643')
+    >>> _get_gene_name('thoraxe/tests/data/MAPK8_ENSG00000107643')
     (..., 'MAPK8_ENSG00000107643')
-    >>> _get_gene_name('exonhomology/tests/data/MAPK8')
+    >>> _get_gene_name('thoraxe/tests/data/MAPK8')
     (..., 'MAPK8')
     """
     input_folder = os.path.abspath(input_folder)
@@ -319,12 +318,12 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
 
 def _intermediate_output_folder(output_folder):
     """
-    Return path to _exonhomology_intermediate_outputs folder.
+    Return path to _thoraxe_intermediate_outputs folder.
 
     This function creates the folder if it doesn't exist.
     """
     intermediate_output_path = os.path.join(
-        output_folder, '_exonhomology_intermediate_outputs')
+        output_folder, '_thoraxe_intermediate_outputs')
     if not os.path.exists(intermediate_output_path):
         os.makedirs(intermediate_output_path, exist_ok=True)  # Python 3.2+
     return intermediate_output_path

@@ -4,8 +4,8 @@ import collections
 
 import pandas as pd
 
-from exonhomology import transcript_info
-from exonhomology.transcript_info import phases
+from thoraxe import transcript_info
+from thoraxe.transcript_info import phases
 
 # A basic interval type, containing start and end coordinates
 # and the set of components that are included on it.

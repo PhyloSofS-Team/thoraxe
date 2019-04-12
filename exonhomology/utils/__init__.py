@@ -1,5 +1,5 @@
 """
-utils: A collection of functions to use in different places of exonhomology.
+utils: A collection of functions to use in different places of thoraxe.
 """
 
-from exonhomology.utils import species
+from thoraxe.utils import species

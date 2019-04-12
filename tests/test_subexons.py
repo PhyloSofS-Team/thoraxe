@@ -1,7 +1,7 @@
 import os
 import pytest
-from exonhomology import transcript_info
-from exonhomology import subexons
+from thoraxe import transcript_info
+from thoraxe import subexons
 
 
 @pytest.fixture(scope='module')

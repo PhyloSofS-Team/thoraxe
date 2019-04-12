@@ -20,7 +20,7 @@ from Bio import AlignIO
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
-from exonhomology import transcript_info
+from thoraxe import transcript_info
 
 ORTHO_GROUP_PATTERN = re.compile("^[0-9]+_[0-9]+")
 
@@ -265,8 +265,7 @@ def _win2wsl(path):
 
 def run_mafft(chimerics,
               output_path='alignment.fasta',
-              mafft_path='mafft --op 10 --ep 1 --maxiterate 1000 --globalpair '
-              '--amino --quiet'):
+              mafft_path='mafft --maxiterate 1000 --globalpair --quiet'):
     """
     Run MAFFT in the chimeric sequences and return the output file.
 
@@ -325,6 +324,8 @@ def run_mafft(chimerics,
                      'install it: https://mafft.cbrc.jp/alignment/software/'
                      ).format(mafft_path))
             raise err
+
+    print('run_mafft command: {}'.format(command))
 
     return output_path
 

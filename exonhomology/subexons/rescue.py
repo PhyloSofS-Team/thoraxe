@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
-from exonhomology import transcript_info
+from thoraxe import transcript_info
 
 
 def _get_subexons_to_rescue(subexon_table):

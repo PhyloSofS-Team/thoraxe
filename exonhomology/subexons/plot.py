@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 _HTML_FILE = pkg_resources.resource_filename(
-    'exonhomology', 'subexons/assets/cluster_plots.html')
+    'thoraxe', 'subexons/assets/cluster_plots.html')
 
 
 def _constitutive_value(values):

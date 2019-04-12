@@ -1,7 +1,7 @@
 import os
 import pytest
 import numpy as np
-from exonhomology import transcript_info
+from thoraxe import transcript_info
 
 
 @pytest.fixture(scope='module')
