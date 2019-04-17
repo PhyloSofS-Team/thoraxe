@@ -494,10 +494,16 @@ def main():
         subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)
 
     subexon_table = update_subexon_table(subexon_table, cluster2data)
-    subexon_table = subexons.alignment.impute_orthologous_exon_group(
+    subexon_table = subexons.alignment.impute_missing_orthologous_exon_group(
         subexon_table)
     subexon_table.to_csv(
         os.path.join(output_folder, "homologous_subexons.csv"))
+
+    node2genes, edge2genes = subexons.graph.nodes_and_edges2genes(
+        subexon_table)
+    subexons.graph.splice_graph_gml(
+        os.path.join(output_folder, "splice_graph.gml"), node2genes,
+        edge2genes)
 
 
 if __name__ == '__main___':

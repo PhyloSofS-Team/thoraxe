@@ -2,7 +2,10 @@
 phylosofs: Functions to generate PhyloSofS input.
 """
 
+import logging
 import string
+
+from Bio import Phylo
 
 CHARS = [
     char for char in string.printable
@@ -51,3 +54,43 @@ def get_transcript2phylosofs(data, exon2char):
                     phylosofs.append(exon2char[ortholog])
             transcript2phylosofs[transcript_id] = ''.join(phylosofs)
     return transcript2phylosofs
+
+
+def prune_tree(input_path, output_path, used_proteins):
+    """
+    Delete unused proteins from the Ensembl gene tree.
+
+    The function reads the Newick tree from input_path and stores the pruned
+    tree in output_path if any error occurs, returning output_path. If an
+    error occurs, the function does not save the tree and returns None.
+
+    In the tree, each protein is identified by their ensembl translation id.
+    For each gene, Ensembl uses the longest translated transcript sequence.
+    """
+    tree = Phylo.read(input_path, "newick")
+
+    for clade in tree.get_terminals():
+        if clade.name not in used_proteins:
+            try:
+                tree.prune(clade.name)
+            except ValueError as err:
+                logging.warning(
+                    'ValueError with protein %s while prunning the tree: %s',
+                    clade.name, err)
+                return None
+
+    Phylo.write(tree, output_path, 'newick')
+
+    return output_path
+
+
+def _get_terminal_names(input_path):
+    """Return the set of terminal names in the Newick tree at input_path."""
+    tree = Phylo.read(input_path, "newick")
+    return {clade.name for clade in tree.get_terminals()}
+
+
+# noqa TO DO : Look Gene stable ID to selected Protein stable ID before clean up data
+# noqa data.loc[:,['Gene stable ID', 'Protein stable ID']
+# noqa              ].drop_duplicates().groupby('Gene stable ID').apply(
+# noqa      lambda x: sum(i in terminal_names for i in x['Protein stable ID']))

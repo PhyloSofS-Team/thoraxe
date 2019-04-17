@@ -170,6 +170,7 @@ def _subexon_info(  # pylint: disable=too-many-locals
         # Transcript information
         'Gene stable ID',
         'Transcript stable ID',
+        'Protein stable ID',
         'Strand',
         'Exon rank in transcript',
         'Transcript stable ID cluster',

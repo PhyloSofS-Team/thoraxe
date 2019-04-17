@@ -68,7 +68,7 @@ def parse_command_line():
         '-o',
         '--orthology',
         help='Orthology relationship to use; 1:1, 1:n or m:n',
-        default='1:n')
+        default='1:1')
     parser.add_argument(
         '-l',
         '--specieslist',
@@ -203,6 +203,7 @@ def _biomart_exons_annot_request(dataset,
         '<Filter name = "ensembl_gene_id" value = "{eid}"/>'
         '<Attribute name = "ensembl_gene_id" />'
         '<Attribute name = "ensembl_transcript_id" />'
+        '<Attribute name = "ensembl_peptide_id" />'
         '<Attribute name = "transcript_start" />'
         '<Attribute name = "transcript_end" />'
         '<Attribute name = "strand" />'
@@ -392,7 +393,7 @@ def get_genetree(ensgeneid, **params):
     is returned.
     """
     params.setdefault('object_type', 'gene')
-    params.setdefault('nh_format', 'species')  # 'full'
+    params.setdefault('nh_format', 'full')  # 'species'
     params.setdefault('aligned', '1')
     ext_genetree = '/genetree/member/id/{0}?'.format(ensgeneid)
     request = generic_ensembl_rest_request(ext_genetree, params, NHTREE)

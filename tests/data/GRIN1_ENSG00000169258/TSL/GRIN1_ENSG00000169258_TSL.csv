@@ -1,6 +1,6 @@
 Species,Name,Transcript ID,Source,Experiment Source,Biotype,Flags
 homo_sapiens,CDHR2-206,ENST00000510636,ensembl_havana,ensembl_havana_transcript,protein_coding,1
-homo_sapiens,GPRIN1-201,ENST00000303991,ensembl_havana,ensembl_havana_transcript,protein_coding,1
+homo_sapiens,GPRIN1-201,ENST00000303991,ensembl_havana,ensembl_havana_transcript,protein_coding,1 (assigned to previous version 4)
 gorilla_gorilla,GPRIN1-201,ENSGGOT00000030071,ensembl,ensembl,protein_coding,NA
 macaca_mulatta,GPRIN1-201,ENSMMUT00000018649,ensembl,ensembl,protein_coding,NA
 mus_musculus,Gprin1-202,ENSMUST00000135343,ensembl_havana,ensembl_havana_transcript,protein_coding,1
@@ -10,7 +10,4 @@ sus_scrofa,CDHR2-201,ENSSSCT00000043997,ensembl,ensembl,protein_coding,NA
 sus_scrofa,CDHR2-202,ENSSSCT00000055561,ensembl,ensembl,protein_coding,NA
 sus_scrofa,GPRIN1-201,ENSSSCT00000015353,ensembl,ensembl,protein_coding,NA
 monodelphis_domestica,NA,ENSMODT00000006412,ensembl,ensembl,protein_coding,NA
-ornithorhynchus_anatinus,NA,ENSOANT00000004780,ensembl,ensembl,protein_coding,NA
-ornithorhynchus_anatinus,NA,ENSOANT00000004781,ensembl,ensembl,protein_coding,NA
-ornithorhynchus_anatinus,NA,ENSOANT00000042277,ensembl,ensembl,protein_coding,NA
 gallus_gallus,NA,ENSGALT00000084749,ensembl,ensembl,protein_coding,NA

@@ -292,7 +292,8 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     wsl = _get_wsl_name(command[0])
     is_wsl = platform.system() == 'Windows' and wsl is not None
 
-    command.append('--in')
+    if 'clustalo' in command[0]:
+        command.append('--in')
 
     if is_wsl:
         command[0] = _get_wsl_path(wsl)
@@ -320,8 +321,6 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
                      'install it: http://www.clustal.org/omega/'
                      ).format(aligner))
             raise err
-
-    print('run_aligner command: {}'.format(command))
 
     return output_path
 
@@ -629,7 +628,7 @@ def _is_orthologous_exon_group(exon):
     return ORTHO_GROUP_PATTERN.match(str(exon)) is not None
 
 
-def impute_orthologous_exon_group(table, column='HomologousExons'):
+def impute_missing_orthologous_exon_group(table, column='HomologousExons'):
     """
     Replace column values that do not conform to the naming by 0_number.
     """
