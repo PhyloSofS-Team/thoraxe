@@ -1,9 +1,7 @@
 """thoraxe pipeline functions."""
 
 import argparse
-import logging
 import os
-import re
 from ast import literal_eval
 import numpy as np
 from thoraxe import transcript_info
