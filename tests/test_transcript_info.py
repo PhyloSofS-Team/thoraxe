@@ -13,43 +13,31 @@ def datadir(request):
 
 @pytest.fixture(scope='module')
 def mapk8(datadir):
-    mapk8_dir = os.path.join(datadir, 'MAPK8_ENSG00000107643')
+    mapk8_dir = os.path.join(datadir, 'MAPK8', 'Ensembl')
     return {
-        'tsl':
-        os.path.join(mapk8_dir, 'TSL', 'MAPK8_ENSG00000107643_TSL.csv'),
-        'exontable':
-        os.path.join(mapk8_dir, 'TablesExons',
-                     'MAPK8_ENSG00000107643_exonstable.tsv'),
-        'seqs':
-        os.path.join(mapk8_dir, 'Sequences', 'MAPK8_ENSG00000107643.fasta')
+        'tsl': os.path.join(mapk8_dir, 'tsl.csv'),
+        'exontable': os.path.join(mapk8_dir, 'exonstable.tsv'),
+        'seqs': os.path.join(mapk8_dir, 'sequences.fasta')
     }
 
 
 @pytest.fixture(scope='module')
 def camk2a(datadir):
-    camk2a_dir = os.path.join(datadir, 'CAMK2A_ENSG00000070808')
+    camk2a_dir = os.path.join(datadir, 'CAMK2A', 'Ensembl')
     return {
-        'tsl':
-        os.path.join(camk2a_dir, 'TSL', 'CAMK2A_ENSG00000070808_TSL.csv'),
-        'exontable':
-        os.path.join(camk2a_dir, 'TablesExons',
-                     'CAMK2A_ENSG00000070808_exonstable.tsv'),
-        'seqs':
-        os.path.join(camk2a_dir, 'Sequences', 'CAMK2A_ENSG00000070808.fasta')
+        'tsl': os.path.join(camk2a_dir, 'tsl.csv'),
+        'exontable': os.path.join(camk2a_dir, 'exonstable.tsv'),
+        'seqs': os.path.join(camk2a_dir, 'sequences.fasta')
     }
 
 
 @pytest.fixture(scope='module')
 def grin1(datadir):
-    grin1_dir = os.path.join(datadir, 'GRIN1_ENSG00000169258')
+    grin1_dir = os.path.join(datadir, 'GRIN1', 'Ensembl')
     return {
-        'tsl':
-        os.path.join(grin1_dir, 'TSL', 'GRIN1_ENSG00000169258_TSL.csv'),
-        'exontable':
-        os.path.join(grin1_dir, 'TablesExons',
-                     'GRIN1_ENSG00000169258_exonstable.tsv'),
-        'seqs':
-        os.path.join(grin1_dir, 'Sequences', 'GRIN1_ENSG00000169258.fasta')
+        'tsl': os.path.join(grin1_dir, 'tsl.csv'),
+        'exontable': os.path.join(grin1_dir, 'exonstable.tsv'),
+        'seqs': os.path.join(grin1_dir, 'sequences.fasta')
     }
 
 
@@ -70,14 +58,7 @@ def test_remove_na(mapk8):
         mapk8['tsl'], mapk8['exontable'], mapk8['seqs'], remove_na=False)
 
     # I keep other species, not only h. sapiens & m. musculus:
-    assert sorted(trx_data.Species.unique()) == [
-        'bos_taurus', 'danio_rerio', 'gallus_gallus', 'gorilla_gorilla',
-        'homo_sapiens', 'macaca_mulatta', 'monodelphis_domestica',
-        'mus_musculus', 'rattus_norvegicus', 'sus_scrofa', 'xenopus_tropicalis'
-    ]
-    # ornithorhynchus_anatinus is not in the table because ENSOANT00000041772
-    # doesn't end with '*' (i.e. incomplete transcripts)
-    assert 'ENSOANT00000041772' not in trx_data['Transcript stable ID']
+    assert len(trx_data.Species.unique()) > 2
 
     # remove_na doesn't interfere with selecting the correct biotype
     assert sum(value not in ['Protein coding', 'protein_coding']

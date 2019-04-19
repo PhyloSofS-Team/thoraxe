@@ -11,12 +11,11 @@ def clustered_trx_data(request):
     def _get_clustered_trx_data(folder):
         test_dir = os.path.dirname(filename)
         datadir = os.path.join(test_dir, 'data')
-        folder_path = os.path.join(datadir, folder)
+        folder_path = os.path.join(datadir, folder, 'Ensembl')
         trx_data = transcript_info.read_transcript_info(
-            os.path.join(folder_path, 'TSL', folder + '_TSL.csv'),
-            os.path.join(folder_path, 'TablesExons',
-                         folder + '_exonstable.tsv'),
-            os.path.join(folder_path, 'Sequences', folder + '.fasta'),
+            os.path.join(folder_path, 'tsl.csv'),
+            os.path.join(folder_path, 'exonstable.tsv'),
+            os.path.join(folder_path, 'sequences.fasta'),
             remove_na=False)
         return transcript_info.exon_clustering(trx_data)
 
@@ -24,7 +23,7 @@ def clustered_trx_data(request):
 
 
 def test_subexon_table(clustered_trx_data):
-    data = clustered_trx_data('GRIN1_ENSG00000169258')
+    data = clustered_trx_data('GRIN1')
     subexon_table = subexons.create_subexon_table(data)
 
     assert 'Subexon ID' in subexon_table.columns
@@ -38,18 +37,18 @@ def test_subexon_table(clustered_trx_data):
 
 
 def test_subexon_clusters(clustered_trx_data):
-    data = clustered_trx_data('MAPK8_ENSG00000107643')
+    data = clustered_trx_data('MAPK8')
     subexon_table = subexons.create_subexon_table(data)
     assert len(
         subexon_table.loc[subexon_table['Subexon ID cluster'] ==
                           'ENSMMUE00000040028_SE_0/ENSMMUE00000387789_SE_0',
                           'Subexon ID'].unique()) == 1
 
-    # 416 rows with before merging non-redundant contiguous subexons
+    # 426 rows with before merging non-redundant contiguous subexons
     not_merged = subexons.create_subexon_table(data, merge_non_redundant=False)
-    assert not_merged.shape[0] == 416
-    # 395 after merging
-    assert subexon_table.shape[0] == 395
+    assert not_merged.shape[0] == 426
+    # 405 after merging
+    assert subexon_table.shape[0] == 405
 
     # QVQQ
     assert len(

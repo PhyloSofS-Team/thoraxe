@@ -315,26 +315,24 @@ def get_listoftranscripts(ensgeneid, species, **params):
     return dnames
 
 
-def write_tsl_file(gene_name, l_of_sptr):
+def write_tsl_file(path, l_of_sptr):
     """Write a TSL file from a list of transcripts."""
-    fout = "%s_TSL.csv" % (gene_name)
-    csvout = open(fout, "w")
+    with open(os.path.join(path, "tsl.csv"), "w") as csvout:
+        # One trick to get the good names in the header
+        other_names = [
+            "Species", "Name", "Transcript ID", "Source", "Experiment Source",
+            "Biotype", "Flags"
+        ]
+        cfieldnames = [
+            "species", "external_name", "transcript_id", "source",
+            "logic_name", "biotype", "transcript_support_level"
+        ]
+        dnewheader = dict(x for x in zip(cfieldnames, other_names))
 
-    # One trick to get the good names in the header
-    other_names = [
-        "Species", "Name", "Transcript ID", "Source", "Experiment Source",
-        "Biotype", "Flags"
-    ]
-    cfieldnames = [
-        "species", "external_name", "transcript_id", "source", "logic_name",
-        "biotype", "transcript_support_level"
-    ]
-    dnewheader = dict(x for x in zip(cfieldnames, other_names))
+        lodict2csv([dnewheader], csvout, fnames=cfieldnames, header=False)
 
-    lodict2csv([dnewheader], csvout, fnames=cfieldnames, header=False)
-    for sptr in l_of_sptr:
-        lodict2csv(sptr, csvout, fnames=cfieldnames, header=False)
-    csvout.close()
+        for sptr in l_of_sptr:
+            lodict2csv(sptr, csvout, fnames=cfieldnames, header=False)
 
 
 def get_listofexons(ensgeneid, **params):
@@ -374,7 +372,7 @@ def get_exons_sequences(listensexons):  # , **params):
                 SERVER + ext_exons_seq,
                 headers=HJSONPOST,
                 data=json.dumps(dexons))
-            # print(request.url)
+
             if not request.ok:
                 print(("FAILED REQUEST: " + str(dexons)))
                 request.raise_for_status()
@@ -499,29 +497,6 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 4b- Get the exons annotation and sequence
     # 5-  Get the gene tree for the selected species
 
-    # We fix the list of orthologues to a small list inspired from MAPK8
-    # orthokeep = [
-    #     # "homo_sapiens", "felix_catus", "gallus_gallus",
-    #     # "drosophila_melanogaster", "mus_musculus",
-    #     # "caenorhabditis_elegans",
-    #     # "xenopus_tropicalis", "danio_rerio", "oryctolagus_cuniculus",
-    #     # "pan_troglodytes"
-    #     'homo_sapiens',
-    #     'mus_musculus',
-    #     'macaca_mulatta',
-    #     'danio_rerio',
-    #     'xenopus_tropicalis',
-    #     'caenorhabditis_elegans',
-    #     'gallus_gallus',
-    #     'rattus_norvegicus',
-    #     'bos_taurus',
-    #     'monodelphis_domestica',
-    #     'ornithorhynchus_anatinus',
-    #     'drosophila_melanogaster',
-    #     'gorilla_gorilla',
-    #     'sus_scrofa'
-    # ]
-
     # 1-
     args = parse_command_line()
 
@@ -535,24 +510,21 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if not geneids:
         raise KeyError("No gene found, exiting")
     curgene = geneids[0]
-    gene_name = "%s_%s" % (args.genename, curgene)
+    gene_name = args.genename
     cdirectory = gene_name
-    tsl_subdir = cdirectory + "/TSL/"
-    tex_subdir = cdirectory + "/TablesExons/"
-    seqsubdir = cdirectory + "/Sequences/"
+    query_result_subdir = os.path.join(cdirectory, "Ensembl")
     print("Using gene id %s from now on." % (curgene))
     print("Results will be saved in directory %s" % (cdirectory))
     if not os.path.exists(cdirectory):
-        os.makedirs(tsl_subdir)
-        os.makedirs(tex_subdir)
-        os.makedirs(seqsubdir)
+        os.makedirs(query_result_subdir)
+
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
     print("Writing the gene tree")
     tree_text = get_genetree(curgene)
-    treeout = open("%s/%s.tree.nh" % (cdirectory, curgene), "w")
-    treeout.write(tree_text)
-    treeout.close()
+    with open(os.path.join(query_result_subdir, "tree.nh"), "w") as treeout:
+        treeout.write(tree_text)
+
     print("Looking for orthologs :")
     orthologs = get_orthologs(curgene)
     nparalogs = len(
@@ -577,8 +549,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     print("Getting all the transcripts for preparing a TSL file")
     tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
-    tsl_out = "%s/%s" % (tsl_subdir, gene_name)
-    write_tsl_file(tsl_out, [tsl_cur] + tsl_ortho)
+    write_tsl_file(query_result_subdir, [tsl_cur] + tsl_ortho)
 
     print("**** Query species : %s" % (args.species))
     print("Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
@@ -590,8 +561,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     print("Now getting the exons sequences")
     # TO DO revert to multiple files if it is easier
-    ffasta = "%s/%s.fasta" % (seqsubdir, gene_name)
-    fexonstable = "%s/%s_exonstable.tsv" % (tex_subdir, gene_name)
+    ffasta = os.path.join(query_result_subdir, "sequences.fasta")
+    fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")
     fastaout = open(ffasta, "w")
     exonstableout = open(fexonstable, "w")
     dex = get_listofexons(curgene)

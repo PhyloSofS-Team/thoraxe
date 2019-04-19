@@ -60,3 +60,15 @@ gallus_gallus,MAPK8-204,ENSGALT00000073694,ensembl,ensembl,protein_coding,NA
 gallus_gallus,MAPK8-205,ENSGALT00000091236,ensembl,ensembl,protein_coding,NA
 xenopus_tropicalis,mapk8-201,ENSXETT00000046913,ensembl,ensembl,protein_coding,NA
 xenopus_tropicalis,mapk8-202,ENSXETT00000046905,ensembl,ensembl,protein_coding,NA
+danio_rerio,CR931802.4-201,ENSDART00000189602,ensembl,ensembl,protein_coding,NA
+danio_rerio,mapk8a-202,ENSDART00000132129,havana,havana,protein_coding,NA
+danio_rerio,mapk8a-204,ENSDART00000139591,havana,havana,protein_coding,NA
+danio_rerio,mapk8a-201,ENSDART00000049180,ensembl,ensembl,protein_coding,NA
+danio_rerio,mapk8a-206,ENSDART00000190640,ensembl,ensembl,protein_coding,NA
+danio_rerio,mapk8a-207,ENSDART00000192002,ensembl,ensembl,protein_coding,NA
+danio_rerio,mapk8a-203,ENSDART00000134640,havana,havana,retained_intron,NA
+danio_rerio,mapk8a-205,ENSDART00000146250,havana,havana,protein_coding,NA
+danio_rerio,mapk8b-201,ENSDART00000022471,ensembl_havana,ensembl_havana_transcript,protein_coding,NA
+danio_rerio,mapk8b-203,ENSDART00000128677,havana,havana,protein_coding,NA
+danio_rerio,mapk8b-204,ENSDART00000145213,havana,havana,protein_coding,NA
+danio_rerio,mapk8b-202,ENSDART00000086510,ensembl,ensembl,protein_coding,NA

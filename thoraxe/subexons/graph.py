@@ -40,7 +40,7 @@ def _get_genes(node2genes):
     """
     Return a set of genes from the node to (set of) genes dictionary.
 
-    >>> order(_get_genes({'a':{1, 2}, 'b':{2, 3}, 'c':{1}, 'd':{4}}))
+    >>> sorted(_get_genes({'a':{1, 2}, 'b':{2, 3}, 'c':{1}, 'd':{4}}))
     [1, 2, 3, 4]
     """
     return reduce(set.union, node2genes.values())
@@ -48,7 +48,10 @@ def _get_genes(node2genes):
 
 def splice_graph_gml(filename, node2genes, edge2genes):
     """
-    Save the splice graph with conservation level information in GML format.
+    Store the splice graph in GML (Graph Modelling Language) format.
+
+    It stores the conservation level information for nodes and edges, where
+    conservation is the fraction of species that has that particular feature.
     """
     if not filename.endswith('.gml'):
         filename += '.gml'
