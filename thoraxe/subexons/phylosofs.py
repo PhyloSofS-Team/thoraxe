@@ -5,6 +5,8 @@ phylosofs: Functions to generate PhyloSofS input.
 import logging
 import string
 
+import pandas as pd
+
 from Bio import Phylo
 
 CHARS = [
@@ -88,6 +90,17 @@ def _get_terminal_names(input_path):
     """Return the set of terminal names in the Newick tree at input_path."""
     tree = Phylo.read(input_path, "newick")
     return {clade.name for clade in tree.get_terminals()}
+
+
+def _get_protein2gene(exontable_file):
+    """Return a dictionary from protein (translation) id to gene id."""
+    data = pd.read_csv(exontable_file, sep='\t')
+    return {
+        key: value['Gene stable ID']
+        for key, value in data.
+        loc[:, ['Gene stable ID', 'Transcript stable ID']].drop_duplicates(
+        ).set_index('Transcript stable ID').to_dict(orient='index').items()
+    }
 
 
 # noqa TO DO : Look Gene stable ID to selected Protein stable ID before clean up data
