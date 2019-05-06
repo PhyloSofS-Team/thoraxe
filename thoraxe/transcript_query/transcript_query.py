@@ -32,13 +32,40 @@ HJSONPOST = {"Content-Type": "application/json", "Accept": "application/json"}
 NHTREE = {"Content-Type": "text/x-nh"}
 BIOMART_HUMAN = "hsapiens_gene_ensembl"
 
-# Other parameters
-
-VERBOSE = False
+# Download Utils
 
 
-###
+def _requests_retry(retries=3,
+                    backoff_factor=0.3,
+                    status_forcelist=(500, 501, 502, 503, 504, 401, 403, 404),
+                    session=None):
+    """
+    Request with retry and wait.
+
+    Code taking from Sandilya Bhamidipati blog post at
+    https://dev.to/ssbozy/python-requests-with-retries-4p03
+    """
+    if session is None:
+        session = requests.Session()
+
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('https://', adapter)
+    return session
+
+
+SESSION = _requests_retry()
+
 # Utility functions
+
+
 def parse_command_line():
     """
     Parse command line.
@@ -77,6 +104,11 @@ def parse_command_line():
         'with the species list (one species per line). If nothing is '
         'indicated, all the available species are used.',
         default='')
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        help='Print detailed progress.',
+        action='store_true')
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
@@ -111,32 +143,6 @@ def dictseq2fasta(dseq, geneid, out):
     exseq = dseq['seq']
     exseq = "\n".join([exseq[i:i + colw] for i in range(0, len(exseq), colw)])
     out.write(exseq + "\n")
-
-
-def _requests_retry(retries=10,
-                    backoff_factor=0.5,
-                    status_forcelist=(500, 501, 502, 503, 504, 401, 403, 404),
-                    session=None):
-    """
-    Request with retry and wait.
-
-    Code taking from Sandilya Bhamidipati blog post at
-    https://dev.to/ssbozy/python-requests-with-retries-4p03
-    """
-    if session is None:
-        session = requests.Session()
-
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
-    )
-
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('https://', adapter)
-    return session
 
 
 def _species2ensembldataset(species_name):
@@ -182,7 +188,8 @@ def _check_biomart_response(response):
 def _biomart_exons_annot_request(dataset,
                                  geneid,
                                  header=True,
-                                 allow_redirects=True):
+                                 allow_redirects=True,
+                                 quick=False):
     """
     Return all transcript information from the dataset and the ensembl geneid.
 
@@ -225,41 +232,48 @@ def _biomart_exons_annot_request(dataset,
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
 
-    req = _requests_retry().get(
-        biomart_request_url, allow_redirects=allow_redirects)
-
-    if req.status_code >= 300:
-        warnings.warn('BioMart request status for {} in {}: {}'.format(
-            geneid, dataset, req.status_code))
-
-    return req.text
-
-
-def _try_biomart_request(dataset, geneid, header=True, allow_redirects=True):
-    """To do not fail to be able to try again with another parameter."""
     try:
-        response = _biomart_exons_annot_request(
-            dataset, geneid, header=header, allow_redirects=allow_redirects)
+        if quick:
+            # the quick version does not wait and does not use retry
+            req = requests.get(biomart_request_url)
+        else:
+            req = SESSION.get(
+                biomart_request_url, allow_redirects=allow_redirects)
+        if req.status_code >= 300:
+            warnings.warn('BioMart request status for {} in {}: {}.'.format(
+                geneid, dataset, req.status_code))
+        response = req.text
     except Exception as err:  # pylint: disable=broad-except
         print(err)
         response = ''
+
     return response
 
 
 def get_biomart_exons_annot(species_name, geneid, header=True):
     """Return transcript information from a ensembl geneid and species name."""
     dataset_names = _species2ensembldataset(species_name)
+    # Try the download option quickly before retrying:
     for dataset in dataset_names:
-        response = _try_biomart_request(
+        response = _biomart_exons_annot_request(
+            dataset, geneid, header=header, quick=True)
+        if _check_biomart_response(response):
+            return response
+
+    # Now with retry and redirect:
+    for dataset in dataset_names:
+        print(dataset)
+        response = _biomart_exons_annot_request(
             dataset, geneid, header=header, allow_redirects=True)
         if _check_biomart_response(response):
             return response
         # Try without redirect. It avoids the test_download error in Travis CI
-        time.sleep(5)
-        response = _try_biomart_request(
+        time.sleep(2)
+        response = _biomart_exons_annot_request(
             dataset, geneid, header=header, allow_redirects=False)
         if _check_biomart_response(response):
             return response
+
     raise Exception(
         'It can not found {} in biomart (tried: {}).\nLast response:\n{}'.
         format(species_name, dataset_names, response))
@@ -271,10 +285,7 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
 
 def generic_ensembl_rest_request(extension, params, header):
     """Perform a generic request."""
-    request = _requests_retry().get(
-        SERVER + extension, params=params, headers=header)
-    if VERBOSE:
-        print("Trying url:" + request.url)
+    request = SESSION.get(SERVER + extension, params=params, headers=header)
     if not request.ok:
         request.raise_for_status()
         sys.exit()
@@ -321,11 +332,11 @@ def write_tsl_file(path, l_of_sptr):
         # One trick to get the good names in the header
         other_names = [
             "Species", "Name", "Transcript ID", "Source", "Experiment Source",
-            "Biotype", "Flags"
+            "Biotype", "Flags", "Version"
         ]
         cfieldnames = [
             "species", "external_name", "transcript_id", "source",
-            "logic_name", "biotype", "transcript_support_level"
+            "logic_name", "biotype", "transcript_support_level", "version"
         ]
         dnewheader = dict(x for x in zip(cfieldnames, other_names))
 
@@ -484,6 +495,12 @@ def _get_relationships(notation):
     raise ValueError('Orthology should be 1:1, 1:n or m:n')
 
 
+def _print_if(condition, *args):
+    """Print only if condition is True."""
+    if condition:
+        print(args)
+
+
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
 def main():  # pylint: disable=too-many-locals,too-many-statements
@@ -503,63 +520,70 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 2-
     orthokeep = utils.species.get_species_list(args.specieslist)
 
-    print("Searching ID for gene with name %s in species %s..." %
-          (args.genename, args.species))
+    _print_if(
+        args.verbose, "Searching ID for gene with name %s in species %s..." %
+        (args.genename, args.species))
     geneids = get_geneids_from_symbol(args.species, args.genename)
-    print("Found the following list of ids: %s" % (json.dumps(geneids)))
+    _print_if(args.verbose,
+              "Found the following list of ids: %s" % (json.dumps(geneids)))
     if not geneids:
         raise KeyError("No gene found, exiting")
     curgene = geneids[0]
     gene_name = args.genename
     cdirectory = gene_name
     query_result_subdir = os.path.join(cdirectory, "Ensembl")
-    print("Using gene id %s from now on." % (curgene))
-    print("Results will be saved in directory %s" % (cdirectory))
+    _print_if(args.verbose, "Using gene id %s from now on." % (curgene))
+    _print_if(args.verbose,
+              "Results will be saved in directory %s" % (cdirectory))
     if not os.path.exists(cdirectory):
         os.makedirs(query_result_subdir)
 
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
-    print("Writing the gene tree")
+    _print_if(args.verbose, "Writing the gene tree")
     tree_text = get_genetree(curgene)
     with open(os.path.join(query_result_subdir, "tree.nh"), "w") as treeout:
         treeout.write(tree_text)
 
-    print("Looking for orthologs :")
+    _print_if(args.verbose, "Looking for orthologs :")
     orthologs = get_orthologs(curgene)
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
-    print("Found a total of %d orthologs, of which %d paralogs" %
-          (len(orthologs), nparalogs))
+    _print_if(
+        args.verbose, "Found a total of %d orthologs, of which %d paralogs" %
+        (len(orthologs), nparalogs))
     # ['taxonomy_level']
-    print("Orthologous species:")
+    _print_if(args.verbose, "Orthologous species:")
     number = 0
     corthologs = Counter(
         [ortholog['target']['species'] for ortholog in orthologs])
     for i, j in corthologs.most_common():
-        print("  %-23s: %4d" % (i, j))
+        _print_if(args.verbose, "  %-23s: %4d" % (i, j))
         # if nt > 5: break
         number += 1
     ##
     orthologs_filtered = filter_ortho(
         orthologs, orthokeep, relationship=args.orthology)
     # TO DO print : orthokeep can be None
-    # print("Filtering on %d species, %d matches" % (len(orthokeep),
+    # _print_if(args.verbose, "Filtering on %d species, %d matches" % (len(orthokeep),
     #                                                len(orthologs_filtered)))
 
-    print("Getting all the transcripts for preparing a TSL file")
+    _print_if(args.verbose,
+              "Getting all the transcripts for preparing a TSL file")
     tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
     write_tsl_file(query_result_subdir, [tsl_cur] + tsl_ortho)
 
-    print("**** Query species : %s" % (args.species))
-    print("Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
+    _print_if(args.verbose, "**** Query species : %s" % (args.species))
+    _print_if(args.verbose,
+              "Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
     for i, j in Counter([dic['biotype'] for dic in tsl_cur]).most_common():
-        print("  %-23s: %4d" % (i, j))
-    print("**** Orthologues")
+        _print_if(args.verbose, "  %-23s: %4d" % (i, j))
+    _print_if(args.verbose, "**** Orthologues")
     for tr_o in tsl_ortho:
-        print("%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
+        _print_if(args.verbose,
+                  "%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
 
-    print("Now getting the exons sequences")
+    _print_if(args.verbose, "Now getting the exons sequences")
     # TO DO revert to multiple files if it is easier
     ffasta = os.path.join(query_result_subdir, "sequences.fasta")
     fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")
@@ -567,7 +591,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     exonstableout = open(fexonstable, "w")
     dex = get_listofexons(curgene)
     lexid = list({x['exon_id'] for x in dex})
-    print("Getting the sequences files for %s" % (curgene))
+    _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(args.species, curgene)
     exonstableout.write(extable)
@@ -579,16 +603,18 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         orthospecies = ortholog['target']['species']
         # orthotaxon = ortholog['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
-        print("Getting exons information for %s" % (ortho_name))
+        _print_if(args.verbose,
+                  "Getting exons information for %s" % (ortho_name))
         dexortho = get_listofexons(orthoid)
         lexidortho = list({x['exon_id'] for x in dexortho})
-        print("  - %d exons" % (len(lexidortho)))
+        _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
         exorthofasta = get_exons_sequences(lexidortho)
-        print("  - %d fasta sequences" % (len(exorthofasta)))
+        _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
         ortho_exontable = get_biomart_exons_annot(
             orthospecies, orthoid, header=False)
-        print("  - %d lines in the exon table" %
-              (ortho_exontable.count("\n") + 1))
+        _print_if(
+            args.verbose, "  - %d lines in the exon table" %
+            (ortho_exontable.count("\n") + 1))
         exonstableout.write(ortho_exontable)
         for dseq in exorthofasta:
             dictseq2fasta(dseq, ortho_name, fastaout)
