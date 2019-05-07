@@ -222,8 +222,6 @@ def _biomart_exons_annot_request(dataset,
         '<Attribute name = "cdna_coding_end" />'
         '<Attribute name = "genomic_coding_start" />'
         '<Attribute name = "genomic_coding_end" />'
-        '<Attribute name = "cds_start" />'
-        '<Attribute name = "cds_end" />'
         '<Attribute name = "phase" />'
         '<Attribute name = "end_phase" />'
         '</Dataset>'
@@ -231,7 +229,6 @@ def _biomart_exons_annot_request(dataset,
 
     biomart_request_url = biomart_request_url_template.format(
         data=dataset, eid=geneid, ish=int(header))
-
     try:
         if quick:
             # the quick version does not wait and does not use retry
@@ -245,6 +242,7 @@ def _biomart_exons_annot_request(dataset,
         response = req.text
     except Exception as err:  # pylint: disable=broad-except
         print(err)
+        print('Query:\n', biomart_request_url, '\n')
         response = ''
 
     return response

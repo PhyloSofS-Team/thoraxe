@@ -129,7 +129,7 @@ def read_exon_file(exon_table_file):
     # -----------
     int_cols_with_nas = [
         'cDNA coding start', 'cDNA coding end', 'Genomic coding start',
-        'Genomic coding end', 'CDS start', 'CDS end'
+        'Genomic coding end'
     ]
     exon_data = pd.read_csv(
         exon_table_file,
