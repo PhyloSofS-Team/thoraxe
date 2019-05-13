@@ -58,52 +58,64 @@ def get_transcript2phylosofs(data, exon2char):
     return transcript2phylosofs
 
 
-def prune_tree(input_path, output_path, used_proteins):
-    """
-    Delete unused proteins from the Ensembl gene tree.
-
-    The function reads the Newick tree from input_path and stores the pruned
-    tree in output_path if any error occurs, returning output_path. If an
-    error occurs, the function does not save the tree and returns None.
-
-    In the tree, each protein is identified by their ensembl translation id.
-    For each gene, Ensembl uses the longest translated transcript sequence.
-    """
-    tree = Phylo.read(input_path, "newick")
-
-    for clade in tree.get_terminals():
-        if clade.name not in used_proteins:
-            try:
-                tree.prune(clade.name)
-            except ValueError as err:
-                logging.warning(
-                    'ValueError with protein %s while prunning the tree: %s',
-                    clade.name, err)
-                return None
-
-    Phylo.write(tree, output_path, 'newick')
-
-    return output_path
-
-
-def _get_terminal_names(input_path):
-    """Return the set of terminal names in the Newick tree at input_path."""
-    tree = Phylo.read(input_path, "newick")
+def _get_terminal_names(input_tree):
+    """Return the set of terminal names in the Newick tree at input_tree."""
+    tree = Phylo.read(input_tree, "newick")
     return {clade.name for clade in tree.get_terminals()}
 
 
 def _get_protein2gene(exontable_file):
-    """Return a dictionary from protein (translation) id to gene id."""
+    """Return a pandas datafarme to map protein (translation) id to gene id."""
     data = pd.read_csv(exontable_file, sep='\t')
-    return {
-        key: value['Gene stable ID']
-        for key, value in data.
-        loc[:, ['Gene stable ID', 'Transcript stable ID']].drop_duplicates(
-        ).set_index('Transcript stable ID').to_dict(orient='index').items()
-    }
+    data = data.loc[:, ['Gene stable ID', 'Protein stable ID']].dropna(
+    ).drop_duplicates().set_index('Protein stable ID')
+    data['Gene stable ID'] = data['Gene stable ID'].astype('category')
+    return data
 
 
-# noqa TO DO : Look Gene stable ID to selected Protein stable ID before clean up data
-# noqa data.loc[:,['Gene stable ID', 'Protein stable ID']
-# noqa              ].drop_duplicates().groupby('Gene stable ID').apply(
-# noqa      lambda x: sum(i in terminal_names for i in x['Protein stable ID']))
+def _get_used_proteins(exontable_file, gene_list):
+    """
+    Return a set with the translation ids of the proteins in the gene_list.
+
+    The exontable_file downloaded from Ensembl with transcript_query is needed
+    for getting the mapping between translation and gene ids.
+    """
+    data = _get_protein2gene(exontable_file)
+    return set(data.index[data['Gene stable ID'].isin(gene_list)])
+
+
+def _get_terminals_to_delete(tree, used_proteins):
+    """Return the list of terminal nodes to delete."""
+    return [
+        clade.name for clade in tree.get_terminals()
+        if clade.name not in used_proteins and clade.name is not None
+    ]
+
+
+def prune_tree(input_tree, output_tree, exontable_file, used_genes):
+    """
+    Delete unused proteins from the Ensembl gene tree.
+
+    The function reads the Newick tree from input_tree and stores the pruned
+    tree in output_tree if any error occurs, returning output_tree. If an
+    error occurs, the function does not save the tree and returns None.
+
+    In the tree, each protein is identified by their ensembl translation id.
+    For each gene, Ensembl uses the longest translated transcript sequence.
+
+    The exontable_file downloaded from Ensembl with transcript_query is needed
+    for getting the mapping between translation and gene ids of the used_genes.
+    """
+    tree = Phylo.read(input_tree, "newick")
+    used_proteins = _get_used_proteins(exontable_file, used_genes)
+    for clade in _get_terminals_to_delete(tree, used_proteins):
+        try:
+            tree.prune(clade)
+        except ValueError as err:
+            raise Exception(
+                'Error with protein {} while prunning the tree {} : {}'.format(
+                    clade, tree, err))
+
+    Phylo.write(tree, output_tree, 'newick')
+
+    return output_tree
