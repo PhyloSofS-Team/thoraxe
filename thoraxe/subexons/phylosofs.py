@@ -73,17 +73,6 @@ def _get_protein2gene(exontable_file):
     return data
 
 
-def _get_used_proteins(exontable_file, gene_list):
-    """
-    Return a set with the translation ids of the proteins in the gene_list.
-
-    The exontable_file downloaded from Ensembl with transcript_query is needed
-    for getting the mapping between translation and gene ids.
-    """
-    data = _get_protein2gene(exontable_file)
-    return set(data.index[data['Gene stable ID'].isin(gene_list)])
-
-
 def _get_terminals_to_delete(tree, used_proteins):
     """Return the list of terminal nodes to delete."""
     return [
@@ -97,8 +86,8 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     Delete unused proteins from the Ensembl gene tree.
 
     The function reads the Newick tree from input_tree and stores the pruned
-    tree in output_tree if any error occurs, returning output_tree. If an
-    error occurs, the function does not save the tree and returns None.
+    tree in output_tree and returning the output_tree path. If an
+    error occurs, the function does not save the tree and raises an Exception.
 
     In the tree, each protein is identified by their ensembl translation id.
     For each gene, Ensembl uses the longest translated transcript sequence.
@@ -107,14 +96,21 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     for getting the mapping between translation and gene ids of the used_genes.
     """
     tree = Phylo.read(input_tree, "newick")
-    used_proteins = _get_used_proteins(exontable_file, used_genes)
+    data = _get_protein2gene(exontable_file)
+
+    # Delete unused proteins
+    used_proteins = set(data.index[data['Gene stable ID'].isin(used_genes)])
     for clade in _get_terminals_to_delete(tree, used_proteins):
         try:
             tree.prune(clade)
         except ValueError as err:
             raise Exception(
                 'Error with protein {} while prunning the tree {} : {}'.format(
-                    clade, tree, err))
+                    clade, tree, err))Exception
+
+    # Use gene id instead of protein/peptide/translation id in the tree
+    for clade in tree.get_terminals():
+        clade.name = data.loc[clade.name]
 
     Phylo.write(tree, output_tree, 'newick')
 
