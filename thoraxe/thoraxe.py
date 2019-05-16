@@ -284,19 +284,6 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
     return cluster2data
 
 
-def _intermediate_output_folder(output_folder):
-    """
-    Return path to _thoraxe_intermediate_outputs folder.
-
-    This function creates the folder if it doesn't exist.
-    """
-    intermediate_output_path = os.path.join(output_folder,
-                                            '_thoraxe_intermediate_outputs')
-    if not os.path.exists(intermediate_output_path):
-        os.makedirs(intermediate_output_path, exist_ok=True)  # Python 3.2+
-    return intermediate_output_path
-
-
 def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
@@ -312,7 +299,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         species_list=None):
     """Perform almost all the pipeline."""
 
-    intermediate_output_path = _intermediate_output_folder(output_folder)
+    intermediate_output_path = utils.folders.create_subfolder(
+        output_folder, '_thoraxe_intermediate_outputs')
 
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(
@@ -422,7 +410,8 @@ def main():
     input_folder = os.path.abspath(args.inputdir)
     output_folder = input_folder if args.outputdir == '' else args.outputdir
 
-    intermediate_output_path = _intermediate_output_folder(output_folder)
+    intermediate_output_path = utils.folders.create_subfolder(
+        output_folder, '_thoraxe_intermediate_outputs')
 
     transcript_table = get_transcripts(input_folder, species_list=species_list)
     subexon_table = get_subexons(
