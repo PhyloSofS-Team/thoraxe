@@ -72,9 +72,14 @@ def parse_command_line():
         type=int,
         default=10)
     parser.add_argument(
+        '-y',
+        '--phylosofs',
+        help='Save inputs to run PhyloSofS in the phylosofs folder.',
+        action='store_true')
+    parser.add_argument(
         '--plot_chimerics',
         help='Save plotly/html plot for the chimeric alignments in the '
-        '_thoraxe_intermediate_outputs folder.',
+        '_intermediate_outputs folder.',
         action='store_true')
     parser.add_argument(
         '-l',
@@ -300,7 +305,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
     """Perform almost all the pipeline."""
 
     intermediate_output_path = utils.folders.create_subfolder(
-        output_folder, '_thoraxe_intermediate_outputs')
+        output_folder, '_intermediate_outputs')
 
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(
@@ -411,7 +416,7 @@ def main():
     output_folder = input_folder if args.outputdir == '' else args.outputdir
 
     intermediate_output_path = utils.folders.create_subfolder(
-        output_folder, '_thoraxe_intermediate_outputs')
+        output_folder, '_intermediate_outputs')
 
     transcript_table = get_transcripts(input_folder, species_list=species_list)
     subexon_table = get_subexons(
@@ -458,6 +463,11 @@ def main():
     subexons.graph.splice_graph_gml(
         os.path.join(output_folder, "splice_graph.gml"), node2genes,
         edge2genes)
+
+    if args.phylosofs:
+        subexons.phylosofs.phylosofs_inputs(
+            subexon_table, os.path.join(input_folder, 'Ensembl'),
+            output_folder)
 
 
 if __name__ == '__main___':

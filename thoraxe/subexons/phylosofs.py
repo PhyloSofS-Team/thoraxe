@@ -4,17 +4,19 @@ phylosofs: Functions to generate PhyloSofS input.
 
 import os
 import string
+import warnings
 
 import numpy as np
 import pandas as pd
 
 from Bio import Phylo
+from Bio import BiopythonWarning
 from thoraxe import utils
 
 CHARS = [
     char for char in string.printable if char not in {
         ' ', '\t', '\n', '\r', '\x0b', '\x0c', '\\', '*', '>', '"', "'", ',',
-        '-', '_', '/', ';'
+        '-', '_', '/', ';', '#', '$'
     }
 ]
 
@@ -103,8 +105,12 @@ def _get_terminal_names(input_tree):
 def _get_protein2gene(exontable_file):
     """Return a pandas datafarme to map protein (translation) id to gene id."""
     data = pd.read_csv(exontable_file, sep='\t')
-    data = data.loc[:, ['Gene stable ID', 'Protein stable ID']].dropna(
-    ).drop_duplicates().set_index('Protein stable ID')
+    with warnings.catch_warnings():
+        # Bio/Seq.py : class Seq : __hash__ : warnings.warn
+        warnings.simplefilter('ignore', BiopythonWarning)
+        data = data.loc[:, ['Gene stable ID', 'Protein stable ID']].dropna(
+        ).drop_duplicates().set_index('Protein stable ID')
+
     data['Gene stable ID'] = data['Gene stable ID'].astype('category')
     return data
 
@@ -158,8 +164,8 @@ def _int_length(length, seq):
     if not isinstance(length, str) and np.isnan(length):
         return len(seq)
 
-    if isinstance(length, np.float):
-        return np.array([length]).astype(int)[0]
+    if length == '':
+        return len(seq)
 
     return int(length)
 
@@ -169,7 +175,7 @@ def _fill_sequence_and_annotation(df_group, exon2char):
     exon_annot = []
     seqs = []
     for _, row in df_group.iterrows():
-        seq = row['Exon protein sequence'].replace('*', '')
+        seq = str(row['Exon protein sequence']).replace('*', '')
         if '-' in row['HomologousExons']:
             exons = row['HomologousExons'].split('-')
             exon_lengths = row['HomologousExonLengths'].split('-')
@@ -191,14 +197,17 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
     homologous exon for each residue.
     """
     with open(output_file, 'w') as file:
-        groups = exon_data.loc[:, [
-            'Gene stable ID', 'Transcript stable ID', 'Exon protein sequence',
-            'Subexon rank in transcript', 'HomologousExons',
-            'HomologousExonLengths'
-        ]].drop_duplicates().sort_values(by=[
-            'Gene stable ID', 'Transcript stable ID',
-            'Subexon rank in transcript'
-        ]).groupby(['Gene stable ID', 'Transcript stable ID'])
+        with warnings.catch_warnings():
+            # Bio/Seq.py : class Seq : __hash__ : warnings.warn
+            warnings.simplefilter('ignore', BiopythonWarning)
+            groups = exon_data.loc[:, [
+                'Gene stable ID', 'Transcript stable ID',
+                'Exon protein sequence', 'Subexon rank in transcript',
+                'HomologousExons', 'HomologousExonLengths'
+            ]].drop_duplicates().sort_values(by=[
+                'Gene stable ID', 'Transcript stable ID',
+                'Subexon rank in transcript'
+            ]).groupby(['Gene stable ID', 'Transcript stable ID'])
         for (gene, transcript), group in groups:
             seq, annot = _fill_sequence_and_annotation(group, exon2char)
             file.write(">P1;{} {} {}\n".format(

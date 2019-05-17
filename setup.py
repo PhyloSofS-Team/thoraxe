@@ -30,7 +30,7 @@ setup(
     package_data={'thoraxe': ['subexons/assets/cluster_plots.html']},
     setup_requires=['pytest-runner'],
     install_requires=[
-        'pandas', 'biopython', 'requests', 'numpy', 'recordclass',
+        'pandas', 'biopython>1.44', 'requests', 'numpy', 'recordclass',
         'scikit-bio', 'urllib3'
     ],
     test_suite='tests',

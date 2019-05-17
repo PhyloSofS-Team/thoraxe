@@ -518,9 +518,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 2-
     orthokeep = utils.species.get_species_list(args.specieslist)
 
-    _print_if(
-        args.verbose, "Searching ID for gene with name %s in species %s..." %
-        (args.genename, args.species))
+    print("Searching ID for gene with name %s in species %s ..." %
+          (args.genename, args.species))
     geneids = get_geneids_from_symbol(args.species, args.genename)
     _print_if(args.verbose,
               "Found the following list of ids: %s" % (json.dumps(geneids)))
@@ -530,7 +529,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     gene_name = args.genename
     cdirectory = gene_name
     query_result_subdir = os.path.join(cdirectory, "Ensembl")
-    _print_if(args.verbose, "Using gene id %s from now on." % (curgene))
+    print("... using gene id %s from now on." % (curgene))
     _print_if(args.verbose,
               "Results will be saved in directory %s" % (cdirectory))
     if not os.path.exists(cdirectory):
@@ -538,12 +537,12 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
 
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
-    _print_if(args.verbose, "Writing the gene tree")
+    print("Writing the gene tree")
     tree_text = get_genetree(curgene)
     with open(os.path.join(query_result_subdir, "tree.nh"), "w") as treeout:
         treeout.write(tree_text)
 
-    _print_if(args.verbose, "Looking for orthologs :")
+    print("Looking for orthologs")
     orthologs = get_orthologs(curgene)
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
@@ -563,11 +562,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     orthologs_filtered = filter_ortho(
         orthologs, orthokeep, relationship=args.orthology)
     # TO DO print : orthokeep can be None
-    # _print_if(args.verbose, "Filtering on %d species, %d matches" % (len(orthokeep),
-    #                                                len(orthologs_filtered)))
+    # _print_if(args.verbose,
+    # "Filtering on %d species, %d matches" % (len(orthokeep),
+    #                                          len(orthologs_filtered)))
 
-    _print_if(args.verbose,
-              "Getting all the transcripts for preparing a TSL file")
+    print("Getting all the transcripts for TSL file")
     tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
     write_tsl_file(query_result_subdir, [tsl_cur] + tsl_ortho)
 
@@ -581,7 +580,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         _print_if(args.verbose,
                   "%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
 
-    _print_if(args.verbose, "Now getting the exons sequences")
+    print("Getting exons sequences")
     # TO DO revert to multiple files if it is easier
     ffasta = os.path.join(query_result_subdir, "sequences.fasta")
     fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")

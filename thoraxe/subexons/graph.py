@@ -18,21 +18,19 @@ def nodes_and_edges2genes(data):
         for _, transcript in gene.groupby('Transcript stable ID'):
             subexons = transcript.sort_values(
                 'Subexon rank in transcript')['HomologousExons']
-            previous = ''
+
+            previous = 'start'
+            node2genes[previous].update({gene_id})
             for _, subexon in enumerate(subexons):
                 orthologs = subexon.split('-')
-                for j, ortholog in enumerate(orthologs):
-                    if j == 0:
-                        if previous != '':
-                            node2genes[previous].update({gene_id})
-                            node2genes[ortholog].update({gene_id})
-                            edge2genes[(previous, ortholog)].update({gene_id})
-                        previous = ortholog
-                        continue
-                    node2genes[previous].update({gene_id})
+                for ortholog in orthologs:
                     node2genes[ortholog].update({gene_id})
                     edge2genes[(previous, ortholog)].update({gene_id})
                     previous = ortholog
+
+            node2genes['stop'].update({gene_id})
+            edge2genes[(previous, 'stop')].update({gene_id})
+
     return node2genes, edge2genes
 
 
