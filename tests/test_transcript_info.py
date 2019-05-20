@@ -45,7 +45,7 @@ def test_read_transcript_info(mapk8):
     trx_data = transcript_info.read_transcript_info(
         mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
 
-    assert trx_data.loc[trx_data['Transcript stable ID'] ==
+    assert trx_data.loc[trx_data['TranscriptStableID'] ==
                         'ENST00000374179', 'Flags'].unique(
                         )[0] == '1 (assigned to previous version 7)'
 
@@ -65,7 +65,7 @@ def test_remove_na(mapk8):
                for value in trx_data.Biotype.unique()) == 0
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
-    assert sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933') == 0
+    assert sum(trx_data['TranscriptStableID'] == 'ENSRNOT00000083933') == 0
 
 
 def test_species_list(mapk8):
@@ -90,7 +90,7 @@ def test_keep_badquality_sequences(mapk8):
         remove_badquality=False)
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
-    assert sum(trx_data['Transcript stable ID'] == 'ENSRNOT00000083933') == 5
+    assert sum(trx_data['TranscriptStableID'] == 'ENSRNOT00000083933') == 5
 
 
 def test_non_coding_exons_camk2a(camk2a):
@@ -100,8 +100,8 @@ def test_non_coding_exons_camk2a(camk2a):
     # The two first exons of ENSSSCT00000052397 are non-coding
     assert ''.join(
         str(exon)
-        for exon in trx_data.loc[trx_data['Transcript stable ID'] ==
-                                 'ENSSSCT00000052397', 'Exon protein sequence']
+        for exon in trx_data.loc[trx_data['TranscriptStableID'] ==
+                                 'ENSSSCT00000052397', 'ExonProteinSequence']
     ) == ('MLLFLALWALVPCLVLLSLYFYSSAGGKSGGNKKNDGVKKRKSSSSVQLMESSESTNTTI'
           'EDEDTKVRKQEIIKVTEQLIEAISNGDFESYTKMCDPGMTAFEPEALGNLVEGLDFHRFY'
           'FENLWSRNSKPVHTTILNPHIHLMGDESACIAYIRITQYLDAGGIPRTAQSEETRVWHRR'
@@ -116,9 +116,9 @@ def test_non_coding_exons_grin1(grin1):
     # The unique coding exon has UTR at both ends.
     assert ''.join(
         str(exon) for exon in
-        trx_data.loc[trx_data['Transcript stable ID cluster'].
+        trx_data.loc[trx_data['TranscriptStableIDCluster'].
                      map(lambda ids: 'ENSMUST00000099506' in ids.split('/')
-                         ), 'Exon protein sequence']
+                         ), 'ExonProteinSequence']
     ) == ('MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
           'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
           'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
@@ -144,11 +144,11 @@ def test_exon_clustering(mapk8):
     clustered = transcript_info.exon_clustering(trx_data)
 
     # Input order doesn't change
-    assert all(clustered['Exon stable ID'] == trx_data['Exon stable ID'])
+    assert all(clustered['ExonStableID'] == trx_data['ExonStableID'])
 
     # Exon can not have more than one cluster
     assert all(
-        clustered.groupby('Exon stable ID').apply(lambda df: len(df[
+        clustered.groupby('ExonStableID').apply(lambda df: len(df[
             'Cluster'].unique()) == 1))
 
     # Non-clustered exons have Cluster == 0 and QueryExon == ''
@@ -160,14 +160,14 @@ def test_exon_clustering(mapk8):
     # Sequences with less than 4 residues are non-clustered by default
     assert all(
         clustered.
-        loc[clustered['Exon protein sequence'].map(len) < 4, 'Cluster'] == 0)
+        loc[clustered['ExonProteinSequence'].map(len) < 4, 'Cluster'] == 0)
 
     for _, group in clustered.groupby('Cluster'):
         nans = np.isnan(group['PercentIdentity'])
         # There is a nan in PercentIdentity when a sequence initialize its own
-        # cluster, so the QueryExon and the Exon stable ID should be the same
+        # cluster, so the QueryExon and the ExonStableID should be the same
         assert np.all(
-            group.loc[nans, 'QueryExon'] == group.loc[nans, 'Exon stable ID'])
+            group.loc[nans, 'QueryExon'] == group.loc[nans, 'ExonStableID'])
         # Also, if there are more exons, the exons with nan should be the
         # QueryExon of other exon in the cluster. It can not be alone.
         if len(group) > 1:
@@ -178,9 +178,9 @@ def test_exon_clustering(mapk8):
 
             # The aligned seq should be in the exon
             subset = group[np.logical_not(nans)]
-            for _, exon in subset.groupby('Exon stable ID cluster'):
+            for _, exon in subset.groupby('ExonStableIDCluster'):
                 assert np.any([
                     row['AlignedTarget'].replace(
-                        '-', '') in row['Exon protein sequence']
+                        '-', '') in row['ExonProteinSequence']
                     for _, row in exon.iterrows()
                 ])

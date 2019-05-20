@@ -85,11 +85,11 @@ def get_transcript2phylosofs(data, exon2char):
     Return a dictionary from transcript id to its phylosofs representation.
     """
     transcript2phylosofs = {}
-    for _, gene in data.groupby('Gene stable ID'):
-        for transcript_id, transcript in gene.groupby('Transcript stable ID'):
+    for _, gene in data.groupby('GeneStableID'):
+        for transcript_id, transcript in gene.groupby('TranscriptStableID'):
             phylosofs = []
             for subexon in transcript.sort_values(
-                    'Subexon rank in transcript')['HomologousExons']:
+                    'SubexonRank')['HomologousExons']:
                 for ortholog in subexon.split('-'):
                     phylosofs.append(exon2char[ortholog])
             transcript2phylosofs[transcript_id] = ''.join(phylosofs)
@@ -108,10 +108,10 @@ def _get_protein2gene(exontable_file):
     with warnings.catch_warnings():
         # Bio/Seq.py : class Seq : __hash__ : warnings.warn
         warnings.simplefilter('ignore', BiopythonWarning)
-        data = data.loc[:, ['Gene stable ID', 'Protein stable ID']].dropna(
-        ).drop_duplicates().set_index('Protein stable ID')
+        data = data.loc[:, ['GeneStableID', 'ProteinStableID']].dropna(
+        ).drop_duplicates().set_index('ProteinStableID')
 
-    data['Gene stable ID'] = data['Gene stable ID'].astype('category')
+    data['GeneStableID'] = data['GeneStableID'].astype('category')
     return data
 
 
@@ -141,7 +141,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     data = _get_protein2gene(exontable_file)
 
     # Delete unused proteins
-    used_proteins = set(data.index[data['Gene stable ID'].isin(used_genes)])
+    used_proteins = set(data.index[data['GeneStableID'].isin(used_genes)])
     for clade in _get_terminals_to_delete(tree, used_proteins):
         try:
             tree.prune(clade)
@@ -175,7 +175,7 @@ def _fill_sequence_and_annotation(df_group, exon2char):
     exon_annot = []
     seqs = []
     for _, row in df_group.iterrows():
-        seq = str(row['Exon protein sequence']).replace('*', '')
+        seq = str(row['ExonProteinSequence']).replace('*', '')
         if '-' in row['HomologousExons']:
             exons = row['HomologousExons'].split('-')
             exon_lengths = row['HomologousExonLengths'].split('-')
@@ -201,13 +201,13 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
             groups = exon_data.loc[:, [
-                'Gene stable ID', 'Transcript stable ID',
-                'Exon protein sequence', 'Subexon rank in transcript',
+                'GeneStableID', 'TranscriptStableID',
+                'ExonProteinSequence', 'SubexonRank',
                 'HomologousExons', 'HomologousExonLengths'
             ]].drop_duplicates().sort_values(by=[
-                'Gene stable ID', 'Transcript stable ID',
-                'Subexon rank in transcript'
-            ]).groupby(['Gene stable ID', 'Transcript stable ID'])
+                'GeneStableID', 'TranscriptStableID',
+                'SubexonRank'
+            ]).groupby(['GeneStableID', 'TranscriptStableID'])
         for (gene, transcript), group in groups:
             seq, annot = _fill_sequence_and_annotation(group, exon2char)
             file.write(">P1;{} {} {}\n".format(
@@ -221,12 +221,12 @@ def _save_transcripts(exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
     with open(output_file, 'w') as file:
         gene_transcripts = exon_data.loc[:, [
-            'Gene stable ID', 'Transcript stable ID'
+            'GeneStableID', 'TranscriptStableID'
         ]].sort_values(
-            by=['Gene stable ID', 'Transcript stable ID']).drop_duplicates()
-        for gene, group in gene_transcripts.groupby('Gene stable ID'):
+            by=['GeneStableID', 'TranscriptStableID']).drop_duplicates()
+        for gene, group in gene_transcripts.groupby('GeneStableID'):
             file.write("{} ".format(gene))
-            transcripts = group['Transcript stable ID']
+            transcripts = group['TranscriptStableID']
             n_transcripts = len(transcripts)
             for i in range(n_transcripts):
                 file.write(transcript2phylosofs[transcripts.iloc[i]])
@@ -250,7 +250,7 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
         os.path.join(ensembl_folder, 'tree.nh'),
         os.path.join(output_path, 'tree.nh'),
         os.path.join(ensembl_folder, 'exonstable.tsv'),
-        exon_data['Gene stable ID'].unique())
+        exon_data['GeneStableID'].unique())
 
     with open(os.path.join(output_path, 'homologous_exons.tsv'), 'w') as file:
         for exon, char in exon2char.items():

@@ -211,8 +211,6 @@ def _biomart_exons_annot_request(dataset,
         '<Attribute name = "ensembl_gene_id" />'
         '<Attribute name = "ensembl_transcript_id" />'
         '<Attribute name = "ensembl_peptide_id" />'
-        '<Attribute name = "transcript_start" />'
-        '<Attribute name = "transcript_end" />'
         '<Attribute name = "strand" />'
         '<Attribute name = "ensembl_exon_id" />'
         '<Attribute name = "exon_chrom_start" />'
@@ -329,7 +327,7 @@ def write_tsl_file(path, l_of_sptr):
     with open(os.path.join(path, "tsl.csv"), "w") as csvout:
         # One trick to get the good names in the header
         other_names = [
-            "Species", "Name", "Transcript ID", "Source", "Experiment Source",
+            "Species", "Name", "TranscriptID", "Source", "ExperimentSource",
             "Biotype", "Flags", "Version"
         ]
         cfieldnames = [
@@ -493,6 +491,28 @@ def _get_relationships(notation):
     raise ValueError('Orthology should be 1:1, 1:n or m:n')
 
 
+def _rename(table_text):
+    """Rename columns"""
+    table_text = table_text.replace('Gene stable ID', 'GeneStableID', 1)
+    table_text = table_text.replace('Transcript stable ID',
+                                    'TranscriptStableID', 1)
+    table_text = table_text.replace('Protein stable ID', 'ProteinStableID', 1)
+    table_text = table_text.replace('Exon stable ID', 'ExonStableID', 1)
+    table_text = table_text.replace('Exon region start (bp)',
+                                    'ExonRegionStart', 1)
+    table_text = table_text.replace('Exon region end (bp)', 'ExonRegionEnd', 1)
+    table_text = table_text.replace('Exon rank in transcript', 'ExonRank', 1)
+    table_text = table_text.replace('cDNA coding start', 'cDNA_CodingStart', 1)
+    table_text = table_text.replace('cDNA coding end', 'cDNA_CodingEnd', 1)
+    table_text = table_text.replace('Genomic coding start',
+                                    'GenomicCodingStart', 1)
+    table_text = table_text.replace('Genomic coding end', 'GenomicCodingEnd',
+                                    1)
+    table_text = table_text.replace('Start phase', 'StartPhase', 1)
+    table_text = table_text.replace('End phase', 'EndPhase', 1)
+    return table_text
+
+
 def _print_if(condition, *args):
     """Print only if condition is True."""
     if condition:
@@ -591,6 +611,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(args.species, curgene)
+    extable = _rename(extable)
     exonstableout.write(extable)
     exons_name = "%s:%s" % (args.species, args.genename)
     for dseq in exfasta:

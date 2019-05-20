@@ -26,23 +26,23 @@ def test_subexon_table(clustered_trx_data):
     data = clustered_trx_data('GRIN1')
     subexon_table = subexons.create_subexon_table(data)
 
-    assert 'Subexon ID' in subexon_table.columns
-    assert 'Subexon ID cluster' in subexon_table.columns
+    assert 'SubexonID' in subexon_table.columns
+    assert 'SubexonIDCluster' in subexon_table.columns
 
     assert 'ENSMUST00000099506/ENSMUST00000135343' in subexon_table[
-        'Transcript stable ID cluster'].values  # .values, otherwise in
+        'TranscriptStableIDCluster'].values  # .values, otherwise in
     # checks whether the value is in the Series' index.
 
-    assert all(subexon_table['Transcript fraction'] == 1.0)
+    assert all(subexon_table['TranscriptFraction'] == 1.0)
 
 
 def test_subexon_clusters(clustered_trx_data):
     data = clustered_trx_data('MAPK8')
     subexon_table = subexons.create_subexon_table(data)
     assert len(
-        subexon_table.loc[subexon_table['Subexon ID cluster'] ==
+        subexon_table.loc[subexon_table['SubexonIDCluster'] ==
                           'ENSMMUE00000040028_SE_0/ENSMMUE00000387789_SE_0',
-                          'Subexon ID'].unique()) == 1
+                          'SubexonID'].unique()) == 1
 
     # 426 rows with before merging non-redundant contiguous subexons
     not_merged = subexons.create_subexon_table(data, merge_non_redundant=False)
@@ -52,37 +52,37 @@ def test_subexon_clusters(clustered_trx_data):
 
     # QVQQ
     assert len(
-        not_merged[not_merged['Subexon ID'] == 'ENSMUSE00000689835_SE_2']) > 0
+        not_merged[not_merged['SubexonID'] == 'ENSMUSE00000689835_SE_2']) > 0
     assert len(
-        not_merged[not_merged['Subexon ID'] == 'ENSMUSE00000689835_SE_1']) > 0
-    assert len(subexon_table[subexon_table['Subexon ID'] ==
+        not_merged[not_merged['SubexonID'] == 'ENSMUSE00000689835_SE_1']) > 0
+    assert len(subexon_table[subexon_table['SubexonID'] ==
                              'ENSMUSE00000689835_SE_2']) == 0
-    assert len(subexon_table[subexon_table['Subexon ID'] ==
+    assert len(subexon_table[subexon_table['SubexonID'] ==
                              'ENSMUSE00000689835_SE_1']) == 0
-    qvqq = subexon_table[subexon_table['Subexon ID'] ==
+    qvqq = subexon_table[subexon_table['SubexonID'] ==
                          'ENSMUSE00000689835_SE_2_1']
     assert len(qvqq) == 2
-    assert sorted(qvqq['Transcript stable ID']) == [
+    assert sorted(qvqq['TranscriptStableID']) == [
         'ENSMUST00000111943', 'ENSMUST00000111945'
     ]
     for index in [0, 1]:
         assert qvqq['Strand'].iloc[index] == -1
-        assert str(qvqq['Exon protein sequence'].iloc[index]) == 'QVQQ*'
-        assert str(qvqq['Subexon sequence'].iloc[index]) == 'CACAGGTGCAGCAATGA'
-        assert qvqq['Exon stable ID cluster'].iloc[
+        assert str(qvqq['ExonProteinSequence'].iloc[index]) == 'QVQQ*'
+        assert str(qvqq['SubexonSequence'].iloc[index]) == 'CACAGGTGCAGCAATGA'
+        assert qvqq['ExonStableIDCluster'].iloc[
             index] == 'ENSMUSE00000689835/ENSMUSE00000689841'
 
     # VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR
-    exon_row = subexon_table[subexon_table['Exon stable ID'] ==
+    exon_row = subexon_table[subexon_table['ExonStableID'] ==
                              'ENSMMUE00000040064'].iloc[0]
-    assert exon_row['Subexon ID'] == 'ENSMMUE00000040064_SE_15_16'
-    assert exon_row['Subexon ID cluster'] == 'ENSMMUE00000040064_SE_15_16'
-    assert str(exon_row['Exon protein sequence']
+    assert exon_row['SubexonID'] == 'ENSMMUE00000040064_SE_15_16'
+    assert exon_row['SubexonIDCluster'] == 'ENSMMUE00000040064_SE_15_16'
+    assert str(exon_row['ExonProteinSequence']
                ) == 'VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR*'
-    assert str(exon_row['Subexon sequence']) == (
+    assert str(exon_row['SubexonSequence']) == (
         'CAGTGATCAATGGCTCTCAGCATCCATCGTCATCGTCGTCTGTCAATGATGTGTCTTCAA'
         'TGTCAACAGATCCGACTTTGGCCTCGGATACAGACAGCAGTCTAGAAGCATCAGCTGGGC'
         'CTCTGGGCTGCTGTAGATGA')
     assert exon_row['Strand'] == 1
-    assert exon_row['Subexon genomic coding start'] == 42539779
-    assert exon_row['Subexon genomic coding end'] == 42539918
+    assert exon_row['SubexonGenomicCodingStart'] == 42539779
+    assert exon_row['SubexonGenomicCodingEnd'] == 42539918

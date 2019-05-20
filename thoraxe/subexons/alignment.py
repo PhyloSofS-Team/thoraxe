@@ -30,19 +30,19 @@ ColCluster = recordclass(  # pylint: disable=invalid-name
     'ColCluster', ['patterns', 'consensus', 'start', 'end'])
 
 
-def subexon_connectivity(subexon_table, id_column='Subexon ID cluster'):
+def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
     """
     Return a set of connected subexon tuples.
 
-    Each tuple has two elements, 'Subexon ID cluster' (directed) pairs.
+    Each tuple has two elements, 'SubexonIDCluster' (directed) pairs.
     The first subexon appears before of the second in at least one transcript.
     """
     connected_pairs = []
     col_index = subexon_table.columns.get_loc(id_column)
     for _, transcript_df in subexon_table.groupby(
-            'Transcript stable ID cluster'):
+            'TranscriptStableIDCluster'):
         transcript = transcript_df.sort_values(
-            by='Subexon rank in transcript', ascending=True)
+            by='SubexonRank', ascending=True)
         nrows = transcript.shape[0]
         if nrows > 1:
             for row_index in range(1, nrows):
@@ -54,23 +54,23 @@ def subexon_connectivity(subexon_table, id_column='Subexon ID cluster'):
 
 def _create_subexon_index(subexon_table):
     """Return a pandas' DataFrame with subexon information."""
-    # NOTE : Subexon ID is the same for subexons with the same sequence
+    # NOTE : SubexonID is the same for subexons with the same sequence
     # taking phases into account. Being more specific with the subset
     # columns may cause duplicated subexons in the chimeric sequence.
-    subset_columns = ['Subexon ID', 'Gene stable ID']
+    subset_columns = ['SubexonID', 'GeneStableID']
     unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
     unique_subexons = unique_subexons.assign(Order=[
-        row['Subexon genomic coding start'] if row['Strand'] == 1 else (
-            -1 * row['Subexon genomic coding end'])
+        row['SubexonGenomicCodingStart'] if row['Strand'] == 1 else (
+            -1 * row['SubexonGenomicCodingEnd'])
         for _, row in unique_subexons.iterrows()
     ])
 
     unique_subexons = unique_subexons.sort_values(by=['Order'])
 
     unique_subexons = unique_subexons.loc[:, [
-        'Subexon ID', 'Subexon genomic coding start', 'Exon protein sequence',
-        'Subexon genomic coding end', 'Subexon rank in transcript'
+        'SubexonID', 'SubexonGenomicCodingStart', 'ExonProteinSequence',
+        'SubexonGenomicCodingEnd', 'SubexonRank'
     ]]
 
     unique_subexons = unique_subexons.assign(
@@ -86,7 +86,7 @@ def _create_subexon_index(subexon_table):
 
 def _create_transcript_index(subexon_table):
     """Return a pandas' DataFrame with the gene and transcript ids."""
-    transcript_id_columns = ['Gene stable ID', 'Transcript stable ID']
+    transcript_id_columns = ['GeneStableID', 'TranscriptStableID']
     unique_transcripts = subexon_table.drop_duplicates(
         subset=transcript_id_columns)
 
@@ -122,7 +122,7 @@ def create_subexon_matrix(subexon_table):
 
 def _get_sequence(subexon_info,
                   subexon_column,
-                  sequence_column='Exon protein sequence'):
+                  sequence_column='ExonProteinSequence'):
     """
     Return the sequence of the subexon as a string.
 
@@ -143,15 +143,15 @@ def create_chimeric_sequences(  # pylint: disable=too-many-locals
     """
     Create chimeric sequence for Clustal Omega.
 
-    It returns a Dict from 'Gene stable ID' to a tuple with the chimeric
+    It returns a Dict from 'GeneStableID' to a tuple with the chimeric
     sequence and a Dict from 'SubexonIndex' to ...
     """
     chimerics = {}
-    for gene_id, gene_df in subexon_table.groupby('Gene stable ID'):
+    for gene_id, gene_df in subexon_table.groupby('GeneStableID'):
 
         # DataFrame to get a subexon information using its 'SubexonIndex'
         subexon_info_cols = [
-            'SubexonIndex', 'Subexon ID cluster', 'Exon protein sequence'
+            'SubexonIndex', 'SubexonIDCluster', 'ExonProteinSequence'
         ]
         subexon_info = gene_df.loc[:, subexon_info_cols]
         # NOTE: It make copies to not delete subexons inplace:
@@ -179,8 +179,8 @@ def create_chimeric_sequences(  # pylint: disable=too-many-locals
             subexon = subexon_index[idx]
             # Does it need padding ?
             if chimeric and not chimeric.endswith(padding) and (
-                    subexon_info.loc[previous_subexon, 'Subexon ID cluster'],
-                    subexon_info.loc[subexon, 'Subexon ID cluster']
+                    subexon_info.loc[previous_subexon, 'SubexonIDCluster'],
+                    subexon_info.loc[subexon, 'SubexonIDCluster']
             ) not in connected_subexons:
                 chimeric += padding
             chimeric += _get_sequence(subexon_info, subexon)
@@ -326,10 +326,10 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
 
 
 def gene2species(transcript_data):
-    """Return the a dict from 'Gene stable ID' to 'Species'."""
+    """Return the a dict from 'GeneStableID' to 'Species'."""
     return pd.Series(
         transcript_data.Species.values,
-        index=transcript_data['Gene stable ID']).to_dict()
+        index=transcript_data['GeneStableID']).to_dict()
 
 
 def sort_species(chimerics, gene2sp, species_list=None):
@@ -396,7 +396,7 @@ def _fill_msa_matrix(msa_matrix,
 
 
 def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
-    """Return the msa as a matrix of 'Subexon ID cluster'."""
+    """Return the msa as a matrix of 'SubexonIDCluster'."""
     n_seq = len(msa)
     n_col = msa.get_alignment_length()
     msa_matrix = np.empty((n_seq, n_col), dtype=object)
@@ -404,7 +404,7 @@ def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
     index2cluster = {
         index: cluster
         for index, cluster in zip(subexon_df['SubexonIndex'],
-                                  subexon_df['Subexon ID cluster'])
+                                  subexon_df['SubexonIDCluster'])
     }
     for seq_index in range(0, n_seq):
         _fill_msa_matrix(msa_matrix, chimerics, msa,
@@ -502,7 +502,7 @@ def _delete_subexons(subexons, msa_matrix, subexon_matrix):
 
 
 def delete_subexons(subexon_df, chimerics, msa, cutoff=30.0, min_col_number=4):
-    """Return the list of 'Subexon ID cluster' to delete from 'Cluster'."""
+    """Return the list of 'SubexonIDCluster' to delete from 'Cluster'."""
     complete_set = set([])
     msa_matrix, subexon_matrix = msa_matrices(subexon_df, chimerics, msa)
     to_delete = _subexons_to_delete(
@@ -650,7 +650,7 @@ def _store_homologous_subexons(subexon_df, seq, subexon, gene, exon_id):
     seq = seq.replace('-', '')
     length = len(seq)
     query = (subexon_df['SubexonIndex'] == subexon) & (
-        subexon_df['Gene stable ID'] == gene)
+        subexon_df['GeneStableID'] == gene)
     value = subexon_df.loc[query, 'HomologousExons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'HomologousExons'] += '-{}'.format(exon_id)

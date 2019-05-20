@@ -131,7 +131,7 @@ def get_subexons(  # pylint: disable=too-many-arguments
 
 def merge_clusters(subexon_table):
     """Merge 'Cluster's that share subexons."""
-    clusters_df = subexon_table.groupby('Subexon ID cluster').agg(
+    clusters_df = subexon_table.groupby('SubexonIDCluster').agg(
         {'Cluster': lambda col: set(val for val in col if val != 0)})
     cluster_lists = clusters_df.loc[map(lambda x: len(
         x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
@@ -266,7 +266,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
             species_list=species_list)
         while to_delete:
             delete = [
-                subexon_table.loc[index, 'Subexon ID cluster'] in to_delete
+                subexon_table.loc[index, 'SubexonIDCluster'] in to_delete
                 for index in cluster_index
             ]
             for index in cluster_index[delete]:
@@ -383,7 +383,7 @@ def update_subexon_table(subexon_table, cluster2data):
         'HomologousExonLengths', 'HomologousExonSequences', 'HomologousExons',
         'SubexonIndex'
     ]
-    key_col = 'Subexon ID cluster'
+    key_col = 'SubexonIDCluster'
     subexon2data = {}
     for (_, data) in cluster2data.items():
         cluster_df = data[0]

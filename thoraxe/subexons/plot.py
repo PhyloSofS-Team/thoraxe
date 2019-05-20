@@ -44,9 +44,9 @@ def create_python_structure(cluster2data):
         msa_matrix = data[4]
 
         fraction_data = pd.Series(
-            zip(subexon_table['Transcripts in gene'].values,
-                subexon_table['Number of transcripts for subexon'].values,
-                subexon_table['Transcript fraction'].values),
+            zip(subexon_table['TranscriptsInGene'].values,
+                subexon_table['TranscriptsInSubexon'].values,
+                subexon_table['TranscriptFraction'].values),
             index=subexon_table['SubexonIndex']).to_dict()
         z_constitutive = [[
             _constitutive_value(

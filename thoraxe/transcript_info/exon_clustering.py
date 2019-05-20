@@ -86,7 +86,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
         AlignedQuery='',
         AlignedTarget='',
         InputOrder=range(nrows),
-        ProteinSequences=lambda df: df['Exon protein sequence'].map(
+        ProteinSequences=lambda df: df['ExonProteinSequence'].map(
             lambda seq: str(seq).replace('*', '')).values)
     # ?assign: For Python 3.5 and below, the order of keyword arguments is not
     # specified, you cannot refer to newly created or modified columns. All
@@ -94,9 +94,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     trx_data = trx_data.assign(
         SeqLength=lambda df: df['ProteinSequences'].map(len).values)
 
-    # Sort by 'SeqLength'. We then sort by 'Exon stable ID' sequences with
+    # Sort by 'SeqLength'. We then sort by 'ExonStableID' sequences with
     # equal length to ensure reproducibility:
-    trx_data.sort_values(['SeqLength', 'Exon stable ID'],
+    trx_data.sort_values(['SeqLength', 'ExonStableID'],
                          inplace=True,
                          ascending=False)
 
@@ -112,7 +112,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             gap_extend_penalty=gap_extend_penalty,
             substitution_matrix=substitution_matrix)
 
-        query_exon = row_list[i]['Exon stable ID']
+        query_exon = row_list[i]['ExonStableID']
         i_index = trx_data.index[i]
         cluster = trx_data.at[i_index, 'Cluster']
         if cluster == 0:

@@ -115,7 +115,7 @@ def calculate_phase(cdna_len, previous_end_phase):
 def end_phase_previous_exon(data_frame,
                             exon_pos,
                             prev_row_index,
-                            end_phase_column='End phase'):
+                            end_phase_column='EndPhase'):
     """
     Return the end phase of the previous exon.
 
@@ -158,13 +158,13 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
     previous_end_phase = end_phase_previous_exon(data_frame, exon_pos,
                                                  prev_row_index)
 
-    cdna_len = data_frame.loc[row_index, 'cDNA coding end'] - \
-        data_frame.loc[row_index, 'cDNA coding start'] + 1
+    cdna_len = data_frame.loc[row_index, 'cDNA_CodingEnd'] - \
+        data_frame.loc[row_index, 'cDNA_CodingStart'] + 1
 
     start_phase, end_phase = calculate_phase(cdna_len, previous_end_phase)
 
-    df_start_phase = data_frame.loc[row_index, 'Start phase']
-    df_end_phase = data_frame.loc[row_index, 'End phase']
+    df_start_phase = data_frame.loc[row_index, 'StartPhase']
+    df_end_phase = data_frame.loc[row_index, 'EndPhase']
 
     assert _equal_phases(df_start_phase, start_phase),\
         ("%d start phase is observed but %d start phase is expected " %
@@ -184,8 +184,8 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
     if df_end_phase == -1 and row_number != n_rows - 1:
         # next row index.
         next_row_index = data_frame.index[row_number + 1]
-        assert data_frame.loc[row_index, 'Transcript stable ID'] != \
-            data_frame.loc[next_row_index, 'Transcript stable ID'], \
+        assert data_frame.loc[row_index, 'TranscriptStableID'] != \
+            data_frame.loc[next_row_index, 'TranscriptStableID'], \
             "end phase -1 is not in the last exon " + \
             "for row number %d, index %d." % (row_number, row_index)
 
@@ -194,8 +194,8 @@ def _check_exon_order(data_frame, row_number, row_index, prev_row_index,
                       exon_pos):
     """Check that exons are ordered by rank in the transcript."""
     if exon_pos != 0:
-        assert data_frame.loc[row_index, 'Exon rank in transcript'] > \
-            data_frame.loc[prev_row_index, 'Exon rank in transcript'], \
+        assert data_frame.loc[row_index, 'ExonRank'] > \
+            data_frame.loc[prev_row_index, 'ExonRank'], \
             "Exons aren't sorted by rank, error with row number " + \
             str(row_number) + ", index " + str(row_index) + "."
 
@@ -209,7 +209,7 @@ def check_order_and_phases(data_frame):
     of read_exon_file.
 
     The columns of the input dataframe must be ordered by 'Transcript
-    stable ID' and 'Exon rank in transcript'. The function read_exon_file
+    stable ID' and 'ExonRank'. The function read_exon_file
     ensures that order.
 
     It checks that order and it also checks exon start and end phase
@@ -218,13 +218,13 @@ def check_order_and_phases(data_frame):
     # Use a set of transcript ids to ensure that data is sorted
     finished_transcripts = set()
 
-    assert data_frame.loc[data_frame.index[0], 'Start phase'] in {-1, 0},\
+    assert data_frame.loc[data_frame.index[0], 'StartPhase'] in {-1, 0},\
         'First exon has start phase of 1 or 2, row: %s' % data_frame.iloc[0, :]
 
     n_rows = data_frame.shape[0]
     row_number = 1  # to skip the first row
     exon_pos = 1  # to store exon rank without counting non coding exons
-    # as 'Exon rank in transcript' does.
+    # as 'ExonRank' does.
 
     while row_number < n_rows:
 
@@ -235,16 +235,16 @@ def check_order_and_phases(data_frame):
         prev_row_index = data_frame.index[row_number - 1]
         # If transcript id changes, the next exon is 0,
         # i.e. the first of the next gene transcript :
-        actual_transcript = data_frame.loc[row_index, 'Transcript stable ID']
+        actual_transcript = data_frame.loc[row_index, 'TranscriptStableID']
         prev_transcript = data_frame.loc[prev_row_index,
-                                         'Transcript stable ID']
+                                         'TranscriptStableID']
 
         if actual_transcript != prev_transcript:
             finished_transcripts.add(prev_transcript)
             exon_pos = 0
         else:
             assert actual_transcript not in finished_transcripts, \
-                "Data isn't sorted by 'Transcript stable ID'"
+                "Data isn't sorted by 'TranscriptStableID'"
             exon_pos += 1
 
         _check_exon_order(data_frame, row_number, row_index, prev_row_index,

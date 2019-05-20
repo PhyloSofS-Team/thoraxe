@@ -83,7 +83,7 @@ def read_tsl_file(tsl_file,
     (default: False).
 
     It returns a pandas DataFrame with MultiIndex:
-    ('Species', 'Transcript ID').
+    ('Species', 'TranscriptID').
     """
     assert maximum_tsl_level in {1.0, 2.0, 3.0, 4.0, 5.0}
 
@@ -128,8 +128,8 @@ def read_exon_file(exon_table_file):
     # Read data :
     # -----------
     int_cols_with_nas = [
-        'cDNA coding start', 'cDNA coding end', 'Genomic coding start',
-        'Genomic coding end'
+        'cDNA_CodingStart', 'cDNA_CodingEnd', 'GenomicCodingStart',
+        'GenomicCodingEnd'
     ]
     exon_data = pd.read_csv(
         exon_table_file,
@@ -149,10 +149,7 @@ def read_exon_file(exon_table_file):
     # Sort exon by rank in transcript :
     # ---------------------------------
     exon_data.sort_values(
-        by=[
-            'Gene stable ID', 'Transcript stable ID', 'Exon rank in transcript'
-        ],
-        inplace=True)
+        by=['GeneStableID', 'TranscriptStableID', 'ExonRank'], inplace=True)
 
     return exon_data
 
@@ -164,13 +161,13 @@ def add_exon_sequences(data_frame, sequence_file):
     This function adds an 'Exon sequence' column at the end of 'data_frame'.
     For each row, this column has the BioPython's SeqRecord for the exon
     sequence of the row. The sequence description in the sequence_file
-    (in fasta format) should have the 'Exon stable ID' as the second element
+    (in fasta format) should have the 'ExonStableID' as the second element
     if the description is split by ' '.ipt_in
-    The data_frame should have an 'Exon stable ID' column and should not have
+    The data_frame should have an 'ExonStableID' column and should not have
     an 'Exon sequence' column.
-    'Exon stable ID' is going to be used to match the SeqRecord to the row.
+    'ExonStableID' is going to be used to match the SeqRecord to the row.
     """
-    _check_column_presence(data_frame, 'Exon stable ID')
+    _check_column_presence(data_frame, 'ExonStableID')
     _check_column_absence(data_frame, 'Exon sequence',
                           'Values are going to change.')
 
@@ -179,7 +176,7 @@ def add_exon_sequences(data_frame, sequence_file):
         exon_id = seqrecord.description.split(' ')[1]
         # NOTE : This takes 180 ms where one explicit loop over the rows
         # takes 2.75 s :
-        selected_rows = data_frame.index[data_frame['Exon stable ID'] ==
+        selected_rows = data_frame.index[data_frame['ExonStableID'] ==
                                          exon_id].tolist()
         # NOTE : Assign one value / row at each time is needed to avoid
         # shape errors :
@@ -207,7 +204,7 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
     #
     # For sequences in the strand -1 the table has the reverse complement.
     #
-    # cDNA coding start and end are relative to the cDNA of the first exon.
+    # cDNA_CodingStart and end are relative to the cDNA of the first exon.
     # However, the first exon is not always coding,
     # i.e. it could not be in the table.
     #
@@ -251,16 +248,14 @@ def _is_first_or_last_exon(row_list, row_index):
         row = row_list[row_index]
 
         identical_to_previous = row_list[
-            row_index -
-            1]['Transcript stable ID'] == row['Transcript stable ID']
+            row_index - 1]['TranscriptStableID'] == row['TranscriptStableID']
         identical_to_next = row_list[
-            row_index +
-            1]['Transcript stable ID'] == row['Transcript stable ID']
+            row_index + 1]['TranscriptStableID'] == row['TranscriptStableID']
 
-        if (not identical_to_previous) or (row['Start phase'] == -1):
+        if (not identical_to_previous) or (row['StartPhase'] == -1):
             start_exon = True
 
-        if (not identical_to_next) or (row['End phase'] == -1):
+        if (not identical_to_next) or (row['EndPhase'] == -1):
             end_exon = True
 
     return start_exon, end_exon
@@ -305,7 +300,7 @@ def _manage_end_phase(row_list, row_index, cds_seq, end_exon):
     NOTE: _check_phases_by_position should be used beipt_infore this function
     to ensure that there are not errors in the input data.
     """
-    end_phase = row_list[row_index]['End phase']
+    end_phase = row_list[row_index]['EndPhase']
     if end_phase in {1, 2}:
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
@@ -327,14 +322,14 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
     finishes with an incomplete codon (end_phase 1 or 2).
     The pandas' DataFrame row is printed in the error message.
     """
-    end_phase = row['End phase']
+    end_phase = row['EndPhase']
     if end_exon:
         if not allow_incomplete_cds and end_phase in {1, 2}:
             raise ValueError('Exon end phase is 1 or 2 in last exon, '
                              'row:  %s' % row)
     else:
         if end_phase == -1:
-            if row['Start phase'] != -1:
+            if row['StartPhase'] != -1:
                 raise ValueError('Exon end phase -1 is not in the last exon, '
                                  'row: {}'.format(row))
             warnings.warn('Exon start and end phases are -1, possible '
@@ -348,9 +343,9 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     In particular, if the start or end phase is different from 0 or -1.
     """
     if end_exon:
-        return row['End phase'] in {1, 2}
+        return row['EndPhase'] in {1, 2}
     if start_exon:
-        return row['Start phase'] in {1, 2}
+        return row['StartPhase'] in {1, 2}
     return False
 
 
@@ -365,9 +360,9 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
     _check_column_presence(
         data_frame, 'Exon sequence', 'You need to run '
         'add_exonpercent_identity_cutoff_sequences first.')
-    _check_column_absence(data_frame, 'Exon protein sequence',
+    _check_column_absence(data_frame, 'ExonProteinSequence',
                           'Values are going to change.')
-    _check_column_absence(data_frame, 'Incomplete CDS',
+    _check_column_absence(data_frame, 'IncompleteCDS',
                           'Values are going to change.')
 
     sequences = []
@@ -382,23 +377,23 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
         # Copy of the actual row to have easier access :
         row = row_list[row_index]
 
-        if (row['Start phase'] == -1) and (row['End phase'] == -1):
+        if (row['StartPhase'] == -1) and (row['EndPhase'] == -1):
             if row['Strand'] == -1:
-                i = row['Exon region end (bp)'] - row['Genomic coding end']
-                j = row['Exon region end (bp)'] - row['Genomic coding start']
+                i = row['ExonRegionEnd'] - row['GenomicCodingEnd']
+                j = row['ExonRegionEnd'] - row['GenomicCodingStart']
                 j += 1
             else:
                 # TO DO: TEST IT!
-                i = row['Genomic coding start'] - row['Exon region start (bp)']
-                j = row['Genomic coding end'] - row['Exon region start (bp)']
+                i = row['GenomicCodingStart'] - row['ExonRegionStart']
+                j = row['GenomicCodingEnd'] - row['ExonRegionStart']
                 j += 1
 
             cds_seq = row['Exon sequence'][i:j]
 
         else:
             cds_seq = _get_exon_cds(
-                row['Exon sequence'], row['cDNA coding start'],
-                row['cDNA coding end'], start_exon, end_exon)
+                row['Exon sequence'], row['cDNA_CodingStart'],
+                row['cDNA_CodingEnd'], start_exon, end_exon)
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
@@ -406,7 +401,7 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
 
             _check_phases_by_position(row, end_exon, allow_incomplete_cds)
 
-            cds_seq = _manage_start_phase(cds_seq, row['Start phase'])
+            cds_seq = _manage_start_phase(cds_seq, row['StartPhase'])
             cds_seq = _manage_end_phase(row_list, row_index, cds_seq, end_exon)
 
         # Add the translated CDS :
@@ -421,15 +416,15 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
         row_index += 1
 
     # Add new column to store the sequences :
-    data_frame['Exon protein sequence'] = sequences
+    data_frame['ExonProteinSequence'] = sequences
     # New column to store signals of incomplete CDS :
-    data_frame['Incomplete CDS'] = incomplete_cds
+    data_frame['IncompleteCDS'] = incomplete_cds
 
 
 def _different_phases(row_i, row_j):
     """Return True if exon start or end phases are different."""
-    value = (row_i['Start phase'] != row_j['Start phase']) or \
-            (row_i['End phase'] != row_j['End phase'])
+    value = (row_i['StartPhase'] != row_j['StartPhase']) or \
+            (row_i['EndPhase'] != row_j['EndPhase'])
     return value
 
 
@@ -442,12 +437,12 @@ def _different_coordinates(row_i, row_j):
     have different genomic coordinates, but still have the same protein
     sequence.
     """
-    if row_i['Start phase'] != -1 and row_j['Start phase'] != -1:
-        if row_i['Genomic coding start'] != row_j['Genomic coding start']:
+    if row_i['StartPhase'] != -1 and row_j['StartPhase'] != -1:
+        if row_i['GenomicCodingStart'] != row_j['GenomicCodingStart']:
             return True
 
-    if row_i['End phase'] != -1 and row_j['End phase'] != -1:
-        if row_i['Genomic coding end'] != row_j['Genomic coding end']:
+    if row_i['EndPhase'] != -1 and row_j['EndPhase'] != -1:
+        if row_i['GenomicCodingEnd'] != row_j['GenomicCodingEnd']:
             return True
 
     return False
@@ -461,8 +456,8 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     if _different_coordinates(rowi, rowj):
         return False
 
-    seq_i = rowi['Exon protein sequence']
-    seq_j = rowj['Exon protein sequence']
+    seq_i = rowi['ExonProteinSequence']
+    seq_j = rowj['ExonProteinSequence']
 
     if len(seq_i) != len(seq_j):
         return False
@@ -472,7 +467,7 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     #
     # It takes into account that last residue could be different
     # if the end phase is different from 0 or -1.
-    if rowi['End phase'] in [0, -1]:
+    if rowi['EndPhase'] in [0, -1]:
         if seq_i != seq_j:
             return False
     else:
@@ -482,13 +477,13 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     return True
 
 
-def find_identical_exons(data_frame, exon_id_column='Exon stable ID'):
+def find_identical_exons(data_frame, exon_id_column='ExonStableID'):
     """Find exons that have similar coordinates and identical sequences."""
     exon_clusters = []
-    for _, subdf in data_frame.groupby(['Gene stable ID']):
+    for _, subdf in data_frame.groupby(['GeneStableID']):
         subdf = subdf.drop_duplicates([
-            exon_id_column, 'Start phase', 'End phase', 'Genomic coding start',
-            'Genomic coding end'
+            exon_id_column, 'StartPhase', 'EndPhase', 'GenomicCodingStart',
+            'GenomicCodingEnd'
         ])
         row_list = subdf.to_dict('records')
         n_rows = len(row_list)
@@ -512,46 +507,46 @@ def delete_incomplete_sequences(data_frame):
     It also deletes sequences that probably has an incomplete CDS because
     starts or ends with phases differente fron 0 or -1.
     """
-    _check_column_presence(data_frame, 'Exon protein sequence',
+    _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
     incomplete_cdss = data_frame.loc[:, [
-        'Transcript stable ID', 'Incomplete CDS'
-    ]].groupby('Transcript stable ID').agg(lambda df: sum(df) > 0)
+        'TranscriptStableID', 'IncompleteCDS'
+    ]].groupby('TranscriptStableID').agg(lambda df: sum(df) > 0)
 
-    incomplete_seqs = data_frame.loc[:, ['Transcript stable ID',
-                                         'Exon protein sequence']]. \
-        groupby('Transcript stable ID'). \
+    incomplete_seqs = data_frame.loc[:, ['TranscriptStableID',
+                                         'ExonProteinSequence']]. \
+        groupby('TranscriptStableID'). \
         agg(lambda df: "".join([str(s) for s in df])[-1] != "*")
     # Incomplete sequences do not end with '*'
 
     incomplete_transcripts = set(
-        incomplete_seqs.index[incomplete_seqs['Exon protein sequence']]).union(
-            incomplete_cdss.index[incomplete_cdss['Incomplete CDS']])
+        incomplete_seqs.index[incomplete_seqs['ExonProteinSequence']]).union(
+            incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
 
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in incomplete_transcripts
+        if data_frame.loc[i, 'TranscriptStableID'] in incomplete_transcripts
     ],
                     inplace=True)
 
 
 def delete_badquality_sequences(data_frame):
     """Delete protein sequences with X's in their sequence in place."""
-    _check_column_presence(data_frame, 'Exon protein sequence',
+    _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
-    badquality_seqs = data_frame.loc[:, ['Transcript stable ID',
-                                         'Exon protein sequence']]. \
-        groupby('Transcript stable ID'). \
+    badquality_seqs = data_frame.loc[:, ['TranscriptStableID',
+                                         'ExonProteinSequence']]. \
+        groupby('TranscriptStableID'). \
         agg(lambda df: any('X' in str(s) for s in df))
 
     badquality_transcripts = set(
-        badquality_seqs.index[badquality_seqs['Exon protein sequence']])
+        badquality_seqs.index[badquality_seqs['ExonProteinSequence']])
 
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in badquality_transcripts
+        if data_frame.loc[i, 'TranscriptStableID'] in badquality_transcripts
     ],
                     inplace=True)
 
@@ -564,26 +559,26 @@ def find_identical_sequences(data_frame):
     It returns a list with the identical sequence clusters (sets).
     """
     # Concatenate the sequences as a string for each transcript in each gene :
-    seqs_df = data_frame.loc[:, ['Gene stable ID',
-                                 'Transcript stable ID',
-                                 'Exon protein sequence']]. \
-        groupby(['Gene stable ID', 'Transcript stable ID']). \
+    seqs_df = data_frame.loc[:, ['GeneStableID',
+                                 'TranscriptStableID',
+                                 'ExonProteinSequence']]. \
+        groupby(['GeneStableID', 'TranscriptStableID']). \
         agg(lambda df: "".join([str(s) for s in df]))
     # Store the cluster of identical sequences :
     seq_clusters = []
     # Find duplicated sequences in each gene transcript :
-    for _, subdf in seqs_df.groupby('Gene stable ID'):
+    for _, subdf in seqs_df.groupby('GeneStableID'):
         n_rows = len(subdf)
         if n_rows > 1:
-            # Sort by 'Transcript stable ID' to ensure reproducibility
+            # Sort by 'TranscriptStableID' to ensure reproducibility
             subdf = subdf.sort_index(level=1)
             row_list = subdf.to_dict('records')
             for i in range(0, n_rows - 1):
                 row_i = row_list[i]
                 for j in range(i + 1, n_rows):
                     row_j = row_list[j]
-                    if row_i['Exon protein sequence'] == row_j[
-                            'Exon protein sequence']:
+                    if row_i['ExonProteinSequence'] == row_j[
+                            'ExonProteinSequence']:
                         clusters.fill_clusters(seq_clusters, subdf.index[i][1],
                                                subdf.index[j][1])
 
@@ -651,31 +646,31 @@ def store_cluster(  # pylint: disable=too-many-arguments
 
 def delete_identical_sequences(data_frame):
     """Delete identical sequences in place keeping only one."""
-    _check_column_presence(data_frame, 'Exon protein sequence',
+    _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
     identical_sequences = find_identical_sequences(data_frame)
-    store_cluster(data_frame, identical_sequences, 'Transcript stable ID',
-                  'Transcript stable ID cluster')
+    store_cluster(data_frame, identical_sequences, 'TranscriptStableID',
+                  'TranscriptStableIDCluster')
     to_delete = clusters.set_to_delete(identical_sequences)
     clusters.inform_about_deletions(
         to_delete,
         "Identical isoform sequences were found, keeping only one transcript:")
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'Transcript stable ID'] in to_delete
+        if data_frame.loc[i, 'TranscriptStableID'] in to_delete
     ],
                     inplace=True)
 
 
-def merge_identical_exons(data_frame, exon_id_column='Exon stable ID'):
-    """Unify the 'Exon stable ID' of identical exons."""
-    _check_column_presence(data_frame, 'Exon protein sequence',
+def merge_identical_exons(data_frame, exon_id_column='ExonStableID'):
+    """Unify the 'ExonStableID' of identical exons."""
+    _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
     identical_exons = find_identical_exons(data_frame, exon_id_column)
     store_cluster(data_frame, identical_exons, exon_id_column,
-                  exon_id_column + ' cluster')
+                  exon_id_column + 'Cluster')
     old2new = dict((exon_id, sorted(group)[0]) for group in identical_exons
                    for exon_id in sorted(group)[1:])
     data_frame.replace(to_replace={exon_id_column: old2new}, inplace=True)
@@ -729,9 +724,9 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # Merge both tables to have all the transcript information in one
     # DataFrame and to filter the exon table based on tsl evidence:
     tsl_table.rename(
-        columns={'Transcript ID': 'Transcript stable ID'}, inplace=True)
+        columns={'TranscriptID': 'TranscriptStableID'}, inplace=True)
     transcript_info = pd.merge(
-        tsl_table, exon_table, how='inner', on='Transcript stable ID')
+        tsl_table, exon_table, how='inner', on='TranscriptStableID')
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:

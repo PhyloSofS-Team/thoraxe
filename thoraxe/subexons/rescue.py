@@ -14,8 +14,8 @@ from thoraxe import transcript_info
 def _get_subexons_to_rescue(subexon_table):
     """Return a DataFrame with the subexons to rescue."""
     return subexon_table.loc[subexon_table['Cluster'] < 0, [
-        'Subexon ID cluster', 'Cluster', 'Exon protein sequence'
-    ]].drop_duplicates(subset='Subexon ID cluster').to_dict('records')
+        'SubexonIDCluster', 'Cluster', 'ExonProteinSequence'
+    ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
 
 
 def _get_sequence_list(sequences, minimum_len):
@@ -31,16 +31,16 @@ def _get_sequence_list(sequences, minimum_len):
 def _get_cluster2sequence(subexon_table, minimum_len=0):
     """Return a dict from cluster id to cluster unique sequences."""
     clusterized = subexon_table.loc[subexon_table['Cluster'] > 0, [
-        'Subexon ID cluster', 'Cluster', 'Exon protein sequence'
+        'SubexonIDCluster', 'Cluster', 'ExonProteinSequence'
     ]]
-    clusterized.drop_duplicates('Subexon ID cluster', inplace=True)
-    clusterized.drop(columns='Subexon ID cluster', inplace=True)
+    clusterized.drop_duplicates('SubexonIDCluster', inplace=True)
+    clusterized.drop(columns='SubexonIDCluster', inplace=True)
     cluster2sequence = clusterized.groupby('Cluster').agg(
         lambda col: _get_sequence_list(col, minimum_len)).to_dict('index')
     return {
-        cluster: seqs['Exon protein sequence']
+        cluster: seqs['ExonProteinSequence']
         for cluster, seqs in cluster2sequence.items()
-        if seqs['Exon protein sequence']
+        if seqs['ExonProteinSequence']
     }
 
 
@@ -90,7 +90,7 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
         gap_extend_penalty=1,
         substitution_matrix=None):
     """
-    Return a dict from 'Subexon ID cluster' to cluster.
+    Return a dict from 'SubexonIDCluster' to cluster.
 
     This function takes
     """
@@ -100,7 +100,7 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
     subexon2cluster = {}
     for row in to_rescue:
         origin_cluster = -1 * row['Cluster']
-        seq = str(row['Exon protein sequence']).replace('*', '')
+        seq = str(row['ExonProteinSequence']).replace('*', '')
         query = StripedSmithWaterman(
             seq,
             gap_open_penalty=gap_open_penalty,
@@ -110,7 +110,7 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
                                    cluster2sequence, coverage_cutoff,
                                    percent_identity_cutoff)
         if aln_stats:
-            subexon2cluster[row['Subexon ID cluster']] = _get_cluster_number(
+            subexon2cluster[row['SubexonIDCluster']] = _get_cluster_number(
                 aln_stats)
 
     return subexon2cluster
@@ -119,7 +119,7 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
 def modify_subexon_cluster(subexon_table, subexon2cluster):
     """Modify subexon_table using the mapping in subexon2cluster."""
     for subexon, cluster in subexon2cluster.items():
-        subexon_index = subexon_table.index[subexon_table['Subexon ID cluster']
+        subexon_index = subexon_table.index[subexon_table['SubexonIDCluster']
                                             == subexon]
         for i in subexon_index:
             subexon_table.at[i, 'Cluster'] = cluster

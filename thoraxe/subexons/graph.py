@@ -14,10 +14,10 @@ def nodes_and_edges2genes(data):
     """
     node2genes = collections.defaultdict(set)
     edge2genes = collections.defaultdict(set)
-    for gene_id, gene in data.groupby('Gene stable ID'):  # noqa pylint: disable=too-many-nested-blocks
-        for _, transcript in gene.groupby('Transcript stable ID'):
+    for gene_id, gene in data.groupby('GeneStableID'):  # noqa pylint: disable=too-many-nested-blocks
+        for _, transcript in gene.groupby('TranscriptStableID'):
             subexons = transcript.sort_values(
-                'Subexon rank in transcript')['HomologousExons']
+                'SubexonRank')['HomologousExons']
 
             previous = 'start'
             node2genes[previous].update({gene_id})
