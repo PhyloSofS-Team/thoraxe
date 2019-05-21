@@ -39,8 +39,7 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
     """
     connected_pairs = []
     col_index = subexon_table.columns.get_loc(id_column)
-    for _, transcript_df in subexon_table.groupby(
-            'TranscriptStableIDCluster'):
+    for _, transcript_df in subexon_table.groupby('TranscriptStableIDCluster'):
         transcript = transcript_df.sort_values(
             by='SubexonRank', ascending=True)
         nrows = transcript.shape[0]
@@ -61,9 +60,9 @@ def _create_subexon_index(subexon_table):
     unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
     unique_subexons = unique_subexons.assign(Order=[
-        row['SubexonGenomicCodingStart'] if row['Strand'] == 1 else (
-            -1 * row['SubexonGenomicCodingEnd'])
-        for _, row in unique_subexons.iterrows()
+        row.SubexonGenomicCodingStart if row.Strand == 1 else (
+            -1 * row.SubexonGenomicCodingEnd)
+        for row in unique_subexons.itertuples()
     ])
 
     unique_subexons = unique_subexons.sort_values(by=['Order'])

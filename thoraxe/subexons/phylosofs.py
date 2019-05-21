@@ -174,14 +174,14 @@ def _fill_sequence_and_annotation(df_group, exon2char):
     """Create a list of sequences and homologous exons (annotation)."""
     exon_annot = []
     seqs = []
-    for _, row in df_group.iterrows():
-        seq = str(row['ExonProteinSequence']).replace('*', '')
-        if '-' in row['HomologousExons']:
-            exons = row['HomologousExons'].split('-')
-            exon_lengths = row['HomologousExonLengths'].split('-')
+    for row in df_group.itertuples():
+        seq = str(row.ExonProteinSequence).replace('*', '')
+        if '-' in row.HomologousExons:
+            exons = row.HomologousExons.split('-')
+            exon_lengths = row.HomologousExonLengths.split('-')
         else:
-            exons = [row['HomologousExons']]
-            exon_lengths = [row['HomologousExonLengths']]
+            exons = [row.HomologousExons]
+            exon_lengths = [row.HomologousExonLengths]
         for exon, length in zip(exons, exon_lengths):
             for _ in range(_int_length(length, seq)):
                 exon_annot.append(exon2char[exon])
@@ -201,13 +201,11 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
             groups = exon_data.loc[:, [
-                'GeneStableID', 'TranscriptStableID',
-                'ExonProteinSequence', 'SubexonRank',
-                'HomologousExons', 'HomologousExonLengths'
-            ]].drop_duplicates().sort_values(by=[
-                'GeneStableID', 'TranscriptStableID',
-                'SubexonRank'
-            ]).groupby(['GeneStableID', 'TranscriptStableID'])
+                'GeneStableID', 'TranscriptStableID', 'ExonProteinSequence',
+                'SubexonRank', 'HomologousExons', 'HomologousExonLengths'
+            ]].drop_duplicates().sort_values(
+                by=['GeneStableID', 'TranscriptStableID', 'SubexonRank'
+                    ]).groupby(['GeneStableID', 'TranscriptStableID'])
         for (gene, transcript), group in groups:
             seq, annot = _fill_sequence_and_annotation(group, exon2char)
             file.write(">P1;{} {} {}\n".format(

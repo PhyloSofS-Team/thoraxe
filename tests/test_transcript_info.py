@@ -148,8 +148,8 @@ def test_exon_clustering(mapk8):
 
     # Exon can not have more than one cluster
     assert all(
-        clustered.groupby('ExonStableID').apply(lambda df: len(df[
-            'Cluster'].unique()) == 1))
+        clustered.groupby(
+            'ExonStableID').apply(lambda df: len(df['Cluster'].unique()) == 1))
 
     # Non-clustered exons have Cluster == 0 and QueryExon == ''
     assert all(row.QueryExon == '' for row in clustered.itertuples()
@@ -159,8 +159,8 @@ def test_exon_clustering(mapk8):
 
     # Sequences with less than 4 residues are non-clustered by default
     assert all(
-        clustered.
-        loc[clustered['ExonProteinSequence'].map(len) < 4, 'Cluster'] == 0)
+        clustered.loc[clustered['ExonProteinSequence'].map(len) < 4, 'Cluster']
+        == 0)
 
     for _, group in clustered.groupby('Cluster'):
         nans = np.isnan(group['PercentIdentity'])
@@ -180,7 +180,7 @@ def test_exon_clustering(mapk8):
             subset = group[np.logical_not(nans)]
             for _, exon in subset.groupby('ExonStableIDCluster'):
                 assert np.any([
-                    row['AlignedTarget'].replace(
-                        '-', '') in row['ExonProteinSequence']
-                    for _, row in exon.iterrows()
+                    row.AlignedTarget.replace('-',
+                                              '') in row.ExonProteinSequence
+                    for row in exon.itertuples()
                 ])
