@@ -84,18 +84,17 @@ def parse_command_line():
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument(
-        'genename', type=str, help='gene name in Ensembl (e.g. MAPK8)')
-    parser.add_argument(
-        '-s',
-        '--species',
-        help='species to look for the gene name',
-        default='homo_sapiens')
-    parser.add_argument(
-        '-o',
-        '--orthology',
-        help='Orthology relationship to use; 1:1, 1:n or m:n',
-        default='1:1')
+    parser.add_argument('genename',
+                        type=str,
+                        help='gene name in Ensembl (e.g. MAPK8)')
+    parser.add_argument('-s',
+                        '--species',
+                        help='species to look for the gene name',
+                        default='homo_sapiens')
+    parser.add_argument('-o',
+                        '--orthology',
+                        help='Orthology relationship to use; 1:1, 1:n or m:n',
+                        default='1:1')
     parser.add_argument(
         '-l',
         '--specieslist',
@@ -104,11 +103,10 @@ def parse_command_line():
         'with the species list (one species per line). If nothing is '
         'indicated, all the available species are used.',
         default='')
-    parser.add_argument(
-        '-v',
-        '--verbose',
-        help='Print detailed progress.',
-        action='store_true')
+    parser.add_argument('-v',
+                        '--verbose',
+                        help='Print detailed progress.',
+                        action='store_true')
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
@@ -128,8 +126,10 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
         for dictionary in listofdicts:
             fnames.update(list(dictionary.keys()))
         fnames = sorted(fnames)
-    csv_writer = csv.DictWriter(
-        out, fieldnames=fnames, restval='NA', extrasaction='ignore')
+    csv_writer = csv.DictWriter(out,
+                                fieldnames=fnames,
+                                restval='NA',
+                                extrasaction='ignore')
     if header:
         csv_writer.writeheader()
     csv_writer.writerows(listofdicts)
@@ -225,15 +225,16 @@ def _biomart_exons_annot_request(dataset,
         '</Dataset>'
         '</Query>')
 
-    biomart_request_url = biomart_request_url_template.format(
-        data=dataset, eid=geneid, ish=int(header))
+    biomart_request_url = biomart_request_url_template.format(data=dataset,
+                                                              eid=geneid,
+                                                              ish=int(header))
     try:
         if quick:
             # the quick version does not wait and does not use retry
             req = requests.get(biomart_request_url)
         else:
-            req = SESSION.get(
-                biomart_request_url, allow_redirects=allow_redirects)
+            req = SESSION.get(biomart_request_url,
+                              allow_redirects=allow_redirects)
         if req.status_code >= 300:
             warnings.warn('BioMart request status for {} in {}: {}.'.format(
                 geneid, dataset, req.status_code))
@@ -251,22 +252,28 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
     dataset_names = _species2ensembldataset(species_name)
     # Try the download option quickly before retrying:
     for dataset in dataset_names:
-        response = _biomart_exons_annot_request(
-            dataset, geneid, header=header, quick=True)
+        response = _biomart_exons_annot_request(dataset,
+                                                geneid,
+                                                header=header,
+                                                quick=True)
         if _check_biomart_response(response):
             return response
 
     # Now with retry and redirect:
     for dataset in dataset_names:
         print(dataset)
-        response = _biomart_exons_annot_request(
-            dataset, geneid, header=header, allow_redirects=True)
+        response = _biomart_exons_annot_request(dataset,
+                                                geneid,
+                                                header=header,
+                                                allow_redirects=True)
         if _check_biomart_response(response):
             return response
         # Try without redirect. It avoids the test_download error in Travis CI
         time.sleep(2)
-        response = _biomart_exons_annot_request(
-            dataset, geneid, header=header, allow_redirects=False)
+        response = _biomart_exons_annot_request(dataset,
+                                                geneid,
+                                                header=header,
+                                                allow_redirects=False)
         if _check_biomart_response(response):
             return response
 
@@ -375,10 +382,9 @@ def get_exons_sequences(listensexons):  # , **params):
         if exons:
             dexons = {"ids": exons}  # , "type": "cds"}
             ext_exons_seq = '/sequence/id/type=cds'
-            request = requests.post(
-                SERVER + ext_exons_seq,
-                headers=HJSONPOST,
-                data=json.dumps(dexons))
+            request = requests.post(SERVER + ext_exons_seq,
+                                    headers=HJSONPOST,
+                                    data=json.dumps(dexons))
 
             if not request.ok:
                 print(("FAILED REQUEST: " + str(dexons)))
@@ -493,11 +499,10 @@ def _get_relationships(notation):
 
 def _rename(table_text):
     """Rename columns"""
-    table_text = table_text.replace('Gene stable ID', 'GeneStableID', 1)
-    table_text = table_text.replace('Transcript stable ID',
-                                    'TranscriptStableID', 1)
-    table_text = table_text.replace('Protein stable ID', 'ProteinStableID', 1)
-    table_text = table_text.replace('Exon stable ID', 'ExonStableID', 1)
+    table_text = table_text.replace('Gene stable ID', 'GeneID', 1)
+    table_text = table_text.replace('Transcript stable ID', 'TranscriptID', 1)
+    table_text = table_text.replace('Protein stable ID', 'ProteinID', 1)
+    table_text = table_text.replace('Exon stable ID', 'ExonID', 1)
     table_text = table_text.replace('Exon region start (bp)',
                                     'ExonRegionStart', 1)
     table_text = table_text.replace('Exon region end (bp)', 'ExonRegionEnd', 1)
@@ -579,8 +584,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         # if nt > 5: break
         number += 1
     ##
-    orthologs_filtered = filter_ortho(
-        orthologs, orthokeep, relationship=args.orthology)
+    orthologs_filtered = filter_ortho(orthologs,
+                                      orthokeep,
+                                      relationship=args.orthology)
     # TO DO print : orthokeep can be None
     # _print_if(args.verbose,
     # "Filtering on %d species, %d matches" % (len(orthokeep),
@@ -628,8 +634,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
         exorthofasta = get_exons_sequences(lexidortho)
         _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
-        ortho_exontable = get_biomart_exons_annot(
-            orthospecies, orthoid, header=False)
+        ortho_exontable = get_biomart_exons_annot(orthospecies,
+                                                  orthoid,
+                                                  header=False)
         _print_if(
             args.verbose, "  - %d lines in the exon table" %
             (ortho_exontable.count("\n") + 1))

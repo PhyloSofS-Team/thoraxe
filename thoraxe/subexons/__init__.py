@@ -11,3 +11,4 @@ from thoraxe.subexons import graph
 from thoraxe.subexons import phylosofs
 from thoraxe.subexons import plot
 from thoraxe.subexons import rescue
+from thoraxe.subexons import tidy

@@ -41,14 +41,16 @@ def parse_command_line():
         'by default.',
         type=str,
         default='')
-    parser.add_argument(
-        '-a',
-        '--aligner',
-        help='Path to Clustal Omega.',
-        type=str,
-        default='clustalo')
-    parser.add_argument(
-        '-m', '--minlen', help='Minimum exon length.', type=int, default=4)
+    parser.add_argument('-a',
+                        '--aligner',
+                        help='Path to Clustal Omega.',
+                        type=str,
+                        default='clustalo')
+    parser.add_argument('-m',
+                        '--minlen',
+                        help='Minimum exon length.',
+                        type=int,
+                        default=4)
     parser.add_argument(
         '-c',
         '--coverage',
@@ -62,10 +64,14 @@ def parse_command_line():
         help='Minimum percent identity to include exons in the same cluster.',
         type=float,
         default=30.0)
-    parser.add_argument(
-        '--gapopen', help='Penalty for a gap opening.', type=int, default=10)
-    parser.add_argument(
-        '--gapextend', help='Penalty for gap extensions.', type=int, default=1)
+    parser.add_argument('--gapopen',
+                        help='Penalty for a gap opening.',
+                        type=int,
+                        default=10)
+    parser.add_argument('--gapextend',
+                        help='Penalty for gap extensions.',
+                        type=int,
+                        default=1)
     parser.add_argument(
         '--padding',
         help='Length of padding, Xs, in the chimeric alignment.',
@@ -174,8 +180,9 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
                                                 species_list)
     msa_file = _outfile(output_folder, "chimeric_alignment_", cluster,
                         ".fasta")
-    subexons.alignment.run_aligner(
-        chimerics, aligner=aligner, output_path=msa_file)
+    subexons.alignment.run_aligner(chimerics,
+                                   aligner=aligner,
+                                   output_path=msa_file)
     msa = subexons.alignment.read_msa_fasta(msa_file)
     return subexon_df, chimerics, msa
 
@@ -212,12 +219,11 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
     cluster2data[cluster] = (subexon_df, chimerics, msa)
     if msa is None:
         return {}
-    return subexons.alignment.delete_subexons(
-        subexon_df,
-        chimerics,
-        msa,
-        cutoff=cutoff,
-        min_col_number=min_col_number)
+    return subexons.alignment.delete_subexons(subexon_df,
+                                              chimerics,
+                                              msa,
+                                              cutoff=cutoff,
+                                              min_col_number=min_col_number)
 
 
 def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
@@ -308,16 +314,15 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         output_folder, '_intermediate_outputs')
 
     cluster2updated_data = {}
-    cluster2data = create_chimeric_msa(
-        intermediate_output_path,
-        subexon_table,
-        gene2speciesname,
-        connected_subexons,
-        cutoff=percent_identity_cutoff,
-        min_col_number=minimum_len,
-        aligner=aligner,
-        padding=padding,
-        species_list=species_list)
+    cluster2data = create_chimeric_msa(intermediate_output_path,
+                                       subexon_table,
+                                       gene2speciesname,
+                                       connected_subexons,
+                                       cutoff=percent_identity_cutoff,
+                                       min_col_number=minimum_len,
+                                       aligner=aligner,
+                                       padding=padding,
+                                       species_list=species_list)
     modified_clusters = subexons.rescue.subexon_rescue_phase(
         subexon_table,
         minimum_len=minimum_len,
@@ -327,17 +332,16 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         gap_extend_penalty=gap_extend_penalty,
         substitution_matrix=None)
     cluster2data.update(
-        create_chimeric_msa(
-            intermediate_output_path,
-            subexon_table,
-            gene2speciesname,
-            connected_subexons,
-            clusters=modified_clusters,
-            cutoff=percent_identity_cutoff,
-            min_col_number=minimum_len,
-            aligner=aligner,
-            padding=padding,
-            species_list=species_list))
+        create_chimeric_msa(intermediate_output_path,
+                            subexon_table,
+                            gene2speciesname,
+                            connected_subexons,
+                            clusters=modified_clusters,
+                            cutoff=percent_identity_cutoff,
+                            min_col_number=minimum_len,
+                            aligner=aligner,
+                            padding=padding,
+                            species_list=species_list))
 
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if msa is not None:
@@ -350,11 +354,10 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
                 for item in gene_ids:
                     outfile.write("%s\n" % item)
 
-            np.savetxt(
-                _outfile(intermediate_output_path, "msa_matrix_", cluster,
-                         ".txt"),
-                msa_matrix,
-                delimiter=",")
+            np.savetxt(_outfile(intermediate_output_path, "msa_matrix_",
+                                cluster, ".txt"),
+                       msa_matrix,
+                       delimiter=",")
 
             colclusters = subexons.alignment.column_clusters(
                 subexons.alignment.column_patterns(msa_matrix))
@@ -389,8 +392,9 @@ def update_subexon_table(subexon_table, cluster2data):
         cluster_df = data[0]
         if cluster_df.shape[0] > 0:
             subexon2data.update(
-                cluster_df.loc[:, [key_col] + columns_to_add].drop_duplicates(
-                ).set_index(key_col).to_dict('index'))
+                cluster_df.loc[:, [key_col] +
+                               columns_to_add].drop_duplicates().set_index(
+                                   key_col).to_dict('index'))
 
     columns = {colname: [] for colname in columns_to_add}
     for subexon in subexon_table[key_col]:
@@ -419,13 +423,12 @@ def main():
         output_folder, '_intermediate_outputs')
 
     transcript_table = get_transcripts(input_folder, species_list=species_list)
-    subexon_table = get_subexons(
-        transcript_table,
-        minimum_len=args.minlen,
-        coverage_cutoff=args.coverage,
-        percent_identity_cutoff=args.identity,
-        gap_open_penalty=args.gapopen,
-        gap_extend_penalty=args.gapextend)
+    subexon_table = get_subexons(transcript_table,
+                                 minimum_len=args.minlen,
+                                 coverage_cutoff=args.coverage,
+                                 percent_identity_cutoff=args.identity,
+                                 gap_open_penalty=args.gapopen,
+                                 gap_extend_penalty=args.gapextend)
 
     transcript_table.to_csv(
         os.path.join(intermediate_output_path, "transcript_table.csv"))
@@ -455,8 +458,8 @@ def main():
     subexon_table = update_subexon_table(subexon_table, cluster2data)
     subexon_table = subexons.alignment.impute_missing_orthologous_exon_group(
         subexon_table)
-    subexon_table.to_csv(
-        os.path.join(output_folder, "homologous_subexons.csv"))
+    subexon_table.to_csv(os.path.join(output_folder,
+                                      "homologous_subexons.csv"))
 
     node2genes, edge2genes = subexons.graph.nodes_and_edges2genes(
         subexon_table)
@@ -468,6 +471,8 @@ def main():
         subexons.phylosofs.phylosofs_inputs(
             subexon_table, os.path.join(input_folder, 'Ensembl'),
             output_folder)
+
+    subexons.tidy.save_tidy_csv(output_folder, subexon_table, gene2species)
 
 
 if __name__ == '__main___':

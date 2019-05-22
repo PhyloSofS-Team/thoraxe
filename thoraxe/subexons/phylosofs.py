@@ -6,12 +6,12 @@ import os
 import string
 import warnings
 
-import numpy as np
 import pandas as pd
 
 from Bio import Phylo
 from Bio import BiopythonWarning
-from thoraxe import utils
+from thoraxe.utils import folders
+from thoraxe.utils import split
 
 CHARS = [
     char for char in string.printable if char not in {
@@ -59,7 +59,7 @@ def get_exon2char(exons):
     """
     Return a dictionary from orthologous exon group to a single character.
 
-    >>> result = get_exon2char(['1_0-1_1', '2_0'])
+    >>> result = get_exon2char(['1_0/1_1', '2_0'])
     >>> sorted(result)
     ['1_0', '1_1', '2_0']
     >>> [result[exon] for exon in sorted(result)]
@@ -68,7 +68,7 @@ def get_exon2char(exons):
     homologous_exons = {}
     i = 0
     for exon in exons:
-        for subexon in str(exon).split('-'):
+        for subexon in str(exon).split('/'):
             if subexon not in homologous_exons:
                 if i < MAX_EXONS:
                     homologous_exons[subexon] = CHARS[i]
@@ -85,12 +85,12 @@ def get_transcript2phylosofs(data, exon2char):
     Return a dictionary from transcript id to its phylosofs representation.
     """
     transcript2phylosofs = {}
-    for _, gene in data.groupby('GeneStableID'):
-        for transcript_id, transcript in gene.groupby('TranscriptStableID'):
+    for _, gene in data.groupby('GeneID'):
+        for transcript_id, transcript in gene.groupby('TranscriptID'):
             phylosofs = []
             for subexon in transcript.sort_values(
                     'SubexonRank')['HomologousExons']:
-                for ortholog in subexon.split('-'):
+                for ortholog in subexon.split('/'):
                     phylosofs.append(exon2char[ortholog])
             transcript2phylosofs[transcript_id] = ''.join(phylosofs)
     return transcript2phylosofs
@@ -108,10 +108,10 @@ def _get_protein2gene(exontable_file):
     with warnings.catch_warnings():
         # Bio/Seq.py : class Seq : __hash__ : warnings.warn
         warnings.simplefilter('ignore', BiopythonWarning)
-        data = data.loc[:, ['GeneStableID', 'ProteinStableID']].dropna(
-        ).drop_duplicates().set_index('ProteinStableID')
+        data = data.loc[:, ['GeneID', 'ProteinID']].dropna().drop_duplicates(
+        ).set_index('ProteinID')
 
-    data['GeneStableID'] = data['GeneStableID'].astype('category')
+    data['GeneID'] = data['GeneID'].astype('category')
     return data
 
 
@@ -141,7 +141,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     data = _get_protein2gene(exontable_file)
 
     # Delete unused proteins
-    used_proteins = set(data.index[data['GeneStableID'].isin(used_genes)])
+    used_proteins = set(data.index[data['GeneID'].isin(used_genes)])
     for clade in _get_terminals_to_delete(tree, used_proteins):
         try:
             tree.prune(clade)
@@ -159,31 +159,16 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     return output_tree
 
 
-def _int_length(length, seq):
-    """Return length as an int."""
-    if not isinstance(length, str) and np.isnan(length):
-        return len(seq)
-
-    if length == '':
-        return len(seq)
-
-    return int(length)
-
-
 def _fill_sequence_and_annotation(df_group, exon2char):
     """Create a list of sequences and homologous exons (annotation)."""
     exon_annot = []
     seqs = []
     for row in df_group.itertuples():
-        seq = str(row.ExonProteinSequence).replace('*', '')
-        if '-' in row.HomologousExons:
-            exons = row.HomologousExons.split('-')
-            exon_lengths = row.HomologousExonLengths.split('-')
-        else:
-            exons = [row.HomologousExons]
-            exon_lengths = [row.HomologousExonLengths]
+        seq = str(row.SubexonSequence).replace('*', '')
+        exons = split.split_exons(row.HomologousExons)
+        exon_lengths = split.split_lengths(row.HomologousExonLengths, seq)
         for exon, length in zip(exons, exon_lengths):
-            for _ in range(_int_length(length, seq)):
+            for _ in range(length):
                 exon_annot.append(exon2char[exon])
         seqs.append(seq)
     return "".join(seqs), "".join(exon_annot)
@@ -201,11 +186,11 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
             groups = exon_data.loc[:, [
-                'GeneStableID', 'TranscriptStableID', 'ExonProteinSequence',
-                'SubexonRank', 'HomologousExons', 'HomologousExonLengths'
+                'GeneID', 'TranscriptID', 'SubexonSequence', 'SubexonRank',
+                'HomologousExons', 'HomologousExonLengths'
             ]].drop_duplicates().sort_values(
-                by=['GeneStableID', 'TranscriptStableID', 'SubexonRank'
-                    ]).groupby(['GeneStableID', 'TranscriptStableID'])
+                by=['GeneID', 'TranscriptID', 'SubexonRank']).groupby(
+                    ['GeneID', 'TranscriptID'])
         for (gene, transcript), group in groups:
             seq, annot = _fill_sequence_and_annotation(group, exon2char)
             file.write(">P1;{} {} {}\n".format(
@@ -218,13 +203,13 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
 def _save_transcripts(exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
     with open(output_file, 'w') as file:
-        gene_transcripts = exon_data.loc[:, [
-            'GeneStableID', 'TranscriptStableID'
-        ]].sort_values(
-            by=['GeneStableID', 'TranscriptStableID']).drop_duplicates()
-        for gene, group in gene_transcripts.groupby('GeneStableID'):
+        gene_transcripts = exon_data.loc[:, ['GeneID', 'TranscriptID'
+                                             ]].sort_values(
+                                                 by=['GeneID', 'TranscriptID'
+                                                     ]).drop_duplicates()
+        for gene, group in gene_transcripts.groupby('GeneID'):
             file.write("{} ".format(gene))
-            transcripts = group['TranscriptStableID']
+            transcripts = group['TranscriptID']
             n_transcripts = len(transcripts)
             for i in range(n_transcripts):
                 file.write(transcript2phylosofs[transcripts.iloc[i]])
@@ -239,16 +224,15 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
     """
     Create the input files needed for running PhyloSofS in a phylosofs folder.
     """
-    output_path = utils.folders.create_subfolder(output_folder, 'phylosofs')
+    output_path = folders.create_subfolder(output_folder, 'phylosofs')
 
     exon2char = get_exon2char(exon_data['HomologousExons'].unique())
     transcript2phylosofs = get_transcript2phylosofs(exon_data, exon2char)
 
-    prune_tree(
-        os.path.join(ensembl_folder, 'tree.nh'),
-        os.path.join(output_path, 'tree.nh'),
-        os.path.join(ensembl_folder, 'exonstable.tsv'),
-        exon_data['GeneStableID'].unique())
+    prune_tree(os.path.join(ensembl_folder, 'tree.nh'),
+               os.path.join(output_path, 'tree.nh'),
+               os.path.join(ensembl_folder, 'exonstable.tsv'),
+               exon_data['GeneID'].unique())
 
     with open(os.path.join(output_path, 'homologous_exons.tsv'), 'w') as file:
         for exon, char in exon2char.items():

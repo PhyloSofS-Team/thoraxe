@@ -184,8 +184,8 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
     if df_end_phase == -1 and row_number != n_rows - 1:
         # next row index.
         next_row_index = data_frame.index[row_number + 1]
-        assert data_frame.loc[row_index, 'TranscriptStableID'] != \
-            data_frame.loc[next_row_index, 'TranscriptStableID'], \
+        assert data_frame.loc[row_index, 'TranscriptID'] != \
+            data_frame.loc[next_row_index, 'TranscriptID'], \
             "end phase -1 is not in the last exon " + \
             "for row number %d, index %d." % (row_number, row_index)
 
@@ -235,16 +235,16 @@ def check_order_and_phases(data_frame):
         prev_row_index = data_frame.index[row_number - 1]
         # If transcript id changes, the next exon is 0,
         # i.e. the first of the next gene transcript :
-        actual_transcript = data_frame.loc[row_index, 'TranscriptStableID']
+        actual_transcript = data_frame.loc[row_index, 'TranscriptID']
         prev_transcript = data_frame.loc[prev_row_index,
-                                         'TranscriptStableID']
+                                         'TranscriptID']
 
         if actual_transcript != prev_transcript:
             finished_transcripts.add(prev_transcript)
             exon_pos = 0
         else:
             assert actual_transcript not in finished_transcripts, \
-                "Data isn't sorted by 'TranscriptStableID'"
+                "Data isn't sorted by 'TranscriptID'"
             exon_pos += 1
 
         _check_exon_order(data_frame, row_number, row_index, prev_row_index,

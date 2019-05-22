@@ -94,9 +94,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     trx_data = trx_data.assign(
         SeqLength=lambda df: df['ProteinSequences'].map(len).values)
 
-    # Sort by 'SeqLength'. We then sort by 'ExonStableID' sequences with
+    # Sort by 'SeqLength'. We then sort by 'ExonID' sequences with
     # equal length to ensure reproducibility:
-    trx_data.sort_values(['SeqLength', 'ExonStableID'],
+    trx_data.sort_values(['SeqLength', 'ExonID'],
                          inplace=True,
                          ascending=False)
 
@@ -112,7 +112,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             gap_extend_penalty=gap_extend_penalty,
             substitution_matrix=substitution_matrix)
 
-        query_exon = row_list[i]['ExonStableID']
+        query_exon = row_list[i]['ExonID']
         i_index = trx_data.index[i]
         cluster = trx_data.at[i_index, 'Cluster']
         if cluster == 0:

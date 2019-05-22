@@ -30,7 +30,7 @@ def test_subexon_table(clustered_trx_data):
     assert 'SubexonIDCluster' in subexon_table.columns
 
     assert 'ENSMUST00000099506/ENSMUST00000135343' in subexon_table[
-        'TranscriptStableIDCluster'].values  # .values, otherwise in
+        'TranscriptIDCluster'].values  # .values, otherwise in
     # checks whether the value is in the Series' index.
 
     assert all(subexon_table['TranscriptFraction'] == 1.0)
@@ -62,18 +62,18 @@ def test_subexon_clusters(clustered_trx_data):
     qvqq = subexon_table[subexon_table['SubexonID'] ==
                          'ENSMUSE00000689835_SE_2_1']
     assert len(qvqq) == 2
-    assert sorted(qvqq['TranscriptStableID']) == [
+    assert sorted(qvqq['TranscriptID']) == [
         'ENSMUST00000111943', 'ENSMUST00000111945'
     ]
     for index in [0, 1]:
         assert qvqq['Strand'].iloc[index] == -1
         assert str(qvqq['ExonProteinSequence'].iloc[index]) == 'QVQQ*'
         assert str(qvqq['SubexonSequence'].iloc[index]) == 'CACAGGTGCAGCAATGA'
-        assert qvqq['ExonStableIDCluster'].iloc[
+        assert qvqq['ExonIDCluster'].iloc[
             index] == 'ENSMUSE00000689835/ENSMUSE00000689841'
 
     # VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR
-    exon_row = subexon_table[subexon_table['ExonStableID'] ==
+    exon_row = subexon_table[subexon_table['ExonID'] ==
                              'ENSMMUE00000040064'].iloc[0]
     assert exon_row['SubexonID'] == 'ENSMMUE00000040064_SE_15_16'
     assert exon_row['SubexonIDCluster'] == 'ENSMMUE00000040064_SE_15_16'
@@ -84,5 +84,5 @@ def test_subexon_clusters(clustered_trx_data):
         'TGTCAACAGATCCGACTTTGGCCTCGGATACAGACAGCAGTCTAGAAGCATCAGCTGGGC'
         'CTCTGGGCTGCTGTAGATGA')
     assert exon_row['Strand'] == 1
-    assert exon_row['SubexonGenomicCodingStart'] == 42539779
-    assert exon_row['SubexonGenomicCodingEnd'] == 42539918
+    assert exon_row['SubexonCodingStart'] == 42539779
+    assert exon_row['SubexonCodingEnd'] == 42539918

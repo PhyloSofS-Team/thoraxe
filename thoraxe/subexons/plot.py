@@ -45,7 +45,7 @@ def create_python_structure(cluster2data):
 
         fraction_data = pd.Series(
             zip(subexon_table['TranscriptsInGene'].values,
-                subexon_table['TranscriptsInSubexon'].values,
+                subexon_table['TranscriptsWithSubexon'].values,
                 subexon_table['TranscriptFraction'].values),
             index=subexon_table['SubexonIndex']).to_dict()
         z_constitutive = [[

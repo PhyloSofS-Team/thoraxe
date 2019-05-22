@@ -149,7 +149,7 @@ def read_exon_file(exon_table_file):
     # Sort exon by rank in transcript :
     # ---------------------------------
     exon_data.sort_values(
-        by=['GeneStableID', 'TranscriptStableID', 'ExonRank'], inplace=True)
+        by=['GeneID', 'TranscriptID', 'ExonRank'], inplace=True)
 
     return exon_data
 
@@ -161,13 +161,13 @@ def add_exon_sequences(data_frame, sequence_file):
     This function adds an 'Exon sequence' column at the end of 'data_frame'.
     For each row, this column has the BioPython's SeqRecord for the exon
     sequence of the row. The sequence description in the sequence_file
-    (in fasta format) should have the 'ExonStableID' as the second element
+    (in fasta format) should have the 'ExonID' as the second element
     if the description is split by ' '.ipt_in
-    The data_frame should have an 'ExonStableID' column and should not have
+    The data_frame should have an 'ExonID' column and should not have
     an 'Exon sequence' column.
-    'ExonStableID' is going to be used to match the SeqRecord to the row.
+    'ExonID' is going to be used to match the SeqRecord to the row.
     """
-    _check_column_presence(data_frame, 'ExonStableID')
+    _check_column_presence(data_frame, 'ExonID')
     _check_column_absence(data_frame, 'Exon sequence',
                           'Values are going to change.')
 
@@ -176,7 +176,7 @@ def add_exon_sequences(data_frame, sequence_file):
         exon_id = seqrecord.description.split(' ')[1]
         # NOTE : This takes 180 ms where one explicit loop over the rows
         # takes 2.75 s :
-        selected_rows = data_frame.index[data_frame['ExonStableID'] ==
+        selected_rows = data_frame.index[data_frame['ExonID'] ==
                                          exon_id].tolist()
         # NOTE : Assign one value / row at each time is needed to avoid
         # shape errors :
@@ -248,9 +248,9 @@ def _is_first_or_last_exon(row_list, row_index):
         row = row_list[row_index]
 
         identical_to_previous = row_list[
-            row_index - 1]['TranscriptStableID'] == row['TranscriptStableID']
+            row_index - 1]['TranscriptID'] == row['TranscriptID']
         identical_to_next = row_list[
-            row_index + 1]['TranscriptStableID'] == row['TranscriptStableID']
+            row_index + 1]['TranscriptID'] == row['TranscriptID']
 
         if (not identical_to_previous) or (row['StartPhase'] == -1):
             start_exon = True
@@ -477,10 +477,10 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     return True
 
 
-def find_identical_exons(data_frame, exon_id_column='ExonStableID'):
+def find_identical_exons(data_frame, exon_id_column='ExonID'):
     """Find exons that have similar coordinates and identical sequences."""
     exon_clusters = []
-    for _, subdf in data_frame.groupby(['GeneStableID']):
+    for _, subdf in data_frame.groupby(['GeneID']):
         subdf = subdf.drop_duplicates([
             exon_id_column, 'StartPhase', 'EndPhase', 'GenomicCodingStart',
             'GenomicCodingEnd'
@@ -511,12 +511,12 @@ def delete_incomplete_sequences(data_frame):
                            'You need to run add_protein_seq first.')
 
     incomplete_cdss = data_frame.loc[:, [
-        'TranscriptStableID', 'IncompleteCDS'
-    ]].groupby('TranscriptStableID').agg(lambda df: sum(df) > 0)
+        'TranscriptID', 'IncompleteCDS'
+    ]].groupby('TranscriptID').agg(lambda df: sum(df) > 0)
 
-    incomplete_seqs = data_frame.loc[:, ['TranscriptStableID',
+    incomplete_seqs = data_frame.loc[:, ['TranscriptID',
                                          'ExonProteinSequence']]. \
-        groupby('TranscriptStableID'). \
+        groupby('TranscriptID'). \
         agg(lambda df: "".join([str(s) for s in df])[-1] != "*")
     # Incomplete sequences do not end with '*'
 
@@ -526,7 +526,7 @@ def delete_incomplete_sequences(data_frame):
 
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'TranscriptStableID'] in incomplete_transcripts
+        if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
     ],
                     inplace=True)
 
@@ -536,9 +536,9 @@ def delete_badquality_sequences(data_frame):
     _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
-    badquality_seqs = data_frame.loc[:, ['TranscriptStableID',
+    badquality_seqs = data_frame.loc[:, ['TranscriptID',
                                          'ExonProteinSequence']]. \
-        groupby('TranscriptStableID'). \
+        groupby('TranscriptID'). \
         agg(lambda df: any('X' in str(s) for s in df))
 
     badquality_transcripts = set(
@@ -546,7 +546,7 @@ def delete_badquality_sequences(data_frame):
 
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'TranscriptStableID'] in badquality_transcripts
+        if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
     ],
                     inplace=True)
 
@@ -559,18 +559,18 @@ def find_identical_sequences(data_frame):
     It returns a list with the identical sequence clusters (sets).
     """
     # Concatenate the sequences as a string for each transcript in each gene :
-    seqs_df = data_frame.loc[:, ['GeneStableID',
-                                 'TranscriptStableID',
+    seqs_df = data_frame.loc[:, ['GeneID',
+                                 'TranscriptID',
                                  'ExonProteinSequence']]. \
-        groupby(['GeneStableID', 'TranscriptStableID']). \
+        groupby(['GeneID', 'TranscriptID']). \
         agg(lambda df: "".join([str(s) for s in df]))
     # Store the cluster of identical sequences :
     seq_clusters = []
     # Find duplicated sequences in each gene transcript :
-    for _, subdf in seqs_df.groupby('GeneStableID'):
+    for _, subdf in seqs_df.groupby('GeneID'):
         n_rows = len(subdf)
         if n_rows > 1:
-            # Sort by 'TranscriptStableID' to ensure reproducibility
+            # Sort by 'TranscriptID' to ensure reproducibility
             subdf = subdf.sort_index(level=1)
             row_list = subdf.to_dict('records')
             for i in range(0, n_rows - 1):
@@ -650,21 +650,21 @@ def delete_identical_sequences(data_frame):
                            'You need to run add_protein_seq first.')
 
     identical_sequences = find_identical_sequences(data_frame)
-    store_cluster(data_frame, identical_sequences, 'TranscriptStableID',
-                  'TranscriptStableIDCluster')
+    store_cluster(data_frame, identical_sequences, 'TranscriptID',
+                  'TranscriptIDCluster')
     to_delete = clusters.set_to_delete(identical_sequences)
     clusters.inform_about_deletions(
         to_delete,
         "Identical isoform sequences were found, keeping only one transcript:")
     data_frame.drop([
         i for i in data_frame.index
-        if data_frame.loc[i, 'TranscriptStableID'] in to_delete
+        if data_frame.loc[i, 'TranscriptID'] in to_delete
     ],
                     inplace=True)
 
 
-def merge_identical_exons(data_frame, exon_id_column='ExonStableID'):
-    """Unify the 'ExonStableID' of identical exons."""
+def merge_identical_exons(data_frame, exon_id_column='ExonID'):
+    """Unify the 'ExonID' of identical exons."""
     _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
@@ -724,9 +724,9 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # Merge both tables to have all the transcript information in one
     # DataFrame and to filter the exon table based on tsl evidence:
     tsl_table.rename(
-        columns={'TranscriptID': 'TranscriptStableID'}, inplace=True)
+        columns={'TranscriptID': 'TranscriptID'}, inplace=True)
     transcript_info = pd.merge(
-        tsl_table, exon_table, how='inner', on='TranscriptStableID')
+        tsl_table, exon_table, how='inner', on='TranscriptID')
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
