@@ -291,7 +291,7 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     wsl = _get_wsl_name(command[0])
     is_wsl = platform.system() == 'Windows' and wsl is not None
 
-    if 'clustalo' in command[0]:
+    if 'clustalo' in command[-1]:
         command.append('--in')
 
     if is_wsl:
