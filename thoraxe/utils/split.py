@@ -61,9 +61,13 @@ def split_seqs(sequences, seq):
     ['MLGH', 'AC']
     >>> split_seqs('MLGHAC', 'MLGHAC')
     ['MLGHAC']
+    >>> split_seqs('', 'MLGHAC')
+    ['MLGHAC']
     """
     if '/' in sequences:
         return sequences.split('/')
 
-    assert seq == sequences
+    if not sequences:
+        return [seq]
+
     return [sequences]
