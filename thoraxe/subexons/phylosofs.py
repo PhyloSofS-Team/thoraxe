@@ -164,7 +164,7 @@ def _fill_sequence_and_annotation(df_group, exon2char):
     exon_annot = []
     seqs = []
     for row in df_group.itertuples():
-        seq = str(row.SubexonSequence).replace('*', '')
+        seq = str(row.SubexonProteinSequence).replace('*', '')
         exons = split.split_exons(row.HomologousExons)
         exon_lengths = split.split_lengths(row.HomologousExonLengths, seq)
         for exon, length in zip(exons, exon_lengths):
@@ -186,8 +186,9 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
             groups = exon_data.loc[:, [
-                'GeneID', 'TranscriptID', 'SubexonSequence', 'SubexonRank',
-                'HomologousExons', 'HomologousExonLengths'
+                'GeneID', 'TranscriptID', 'SubexonProteinSequence',
+                'SubexonRank', 'HomologousExons', 'HomologousExonLengths',
+                'HomologousExonSequences'
             ]].drop_duplicates().sort_values(
                 by=['GeneID', 'TranscriptID', 'SubexonRank']).groupby(
                     ['GeneID', 'TranscriptID'])

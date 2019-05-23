@@ -106,11 +106,10 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     for i in range(nrows):
         if row_list[i]['SeqLength'] < minimum_len:
             continue
-        query = StripedSmithWaterman(
-            row_list[i]['ProteinSequences'],
-            gap_open_penalty=gap_open_penalty,
-            gap_extend_penalty=gap_extend_penalty,
-            substitution_matrix=substitution_matrix)
+        query = StripedSmithWaterman(row_list[i]['ProteinSequences'],
+                                     gap_open_penalty=gap_open_penalty,
+                                     gap_extend_penalty=gap_extend_penalty,
+                                     substitution_matrix=substitution_matrix)
 
         query_exon = row_list[i]['ExonID']
         i_index = trx_data.index[i]

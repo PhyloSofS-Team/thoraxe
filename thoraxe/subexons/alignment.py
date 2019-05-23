@@ -68,7 +68,7 @@ def _create_subexon_index(subexon_table):
     unique_subexons = unique_subexons.sort_values(by=['Order'])
 
     unique_subexons = unique_subexons.loc[:, [
-        'SubexonID', 'SubexonCodingStart', 'ExonProteinSequence',
+        'SubexonID', 'SubexonCodingStart', 'SubexonProteinSequence',
         'SubexonCodingEnd', 'SubexonRank'
     ]]
 
@@ -121,7 +121,7 @@ def create_subexon_matrix(subexon_table):
 
 def _get_sequence(subexon_info,
                   subexon_column,
-                  sequence_column='ExonProteinSequence'):
+                  sequence_column='SubexonProteinSequence'):
     """
     Return the sequence of the subexon as a string.
 
@@ -150,7 +150,7 @@ def create_chimeric_sequences(  # pylint: disable=too-many-locals
 
         # DataFrame to get a subexon information using its 'SubexonIndex'
         subexon_info_cols = [
-            'SubexonIndex', 'SubexonIDCluster', 'ExonProteinSequence'
+            'SubexonIndex', 'SubexonIDCluster', 'SubexonProteinSequence'
         ]
         subexon_info = gene_df.loc[:, subexon_info_cols]
         # NOTE: It make copies to not delete subexons inplace:

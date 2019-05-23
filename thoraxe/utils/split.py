@@ -48,9 +48,7 @@ def split_lengths(lengths, seq):
     length_seq = len(seq)
 
     if isinstance(lengths, str) and '/' in lengths:
-        lengths = [int(length) for length in lengths.split('/')]
-        assert sum(lengths) == length_seq
-        return lengths
+        return [int(length) for length in lengths.split('/')]
 
     return [_int_length(lengths, length_seq)]
 
@@ -65,9 +63,7 @@ def split_seqs(sequences, seq):
     ['MLGHAC']
     """
     if '/' in sequences:
-        seqs = sequences.split('/')
-        assert seq == ''.join(seqs)
-        return seqs
+        return sequences.split('/')
 
     assert seq == sequences
-    return sequences
+    return [sequences]

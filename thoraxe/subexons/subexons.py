@@ -77,7 +77,7 @@ Interval(start=8, end=9, components={1})]
 
 def _get_subexon_seq(exon_row, interval):
     """Return the interval sequence of the subexon."""
-    seq = exon_row['Exon sequence']
+    seq = exon_row['ExonSequence']
     if exon_row['Strand'] == 1:
         exon_start = exon_row['ExonRegionStart']
         interval_start = interval.start - exon_start
@@ -159,7 +159,7 @@ def _subexon_info(  # pylint: disable=too-many-locals
     # names by the columns_to_rename values before returning subexon_df:
     columns_to_rename = {
         'SubexonID': 'SubexonID',
-        'Exon sequence': 'SubexonSequence',
+        'ExonSequence': 'SubexonSequence',
         'GenomicCodingStart': 'SubexonCodingStart',
         'GenomicCodingEnd': 'SubexonCodingEnd',
         'IntervalNumber': 'IntervalNumber'
@@ -206,7 +206,7 @@ def _subexon_info(  # pylint: disable=too-many-locals
                 'Cluster': exon_row['Cluster'],
 
                 # CDS sequence of the subexon:
-                'Exon sequence': seq,
+                'ExonSequence': seq,
 
                 # cDNA_CodingStart and end have dummy values to make
                 # _get_exon_cds to return the input sequence without
@@ -214,8 +214,7 @@ def _subexon_info(  # pylint: disable=too-many-locals
                 'cDNA_CodingStart': 0,
                 'cDNA_CodingEnd': len(seq) - 1
             }
-            for row in gene_df[gene_df['ExonID'] ==
-                               exon_id].itertuples():
+            for row in gene_df[gene_df['ExonID'] == exon_id].itertuples():
                 transcript_row_info = _get_info_from_row(row, columns_to_keep)
                 transcript_row_info.update(subexon_info)
                 for key, value in transcript_row_info.items():
@@ -226,13 +225,16 @@ def _subexon_info(  # pylint: disable=too-many-locals
     subexon_df = subexon_df.sort_values(
         by=['GeneID', 'TranscriptID', 'SubexonRank'])
 
-    _add_phases(
-        subexon_df, rank_column='SubexonRank', seq_column='Exon sequence')
+    _add_phases(subexon_df,
+                rank_column='SubexonRank',
+                seq_column='ExonSequence')
 
-    transcript_info.add_protein_seq(subexon_df)
+    transcript_info.add_protein_seq(subexon_df,
+                                    seq_column="SubexonProteinSequence")
 
-    transcript_info.merge_identical_exons(
-        subexon_df, exon_id_column='SubexonID')
+    transcript_info.merge_identical_exons(subexon_df,
+                                          exon_id_column='SubexonID',
+                                          seq_column="SubexonProteinSequence")
 
     subexon_df.drop(columns=column_to_delete, inplace=True)
     subexon_df.rename(columns=columns_to_rename, inplace=True)
@@ -293,22 +295,25 @@ def _add_transcript_fraction(subexon_df):
     ]].drop_duplicates().groupby(
         ['GeneID']).size().to_frame('TranscriptsInGene').reset_index()
 
-    counts = pd.merge(
-        subexon_counts, transcript_counts, how='inner', on='GeneID')
+    counts = pd.merge(subexon_counts,
+                      transcript_counts,
+                      how='inner',
+                      on='GeneID')
 
     counts['TranscriptFraction'] = (
         counts['TranscriptsWithSubexon'] /
         counts['TranscriptsInGene'].astype('float64'))
 
-    return pd.merge(
-        subexon_df, counts, how='inner', on=['GeneID', 'SubexonID'])
+    return pd.merge(subexon_df,
+                    counts,
+                    how='inner',
+                    on=['GeneID', 'SubexonID'])
 
 
 def _find_exon(subexon_table, subexon_id_cluster):
     """Return a list with the 'ExonID's of a particular subexon."""
     return subexon_table.loc[subexon_table['SubexonIDCluster'] ==
-                             subexon_id_cluster, 'ExonID'].unique(
-                             ).tolist()
+                             subexon_id_cluster, 'ExonID'].unique().tolist()
 
 
 def _update_to_merge_list(to_merge, subexon_1, subexon_2):
@@ -395,41 +400,34 @@ def _find_subexons_to_merge(subexon_table, delim='/'):
 def _fill_with_new_subexon_data(old2new, rowi, rowj):
     """Fill a dict from old subexon ID to a dict with the new values."""
     if rowi['Strand'] == 1:
-        doit = (rowj['SubexonCodingStart'] -
-                rowi['SubexonCodingEnd'] == 1)
+        doit = (rowj['SubexonCodingStart'] - rowi['SubexonCodingEnd'] == 1)
     else:
-        doit = (rowi['SubexonCodingStart'] -
-                rowj['SubexonCodingEnd'] == 1)
+        doit = (rowi['SubexonCodingStart'] - rowj['SubexonCodingEnd'] == 1)
 
     if doit:
         keys = [
             'SubexonID', 'SubexonIDCluster', 'SubexonCodingStart',
-            'SubexonCodingEnd', 'StartPhase', 'EndPhase',
-            'SubexonSequence', 'ExonProteinSequence', 'IntervalNumber',
-            'SubexonRank'
+            'SubexonCodingEnd', 'StartPhase', 'EndPhase', 'SubexonSequence',
+            'SubexonProteinSequence', 'IntervalNumber', 'SubexonRank'
         ]
         rowi_subexon = rowi['SubexonIDCluster']
         rowj_subexon = rowj['SubexonIDCluster']
         previous = old2new.setdefault(rowi_subexon, rowi[keys].to_dict())
         actual = old2new.setdefault(rowj_subexon, rowj[keys].to_dict())
         if rowi['Strand'] == 1:
-            previous['SubexonCodingEnd'] = actual[
-                'SubexonCodingEnd']
-            actual['SubexonCodingStart'] = previous[
-                'SubexonCodingStart']
+            previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
+            actual['SubexonCodingStart'] = previous['SubexonCodingStart']
             previous['EndPhase'] = actual['EndPhase']
             actual['StartPhase'] = previous['StartPhase']
         else:
-            actual['SubexonCodingEnd'] = previous[
-                'SubexonCodingEnd']
-            previous['SubexonCodingStart'] = actual[
-                'SubexonCodingStart']
+            actual['SubexonCodingEnd'] = previous['SubexonCodingEnd']
+            previous['SubexonCodingStart'] = actual['SubexonCodingStart']
             actual['EndPhase'] = previous['EndPhase']
             previous['StartPhase'] = actual['StartPhase']
-        merged_protein = previous['ExonProteinSequence'] + actual[
-            'ExonProteinSequence']
-        previous['ExonProteinSequence'] = merged_protein
-        actual['ExonProteinSequence'] = merged_protein
+        merged_protein = previous['SubexonProteinSequence'] + actual[
+            'SubexonProteinSequence']
+        previous['SubexonProteinSequence'] = merged_protein
+        actual['SubexonProteinSequence'] = merged_protein
         merged_dna_seq = previous['SubexonSequence'] + actual['SubexonSequence']
         previous['SubexonSequence'] = merged_dna_seq
         actual['SubexonSequence'] = merged_dna_seq
@@ -452,8 +450,9 @@ def _merge_subexons(subexon_table, subexons_to_merge):
             group_mask = subexon_table.index.isin(group_index)
             transcript = subexon_table[group_mask].drop_duplicates(
                 'SubexonIDCluster')  # keep the first transcript
-            transcript.sort_values(
-                by='SubexonRank', inplace=True, ascending=True)
+            transcript.sort_values(by='SubexonRank',
+                                   inplace=True,
+                                   ascending=True)
             assert len(transcript) == n_subexons
 
             old2new = {}
@@ -467,13 +466,11 @@ def _merge_subexons(subexon_table, subexons_to_merge):
                 for key, value in old2new[subexon_id].items():
                     subexon_table.loc[index, key] = value
 
-            subexon_table.drop_duplicates(
-                subset=[
-                    'GeneID', 'TranscriptID',
-                    'TranscriptIDCluster', 'ExonID',
-                    'ExonIDCluster', 'SubexonID', 'SubexonIDCluster'
-                ],
-                inplace=True)
+            subexon_table.drop_duplicates(subset=[
+                'GeneID', 'TranscriptID', 'TranscriptIDCluster', 'ExonID',
+                'ExonIDCluster', 'SubexonID', 'SubexonIDCluster'
+            ],
+                                          inplace=True)
 
 
 def create_subexon_table(transcript_data, merge_non_redundant=True):
@@ -497,9 +494,9 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
         exon_df = exon_df.sort_values(
             by=['GenomicCodingStart', 'GenomicCodingEnd'])
 
-        intervals = disjoint_intervals(
-            list(exon_df['GenomicCodingStart']),
-            list(exon_df['GenomicCodingEnd']), list(exon_df.index))
+        intervals = disjoint_intervals(list(exon_df['GenomicCodingStart']),
+                                       list(exon_df['GenomicCodingEnd']),
+                                       list(exon_df.index))
 
         intervals = [
             interval for interval in intervals if len(interval.components) > 0

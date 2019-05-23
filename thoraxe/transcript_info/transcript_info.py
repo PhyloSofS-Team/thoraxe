@@ -15,15 +15,15 @@ from thoraxe.transcript_info import phases
 def _check_column_presence(data_frame, column, message=""):
     """Raise an error if column is not in data_frame."""
     if column not in data_frame.columns:
-        raise ValueError(
-            "Input DataFrame hasn't column: %s. %s" % (column, message))
+        raise ValueError("Input DataFrame hasn't column: %s. %s" %
+                         (column, message))
 
 
 def _check_column_absence(data_frame, column, message=""):
     """Give a warning if the column is already present in the data_frame."""
     if column in data_frame.columns:
-        warnings.warn(
-            "Input DataFrame already has column: %s. %s" % (column, message))
+        warnings.warn("Input DataFrame already has column: %s. %s" %
+                      (column, message))
 
 
 def _get_flag(flag):
@@ -131,11 +131,10 @@ def read_exon_file(exon_table_file):
         'cDNA_CodingStart', 'cDNA_CodingEnd', 'GenomicCodingStart',
         'GenomicCodingEnd'
     ]
-    exon_data = pd.read_csv(
-        exon_table_file,
-        sep='\t',
-        dtype={col: np.str
-               for col in int_cols_with_nas})
+    exon_data = pd.read_csv(exon_table_file,
+                            sep='\t',
+                            dtype={col: np.str
+                                   for col in int_cols_with_nas})
     # That columns are sometimes interpreted as
     # floats because pandas doesn't allow NA values
     # for int columns. We read these columns as np.str
@@ -148,8 +147,8 @@ def read_exon_file(exon_table_file):
 
     # Sort exon by rank in transcript :
     # ---------------------------------
-    exon_data.sort_values(
-        by=['GeneID', 'TranscriptID', 'ExonRank'], inplace=True)
+    exon_data.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
+                          inplace=True)
 
     return exon_data
 
@@ -158,20 +157,20 @@ def add_exon_sequences(data_frame, sequence_file):
     """
     Add exon sequences to the DataFrame.
 
-    This function adds an 'Exon sequence' column at the end of 'data_frame'.
+    This function adds an 'ExonSequence' column at the end of 'data_frame'.
     For each row, this column has the BioPython's SeqRecord for the exon
     sequence of the row. The sequence description in the sequence_file
     (in fasta format) should have the 'ExonID' as the second element
     if the description is split by ' '.ipt_in
     The data_frame should have an 'ExonID' column and should not have
-    an 'Exon sequence' column.
+    an 'ExonSequence' column.
     'ExonID' is going to be used to match the SeqRecord to the row.
     """
     _check_column_presence(data_frame, 'ExonID')
-    _check_column_absence(data_frame, 'Exon sequence',
+    _check_column_absence(data_frame, 'ExonSequence',
                           'Values are going to change.')
 
-    data_frame['Exon sequence'] = None
+    data_frame['ExonSequence'] = None
     for seqrecord in SeqIO.parse(sequence_file, "fasta"):
         exon_id = seqrecord.description.split(' ')[1]
         # NOTE : This takes 180 ms where one explicit loop over the rows
@@ -182,7 +181,7 @@ def add_exon_sequences(data_frame, sequence_file):
         # shape errors :
         for row in selected_rows:
             # NOTE : at is needed to assign the sequence in-place
-            data_frame.at[row, 'Exon sequence'] = seqrecord.seq
+            data_frame.at[row, 'ExonSequence'] = seqrecord.seq
 
 
 def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
@@ -194,7 +193,7 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
     coding start and end coordinates to cut the sequence and
     return the coding sequence (CDS) of the exon.
     """
-    # Exon sequences in the table are cDNA sequences.
+    # ExonSequences in the table are cDNA sequences.
     # cDNA sequence can have UTR regions but they have not introns.
     # CDS hasn't UTRs nor introns :ipt_in
     #
@@ -249,8 +248,8 @@ def _is_first_or_last_exon(row_list, row_index):
 
         identical_to_previous = row_list[
             row_index - 1]['TranscriptID'] == row['TranscriptID']
-        identical_to_next = row_list[
-            row_index + 1]['TranscriptID'] == row['TranscriptID']
+        identical_to_next = row_list[row_index +
+                                     1]['TranscriptID'] == row['TranscriptID']
 
         if (not identical_to_previous) or (row['StartPhase'] == -1):
             start_exon = True
@@ -305,7 +304,7 @@ def _manage_end_phase(row_list, row_index, cds_seq, end_exon):
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
         else:
-            next_exon_sequence = row_list[row_index + 1]['Exon sequence']
+            next_exon_sequence = row_list[row_index + 1]['ExonSequence']
             n_bases = phases.bases_to_complete_previous_codon(end_phase)
             cds_seq = cds_seq + next_exon_sequence[0:n_bases]
 
@@ -349,7 +348,9 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
-def add_protein_seq(data_frame, allow_incomplete_cds=True):
+def add_protein_seq(data_frame,
+                    allow_incomplete_cds=True,
+                    seq_column="ExonProteinSequence"):
     """
     Add a column with the protein sequence of the exon.
 
@@ -358,9 +359,9 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
     of read_exon_file.
     """
     _check_column_presence(
-        data_frame, 'Exon sequence', 'You need to run '
+        data_frame, 'ExonSequence', 'You need to run '
         'add_exonpercent_identity_cutoff_sequences first.')
-    _check_column_absence(data_frame, 'ExonProteinSequence',
+    _check_column_absence(data_frame, seq_column,
                           'Values are going to change.')
     _check_column_absence(data_frame, 'IncompleteCDS',
                           'Values are going to change.')
@@ -388,12 +389,13 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
                 j = row['GenomicCodingEnd'] - row['ExonRegionStart']
                 j += 1
 
-            cds_seq = row['Exon sequence'][i:j]
+            cds_seq = row['ExonSequence'][i:j]
 
         else:
-            cds_seq = _get_exon_cds(
-                row['Exon sequence'], row['cDNA_CodingStart'],
-                row['cDNA_CodingEnd'], start_exon, end_exon)
+            cds_seq = _get_exon_cds(row['ExonSequence'],
+                                    row['cDNA_CodingStart'],
+                                    row['cDNA_CodingEnd'], start_exon,
+                                    end_exon)
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
@@ -416,7 +418,7 @@ def add_protein_seq(data_frame, allow_incomplete_cds=True):
         row_index += 1
 
     # Add new column to store the sequences :
-    data_frame['ExonProteinSequence'] = sequences
+    data_frame[seq_column] = sequences
     # New column to store signals of incomplete CDS :
     data_frame['IncompleteCDS'] = incomplete_cds
 
@@ -448,7 +450,7 @@ def _different_coordinates(row_i, row_j):
     return False
 
 
-def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
+def _identical_seqs(rowi, rowj, seq_column='ExonProteinSequence'):  # pylint: disable=too-many-return-statements
     """Check if the sequences in rows i (rowi) and j (rowj) are identical."""
     if _different_phases(rowi, rowj):
         return False
@@ -456,8 +458,8 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     if _different_coordinates(rowi, rowj):
         return False
 
-    seq_i = rowi['ExonProteinSequence']
-    seq_j = rowj['ExonProteinSequence']
+    seq_i = rowi[seq_column]
+    seq_j = rowj[seq_column]
 
     if len(seq_i) != len(seq_j):
         return False
@@ -477,7 +479,9 @@ def _identical_seqs(rowi, rowj):  # pylint: disable=too-many-return-statements
     return True
 
 
-def find_identical_exons(data_frame, exon_id_column='ExonID'):
+def find_identical_exons(data_frame,
+                         exon_id_column='ExonID',
+                         seq_column='ExonProteinSequence'):
     """Find exons that have similar coordinates and identical sequences."""
     exon_clusters = []
     for _, subdf in data_frame.groupby(['GeneID']):
@@ -491,7 +495,7 @@ def find_identical_exons(data_frame, exon_id_column='ExonID'):
             row_i = row_list[i]
             for j in range(i + 1, n_rows):
                 row_j = row_list[j]
-                if _identical_seqs(row_i, row_j):
+                if _identical_seqs(row_i, row_j, seq_column=seq_column):
                     clusters.fill_clusters(exon_clusters,
                                            row_i[exon_id_column],
                                            row_j[exon_id_column])
@@ -510,9 +514,9 @@ def delete_incomplete_sequences(data_frame):
     _check_column_presence(data_frame, 'ExonProteinSequence',
                            'You need to run add_protein_seq first.')
 
-    incomplete_cdss = data_frame.loc[:, [
-        'TranscriptID', 'IncompleteCDS'
-    ]].groupby('TranscriptID').agg(lambda df: sum(df) > 0)
+    incomplete_cdss = data_frame.loc[:, ['TranscriptID', 'IncompleteCDS'
+                                         ]].groupby('TranscriptID').agg(
+                                             lambda df: sum(df) > 0)
 
     incomplete_seqs = data_frame.loc[:, ['TranscriptID',
                                          'ExonProteinSequence']]. \
@@ -633,8 +637,9 @@ def store_cluster(  # pylint: disable=too-many-arguments
         for cluster in cluster_list:
             if get_item(row, default_idx) in cluster:
                 cluster_column.append(
-                    clusters.cluster2str(
-                        cluster, delim=delim, item2str=item2str))
+                    clusters.cluster2str(cluster,
+                                         delim=delim,
+                                         item2str=item2str))
                 assigned = True
                 break
 
@@ -644,9 +649,9 @@ def store_cluster(  # pylint: disable=too-many-arguments
     return data_frame.insert(2, column_name, cluster_column)
 
 
-def delete_identical_sequences(data_frame):
+def delete_identical_sequences(data_frame, seq_column='ExonProteinSequence'):
     """Delete identical sequences in place keeping only one."""
-    _check_column_presence(data_frame, 'ExonProteinSequence',
+    _check_column_presence(data_frame, seq_column,
                            'You need to run add_protein_seq first.')
 
     identical_sequences = find_identical_sequences(data_frame)
@@ -663,12 +668,16 @@ def delete_identical_sequences(data_frame):
                     inplace=True)
 
 
-def merge_identical_exons(data_frame, exon_id_column='ExonID'):
+def merge_identical_exons(data_frame,
+                          exon_id_column='ExonID',
+                          seq_column='ExonProteinSequence'):
     """Unify the 'ExonID' of identical exons."""
-    _check_column_presence(data_frame, 'ExonProteinSequence',
+    _check_column_presence(data_frame, seq_column,
                            'You need to run add_protein_seq first.')
 
-    identical_exons = find_identical_exons(data_frame, exon_id_column)
+    identical_exons = find_identical_exons(data_frame,
+                                           exon_id_column,
+                                           seq_column=seq_column)
     store_cluster(data_frame, identical_exons, exon_id_column,
                   exon_id_column + 'Cluster')
     old2new = dict((exon_id, sorted(group)[0]) for group in identical_exons
@@ -717,16 +726,19 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     deleted.
     """
     # 1. Read the Transcript Support Level (TSL) table as a pandas' DataFrame:
-    tsl_table = read_tsl_file(
-        tsl_table_file, max_tsl_level, remove_na, species_list=species_list)
+    tsl_table = read_tsl_file(tsl_table_file,
+                              max_tsl_level,
+                              remove_na,
+                              species_list=species_list)
     # 2. Read the exon table as a pandas' DataFrame:
     exon_table = read_exon_file(exon_table_file)
     # Merge both tables to have all the transcript information in one
     # DataFrame and to filter the exon table based on tsl evidence:
-    tsl_table.rename(
-        columns={'TranscriptID': 'TranscriptID'}, inplace=True)
-    transcript_info = pd.merge(
-        tsl_table, exon_table, how='inner', on='TranscriptID')
+    tsl_table.rename(columns={'TranscriptID': 'TranscriptID'}, inplace=True)
+    transcript_info = pd.merge(tsl_table,
+                               exon_table,
+                               how='inner',
+                               on='TranscriptID')
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:

@@ -472,7 +472,8 @@ def main():
             subexon_table, os.path.join(input_folder, 'Ensembl'),
             output_folder)
 
-    subexons.tidy.save_tidy_csv(output_folder, subexon_table, gene2species)
+    tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
+    tidy_table.to_csv(os.path.join(output_folder, "homologous_exon_table.csv"))
 
 
 if __name__ == '__main___':
