@@ -18,8 +18,6 @@ import warnings
 from collections import Counter
 
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 from thoraxe import utils
 
@@ -35,33 +33,34 @@ BIOMART_HUMAN = "hsapiens_gene_ensembl"
 # Download Utils
 
 
-def _requests_retry(retries=3,
-                    backoff_factor=0.3,
-                    status_forcelist=(500, 501, 502, 503, 504, 401, 403, 404),
-                    session=None):
+def _request_ensembl(*args, **kargs):
     """
-    Request with retry and wait.
+    Try to request Ensembl waiting if needed.
 
-    Code taking from Sandilya Bhamidipati blog post at
-    https://dev.to/ssbozy/python-requests-with-retries-4p03
+    https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
     """
-    if session is None:
-        session = requests.Session()
+    response = requests.get(*args, **kargs)
+    wait = response.headers.get('Retry-After')
+    if wait:
+        warnings.warn(
+            'Ensembl rate limit reached, waiting for {} seconds.'.format(wait))
+        time.sleep(float(wait) + 1.0)
+        response = requests.get(*args, **kargs)
 
-    retry = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
-    )
-
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount('https://', adapter)
-    return session
+    return response
 
 
-SESSION = _requests_retry()
+def generic_ensembl_rest_request(extension, params, header):
+    "Perform a generic request."
+    response = _request_ensembl(SERVER + extension,
+                                params=params,
+                                headers=header,
+                                allow_redirects=True)
+    if not response.ok:
+        response.raise_for_status()
+        sys.exit()
+    return response
+
 
 # Utility functions
 
@@ -185,11 +184,7 @@ def _check_biomart_response(response):
 # Small biomart function from keithshep
 
 
-def _biomart_exons_annot_request(dataset,
-                                 geneid,
-                                 header=True,
-                                 allow_redirects=True,
-                                 quick=False):
+def _biomart_exons_annot_request(dataset, geneid, header=True):
     """
     Return all transcript information from the dataset and the ensembl geneid.
 
@@ -229,12 +224,7 @@ def _biomart_exons_annot_request(dataset,
                                                               eid=geneid,
                                                               ish=int(header))
     try:
-        if quick:
-            # the quick version does not wait and does not use retry
-            req = requests.get(biomart_request_url)
-        else:
-            req = SESSION.get(biomart_request_url,
-                              allow_redirects=allow_redirects)
+        req = _request_ensembl(biomart_request_url)
         if req.status_code >= 300:
             warnings.warn('BioMart request status for {} in {}: {}.'.format(
                 geneid, dataset, req.status_code))
@@ -252,28 +242,7 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
     dataset_names = _species2ensembldataset(species_name)
     # Try the download option quickly before retrying:
     for dataset in dataset_names:
-        response = _biomart_exons_annot_request(dataset,
-                                                geneid,
-                                                header=header,
-                                                quick=True)
-        if _check_biomart_response(response):
-            return response
-
-    # Now with retry and redirect:
-    for dataset in dataset_names:
-        print(dataset)
-        response = _biomart_exons_annot_request(dataset,
-                                                geneid,
-                                                header=header,
-                                                allow_redirects=True)
-        if _check_biomart_response(response):
-            return response
-        # Try without redirect. It avoids the test_download error in Travis CI
-        time.sleep(2)
-        response = _biomart_exons_annot_request(dataset,
-                                                geneid,
-                                                header=header,
-                                                allow_redirects=False)
+        response = _biomart_exons_annot_request(dataset, geneid, header=header)
         if _check_biomart_response(response):
             return response
 
@@ -284,15 +253,6 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
 
 # TO DO : passer toutes les fonctions avec un conteneur générique sur la
 # forme de la partie extension
-
-
-def generic_ensembl_rest_request(extension, params, header):
-    """Perform a generic request."""
-    request = SESSION.get(SERVER + extension, params=params, headers=header)
-    if not request.ok:
-        request.raise_for_status()
-        sys.exit()
-    return request
 
 
 def get_geneids_from_symbol(species, symbol, **params):
