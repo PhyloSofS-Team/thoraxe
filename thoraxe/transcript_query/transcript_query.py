@@ -481,7 +481,7 @@ def _rename(table_text):
 def _print_if(condition, *args):
     """Print only if condition is True."""
     if condition:
-        print(args)
+        print(*args)
 
 
 # TO DO : Refactor main to avoid pylint statements if possible:
