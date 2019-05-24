@@ -85,7 +85,7 @@ def parse_command_line():
     parser.add_argument(
         '--plot_chimerics',
         help='Save plotly/html plot for the chimeric alignments in the '
-        '_intermediate_outputs folder.',
+        '_intermediate folder.',
         action='store_true')
     parser.add_argument(
         '-l',
@@ -311,7 +311,8 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
     """Perform almost all the pipeline."""
 
     intermediate_output_path = utils.folders.create_subfolder(
-        output_folder, '_intermediate_outputs')
+        output_folder, '_intermediate')
+    msa_output_path = utils.folders.create_subfolder(output_folder, 'msa')
 
     cluster2updated_data = {}
     cluster2data = create_chimeric_msa(intermediate_output_path,
@@ -365,7 +366,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
             sequences = subexons.alignment.msa2sequences(
                 msa, gene_ids, padding)
             subexon_df = subexons.alignment.save_homologous_subexons(
-                subexon_df, sequences, gene_ids, colclusters, output_folder)
+                subexon_df, sequences, gene_ids, colclusters, msa_output_path)
         else:
             gene_ids = None
             msa_matrix = None
@@ -418,9 +419,10 @@ def main():
 
     input_folder = os.path.abspath(args.inputdir)
     output_folder = input_folder if args.outputdir == '' else args.outputdir
+    output_folder = utils.folders.create_subfolder(output_folder, 'thoraxe')
 
     intermediate_output_path = utils.folders.create_subfolder(
-        output_folder, '_intermediate_outputs')
+        output_folder, '_intermediate')
 
     transcript_table = get_transcripts(input_folder, species_list=species_list)
     subexon_table = get_subexons(transcript_table,
@@ -458,8 +460,6 @@ def main():
     subexon_table = update_subexon_table(subexon_table, cluster2data)
     subexon_table = subexons.alignment.impute_missing_orthologous_exon_group(
         subexon_table)
-    subexon_table.to_csv(os.path.join(output_folder,
-                                      "homologous_subexons.csv"))
 
     node2genes, edge2genes = subexons.graph.nodes_and_edges2genes(
         subexon_table)
@@ -475,6 +475,8 @@ def main():
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     tidy_table.to_csv(os.path.join(output_folder, "homologous_exon_table.csv"))
 
+    return tidy_table
+
 
 if __name__ == '__main___':
-    main()
+    TIDY_TABLE = main()
