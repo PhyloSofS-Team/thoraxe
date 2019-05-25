@@ -52,14 +52,16 @@ def _request_ensembl(*args, **kargs):
 
 def generic_ensembl_rest_request(extension, params, header):
     "Perform a generic request."
-    response = _request_ensembl(SERVER + extension,
-                                params=params,
-                                headers=header,
-                                allow_redirects=True)
-    if not response.ok:
-        response.raise_for_status()
-        sys.exit()
-    return response
+    for redirect in [True, False]:
+        response = _request_ensembl(SERVER + extension,
+                                    params=params,
+                                    headers=header,
+                                    allow_redirects=redirect)
+        if response.ok:
+            return response
+
+    warnings.warn('Failed request for {}'.format(SERVER + extension))
+    return None
 
 
 # Utility functions
