@@ -511,7 +511,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     _print_if(args.verbose,
               "Found the following list of ids: %s" % (json.dumps(geneids)))
     if not geneids:
-        raise KeyError("No gene found, exiting")
+        raise Exception("No results for {}".format(args.genename))
     curgene = geneids[0]
     gene_name = args.genename
     cdirectory = gene_name
