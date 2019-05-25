@@ -18,6 +18,8 @@ import warnings
 from collections import Counter
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from thoraxe import utils
 
@@ -33,35 +35,98 @@ BIOMART_HUMAN = "hsapiens_gene_ensembl"
 # Download Utils
 
 
-def _request_ensembl(*args, **kargs):
+def _requests_retry(
+        retries=5,
+        backoff_factor=1,
+        redirect=5,
+        # github.com/Ensembl/ensembl-rest/wiki/HTTP-Response-Codes
+        status_forcelist=(403, 408, 503),
+        session=None):
+    """
+    Request with retry and wait.
+
+    Code taking from Sandilya Bhamidipati blog post at
+    https://dev.to/ssbozy/python-requests-with-retries-4p03
+    """
+    if session is None:
+        session = requests.Session()
+
+    retry = Retry(
+        total=retries,
+        redirect=redirect,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('https://', adapter)
+
+    return session
+
+
+SESSION = _requests_retry()
+
+
+def _request_ensembl_retry(session, *args, **kargs):
     """
     Try to request Ensembl waiting if needed.
 
     https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
     """
-    response = requests.get(*args, **kargs)
+    response = session.get(*args, **kargs)
     wait = response.headers.get('Retry-After')
     if wait:
         warnings.warn(
             'Ensembl rate limit reached, waiting for {} seconds.'.format(wait))
         time.sleep(float(wait) + 1.0)
-        response = requests.get(*args, **kargs)
+        response = session.get(*args, **kargs)
 
     return response
 
 
+def _check_biomart_response(response):
+    """
+    Return True if the response doesn't look like an query ERROR or 404 page.
+
+    >>> _check_biomart_response('')
+    False
+    >>> _check_biomart_response('<html>')
+    False
+    >>> _check_biomart_response('Query ERROR: caught BioMart::Exception')
+    False
+    >>> _check_biomart_response('ENSG00000107643	ENST00000432379	48306655')
+    True
+    """
+    response = response.strip()
+    if response.startswith('<html') or response.startswith(
+            'Query ERROR:') or not response:
+        return False
+
+    return True
+
+
+def _request_ensembl_redirect(*args, **kargs):
+    """
+    Try to request Ensembl waiting if needed.
+
+    https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
+    """
+    response = _request_ensembl_retry(SESSION, *args, **kargs)
+    if response.ok:
+        return response
+
+    response = _request_ensembl_retry(
+        requests, *args, **kargs, allow_redirects=False)
+    if response.ok:
+        return response
+
+    warnings.warn('Failed request for args: {} kargs: {}'.format(args, kargs))
+    return None
+
+
 def generic_ensembl_rest_request(extension, params, header):
     "Perform a generic request."
-    for redirect in [True, False]:
-        response = _request_ensembl(SERVER + extension,
-                                    params=params,
-                                    headers=header,
-                                    allow_redirects=redirect)
-        if response.ok:
-            return response
-
-    warnings.warn('Failed request for {}'.format(SERVER + extension))
-    return None
+    return _request_ensembl_redirect(
+        SERVER + extension, params=params, headers=header)
 
 
 # Utility functions
@@ -85,17 +150,18 @@ def parse_command_line():
         Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.
         """,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('genename',
-                        type=str,
-                        help='gene name in Ensembl (e.g. MAPK8)')
-    parser.add_argument('-s',
-                        '--species',
-                        help='species to look for the gene name',
-                        default='homo_sapiens')
-    parser.add_argument('-o',
-                        '--orthology',
-                        help='Orthology relationship to use; 1:1, 1:n or m:n',
-                        default='1:1')
+    parser.add_argument(
+        'genename', type=str, help='gene name in Ensembl (e.g. MAPK8)')
+    parser.add_argument(
+        '-s',
+        '--species',
+        help='species to look for the gene name',
+        default='homo_sapiens')
+    parser.add_argument(
+        '-o',
+        '--orthology',
+        help='Orthology relationship to use; 1:1, 1:n or m:n',
+        default='1:1')
     parser.add_argument(
         '-l',
         '--specieslist',
@@ -104,10 +170,11 @@ def parse_command_line():
         'with the species list (one species per line). If nothing is '
         'indicated, all the available species are used.',
         default='')
-    parser.add_argument('-v',
-                        '--verbose',
-                        help='Print detailed progress.',
-                        action='store_true')
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        help='Print detailed progress.',
+        action='store_true')
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
@@ -127,10 +194,8 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
         for dictionary in listofdicts:
             fnames.update(list(dictionary.keys()))
         fnames = sorted(fnames)
-    csv_writer = csv.DictWriter(out,
-                                fieldnames=fnames,
-                                restval='NA',
-                                extrasaction='ignore')
+    csv_writer = csv.DictWriter(
+        out, fieldnames=fnames, restval='NA', extrasaction='ignore')
     if header:
         csv_writer.writeheader()
     csv_writer.writerows(listofdicts)
@@ -160,27 +225,6 @@ def _species2ensembldataset(species_name):
     return [
         names[0][0] + names[i] + "_gene_ensembl" for i in range(1, len(names))
     ]
-
-
-def _check_biomart_response(response):
-    """
-    Return True if the response doesn't look like an query ERROR or 404 page.
-
-    >>> _check_biomart_response('')
-    False
-    >>> _check_biomart_response('<html>')
-    False
-    >>> _check_biomart_response('Query ERROR: caught BioMart::Exception')
-    False
-    >>> _check_biomart_response('ENSG00000107643	ENST00000432379	48306655')
-    True
-    """
-    response = response.strip()
-    if response.startswith('<html') or response.startswith(
-            'Query ERROR:') or not response:
-
-        return False
-    return True
 
 
 # Small biomart function from keithshep
@@ -222,11 +266,10 @@ def _biomart_exons_annot_request(dataset, geneid, header=True):
         '</Dataset>'
         '</Query>')
 
-    biomart_request_url = biomart_request_url_template.format(data=dataset,
-                                                              eid=geneid,
-                                                              ish=int(header))
+    biomart_request_url = biomart_request_url_template.format(
+        data=dataset, eid=geneid, ish=int(header))
     try:
-        req = _request_ensembl(biomart_request_url)
+        req = _request_ensembl_redirect(biomart_request_url)
         if req.status_code >= 300:
             warnings.warn('BioMart request status for {} in {}: {}.'.format(
                 geneid, dataset, req.status_code))
@@ -344,9 +387,10 @@ def get_exons_sequences(listensexons):  # , **params):
         if exons:
             dexons = {"ids": exons}  # , "type": "cds"}
             ext_exons_seq = '/sequence/id/type=cds'
-            request = requests.post(SERVER + ext_exons_seq,
-                                    headers=HJSONPOST,
-                                    data=json.dumps(dexons))
+            request = requests.post(
+                SERVER + ext_exons_seq,
+                headers=HJSONPOST,
+                data=json.dumps(dexons))
 
             if not request.ok:
                 print(("FAILED REQUEST: " + str(dexons)))
@@ -546,9 +590,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         # if nt > 5: break
         number += 1
     ##
-    orthologs_filtered = filter_ortho(orthologs,
-                                      orthokeep,
-                                      relationship=args.orthology)
+    orthologs_filtered = filter_ortho(
+        orthologs, orthokeep, relationship=args.orthology)
     # TO DO print : orthokeep can be None
     # _print_if(args.verbose,
     # "Filtering on %d species, %d matches" % (len(orthokeep),
@@ -596,9 +639,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
         exorthofasta = get_exons_sequences(lexidortho)
         _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
-        ortho_exontable = get_biomart_exons_annot(orthospecies,
-                                                  orthoid,
-                                                  header=False)
+        ortho_exontable = get_biomart_exons_annot(
+            orthospecies, orthoid, header=False)
         _print_if(
             args.verbose, "  - %d lines in the exon table" %
             (ortho_exontable.count("\n") + 1))
