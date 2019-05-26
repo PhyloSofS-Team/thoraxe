@@ -181,7 +181,7 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
     Annotation line is used to store the one character identifier of the
     homologous exon for each residue.
     """
-    with open(output_file, 'w') as file:
+    with open(output_file, 'w', encoding='utf-8') as file:
         with warnings.catch_warnings():
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
@@ -203,7 +203,7 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
 
 def _save_transcripts(exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
-    with open(output_file, 'w') as file:
+    with open(output_file, 'w', encoding='utf-8') as file:
         gene_transcripts = exon_data.loc[:, ['GeneID', 'TranscriptID'
                                              ]].sort_values(
                                                  by=['GeneID', 'TranscriptID'
@@ -230,12 +230,16 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
     exon2char = get_exon2char(exon_data['HomologousExons'].unique())
     transcript2phylosofs = get_transcript2phylosofs(exon_data, exon2char)
 
-    prune_tree(os.path.join(ensembl_folder, 'tree.nh'),
-               os.path.join(output_path, 'tree.nh'),
-               os.path.join(ensembl_folder, 'exonstable.tsv'),
-               exon_data['GeneID'].unique())
+    prune_tree(
+        os.path.join(ensembl_folder, 'tree.nh'),
+        os.path.join(output_path, 'tree.nh'),
+        os.path.join(ensembl_folder, 'exonstable.tsv'),
+        exon_data['GeneID'].unique())
 
-    with open(os.path.join(output_path, 'homologous_exons.tsv'), 'w') as file:
+    with open(
+            os.path.join(output_path, 'homologous_exons.tsv'),
+            'w',
+            encoding='utf-8') as file:
         for exon, char in exon2char.items():
             file.write("{}\t{}\n".format(exon, char))
 
