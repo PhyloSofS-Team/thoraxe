@@ -15,15 +15,15 @@ from thoraxe.transcript_info import phases
 def _check_column_presence(data_frame, column, message=""):
     """Raise an error if column is not in data_frame."""
     if column not in data_frame.columns:
-        raise ValueError("Input DataFrame hasn't column: %s. %s" %
-                         (column, message))
+        raise ValueError(
+            "Input DataFrame hasn't column: %s. %s" % (column, message))
 
 
 def _check_column_absence(data_frame, column, message=""):
     """Give a warning if the column is already present in the data_frame."""
     if column in data_frame.columns:
-        warnings.warn("Input DataFrame already has column: %s. %s" %
-                      (column, message))
+        warnings.warn(
+            "Input DataFrame already has column: %s. %s" % (column, message))
 
 
 def _get_flag(flag):
@@ -131,10 +131,11 @@ def read_exon_file(exon_table_file):
         'cDNA_CodingStart', 'cDNA_CodingEnd', 'GenomicCodingStart',
         'GenomicCodingEnd'
     ]
-    exon_data = pd.read_csv(exon_table_file,
-                            sep='\t',
-                            dtype={col: np.str
-                                   for col in int_cols_with_nas})
+    exon_data = pd.read_csv(
+        exon_table_file,
+        sep='\t',
+        dtype={col: np.str
+               for col in int_cols_with_nas})
     # That columns are sometimes interpreted as
     # floats because pandas doesn't allow NA values
     # for int columns. We read these columns as np.str
@@ -147,10 +148,29 @@ def read_exon_file(exon_table_file):
 
     # Sort exon by rank in transcript :
     # ---------------------------------
-    exon_data.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
-                          inplace=True)
+    exon_data.sort_values(
+        by=['GeneID', 'TranscriptID', 'ExonRank'], inplace=True)
 
     return exon_data
+
+
+def _complete_transcripts(data):
+    """
+    Delete transcripts that have exons without sequence.
+
+    There are exons in the TSL table that doesn't have sequences in the
+    downloaded fasta file, e.g.: ENSBBBE00000162100 for MAPK10
+    """
+    mask = data.ExonSequence.isnull()
+    if mask.sum() > 0:
+        exons_to_delete = set(data.ExonID[mask])
+        to_delete = set(data.TranscriptID[mask])
+        index_to_delete = data.index[data.TranscriptID.isin(to_delete)]
+        data.drop(index_to_delete, inplace=True)
+        clusters.inform_about_deletions(
+            to_delete,
+            "Exons without sequences: {}... Deleting incomplete transcripts:".
+            format(exons_to_delete))
 
 
 def add_exon_sequences(data_frame, sequence_file):
@@ -182,6 +202,9 @@ def add_exon_sequences(data_frame, sequence_file):
         for row in selected_rows:
             # NOTE : at is needed to assign the sequence in-place
             data_frame.at[row, 'ExonSequence'] = seqrecord.seq
+
+    # Delete transcripts without sequences
+    _complete_transcripts(data_frame)
 
 
 def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
@@ -392,10 +415,9 @@ def add_protein_seq(data_frame,
             cds_seq = row['ExonSequence'][i:j]
 
         else:
-            cds_seq = _get_exon_cds(row['ExonSequence'],
-                                    row['cDNA_CodingStart'],
-                                    row['cDNA_CodingEnd'], start_exon,
-                                    end_exon)
+            cds_seq = _get_exon_cds(
+                row['ExonSequence'], row['cDNA_CodingStart'],
+                row['cDNA_CodingEnd'], start_exon, end_exon)
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
@@ -637,9 +659,8 @@ def store_cluster(  # pylint: disable=too-many-arguments
         for cluster in cluster_list:
             if get_item(row, default_idx) in cluster:
                 cluster_column.append(
-                    clusters.cluster2str(cluster,
-                                         delim=delim,
-                                         item2str=item2str))
+                    clusters.cluster2str(
+                        cluster, delim=delim, item2str=item2str))
                 assigned = True
                 break
 
@@ -675,9 +696,8 @@ def merge_identical_exons(data_frame,
     _check_column_presence(data_frame, seq_column,
                            'You need to run add_protein_seq first.')
 
-    identical_exons = find_identical_exons(data_frame,
-                                           exon_id_column,
-                                           seq_column=seq_column)
+    identical_exons = find_identical_exons(
+        data_frame, exon_id_column, seq_column=seq_column)
     store_cluster(data_frame, identical_exons, exon_id_column,
                   exon_id_column + 'Cluster')
     old2new = dict((exon_id, sorted(group)[0]) for group in identical_exons
@@ -726,19 +746,15 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     deleted.
     """
     # 1. Read the Transcript Support Level (TSL) table as a pandas' DataFrame:
-    tsl_table = read_tsl_file(tsl_table_file,
-                              max_tsl_level,
-                              remove_na,
-                              species_list=species_list)
+    tsl_table = read_tsl_file(
+        tsl_table_file, max_tsl_level, remove_na, species_list=species_list)
     # 2. Read the exon table as a pandas' DataFrame:
     exon_table = read_exon_file(exon_table_file)
     # Merge both tables to have all the transcript information in one
     # DataFrame and to filter the exon table based on tsl evidence:
     tsl_table.rename(columns={'TranscriptID': 'TranscriptID'}, inplace=True)
-    transcript_info = pd.merge(tsl_table,
-                               exon_table,
-                               how='inner',
-                               on='TranscriptID')
+    transcript_info = pd.merge(
+        tsl_table, exon_table, how='inner', on='TranscriptID')
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
