@@ -36,10 +36,10 @@ BIOMART_HUMAN = "hsapiens_gene_ensembl"
 
 
 def _requests_retry(
-        retries=5,
+        retries=20,
         backoff_factor=1,
-        redirect=5,
         # github.com/Ensembl/ensembl-rest/wiki/HTTP-Response-Codes
+        # OLD: (500, 501, 502, 503, 504, 401, 403, 404),
         status_forcelist=(403, 408, 503),
         session=None):
     """
@@ -53,7 +53,8 @@ def _requests_retry(
 
     retry = Retry(
         total=retries,
-        redirect=redirect,
+        read=retries,
+        connect=retries,
         backoff_factor=backoff_factor,
         status_forcelist=status_forcelist,
     )
@@ -105,12 +106,9 @@ def _check_biomart_response(response):
 
 
 def _request_ensembl_redirect(*args, **kargs):
-    """
-    Try to request Ensembl waiting if needed.
-
-    https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
-    """
+    """Try to request Ensembl with and without redirect."""
     response = _request_ensembl_retry(SESSION, "get", *args, **kargs)
+
     if response.ok:
         return response
 
