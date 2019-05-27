@@ -66,19 +66,19 @@ def _requests_retry(
 SESSION = _requests_retry()
 
 
-def _request_ensembl_retry(session, *args, **kargs):
+def _request_ensembl_retry(session, session_method, *args, **kargs):
     """
     Try to request Ensembl waiting if needed.
 
     https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
     """
-    response = session.get(*args, **kargs)
+    response = getattr(session, session_method)(*args, **kargs)
     wait = response.headers.get('Retry-After')
     if wait:
         warnings.warn(
             'Ensembl rate limit reached, waiting for {} seconds.'.format(wait))
         time.sleep(float(wait) + 1.0)
-        response = session.get(*args, **kargs)
+        response = getattr(session, session_method)(*args, **kargs)
 
     return response
 
@@ -110,11 +110,12 @@ def _request_ensembl_redirect(*args, **kargs):
 
     https://github.com/Ensembl/ensembl-rest/wiki/Rate-Limits
     """
-    response = _request_ensembl_retry(SESSION, *args, **kargs)
+    response = _request_ensembl_retry(SESSION, "get", *args, **kargs)
     if response.ok:
         return response
 
     response = _request_ensembl_retry(requests,
+                                      "get",
                                       *args,
                                       **kargs,
                                       allow_redirects=False)
@@ -391,9 +392,11 @@ def get_exons_sequences(listensexons):  # , **params):
         if exons:
             dexons = {"ids": exons}  # , "type": "cds"}
             ext_exons_seq = '/sequence/id/type=cds'
-            request = SESSION.post(SERVER + ext_exons_seq,
-                                   headers=HJSONPOST,
-                                   data=json.dumps(dexons))
+            request = _request_ensembl_retry(SESSION,
+                                             "post",
+                                             SERVER + ext_exons_seq,
+                                             headers=HJSONPOST,
+                                             data=json.dumps(dexons))
 
             if not request.ok:
                 print(("FAILED REQUEST: " + str(dexons)))
