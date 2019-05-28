@@ -475,8 +475,6 @@ def main():
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     tidy_table.to_csv(os.path.join(output_folder, "homologous_exon_table.csv"))
 
-    return tidy_table
-
 
 if __name__ == '__main___':
-    TIDY_TABLE = main()
+    main()
