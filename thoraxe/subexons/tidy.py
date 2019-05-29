@@ -23,11 +23,10 @@ def get_tidy_table(table, gene2species):
     tidy_table = pd.DataFrame(columns=[
         'Species', "GeneID", "TranscriptIDCluster", "ExonIDCluster",
         "SubexonIDCluster", "HomologousExon", "Strand", "TranscriptsInGene",
-        "ExonRank", "SubexonProteinSequence", "Cluster", "StartPhase",
-        "EndPhase", "SubexonRank", "SubexonSequence", "SubexonProteinSequence",
-        "SubexonCodingStart", "SubexonCodingEnd", "TranscriptsWithSubexon",
-        "HomologousExonRank", "HomologousExonSequence", "HomologousExonStart",
-        "HomologousExonEnd"
+        "ExonRank", "Cluster", "StartPhase", "EndPhase", "SubexonRank",
+        "SubexonSequence", "SubexonProteinSequence", "SubexonCodingStart",
+        "SubexonCodingEnd", "TranscriptsWithSubexon", "HomologousExonRank",
+        "HomologousExonSequence", "HomologousExonStart", "HomologousExonEnd"
     ])
 
     previous_transcript = ""

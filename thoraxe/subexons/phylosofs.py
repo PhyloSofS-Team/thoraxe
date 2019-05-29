@@ -16,7 +16,7 @@ from thoraxe.utils import split
 CHARS = [
     char for char in string.printable if char not in {
         ' ', '\t', '\n', '\r', '\x0b', '\x0c', '\\', '*', '>', '"', "'", ',',
-        '-', '_', '/', ';', '#', '$'
+        '-', '_', '/', ';', '#', '$', '.', '&', '!', '@'
     }
 ]
 
@@ -230,16 +230,14 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
     exon2char = get_exon2char(exon_data['HomologousExons'].unique())
     transcript2phylosofs = get_transcript2phylosofs(exon_data, exon2char)
 
-    prune_tree(
-        os.path.join(ensembl_folder, 'tree.nh'),
-        os.path.join(output_path, 'tree.nh'),
-        os.path.join(ensembl_folder, 'exonstable.tsv'),
-        exon_data['GeneID'].unique())
+    prune_tree(os.path.join(ensembl_folder, 'tree.nh'),
+               os.path.join(output_path, 'tree.nh'),
+               os.path.join(ensembl_folder, 'exonstable.tsv'),
+               exon_data['GeneID'].unique())
 
-    with open(
-            os.path.join(output_path, 'homologous_exons.tsv'),
-            'w',
-            encoding='utf-8') as file:
+    with open(os.path.join(output_path, 'homologous_exons.tsv'),
+              'w',
+              encoding='utf-8') as file:
         for exon, char in exon2char.items():
             file.write("{}\t{}\n".format(exon, char))
 
