@@ -443,11 +443,15 @@ def filter_ortho(dortho, species=None, relationship='1:n'):
     """Filter the dictionary of orthologues according to the list of names."""
     # TO DO: rajouter un système de synonymes sur les espèces pour le filtrage
     relationships = _get_relationships(relationship)
-    return [
+    orthologs = [
         value for value in dortho if value['type'] in relationships and (
             True if species is None else value['target']['species'].lower() in
             species)
     ]
+    if dortho and not orthologs:
+        raise Exception(
+            "There are not {} in the requested species.".format(relationships))
+    return orthologs
 
 
 def get_transcripts_orthologs(ensgeneid, lorthologs):
