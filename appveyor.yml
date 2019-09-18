@@ -10,6 +10,7 @@ install:
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "python -m pip install --upgrade setuptools pip"
+  - "python -m pip install coveralls codecov"
   - "python -m pip install numpy" # is needed to install scikit-bio
   - "python -m pip install -e ."
 
