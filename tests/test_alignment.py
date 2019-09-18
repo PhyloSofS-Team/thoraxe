@@ -24,7 +24,7 @@ def subexon_data(request):
 
 
 def test_subexon_connectivity(subexon_data):
-    data = subexon_data('GRIN1')
+    data = subexon_data('GPRIN1')
     connected_subexons = subexons.alignment.subexon_connectivity(data)
     # Gene: ENSMODG00000005102
     # Transcript: ENSMODT00000006412.2
@@ -33,7 +33,7 @@ def test_subexon_connectivity(subexon_data):
 
 
 def test_subexon_table(subexon_data):
-    data = subexon_data('GRIN1')
+    data = subexon_data('GPRIN1')
     connected_subexons = subexons.alignment.subexon_connectivity(data)
     subgroup, subexon_matrix = subexons.alignment.create_subexon_matrix(data)
     chimerics = subexons.alignment.create_chimeric_sequences(

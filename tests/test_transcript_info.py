@@ -32,18 +32,19 @@ def camk2a(datadir):
 
 
 @pytest.fixture(scope='module')
-def grin1(datadir):
-    grin1_dir = os.path.join(datadir, 'GRIN1', 'Ensembl')
+def gprin1(datadir):
+    gprin1_dir = os.path.join(datadir, 'GPRIN1', 'Ensembl')
     return {
-        'tsl': os.path.join(grin1_dir, 'tsl.csv'),
-        'exontable': os.path.join(grin1_dir, 'exonstable.tsv'),
-        'seqs': os.path.join(grin1_dir, 'sequences.fasta')
+        'tsl': os.path.join(gprin1_dir, 'tsl.csv'),
+        'exontable': os.path.join(gprin1_dir, 'exonstable.tsv'),
+        'seqs': os.path.join(gprin1_dir, 'sequences.fasta')
     }
 
 
 def test_read_transcript_info(mapk8):
-    trx_data = transcript_info.read_transcript_info(
-        mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
+    trx_data = transcript_info.read_transcript_info(mapk8['tsl'],
+                                                    mapk8['exontable'],
+                                                    mapk8['seqs'])
 
     assert trx_data.loc[trx_data['TranscriptID'] ==
                         'ENST00000374179', 'Flags'].unique(
@@ -54,8 +55,10 @@ def test_read_transcript_info(mapk8):
 
 
 def test_remove_na(mapk8):
-    trx_data = transcript_info.read_transcript_info(
-        mapk8['tsl'], mapk8['exontable'], mapk8['seqs'], remove_na=False)
+    trx_data = transcript_info.read_transcript_info(mapk8['tsl'],
+                                                    mapk8['exontable'],
+                                                    mapk8['seqs'],
+                                                    remove_na=False)
 
     # I keep other species, not only h. sapiens & m. musculus:
     assert len(trx_data.Species.unique()) > 2
@@ -69,33 +72,33 @@ def test_remove_na(mapk8):
 
 
 def test_species_list(mapk8):
-    species_list = ['bos_taurus', 'danio_rerio', 'homo_sapiens']
+    species_list = ['bos_taurus', 'homo_sapiens']
 
-    trx_data = transcript_info.read_transcript_info(
-        mapk8['tsl'],
-        mapk8['exontable'],
-        mapk8['seqs'],
-        remove_na=False,
-        species_list=species_list)
+    trx_data = transcript_info.read_transcript_info(mapk8['tsl'],
+                                                    mapk8['exontable'],
+                                                    mapk8['seqs'],
+                                                    remove_na=False,
+                                                    species_list=species_list)
 
     assert sorted(trx_data.Species.unique()) == species_list
 
 
 def test_keep_badquality_sequences(mapk8):
-    trx_data = transcript_info.read_transcript_info(
-        mapk8['tsl'],
-        mapk8['exontable'],
-        mapk8['seqs'],
-        remove_na=False,
-        remove_badquality=False)
+    trx_data = transcript_info.read_transcript_info(mapk8['tsl'],
+                                                    mapk8['exontable'],
+                                                    mapk8['seqs'],
+                                                    remove_na=False,
+                                                    remove_badquality=False)
 
     # ENSRNOT00000083933 has Xs in its sequence: ...VILGMGYKENGQXVXHVQRGLICC*
     assert sum(trx_data['TranscriptID'] == 'ENSRNOT00000083933') == 5
 
 
 def test_non_coding_exons_camk2a(camk2a):
-    trx_data = transcript_info.read_transcript_info(
-        camk2a['tsl'], camk2a['exontable'], camk2a['seqs'], remove_na=False)
+    trx_data = transcript_info.read_transcript_info(camk2a['tsl'],
+                                                    camk2a['exontable'],
+                                                    camk2a['seqs'],
+                                                    remove_na=False)
 
     # The two first exons of ENSSSCT00000052397 are non-coding
     assert ''.join(
@@ -108,9 +111,11 @@ def test_non_coding_exons_camk2a(camk2a):
           'DGKWQIVHFHRSGAPSVLPH*')
 
 
-def test_non_coding_exons_grin1(grin1):
-    trx_data = transcript_info.read_transcript_info(
-        grin1['tsl'], grin1['exontable'], grin1['seqs'], remove_na=False)
+def test_non_coding_exons_gprin1(gprin1):
+    trx_data = transcript_info.read_transcript_info(gprin1['tsl'],
+                                                    gprin1['exontable'],
+                                                    gprin1['seqs'],
+                                                    remove_na=False)
 
     # The last two exons of ENSMUST00000099506 are non-coding.
     # The unique coding exon has UTR at both ends.
@@ -138,8 +143,9 @@ def test_non_coding_exons_grin1(grin1):
 
 
 def test_exon_clustering(mapk8):
-    trx_data = transcript_info.read_transcript_info(
-        mapk8['tsl'], mapk8['exontable'], mapk8['seqs'])
+    trx_data = transcript_info.read_transcript_info(mapk8['tsl'],
+                                                    mapk8['exontable'],
+                                                    mapk8['seqs'])
 
     clustered = transcript_info.exon_clustering(trx_data)
 

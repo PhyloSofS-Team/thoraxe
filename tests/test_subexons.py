@@ -23,7 +23,7 @@ def clustered_trx_data(request):
 
 
 def test_subexon_table(clustered_trx_data):
-    data = clustered_trx_data('GRIN1')
+    data = clustered_trx_data('GPRIN1')
     subexon_table = subexons.create_subexon_table(data)
 
     assert 'SubexonID' in subexon_table.columns
@@ -44,11 +44,8 @@ def test_subexon_clusters(clustered_trx_data):
                           'ENSMMUE00000040028_SE_0/ENSMMUE00000387789_SE_0',
                           'SubexonID'].unique()) == 1
 
-    # 426 rows with before merging non-redundant contiguous subexons
     not_merged = subexons.create_subexon_table(data, merge_non_redundant=False)
-    assert not_merged.shape[0] == 426
-    # 405 after merging
-    assert subexon_table.shape[0] == 405
+    assert not_merged.shape[0] > subexon_table.shape[0]
 
     # QVQQ
     assert len(
@@ -62,12 +59,11 @@ def test_subexon_clusters(clustered_trx_data):
     qvqq = subexon_table[subexon_table['SubexonID'] ==
                          'ENSMUSE00000689835_SE_2_1']
     assert len(qvqq) == 2
-    assert sorted(qvqq['TranscriptID']) == [
-        'ENSMUST00000111943', 'ENSMUST00000111945'
-    ]
+    assert sorted(
+        qvqq['TranscriptID']) == ['ENSMUST00000111943', 'ENSMUST00000111945']
     for index in [0, 1]:
         assert qvqq['Strand'].iloc[index] == -1
-        assert str(qvqq['ExonProteinSequence'].iloc[index]) == 'QVQQ*'
+        assert str(qvqq['SubexonProteinSequence'].iloc[index]) == 'QVQQ*'
         assert str(qvqq['SubexonSequence'].iloc[index]) == 'CACAGGTGCAGCAATGA'
         assert qvqq['ExonIDCluster'].iloc[
             index] == 'ENSMUSE00000689835/ENSMUSE00000689841'
@@ -77,7 +73,7 @@ def test_subexon_clusters(clustered_trx_data):
                              'ENSMMUE00000040064'].iloc[0]
     assert exon_row['SubexonID'] == 'ENSMMUE00000040064_SE_15_16'
     assert exon_row['SubexonIDCluster'] == 'ENSMMUE00000040064_SE_15_16'
-    assert str(exon_row['ExonProteinSequence']
+    assert str(exon_row['SubexonProteinSequence']
                ) == 'VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR*'
     assert str(exon_row['SubexonSequence']) == (
         'CAGTGATCAATGGCTCTCAGCATCCATCGTCATCGTCGTCTGTCAATGATGTGTCTTCAA'

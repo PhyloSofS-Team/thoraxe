@@ -63,7 +63,7 @@ def get_exon2char(exons):
     >>> sorted(result)
     ['1_0', '1_1', '2_0']
     >>> [result[exon] for exon in sorted(result)]
-    ['0', '1', '2']
+    ['%', '(', ')']
     """
     homologous_exons = {}
     i = 0
