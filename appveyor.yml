@@ -18,5 +18,4 @@ build: false
 
 test_script:
   - "python setup.py test "
-  - "coveralls.exe"
   - "codecov.exe"
