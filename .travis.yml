@@ -7,6 +7,7 @@ notifications:
   email: false
 
 install:
+  - sudo apt-get install clustalo
   - python -m pip install coveralls codecov
   - python -m pip install -e .
 
