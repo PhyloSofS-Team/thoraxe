@@ -152,7 +152,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
 
     # Use gene id instead of protein/peptide/translation id in the tree
     for clade in tree.get_terminals():
-        clade.name = data.loc[clade.name]
+        clade.name = data.loc[clade.name][0]
 
     Phylo.write(tree, output_tree, 'newick')
 
