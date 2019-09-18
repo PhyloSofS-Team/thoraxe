@@ -233,7 +233,7 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
     prune_tree(os.path.join(ensembl_folder, 'tree.nh'),
                os.path.join(output_path, 'tree.nh'),
                os.path.join(ensembl_folder, 'exonstable.tsv'),
-               list(exon_data['GeneID'].unique()))
+               exon_data['GeneID'].unique())
 
     with open(os.path.join(output_path, 'homologous_exons.tsv'),
               'w',
