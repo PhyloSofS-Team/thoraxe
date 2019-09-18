@@ -2,15 +2,12 @@
 tidy:  Utils for having a tidy output (denormalized table).
 """
 
-import os
-
 import pandas as pd
 
-from itertools import chain
 from thoraxe.utils import split
 
 
-def get_tidy_table(table, gene2species):
+def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
     """
     Save a tidy and denormalized output table.
 
@@ -43,8 +40,8 @@ def get_tidy_table(table, gene2species):
         assert len(hexons) == len(he_seqs)
 
         tidy_row = dict()
-        for column in tidy_table.columns:
-            if column in table.columns:
+        for column in list(tidy_table.columns):
+            if column in list(table.columns):
                 tidy_row[column] = getattr(row, column)
 
         tidy_row['Species'] = gene2species[row.GeneID]
