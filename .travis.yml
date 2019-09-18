@@ -13,7 +13,3 @@ install:
 script:
   - export PYTEST_ADDOPTS="--pylint"
   - python setup.py test
-
-after_success:
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then coveralls; fi
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then codecov; fi
