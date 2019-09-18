@@ -1,8 +1,9 @@
 import glob
 import os
-import pytest
 import shutil
-import subprocess
+import sys
+import pytest
+from thoraxe import transcript_query
 
 
 def _is_travis():
@@ -20,15 +21,18 @@ def example_folder():
 
 
 @pytest.mark.skipif(_is_travis(), reason="Skipping this test on Travis CI.")
-def test_download():
-    assert subprocess.call([
+def test_download(monkeypatch):
+    monkeypatch.setattr(sys, 'argv', [
         'transcript_query', 'MAPK8', '-l',
         'homo_sapiens,mus_musculus,pan_troglodytes,'
         'panthera_tigris_altaica,cebus_capucinus_imitator,'
         'colobus_angolensis_palliatus,cricetulus_griseus_chok1gshd,'
         'cricetulus_griseus_crigri,canis_lupus_dingo,mustela_putorius_furo,'
         'heterocephalus_glaber_female,heterocephalus_glaber_male'
-    ]) == 0
+    ])
+    assert not os.path.isdir('MAPK8')
+    assert transcript_query.main() is None
+    assert os.path.isdir('MAPK8')
 
 
 @pytest.mark.skipif(_is_travis(), reason="Skipping this test on Travis CI.")
