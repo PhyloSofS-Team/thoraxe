@@ -13,6 +13,13 @@ install:
   - "python -m pip install coveralls codecov"
   - "python -m pip install numpy" # is needed to install scikit-bio
   - "python -m pip install -e ."
+  - "bash 'ls'"
+  - "bash ls"
+  - "wsl ls"
+  - "bash apt-get update"
+  - "bash wget -h"
+  - "bash curl -h"
+  - "bash tar -h"
 
 build: false
 
