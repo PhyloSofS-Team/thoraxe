@@ -11,7 +11,7 @@ install:
   - bash -c "ls"
   - bash -c "pwd"
   - ps: pwd
-  - sudo chmod +x clustalo
+  - bash -c "sudo chmod a+x /c/projects/thoraxe/clustalo"
   - ps: ls
   - bash -c "ls -l"
   - bash -c "/c/projects/thoraxe/clustalo -h"
