@@ -19,12 +19,13 @@ def set_out_dir():
 
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
-    filename = request.module.__file__
-    if "APPVEYOR" in os.environ and os.environ["APPVEYOR"] == "true":
-        aligner = "C:\\projects\\thoraxe\\muscle.exe -in "
-    else:
-        aligner = "clustalo"
+    aligner = "clustalo"
+    if _is_windows():  # AppVeyor
+        muscle = "C:\\projects\\thoraxe\\muscle.exe"
+        if os.path.exists(muscle):
+            aligner = muscle + " -in "
 
+    filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
     monkeypatch.setattr(sys, 'argv', [
         'thoraxe', '-i', in_dir, '-o', 'tmp', '-y', '--plot_chimerics', '-a',
