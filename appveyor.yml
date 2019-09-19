@@ -12,7 +12,6 @@ install:
   - bash -c "pwd"
   - ps: pwd
   - bash -c "chmod a+x /c/projects/thoraxe/clustalo"
-  - wsl /c/projects/thoraxe/clustalo -h
   - bash -c "/c/projects/thoraxe/clustalo -h"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
