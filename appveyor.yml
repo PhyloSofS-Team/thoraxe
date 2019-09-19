@@ -12,7 +12,7 @@ install:
   - "python -m pip install --upgrade setuptools pip"
   - "python -m pip install coveralls codecov"
   - "python -m pip install numpy" # is needed to install scikit-bio
-  - "python -m pip install -e ."
+  - "python -m pip install ."
   - ps: (new-object net.webclient).DownloadFile('https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86win32.exe', 'C:\\projects\\thoraxe\\muscle.exe')
 
 build: false
