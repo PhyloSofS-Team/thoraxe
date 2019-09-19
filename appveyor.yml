@@ -6,13 +6,14 @@ environment:
       PYTHON_ARCH: "64"
 
 install:
-  - ps: (new-object net.webclient).DownloadFile('http://www.clustal.org/omega/clustalo-1.2.2-FreeBSD-x86-64', 'C:\\projects\\thoraxe\\clustalo')
+  - ps: (new-object net.webclient).DownloadFile('http://www.clustal.org/omega/clustalo-1.2.4-Ubuntu-x86_64', 'C:\\projects\\thoraxe\\clustalo')
   - ps: ls
   - bash -c "ls"
   - bash -c "pwd"
   - ps: pwd
   - bash -c "chmod a+x /c/projects/thoraxe/clustalo"
   - ps: ls
+  - bash -c "ls -l"
   - bash -c "/c/projects/thoraxe/clustalo -h"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
