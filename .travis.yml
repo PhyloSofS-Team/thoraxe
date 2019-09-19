@@ -9,7 +9,7 @@ notifications:
 install:
   - sudo apt-get install clustalo
   - python -m pip install coveralls codecov
-  - python -m pip install -e .
+  - python -m pip install .
 
 script:
   - export PYTEST_ADDOPTS="--pylint"
