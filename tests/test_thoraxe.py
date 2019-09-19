@@ -20,15 +20,16 @@ def set_out_dir():
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
     filename = request.module.__file__
+    if "APPVEYOR" in os.environ and os.environ["APPVEYOR"] == "true":
+        aligner = "muscle -in "
+    else:
+        aligner = "clustalo"
+
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
     monkeypatch.setattr(sys, 'argv', [
         'thoraxe', '-i', in_dir, '-o', 'tmp', '-y', '--plot_chimerics', '-a',
-        'clustalo'
+        aligner
     ])
     assert not os.path.isdir('tmp')
-    if _is_windows():
-        with pytest.raises(OSError):
-            assert thoraxe.main()
-    else:
-        assert thoraxe.main() is None
+    assert thoraxe.main() is None
     assert os.path.isdir('tmp')
