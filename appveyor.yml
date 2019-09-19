@@ -14,6 +14,10 @@ install:
   - "python -m pip install numpy" # is needed to install scikit-bio
   - "python -m pip install -e ."
   - ps: (new-object net.webclient).DownloadFile('http://www.clustal.org/omega/clustalo-1.2.4-Ubuntu-x86_64', 'clustalo')
+  - ps: ls
+  - bash -c "ls"
+  - bash -c "pwd"
+  - ps: pwd
   - bash -c "chmod a+x ./clustalo"
   - bash -c "./clustalo -h"
 
