@@ -18,7 +18,6 @@ def set_out_dir():
     shutil.rmtree(out_dir)
 
 
-@pytest.mark.skipif(_is_windows(), reason="Skipping this test on Windows.")
 def test_thoraxe(monkeypatch, request, set_out_dir):
     filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
@@ -27,5 +26,9 @@ def test_thoraxe(monkeypatch, request, set_out_dir):
         'clustalo'
     ])
     assert not os.path.isdir('tmp')
-    assert thoraxe.main() is None
+    if _is_windows():
+        with pytest.raises(OSError):
+            assert thoraxe.main()
+    else:
+        assert thoraxe.main() is None
     assert os.path.isdir('tmp')
