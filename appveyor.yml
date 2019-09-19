@@ -14,12 +14,13 @@ install:
   - "python -m pip install numpy" # is needed to install scikit-bio
   - "python -m pip install -e ."
   - bash -c "ls"
-  - bash -c "wget -h"
-  - bash -c "curl -h"
-  - bash -c "tar -h"
   - bash -c "apt-get update"
   - bash -c "apt-get install clustalo"
   - wsl clustalo
+  - bash -c "curl -h"
+  - bash -c "tar -h"
+  - bash -c "wget -h"
+
 
 build: false
 
