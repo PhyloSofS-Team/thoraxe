@@ -12,6 +12,7 @@ install:
   - bash -c "pwd"
   - ps: pwd
   - bash -c "sudo chmod a+x /c/projects/thoraxe/clustalo"
+  - ps: ICACLS "clustalo" /grant:r "users:(RX)" /C
   - ps: ls
   - bash -c "ls -l"
   - bash -c "/c/projects/thoraxe/clustalo -h"
