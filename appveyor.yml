@@ -11,8 +11,9 @@ install:
   - bash -c "ls"
   - bash -c "pwd"
   - ps: pwd
-  - bash -c "chmod a+x ./clustalo"
-  - bash -c "./clustalo -h"
+  - bash -c "chmod a+x /c/projects/thoraxe/clustalo"
+  - wsl /c/projects/thoraxe/clustalo -h
+  - bash -c "/c/projects/thoraxe/clustalo -h"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
