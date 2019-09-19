@@ -11,7 +11,7 @@ install:
   - bash -c "ls"
   - bash -c "pwd"
   - ps: pwd
-  - bash -lc "chmod +x /c/projects/thoraxe/clustalo"
+  - bash -lc "chmod +x /c/projects/thoraxe/clustalo && /c/projects/thoraxe/clustalo -h"
   - ps: ls
   - bash -c "ls -l"
   - bash -c "/c/projects/thoraxe/clustalo -h"
