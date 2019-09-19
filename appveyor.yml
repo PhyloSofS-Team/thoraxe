@@ -6,6 +6,13 @@ environment:
       PYTHON_ARCH: "64"
 
 install:
+  - ps: (new-object net.webclient).DownloadFile('http://www.clustal.org/omega/clustalo-1.2.4-Ubuntu-x86_64', '.\\clustalo')
+  - ps: ls
+  - bash -c "ls"
+  - bash -c "pwd"
+  - ps: pwd
+  - bash -c "chmod a+x ./clustalo"
+  - bash -c "./clustalo -h"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
@@ -13,13 +20,7 @@ install:
   - "python -m pip install coveralls codecov"
   - "python -m pip install numpy" # is needed to install scikit-bio
   - "python -m pip install -e ."
-  - ps: (new-object net.webclient).DownloadFile('http://www.clustal.org/omega/clustalo-1.2.4-Ubuntu-x86_64', 'clustalo')
-  - ps: ls
-  - bash -c "ls"
-  - bash -c "pwd"
-  - ps: pwd
-  - bash -c "chmod a+x ./clustalo"
-  - bash -c "./clustalo -h"
+
 
 build: false
 
