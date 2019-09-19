@@ -21,7 +21,7 @@ def set_out_dir():
 def test_thoraxe(monkeypatch, request, set_out_dir):
     filename = request.module.__file__
     if "APPVEYOR" in os.environ and os.environ["APPVEYOR"] == "true":
-        aligner = "muscle -in "
+        aligner = "C:\\projects\\thoraxe\\muscle.exe -in "
     else:
         aligner = "clustalo"
 
