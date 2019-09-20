@@ -31,7 +31,7 @@ def _int_length(length, length_seq):
         return length_seq
 
     if length == '':
-        return length_seq
+        return int(length_seq)
 
     return int(length)
 
