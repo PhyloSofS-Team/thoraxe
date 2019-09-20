@@ -439,14 +439,23 @@ def get_orthologs(ensgeneid, **params):
     return dortho
 
 
+FORBIDDEN_SPECIES = {'bos_taurus_hybrid', 'bos_indicus_hybrid'}
+
+
+def _allowed_species(species):
+    "True if the species name is not in FORBIDDEN_SPECIES"
+    return species not in FORBIDDEN_SPECIES
+
+
 def filter_ortho(dortho, species=None, relationship='1:n'):
     """Filter the dictionary of orthologues according to the list of names."""
     # TO DO: rajouter un système de synonymes sur les espèces pour le filtrage
     relationships = _get_relationships(relationship)
     orthologs = [
         value for value in dortho if value['type'] in relationships and (
-            True if species is None else value['target']['species'].lower() in
-            species)
+            _allowed_species(value['target']['species'].lower()) and
+            (True if species is None else value['target']['species'].lower() in
+             species))
     ]
     if dortho and not orthologs:
         raise Exception(
