@@ -26,7 +26,7 @@ setup(name='thoraxe',
               'thoraxe=thoraxe:main'
           ],
       },
-      packages=find_packages(include=['thoraxe']),
+      packages=find_packages(),
       package_data={'thoraxe': ['subexons/assets/cluster_plots.html']},
       setup_requires=['pytest-runner'],
       install_requires=[
