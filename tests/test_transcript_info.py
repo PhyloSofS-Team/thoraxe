@@ -1,6 +1,7 @@
 import os
 import pytest
 import numpy as np
+
 from thoraxe import transcript_info
 
 

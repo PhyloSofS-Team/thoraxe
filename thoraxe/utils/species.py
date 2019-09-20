@@ -2,8 +2,8 @@
 species: Util functions to get the species list.
 """
 
-import re
 import os
+import re
 
 
 def check_species_name(species_name):

@@ -236,8 +236,7 @@ def check_order_and_phases(data_frame):
         # If transcript id changes, the next exon is 0,
         # i.e. the first of the next gene transcript :
         actual_transcript = data_frame.loc[row_index, 'TranscriptID']
-        prev_transcript = data_frame.loc[prev_row_index,
-                                         'TranscriptID']
+        prev_transcript = data_frame.loc[prev_row_index, 'TranscriptID']
 
         if actual_transcript != prev_transcript:
             finished_transcripts.add(prev_transcript)

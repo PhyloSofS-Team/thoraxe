@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
+
 from thoraxe import transcript_info
 
 
@@ -53,10 +54,9 @@ def _get_cluster_number(aln_stats):
         'percent identity': max,
         'number': sum
     })
-    df_stats.sort_values(
-        by=['number', 'coverage', 'percent identity'],
-        ascending=False,
-        inplace=True)
+    df_stats.sort_values(by=['number', 'coverage', 'percent identity'],
+                         ascending=False,
+                         inplace=True)
     return df_stats.index[0]
 
 
@@ -101,11 +101,10 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
     for row in to_rescue:
         origin_cluster = -1 * row['Cluster']
         seq = str(row['SubexonProteinSequence']).replace('*', '')
-        query = StripedSmithWaterman(
-            seq,
-            gap_open_penalty=gap_open_penalty,
-            gap_extend_penalty=gap_extend_penalty,
-            substitution_matrix=substitution_matrix)
+        query = StripedSmithWaterman(seq,
+                                     gap_open_penalty=gap_open_penalty,
+                                     gap_extend_penalty=gap_extend_penalty,
+                                     substitution_matrix=substitution_matrix)
         aln_stats = _get_aln_stats(query, len(seq), origin_cluster,
                                    cluster2sequence, coverage_cutoff,
                                    percent_identity_cutoff)

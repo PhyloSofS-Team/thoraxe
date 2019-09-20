@@ -7,8 +7,8 @@ import pandas as pd
 from thoraxe import transcript_info
 from thoraxe.transcript_info import phases
 
-# A basic interval type, containing start and end coordinates
-# and the set of components that are included on it.
+# A basic interval type, containing start and end coordinates and the set of
+# components that are included on it.
 Interval = collections.namedtuple('Interval', ['start', 'end', 'components'])
 
 

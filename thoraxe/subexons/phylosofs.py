@@ -7,9 +7,9 @@ import string
 import warnings
 
 import pandas as pd
-
 from Bio import Phylo
 from Bio import BiopythonWarning
+
 from thoraxe.utils import folders
 from thoraxe.utils import split
 

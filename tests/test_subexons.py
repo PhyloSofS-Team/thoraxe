@@ -1,5 +1,6 @@
 import os
 import pytest
+
 from thoraxe import transcript_info
 from thoraxe import subexons
 

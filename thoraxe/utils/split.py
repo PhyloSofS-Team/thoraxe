@@ -21,7 +21,12 @@ def split_exons(exons):
 
 
 def _int_length(length, length_seq):
-    "Return length as an int."
+    """
+    Return length as an int.
+
+    >>> _int_length("", 10.0)
+    10
+    """
     if not isinstance(length, str) and np.isnan(length):
         return length_seq
 

@@ -1,4 +1,6 @@
-"""Functions to cluster exons."""
+"""
+Exon clustering: Functions to cluster exons using pairwise alignments.
+"""
 
 import warnings
 

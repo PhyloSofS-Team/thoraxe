@@ -1,4 +1,6 @@
-"""thoraxe pipeline functions."""
+"""
+ThorAxe pipeline and script functions.
+"""
 
 import argparse
 import os

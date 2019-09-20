@@ -3,6 +3,7 @@ import shutil
 import sys
 import platform
 import pytest
+
 import thoraxe
 
 

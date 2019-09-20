@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 import pytest
+
 from thoraxe import transcript_query
 
 

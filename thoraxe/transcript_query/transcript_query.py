@@ -1,7 +1,7 @@
 """
 Created on Fri Apr 14 16:32:51 2017
 
-@author: huguesrichard
+@author: huguesrichard & diegozea
 
 Un premier jeu de fonctions pour faire des requêtes directement avec
 l'API RESTfull de ENSEMBL afin de récupérer tous les gènes homologues
@@ -16,7 +16,6 @@ import sys
 import time
 import warnings
 from collections import Counter
-
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

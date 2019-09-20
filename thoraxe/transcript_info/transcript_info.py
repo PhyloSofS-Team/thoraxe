@@ -2,11 +2,11 @@
 
 import warnings
 
-import numpy as np
-import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
+import numpy as np
+import pandas as pd
 
 from thoraxe.transcript_info import clusters
 from thoraxe.transcript_info import phases

@@ -1,5 +1,5 @@
 """
-transcript_query: Obtain information from Ensembl.
+transcript_query: Download transcript data from Ensembl.
 
 Function to obtain information of gene transcripts and exons from the Ensembl
 database. It creates the folder tree needed for the thoraxe pipeline.

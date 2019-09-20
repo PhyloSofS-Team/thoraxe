@@ -1,7 +1,5 @@
 """
 alignment: Module to create the subexon MSA with Clustal Omega.
-
-This module creates a MSA of subexons using Clustal Omega.
 """
 
 import collections

@@ -1,5 +1,5 @@
 """
-tidy:  Utils for having a tidy output (denormalized table).
+tidy:  Utils for having a tidy CSV table output (denormalized table).
 """
 
 import pandas as pd
