@@ -29,8 +29,7 @@ RUN cat /app/docker_banner.sh >> ~/.bashrc
 RUN git clone https://github.com/PhyloSofS-Team/thoraxe.git && \
     # install numpy before socket-bio (ThorAxe's dependency)
     python3 -m pip install numpy && \
-    cd thoraxe && \
-    python3 -m pip install .
+    python3 -m pip install ./thoraxe
 
 WORKDIR /project
 
