@@ -75,21 +75,21 @@ def read_tsl_file(tsl_file,
     """
     Read a csv file with the Transcript Support Level (TSL) data.
 
-    maximum_tsl_level determines the maximum Transcript Support Level (TSL)
+    `maximum_tsl_level` determines the maximum Transcript Support Level (TSL)
     level to keep. The options are:
+
     - 1.0 : All splice junctions of the transcript are supported by at
-    least one non-suspect mRNA.
+      least one non-suspect mRNA.
     - 2.0 : The best supporting mRNA is flagged as suspect or the support is
-    from multiple ESTs (Expressed Sequence Tags).
+      from multiple ESTs (Expressed Sequence Tags).
     - 3.0 : The only support is from a single EST.
     - 4.0 : The best supporting EST is flagged as suspect.
     - 5.0 : No single transcript supports the model structure.
 
-    If remove_na is True, columns with missing TSL are not included
+    If `remove_na` is True, columns with missing TSL are not included
     (default: False).
 
-    It returns a pandas DataFrame with MultiIndex:
-    ('Species', 'TranscriptID').
+    It returns a pandas DataFrame with MultiIndex: ('Species', 'TranscriptID').
     """
     assert maximum_tsl_level in {1.0, 2.0, 3.0, 4.0, 5.0}
 
@@ -628,19 +628,16 @@ def store_cluster(  # pylint: disable=too-many-arguments
     """
     Store the string representation of clusters in the data_frame.
 
-    Arguments:
-        data_frame     -- DataFrame that's going to store the cluster column.
-        cluster_list   -- List of sets.
-        default_values -- Name of existing DataFrame column that containts
-                          the default (string) values for the new column.
-        column_name    -- Name of the new column to add with the cluster
-                          information.
-        item2str       -- Function to map from cluster item to its
-                          representation in the DataFrame (default: str)
-        getitem        -- Function to get the cluster item from the DataFrame
-                          row and the index of the default_values column
-                          (default: default value).
-        delim          -- Character delimiting cluster items (default: '/').
+    :param data_frame: DataFrame that's going to store the cluster column.
+    :param cluster_list: List of sets.
+    :param default_values: Name of existing DataFrame column that containts the default
+                           (string) values for the new column.
+    :param column_name: Name of the new column to add with the cluster information.
+    :param item2str: Function to map from cluster item to its representation in the
+                     DataFrame (default: str)
+    :param getitem: Function to get the cluster item from the DataFrame row and the index
+                    of the default_values column (default: default value).
+    :param delim: Character delimiting cluster items (default: '/').
 
 
     >>> import pandas as pd
@@ -726,20 +723,21 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
 
     Due to the data structure downloaded from ENSEMBL, we combine 3 types of
     primary information:
-        1. tsl_table_file has the evidence for the gene transcripts. For each
-        transcript, it gives information on its type and its evidence level.
-        We use this information to filter out transcripts which are not
-        interesting for our analysis (e.g. ncRNA, partial transcripts, etc.)
-        At this moment, we keep transcripts with 'Protein coding' biotype and
-        with a TSL evidence level of 1, 2 or 3 by default (max_tsl_level).
-        If remove_na is True (default) rows with missing TSL data are
-        eliminated.
-        2. Each row of the exon_table_file summarizes t :whe information for a
-        transcript exon, as provided by Biomart. The sorting of the exons
-        is important and it is done using the rank information provided by
-        ENSEMBL (not coordinates).
-        3. The genomic sequence information from the coding sequence of all
-        the exons in fasta format is in exon_sequence_file.
+
+    1. tsl_table_file has the evidence for the gene transcripts. For each
+       transcript, it gives information on its type and its evidence level.
+       We use this information to filter out transcripts which are not
+       interesting for our analysis (e.g. ncRNA, partial transcripts, etc.)
+       At this moment, we keep transcripts with 'Protein coding' biotype and
+       with a TSL evidence level of 1, 2 or 3 by default (max_tsl_level).
+       If remove_na is True (default) rows with missing TSL data are
+       eliminated.
+    2. Each row of the exon_table_file summarizes t :whe information for a
+       transcript exon, as provided by Biomart. The sorting of the exons
+       is important and it is done using the rank information provided by
+       ENSEMBL (not coordinates).
+    3. The genomic sequence information from the coding sequence of all
+       the exons in fasta format is in exon_sequence_file.
 
     This function also processes the information within transcript to get the
     peptidic sequences of each exon taking into account the exon phases.

@@ -265,6 +265,8 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     Run Clustal Omega in the chimeric sequences and return the output file.
 
     You can pass arguments using aligner (default: 'clustalo'), e.g:
+    ::
+    
         aligner='clustalo --threads=4'
 
     You need Clustal Omega installed to run this function. You can install it
@@ -273,6 +275,8 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     If you are using Windows 10 and you have installed Clustal Omega in
     Ubuntu using the 'Windows Subsystem for Linux', you can try with the
     following options:
+    ::
+
         aligner='ubuntu.exe -c clustalo'
         aligner='bash.exe -c clustalo'
         aligner='wsl.exe clustalo'

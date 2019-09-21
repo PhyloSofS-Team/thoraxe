@@ -184,9 +184,9 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
     """
     Write a dictionary list with csv formatting to the stream out.
 
-    fnames: when provided as a list, it is used as the column selection,
-        otherwise all keys occuring at least once are used.
-    header: should the header be written
+    :param fnames: when provided as a list, it is used as the column selection,
+                   otherwise all keys occuring at least once are used.
+    :param header: should the header be written
     """
     if fnames is None:
         fnames = set([])
@@ -469,16 +469,21 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     Wrapper function to call multiple times get_listoftranscripts, given
     a ensembl geneid and a list of orthologs provided by get_orthologs
     Data structure for each ortholog is
-    {dn_ds : float, method_link_type : str,rop in
-        source : dict(),  target : dict(), taxonomy_level : str,
-        type: Enum(ortholog_one2one,
-                   ortholog_one2many,
-                   within_species_paralog)}
+    ::
+
+        {dn_ds : float, method_link_type : str,rop in
+            source : dict(),  target : dict(), taxonomy_level : str,
+            type: Enum(ortholog_one2one,
+                       ortholog_one2many,
+                       within_species_paralog)}
+
     The dicts for source and target store information about gene sequence,
     data structure:
-    {"align_seq" : str, "perc_pos" : float, "id" : str, "protein_id" : str,
-     "perc_id" : float, "cigar_line" : str,
-     "taxon_id" : int, "species" : str}
+    ::
+
+        {"align_seq" : str, "perc_pos" : float, "id" : str,
+        "protein_id" : str, "perc_id" : float, "cigar_line" : str,
+        "taxon_id" : int, "species" : str}
     """
     # First get the list for the source
     source_species = lorthologs[0]['source']['species']
