@@ -9,7 +9,7 @@ import platform
 import re
 import shutil
 import subprocess
-import tempfile
+from tempfile import NamedTemporaryFile
 import warnings
 
 import numpy as np
@@ -199,11 +199,10 @@ def _print_fasta(chimerics, stream):
 
 def _print_temporal_fasta(chimerics):
     """Save chimeric sequences in a temporal fasta file and return its name."""
-    with tempfile.NamedTemporaryFile(suffix='.fasta', delete=False,
-                                     mode='w') as tmp_fasta:
-        _print_fasta(chimerics, tmp_fasta)
+    with NamedTemporaryFile(suffix='.fasta', delete=False, mode='w') as tmp:
+        _print_fasta(chimerics, tmp)
 
-    return tmp_fasta.name
+    return tmp.name
 
 
 def _get_wsl_name(executable_path):
@@ -266,7 +265,7 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
 
     You can pass arguments using aligner (default: 'clustalo'), e.g:
     ::
-    
+
         aligner='clustalo --threads=4'
 
     You need Clustal Omega installed to run this function. You can install it
@@ -318,9 +317,8 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
         except (OSError, FileNotFoundError) as err:
             if shutil.which(command[0]) is None:
                 raise OSError(
-                    ('{} not found. Please indicate a correct aligner or '
-                     'install it: http://www.clustal.org/omega/'
-                     ).format(aligner))
+                    '{} not found. Please indicate a correct path or install it: {}'
+                    .format(aligner, 'http://www.clustal.org/omega/'))
             raise err
 
     return output_path
@@ -406,8 +404,8 @@ def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
                                   subexon_df['SubexonIDCluster'])
     }
     for seq_index in range(0, n_seq):
-        _fill_msa_matrix(msa_matrix, chimerics, msa,
-                         seq_index, lambda index: index2cluster[index])
+        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index,
+                         lambda index: index2cluster[index])
 
     return msa_matrix
 

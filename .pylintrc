@@ -1,5 +1,5 @@
 [MASTER]
-ignore=tests,setup.py
+ignore=tests,setup.py,conf.py
 jobs=0
 
 [MESSAGES CONTROL]
