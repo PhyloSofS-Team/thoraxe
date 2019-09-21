@@ -1,0 +1,36 @@
+thoraxe.transcript\_info package
+================================
+
+Submodules
+----------
+
+thoraxe.transcript\_info.clusters module
+----------------------------------------
+
+.. automodule:: thoraxe.transcript_info.clusters
+   :members:
+
+thoraxe.transcript\_info.exon\_clustering module
+------------------------------------------------
+
+.. automodule:: thoraxe.transcript_info.exon_clustering
+   :members:
+
+thoraxe.transcript\_info.phases module
+--------------------------------------
+
+.. automodule:: thoraxe.transcript_info.phases
+   :members:
+
+thoraxe.transcript\_info.transcript\_info module
+------------------------------------------------
+
+.. automodule:: thoraxe.transcript_info.transcript_info
+   :members:
+
+
+Module contents
+---------------
+
+.. automodule:: thoraxe.transcript_info
+   :members:

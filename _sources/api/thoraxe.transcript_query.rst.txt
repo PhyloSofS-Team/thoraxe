@@ -1,0 +1,18 @@
+thoraxe.transcript\_query package
+=================================
+
+Submodules
+----------
+
+thoraxe.transcript\_query.transcript\_query module
+--------------------------------------------------
+
+.. automodule:: thoraxe.transcript_query.transcript_query
+   :members:
+
+
+Module contents
+---------------
+
+.. automodule:: thoraxe.transcript_query
+   :members:

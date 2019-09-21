@@ -1,0 +1,28 @@
+thoraxe package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+
+   thoraxe.subexons
+   thoraxe.transcript_info
+   thoraxe.transcript_query
+   thoraxe.utils
+
+Submodules
+----------
+
+thoraxe.thoraxe module
+----------------------
+
+.. automodule:: thoraxe.thoraxe
+   :members:
+
+
+Module contents
+---------------
+
+.. automodule:: thoraxe
+   :members:

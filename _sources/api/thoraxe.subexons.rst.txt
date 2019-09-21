@@ -1,0 +1,54 @@
+thoraxe.subexons package
+========================
+
+Submodules
+----------
+
+thoraxe.subexons.alignment module
+---------------------------------
+
+.. automodule:: thoraxe.subexons.alignment
+   :members:
+
+thoraxe.subexons.graph module
+-----------------------------
+
+.. automodule:: thoraxe.subexons.graph
+   :members:
+
+thoraxe.subexons.phylosofs module
+---------------------------------
+
+.. automodule:: thoraxe.subexons.phylosofs
+   :members:
+
+thoraxe.subexons.plot module
+----------------------------
+
+.. automodule:: thoraxe.subexons.plot
+   :members:
+
+thoraxe.subexons.rescue module
+------------------------------
+
+.. automodule:: thoraxe.subexons.rescue
+   :members:
+
+thoraxe.subexons.subexons module
+--------------------------------
+
+.. automodule:: thoraxe.subexons.subexons
+   :members:
+
+thoraxe.subexons.tidy module
+----------------------------
+
+.. automodule:: thoraxe.subexons.tidy
+   :members:
+
+
+Module contents
+---------------
+
+.. automodule:: thoraxe.subexons
+   :members:
