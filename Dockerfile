@@ -18,7 +18,10 @@ RUN apt-get update && \
     # ca-certificates is needed to use git clone without SSL CA cert problems
     ca-certificates \
     # ThorAxe's dependencies:
-    clustalo
+    clustalo \
+    # Utilities:
+    tree \
+    ipython3
 
 WORKDIR /app
 
