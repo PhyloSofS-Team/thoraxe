@@ -1,0 +1,6 @@
+[MASTER]
+ignore=tests,setup.py
+jobs=0
+
+[MESSAGES CONTROL]
+disable=W0511
