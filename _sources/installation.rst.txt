@@ -47,10 +47,10 @@ Finally, the easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with
 
 
 Installation from Source
-========================
+------------------------
 
-If you want to install the latest and in-development version of *ThorAxe*,
-clone its `GitHub repo`_ using `git`_:
+If you want to install the latest and in-development version of *ThorAxe*, clone
+its source code from the `thoraxe` `GitHub repo`_ using `git`_:
 
 ::
 
@@ -68,7 +68,7 @@ the changes reflected into the installed version.
 
 
 Docker image
-============
+------------
 
 We offer a `Docker image`_ with *ThorAxe* and all its dependencies installed.
 To run this image, you need to install *Docker* from the `Docker website`_.
