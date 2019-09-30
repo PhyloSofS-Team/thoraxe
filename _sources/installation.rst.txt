@@ -2,31 +2,12 @@ Installation
 ============
 
 
-Installation from GitHub
-------------------------
-
-To install *ThorAxe*, clone its `GitHub repo`_ using `git`_:
-
-::
-
-   git clone https://github.com/PhyloSofS-Team/thoraxe.git
-
-Then, you can use the `pip`_ module of `Python 3`_ to install `NumPy`_ and
-*ThorAxe*. The order is important because `numpy` should be installed before
-`scikit-bio`_, a *ThorAxe* dependency:
-
-::
-
-   python -m pip install numpy
-
-::
-
-   cd thoraxe
-   python -m pip install .
+Dependencies
+------------
 
 
-Dependency: Clustal Omega
--------------------------
+Clustal Omega
+~~~~~~~~~~~~~
 
 To run *ThorAxe* you need `Clustal Omega`_. Follow the instructions on that
 link to install it.
@@ -39,6 +20,49 @@ If you are using **Ubuntu**, the easiest way to install *Clustal Omega* is:
 
 If you are using **Windows 10**, you can use `clustalo` through *Ubuntu* with
 the `Windows Subsystem for Linux`_.
+
+
+NumPy
+~~~~~
+
+You can use the `pip`_ module of `Python 3`_ to install `NumPy`_ before
+*ThorAxe*. The order is important because `numpy` should be installed before
+`scikit-bio`_, a *ThorAxe* dependency:
+
+::
+
+   python -m pip install numpy
+
+In *Ubuntu* you may need to use `python3` instead of `python`.
+
+ThorAxe Installation
+--------------------
+
+The easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with `Python 3`_:
+
+::
+
+   python -m pip install thoraxe
+
+
+Latest version from GitHub
+--------------------------
+
+To install the latest version of *ThorAxe*, clone its `GitHub repo`_ using `git`_:
+
+::
+
+   git clone https://github.com/PhyloSofS-Team/thoraxe.git
+
+Then, you can use the `pip`_ module of `Python 3`_ to install it:
+
+::
+
+   cd thoraxe
+   python -m pip install -e .
+
+The -e flag allows you to update the thoraxe repo using `git pull` and get the
+changes reflected into the installed version.
 
 
 Docker image
@@ -77,3 +101,4 @@ easier the use of the `thoraxe` *Python* module.
 .. _Docker image: https://hub.docker.com/r/diegozea/thoraxe
 .. _Docker website: https://www.docker.com
 .. _ipython3: https://ipython.readthedocs.io/en/stable/
+.. _PyPI: https://pypi.org/project/thoraxe/
