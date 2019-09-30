@@ -35,20 +35,22 @@ You can use the `pip`_ module of `Python 3`_ to install `NumPy`_ before
 
 In *Ubuntu* you may need to use `python3` instead of `python`.
 
-ThorAxe Installation
---------------------
+ThorAxe
+-------
 
-The easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with `Python 3`_:
+Finally, the easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with
+`Python 3`_:
 
 ::
 
    python -m pip install thoraxe
 
 
-Latest version from GitHub
---------------------------
+Installation from Source
+========================
 
-To install the latest version of *ThorAxe*, clone its `GitHub repo`_ using `git`_:
+If you want to install the latest and in-development version of *ThorAxe*,
+clone its `GitHub repo`_ using `git`_:
 
 ::
 
@@ -61,12 +63,12 @@ Then, you can use the `pip`_ module of `Python 3`_ to install it:
    cd thoraxe
    python -m pip install -e .
 
-The -e flag allows you to update the thoraxe repo using `git pull` and get the
-changes reflected into the installed version.
+The `-e` flag allows you to update the `thoraxe` repo using `git pull` and get
+the changes reflected into the installed version.
 
 
 Docker image
-------------
+============
 
 We offer a `Docker image`_ with *ThorAxe* and all its dependencies installed.
 To run this image, you need to install *Docker* from the `Docker website`_.
