@@ -398,14 +398,11 @@ def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
     n_col = msa.get_alignment_length()
     msa_matrix = np.empty((n_seq, n_col), dtype=object)
     msa_matrix.fill('')
-    index2cluster = {
-        index: cluster
-        for index, cluster in zip(subexon_df['SubexonIndex'],
-                                  subexon_df['SubexonIDCluster'])
-    }
+    index2cluster = dict(
+        zip(subexon_df['SubexonIndex'], subexon_df['SubexonIDCluster']))
     for seq_index in range(0, n_seq):
-        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index,
-                         lambda index: index2cluster[index])
+        _fill_msa_matrix(msa_matrix, chimerics, msa,
+                         seq_index, lambda index: index2cluster[index])
 
     return msa_matrix
 
