@@ -27,17 +27,15 @@ def test_download(monkeypatch):
         sys,
         'argv',
         [
-            'transcript_query',
-            'MAPK8',
-            '-l',
+            'transcript_query', 'MAPK8', '-l',
             'homo_sapiens,mus_musculus,pan_troglodytes,'
-            'panthera_tigris_altaica,cebus_capucinus_imitator,'
+            'panthera_tigris_altaica,cebus_capucinus_imitator'
             # 'cricetulus_griseus_chok1gshd,'
             # 'colobus_angolensis_palliatus,'
             # 'cricetulus_griseus_crigri,'
             # 'heterocephalus_glaber_female,heterocephalus_glaber_male,'
-            # 'canis_lupus_dingo,''
-            'mustela_putorius_furo'
+            # 'canis_lupus_dingo,'
+            # 'mustela_putorius_furo'
         ])
     assert not os.path.isdir('MAPK8')
     assert transcript_query.main() is None
