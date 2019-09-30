@@ -27,9 +27,11 @@ def test_download(monkeypatch):
         sys,
         'argv',
         [
-            'transcript_query', 'MAPK8', '-l',
-            'homo_sapiens,mus_musculus,pan_troglodytes,'
-            'panthera_tigris_altaica,cebus_capucinus_imitator'
+            'transcript_query', 'MAPK8', '-l', 'homo_sapiens,'
+            'mus_musculus,'
+            'pan_troglodytes'
+            # 'panthera_tigris_altaica,'
+            # 'cebus_capucinus_imitator,'
             # 'cricetulus_griseus_chok1gshd,'
             # 'colobus_angolensis_palliatus,'
             # 'cricetulus_griseus_crigri,'
