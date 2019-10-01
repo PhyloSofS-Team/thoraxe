@@ -1,5 +1,5 @@
 """
-split: Util functions to split homologous exons.
+split: Util functions to split s-exons.
 """
 
 import numpy as np
@@ -7,7 +7,7 @@ import numpy as np
 
 def split_exons(exons):
     """
-    Return a list of the homologous exons in the string.
+    Return a list of the s-exons in the string.
 
     >>> split_exons('3_0/3_1')
     ['3_0', '3_1']
@@ -38,7 +38,7 @@ def _int_length(length, length_seq):
 
 def split_lengths(lengths, seq):
     """
-    Return a list of the homologous exon lengths, len(seq) if there is not data.
+    Return a list of the s-exon lengths, len(seq) if there is not data.
 
     >>> import numpy as np
     >>> split_lengths('4/2', 'MLGHAC')
@@ -60,7 +60,7 @@ def split_lengths(lengths, seq):
 
 def split_seqs(sequences, seq):
     """
-    Return a list with the homologous exon sequences.
+    Return a list with the s-exon sequences.
 
     >>> split_seqs('MLGH/AC', 'MLGHAC')
     ['MLGH', 'AC']

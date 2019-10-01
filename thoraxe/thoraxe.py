@@ -21,8 +21,8 @@ def parse_command_line():
     parser = argparse.ArgumentParser(
         prog="thoraxe",
         description="""
-        thoraxe is a tool to identify homologous exons in a set of
-        transcripts from the same gene and different species.
+        thoraxe is a tool to identify orthologous exonic regions (s-exons) in a
+        set of transcripts from orthologous genes in a set of species.
         """,
         epilog="""
         It has been developed at LCQB (Laboratory of Computational and
@@ -297,7 +297,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
     return cluster2data
 
 
-def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many-locals
+def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
         gene2speciesname,
@@ -310,7 +310,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
         aligner='clustalo',
         padding='XXXXXXXXXX',
         species_list=None):
-    """Perform almost all the pipeline."""
+    """Perform almost all the ThorAxe pipeline."""
 
     intermediate_output_path = utils.folders.create_subfolder(
         output_folder, '_intermediate')
@@ -367,7 +367,7 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
 
             sequences = subexons.alignment.msa2sequences(
                 msa, gene_ids, padding)
-            subexon_df = subexons.alignment.save_homologous_subexons(
+            subexon_df = subexons.alignment.save_s_exons(
                 subexon_df, sequences, gene_ids, colclusters, msa_output_path)
         else:
             gene_ids = None
@@ -384,10 +384,9 @@ def get_homologous_subexons(  # noqa pylint: disable=too-many-arguments,too-many
 
 
 def update_subexon_table(subexon_table, cluster2data):
-    """Update the subexon table by adding the homologous exon information."""
+    """Update the subexon table by adding the s-exon information."""
     columns_to_add = [
-        'HomologousExonLengths', 'HomologousExonSequences', 'HomologousExons',
-        'SubexonIndex'
+        'S_exon_Lengths', 'S_exon_Sequences', 'S_exons', 'SubexonIndex'
     ]
     key_col = 'SubexonIDCluster'
     subexon2data = {}
@@ -442,26 +441,24 @@ def main():
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
-    cluster2data = get_homologous_subexons(
-        output_folder,
-        subexon_table,
-        gene2speciesname,
-        connected_subexons,
-        minimum_len=args.minlen,
-        coverage_cutoff=args.coverage,
-        percent_identity_cutoff=args.identity,
-        gap_open_penalty=args.gapopen,
-        gap_extend_penalty=args.gapextend,
-        aligner=args.aligner,
-        padding='X' * args.padding,
-        species_list=species_list)
+    cluster2data = get_s_exons(output_folder,
+                               subexon_table,
+                               gene2speciesname,
+                               connected_subexons,
+                               minimum_len=args.minlen,
+                               coverage_cutoff=args.coverage,
+                               percent_identity_cutoff=args.identity,
+                               gap_open_penalty=args.gapopen,
+                               gap_extend_penalty=args.gapextend,
+                               aligner=args.aligner,
+                               padding='X' * args.padding,
+                               species_list=species_list)
 
     if args.plot_chimerics:
         subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)
 
     subexon_table = update_subexon_table(subexon_table, cluster2data)
-    subexon_table = subexons.alignment.impute_missing_orthologous_exon_group(
-        subexon_table)
+    subexon_table = subexons.alignment.impute_missing_s_exon(subexon_table)
 
     node2genes, edge2genes = subexons.graph.nodes_and_edges2genes(
         subexon_table)
@@ -475,7 +472,7 @@ def main():
             output_folder)
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
-    tidy_table.to_csv(os.path.join(output_folder, "homologous_exon_table.csv"))
+    tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"))
 
 
 if __name__ == '__main___':

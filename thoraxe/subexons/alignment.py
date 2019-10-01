@@ -601,85 +601,84 @@ def msa2sequences(msa, gene_ids, padding):
     return sequences
 
 
-def _is_orthologous_exon_group(exon):
+def _is_s_exon(exon):
     """
     Return True if the string has the shape number_number at the beginning.
 
-    >>> _is_orthologous_exon_group('1_1-1_0')
+    >>> _is_s_exon('1_1-1_0')
     True
-    >>> _is_orthologous_exon_group('2_0')
+    >>> _is_s_exon('2_0')
     True
-    >>> _is_orthologous_exon_group('')
+    >>> _is_s_exon('')
     False
-    >>> _is_orthologous_exon_group('nan')
+    >>> _is_s_exon('nan')
     False
-    >>> _is_orthologous_exon_group('NaN')
+    >>> _is_s_exon('NaN')
     False
     """
     return ORTHO_GROUP_PATTERN.match(str(exon)) is not None
 
 
-def impute_missing_orthologous_exon_group(table, column='HomologousExons'):
+def impute_missing_s_exon(table, column='S_exons'):
     """
     Replace column values that do not conform to the naming by 0_number.
     """
     number = 1
     for i in table.index:
         name = table.loc[i, column]
-        if not _is_orthologous_exon_group(name):
+        if not _is_s_exon(name):
             table.at[i, column] = '0_' + str(number)
             number += 1
     return table
 
 
-def _store_homologous_subexons(subexon_df, seq, subexon, gene, exon_id):
+def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
-    Store homologous subexon information in subexon_df.
+    Store s-exon information in subexon_df.
 
-    exon_id is the Homologous Exons ID created by Cluster_ColCluster.
+    s_exon_id is the ID of the orthologous exonic region (s-exon) created as
+    Cluster_ColCluster.
     """
     seq = seq.replace('-', '')
     length = len(seq)
     query = (subexon_df['SubexonIndex'] == subexon) & (
         subexon_df['GeneID'] == gene)
-    value = subexon_df.loc[query, 'HomologousExons'].unique()[0]
+    value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
-        subexon_df.loc[query, 'HomologousExons'] += '/{}'.format(exon_id)
-        subexon_df.loc[query, 'HomologousExonLengths'] += '/{}'.format(length)
-        subexon_df.loc[query, 'HomologousExonSequences'] += '/{}'.format(seq)
+        subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
+        subexon_df.loc[query, 'S_exon_Lengths'] += '/{}'.format(length)
+        subexon_df.loc[query, 'S_exon_Sequences'] += '/{}'.format(seq)
     else:
-        subexon_df.loc[query, 'HomologousExons'] = exon_id
-        subexon_df.loc[query, 'HomologousExonLengths'] = str(length)
-        subexon_df.loc[query, 'HomologousExonSequences'] = seq
+        subexon_df.loc[query, 'S_exons'] = s_exon_id
+        subexon_df.loc[query, 'S_exon_Lengths'] = str(length)
+        subexon_df.loc[query, 'S_exon_Sequences'] = seq
 
 
-def save_homologous_subexons(subexon_df, sequences, gene_ids, colclusters,
-                             output_folder):
+def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
     """
-    It saves the information about homologous exons.
+    It saves the information about s-exons.
 
     It takes a list of sequences, like the one returned by msa2sequences.
-    Return subexon_df with the homologous subexon information.
-    For each homologous subexon saves a fasta MSA in the output_folder.
+    Return subexon_df with the orthologous exonic region (s-exon) information.
+    For each s-exon saves a fasta MSA in the output_folder.
     """
     cluster = str(subexon_df['Cluster'][0])
 
-    subexon_df = subexon_df.assign(HomologousExons=cluster,
-                                   HomologousExonLengths="",
-                                   HomologousExonSequences="")
+    subexon_df = subexon_df.assign(S_exons=cluster,
+                                   S_exon_Lengths="",
+                                   S_exon_Sequences="")
 
     for (i, colcluster) in enumerate(colclusters):
         with open(
-                os.path.join(
-                    output_folder,
-                    'msa_homologous_exon_{}_{}.fasta'.format(cluster, i)),
+                os.path.join(output_folder,
+                             'msa_s_exon_{}_{}.fasta'.format(cluster, i)),
                 'w') as file:
             for (j, subexon) in enumerate(colcluster.consensus):
                 if not np.isnan(subexon):
                     gene = gene_ids[j]
                     seq = sequences[j][colcluster.start:colcluster.end + 1]
                     file.write('>{}\n{}\n'.format(gene, seq))
-                    _store_homologous_subexons(subexon_df, seq, subexon, gene,
-                                               '{}_{}'.format(cluster, i))
+                    _store_s_exons(subexon_df, seq, subexon, gene,
+                                   '{}_{}'.format(cluster, i))
 
     return subexon_df

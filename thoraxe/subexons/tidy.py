@@ -19,23 +19,23 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
 
     tidy_table = pd.DataFrame(columns=[
         'Species', "GeneID", "TranscriptIDCluster", "ExonIDCluster",
-        "SubexonIDCluster", "HomologousExon", "Strand", "TranscriptsInGene",
+        "SubexonIDCluster", "S_exon", "Strand", "TranscriptsInGene",
         "ExonRank", "Cluster", "StartPhase", "EndPhase", "SubexonRank",
         "SubexonSequence", "SubexonProteinSequence", "SubexonCodingStart",
-        "SubexonCodingEnd", "TranscriptsWithSubexon", "HomologousExonRank",
-        "HomologousExonSequence", "HomologousExonStart", "HomologousExonEnd"
+        "SubexonCodingEnd", "TranscriptsWithSubexon", "S_exon_Rank",
+        "S_exon_Sequence", "S_exon_Start", "S_exon_End"
     ])
 
     previous_transcript = ""
     for row in table.itertuples():
         if previous_transcript != row.TranscriptIDCluster:
             previous_transcript = row.TranscriptIDCluster
-            homologous_exon_rank = 0
+            s_exon_rank = 0
 
         sube_seq = str(row.SubexonProteinSequence).replace('*', '')
-        hexons = split.split_exons(row.HomologousExons)
-        he_lens = split.split_lengths(row.HomologousExonLengths, sube_seq)
-        he_seqs = split.split_seqs(row.HomologousExonSequences, sube_seq)
+        hexons = split.split_exons(row.S_exons)
+        he_lens = split.split_lengths(row.S_exon_Lengths, sube_seq)
+        he_seqs = split.split_seqs(row.S_exon_Sequences, sube_seq)
         assert len(hexons) == len(he_lens)
         assert len(hexons) == len(he_seqs)
 
@@ -48,19 +48,19 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
 
         stop = 0
         for (hexon, he_len, he_seq) in zip(hexons, he_lens, he_seqs):
-            homologous_exon_rank += 1
+            s_exon_rank += 1
             tidy_row['Species'] = gene2species[row.GeneID]
-            tidy_row['HomologousExon'] = hexon
-            tidy_row['HomologousExonRank'] = homologous_exon_rank
-            tidy_row['HomologousExonSequence'] = he_seq
+            tidy_row['S_exon'] = hexon
+            tidy_row['S_exon_Rank'] = s_exon_rank
+            tidy_row['S_exon_Sequence'] = he_seq
             if stop == 0:
                 start = 1
                 stop = he_len
             else:
                 start = stop + 1
                 stop = stop + he_len
-            tidy_row['HomologousExonStart'] = start
-            tidy_row['HomologousExonEnd'] = stop
+            tidy_row['S_exon_Start'] = start
+            tidy_row['S_exon_End'] = stop
             tidy_table = tidy_table.append(tidy_row, ignore_index=True)
 
     return tidy_table

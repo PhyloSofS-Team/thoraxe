@@ -16,7 +16,7 @@ def nodes_and_edges2genes(data):
     edge2genes = collections.defaultdict(set)
     for gene_id, gene in data.groupby('GeneID'):  # noqa pylint: disable=too-many-nested-blocks
         for _, transcript in gene.groupby('TranscriptID'):
-            subexons = transcript.sort_values('SubexonRank')['HomologousExons']
+            subexons = transcript.sort_values('SubexonRank')['S_exons']
 
             previous = 'start'
             node2genes[previous].update({gene_id})
@@ -63,7 +63,7 @@ def splice_graph_gml(filename, node2genes, edge2genes):
         graph [
             directed 1
             id 42
-            label "splice graph of orthologous exon groups"
+            label "splice graph of s-exons"
         ''')
         node2id = {}
         node_id = 1

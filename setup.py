@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(name='thoraxe',
       description="Disentangle homology relationships between exons.",
-      keywords=['homologous exons', 'protein isoforms', 'gene transcripts'],
+      keywords=['orthologous exons', 'protein isoforms', 'gene transcripts'],
       author="Diego Javier Zea, Hugues Richard & Elodie Laine",
       author_email='diegozea@gmail.com',
       url='https://github.com/PhyloSofS-Team/thoraxe',
