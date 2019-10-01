@@ -177,7 +177,7 @@ def parse_command_line():
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
-    return parser.parse_args()
+    return parser
 
 
 def lodict2csv(listofdicts, out, fnames=None, header=True):
@@ -565,7 +565,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 5-  Get the gene tree for the selected species
 
     # 1-
-    args = parse_command_line()
+    args = parse_command_line().parse_args()
 
     # 2-
     orthokeep = utils.species.get_species_list(args.specieslist)

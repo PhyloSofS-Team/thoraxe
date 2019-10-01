@@ -46,7 +46,7 @@ Finally, the easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with
    python -m pip install thoraxe
 
 
-Installation from Source
+Installation from source
 ------------------------
 
 If you want to install the latest and in-development version of *ThorAxe*, clone

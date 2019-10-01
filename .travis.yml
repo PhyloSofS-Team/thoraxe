@@ -10,7 +10,7 @@ notifications:
 install:
   - sudo apt-get install clustalo
   - python -m pip install coveralls codecov
-  - python -m pip install sphinx sphinx_rtd_theme
+  - python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
   - python -m pip install .
 
 script:

@@ -98,7 +98,7 @@ def parse_command_line():
         'indicated, all the available species are used.',
         default='')
 
-    return parser.parse_args()
+    return parser
 
 
 def get_transcripts(input_folder, species_list=None):
@@ -415,7 +415,7 @@ def update_subexon_table(subexon_table, cluster2data):
 
 def main():
     """Perform Pipeline."""
-    args = parse_command_line()
+    args = parse_command_line().parse_args()
 
     species_list = utils.species.get_species_list(args.specieslist)
 
