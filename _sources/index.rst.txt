@@ -5,7 +5,8 @@ Welcome to ThorAxe's documentation!
    :maxdepth: 4
 
    installation
-   API <api/modules>
+   Command line programs <programs/programs>
+   Module API <api/modules>
 
 
 Indices and tables
