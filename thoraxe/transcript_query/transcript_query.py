@@ -434,6 +434,8 @@ def get_orthologs(ensgeneid, **params):
     request = generic_ensembl_rest_request(ext_orthologs, params, HJSON)
     res = request.json()
     dortho = res['data'][0]['homologies']
+    # keep only binomial species names:
+    dortho = [d for d in dortho if len(d['target']['species'].split('_')) == 2]
     return dortho
 
 
@@ -492,9 +494,6 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     for ortho in lorthologs:
         orthoid = ortho['target']['id']
         orthospecies = ortho['target']['species']
-        if len(orthospecies.split(
-                '_')) != 2:  # use only binomial species names
-            continue
         # orthotaxon = ortho['target']['taxon_id']
         ortho_transcripts.append(get_listoftranscripts(orthoid, orthospecies))
 
@@ -656,10 +655,6 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     for ortholog in orthologs_filtered:
         orthoid = ortholog['target']['id']
         orthospecies = ortholog['target']['species']
-        if len(orthospecies.split(
-                '_')) != 2:  # use only binomial species names
-            _print_if(args.verbose, "  !skipping species %s" % (orthospecies))
-            continue
         # orthotaxon = ortholog['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
         _print_if(args.verbose,
