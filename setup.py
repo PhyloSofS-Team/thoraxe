@@ -8,7 +8,7 @@ setup(name='thoraxe',
       author="Diego Javier Zea, Hugues Richard & Elodie Laine",
       author_email='diegozea@gmail.com',
       url='https://github.com/PhyloSofS-Team/thoraxe',
-      version='0.1.0',
+      version='0.2.0',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Science/Research',
