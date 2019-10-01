@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Output description &mdash; ThorAxe 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="thoraxe" href="api/modules.html" />
+    <link rel="prev" title="transcript_query" href="programs/transcript_query.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ThorAxe
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programs/programs.html">Command line programs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Output description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#transcript-query">transcript_query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#thoraxe">thoraxe</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">thoraxe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">Module API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ThorAxe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Output description</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/output.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="output-description">
+<h1>Output description<a class="headerlink" href="#output-description" title="Permalink to this headline">¶</a></h1>
+<p><em>ThorAxe</em> has two command-line programs, <cite>transcript_query</cite> and <cite>thoraxe</cite>. The
+first downloads from <a class="reference external" href="https://www.ensembl.org/index.html">Ensembl</a> the inputs for the second.</p>
+<div class="section" id="transcript-query">
+<h2>transcript_query<a class="headerlink" href="#transcript-query" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>::</dt><dd><p>transcript_query PAX6 -l homo_sapiens,mus_musculus,xenopus_tropicalis,danio_rerio</p>
+</dd>
+</dl>
+<p>Running the previous line is going to create a <cite>PAX6</cite> folder with an <cite>Ensembl</cite>
+subfolder. That last folder contains four files with information downloaded
+from <em>Ensembl</em>. In this case, the information corresponds to the transcripts
+and exons from the human <em>PAX6</em> gene and all their one-to-one orthologs in the
+indicated species:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PAX6
+└── Ensembl
+    ├── exonstable.tsv
+    ├── sequences.fasta
+    ├── tree.nh
+    └── tsl.csv
+</pre></div>
+</div>
+</div>
+<div class="section" id="thoraxe">
+<h2>thoraxe<a class="headerlink" href="#thoraxe" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PAX6
+├── Ensembl
+│   ├── exonstable.tsv
+│   ├── sequences.fasta
+│   ├── tree.nh
+│   └── tsl.csv
+└── thoraxe
+    ├── _intermediate
+    │   ├── chimeric_alignment_1.fasta
+    │   ⋮
+    │   ├── cluster_data.js
+    │   ├── cluster_plots.html
+    │   ├── gene_ids_1.txt
+    │   ⋮
+    │   ├── msa_matrix_1.txt
+    │   ⋮
+    │   ├── subexon_table.csv
+    │   ├── subexon_table_1.csv
+    │   ⋮
+    │   └── transcript_table.csv
+    ├── homologous_exon_table.csv
+    ├── msa
+    │   ├── msa_homologous_exon_10_0.fasta
+    │   ⋮
+    │   └── msa_homologous_exon_9_0.fasta
+    ├── phylosofs
+    │   ├── homologous_exons.tsv
+    │   ├── transcripts.pir
+    │   ├── transcripts.txt
+    │   └── tree.nh
+    └── splice_graph.gml
+</pre></div>
+</div>
+<p>For each protein, the <cite>Ensembl</cite> folder has the data downloaded from Ensembl
+with <cite>transcript_query</cite>. The <cite>thoraxe</cite> folder as the raw output from <cite>thoraxe</cite>.</p>
+<div class="section" id="id1">
+<h3>thoraxe<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>homologous_exon_table.csv</cite> file has the tidy (denormalized) output data for
+homologous exons. Each row is an observation of a homologous exon in a
+particular transcript. Rows are in order, following the homologous exon rank.
+That means that the concatenation of the homologous exon sequence for each
+transcript gives the protein isoform sequence.</p>
+<p>The <cite>splice_graph.gml</cite> is the splice graph of homologous exons in all the
+transcripts/species using the human-readable Graph Modelling Language (GML)
+format. Each node and edge has conservation information, where conservation
+means the fraction of species showing that particular node (homologous exon) or
+connection.</p>
+<p>The <cite>msa</cite> folder has a multiple sequence alignment for each homologous exon, e.g.
+<cite>msa_homologous_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
+look for homologous sequences in different databases by using
+[hmmsearch](<a class="reference external" href="https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">https://www.ebi.ac.uk/Tools/hmmer/search/hmmsearch</a>).</p>
+</div>
+<div class="section" id="phylosofs">
+<h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and mollecular
+modelling pipelines of <em>PhyloSofS</em>. In particular, these files use a single
+unicode character to represent each homologous exon. The mapping between the id
+for <em>PhyloSofS</em> and the one of <em>ThorAxe</em> (<em>ExonCluster*_*ChimericBlock</em>) is in
+the <cite>homologous_exons.tsv</cite> file.</p>
+<p>The <cite>transcripts.pir</cite> has the annotated sequence using the PIR format.</p>
+<p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
+</div>
+<div class="section" id="intermediate-outputs">
+<h3>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>_intermediate</cite> folder has intermediate files and states from the <em>ThorAxe</em>
+pipeline. In particular, <cite>cluster_plots.html</cite> has the interactive plots of the
+chimeric alignments, with the possibility to show the <cite>constitutive</cite> value
+calculated for each subexon as described in previous issues of this repo.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api/modules.html" class="btn btn-neutral float-right" title="thoraxe" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="programs/transcript_query.html" class="btn btn-neutral float-left" title="transcript_query" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

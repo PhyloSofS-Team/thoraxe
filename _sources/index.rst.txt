@@ -1,11 +1,12 @@
-Welcome to ThorAxe's documentation!
-===================================
+ThorAxe's documentation!
+========================
 
 .. toctree::
    :maxdepth: 4
 
    installation
    Command line programs <programs/programs>
+   output
    Module API <api/modules>
 
 
