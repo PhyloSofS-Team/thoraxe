@@ -216,11 +216,11 @@ error is raised.</p>
 </div>
 <div class="section" id="module-thoraxe.utils.split">
 <span id="thoraxe-utils-split-module"></span><h2>thoraxe.utils.split module<a class="headerlink" href="#module-thoraxe.utils.split" title="Permalink to this headline">¶</a></h2>
-<p>split: Util functions to split homologous exons.</p>
+<p>split: Util functions to split s-exons.</p>
 <dl class="function">
 <dt id="thoraxe.utils.split.split_exons">
 <code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_exons</code><span class="sig-paren">(</span><em class="sig-param">exons</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_exons" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of the homologous exons in the string.</p>
+<dd><p>Return a list of the s-exons in the string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_exons</span><span class="p">(</span><span class="s1">&#39;3_0/3_1&#39;</span><span class="p">)</span>
 <span class="go">[&#39;3_0&#39;, &#39;3_1&#39;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">split_exons</span><span class="p">(</span><span class="s1">&#39;4_0&#39;</span><span class="p">)</span>
@@ -232,7 +232,7 @@ error is raised.</p>
 <dl class="function">
 <dt id="thoraxe.utils.split.split_lengths">
 <code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_lengths</code><span class="sig-paren">(</span><em class="sig-param">lengths</em>, <em class="sig-param">seq</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_lengths" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list of the homologous exon lengths, len(seq) if there is not data.</p>
+<dd><p>Return a list of the s-exon lengths, len(seq) if there is not data.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">split_lengths</span><span class="p">(</span><span class="s1">&#39;4/2&#39;</span><span class="p">,</span> <span class="s1">&#39;MLGHAC&#39;</span><span class="p">)</span>
 <span class="go">[4, 2]</span>
@@ -249,7 +249,7 @@ error is raised.</p>
 <dl class="function">
 <dt id="thoraxe.utils.split.split_seqs">
 <code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_seqs</code><span class="sig-paren">(</span><em class="sig-param">sequences</em>, <em class="sig-param">seq</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_seqs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a list with the homologous exon sequences.</p>
+<dd><p>Return a list with the s-exon sequences.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_seqs</span><span class="p">(</span><span class="s1">&#39;MLGH/AC&#39;</span><span class="p">,</span> <span class="s1">&#39;MLGHAC&#39;</span><span class="p">)</span>
 <span class="go">[&#39;MLGH&#39;, &#39;AC&#39;]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">split_seqs</span><span class="p">(</span><span class="s1">&#39;MLGHAC&#39;</span><span class="p">,</span> <span class="s1">&#39;MLGHAC&#39;</span><span class="p">)</span>

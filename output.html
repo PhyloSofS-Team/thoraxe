@@ -210,20 +210,20 @@ results of the study.</p>
     │   ├── subexon_table_1.csv
     │   ⋮
     │   └── transcript_table.csv
-    ├── homologous_exon_table.csv
+    ├── s_exon_table.csv
     ├── msa
-    │   ├── msa_homologous_exon_10_0.fasta
+    │   ├── msa_s_exon_10_0.fasta
     │   ⋮
-    │   └── msa_homologous_exon_9_0.fasta
+    │   └── msa_s_exon_9_0.fasta
     ├── phylosofs
-    │   ├── homologous_exons.tsv
+    │   ├── s_exons.tsv
     │   ├── transcripts.pir
     │   ├── transcripts.txt
     │   └── tree.nh
     └── splice_graph.gml
 </pre></div>
 </div>
-<p>The <cite>homologous_exon_table.csv</cite> file has the tidy (denormalized) output data for
+<p>The <cite>s_exon_table.csv</cite> file has the tidy (denormalized) output data for
 the <strong>orthologous exonic regions (s-exons)</strong>. Each row is an observation of an
 s-exon in a particular transcript. Rows are in order, following the s-exon rank.
 That means that the concatenation of the s-exon sequences for each
@@ -234,7 +234,7 @@ format. Each node and edge has conservation information, where conservation
 means the fraction of species showing that particular node (s-exon) or
 connection.</p>
 <p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
-<cite>msa_homologous_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
+<cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
 look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
 <div class="section" id="phylosofs">
 <h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h3>
@@ -242,7 +242,7 @@ look for homologous sequences in different databases by using <a class="referenc
 modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. In particular, these files use a single
 unicode character to represent each s-exon. The mapping between the id
 for <em>PhyloSofS</em> and the one of <em>ThorAxe</em> (<em>ExonCluster*_*ChimericBlock</em>) is in
-the <cite>homologous_exons.tsv</cite> file.</p>
+the <cite>s_exons.tsv</cite> file.</p>
 <p>The <cite>transcripts.pir</cite> has the annotated sequence using the PIR format.</p>
 <p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
 </div>

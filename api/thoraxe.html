@@ -231,9 +231,9 @@ identifiers from subexon_table are used.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="thoraxe.thoraxe.get_homologous_subexons">
-<code class="sig-prename descclassname">thoraxe.thoraxe.</code><code class="sig-name descname">get_homologous_subexons</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">subexon_table</em>, <em class="sig-param">gene2speciesname</em>, <em class="sig-param">connected_subexons</em>, <em class="sig-param">minimum_len=4</em>, <em class="sig-param">coverage_cutoff=80.0</em>, <em class="sig-param">percent_identity_cutoff=30.0</em>, <em class="sig-param">gap_open_penalty=10</em>, <em class="sig-param">gap_extend_penalty=1</em>, <em class="sig-param">aligner='clustalo'</em>, <em class="sig-param">padding='XXXXXXXXXX'</em>, <em class="sig-param">species_list=None</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_homologous_subexons" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform almost all the pipeline.</p>
+<dt id="thoraxe.thoraxe.get_s_exons">
+<code class="sig-prename descclassname">thoraxe.thoraxe.</code><code class="sig-name descname">get_s_exons</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em>, <em class="sig-param">subexon_table</em>, <em class="sig-param">gene2speciesname</em>, <em class="sig-param">connected_subexons</em>, <em class="sig-param">minimum_len=4</em>, <em class="sig-param">coverage_cutoff=80.0</em>, <em class="sig-param">percent_identity_cutoff=30.0</em>, <em class="sig-param">gap_open_penalty=10</em>, <em class="sig-param">gap_extend_penalty=1</em>, <em class="sig-param">aligner='clustalo'</em>, <em class="sig-param">padding='XXXXXXXXXX'</em>, <em class="sig-param">species_list=None</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_s_exons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform almost all the ThorAxe pipeline.</p>
 </dd></dl>
 
 <dl class="function">
@@ -274,7 +274,7 @@ the argparse parser.</p>
 <dl class="function">
 <dt id="thoraxe.thoraxe.update_subexon_table">
 <code class="sig-prename descclassname">thoraxe.thoraxe.</code><code class="sig-name descname">update_subexon_table</code><span class="sig-paren">(</span><em class="sig-param">subexon_table</em>, <em class="sig-param">cluster2data</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.update_subexon_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the subexon table by adding the homologous exon information.</p>
+<dd><p>Update the subexon table by adding the s-exon information.</p>
 </dd></dl>
 
 </div>

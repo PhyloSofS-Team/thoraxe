@@ -256,8 +256,8 @@ sequence and a Dict from ‘SubexonIndex’ to …</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="thoraxe.subexons.alignment.impute_missing_orthologous_exon_group">
-<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">impute_missing_orthologous_exon_group</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">column='HomologousExons'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.impute_missing_orthologous_exon_group" title="Permalink to this definition">¶</a></dt>
+<dt id="thoraxe.subexons.alignment.impute_missing_s_exon">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">impute_missing_s_exon</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">column='S_exons'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.impute_missing_s_exon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace column values that do not conform to the naming by 0_number.</p>
 </dd></dl>
 
@@ -302,12 +302,12 @@ following options:</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="thoraxe.subexons.alignment.save_homologous_subexons">
-<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">save_homologous_subexons</code><span class="sig-paren">(</span><em class="sig-param">subexon_df</em>, <em class="sig-param">sequences</em>, <em class="sig-param">gene_ids</em>, <em class="sig-param">colclusters</em>, <em class="sig-param">output_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.save_homologous_subexons" title="Permalink to this definition">¶</a></dt>
-<dd><p>It saves the information about homologous exons.</p>
+<dt id="thoraxe.subexons.alignment.save_s_exons">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">save_s_exons</code><span class="sig-paren">(</span><em class="sig-param">subexon_df</em>, <em class="sig-param">sequences</em>, <em class="sig-param">gene_ids</em>, <em class="sig-param">colclusters</em>, <em class="sig-param">output_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.save_s_exons" title="Permalink to this definition">¶</a></dt>
+<dd><p>It saves the information about s-exons.</p>
 <p>It takes a list of sequences, like the one returned by msa2sequences.
-Return subexon_df with the homologous subexon information.
-For each homologous subexon saves a fasta MSA in the output_folder.</p>
+Return subexon_df with the orthologous exonic region (s-exon) information.
+For each s-exon saves a fasta MSA in the output_folder.</p>
 </dd></dl>
 
 <dl class="function">
@@ -349,7 +349,7 @@ conservation is the fraction of species that has that particular feature.</p>
 <dl class="function">
 <dt id="thoraxe.subexons.phylosofs.get_exon2char">
 <code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">get_exon2char</code><span class="sig-paren">(</span><em class="sig-param">exons</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.get_exon2char" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary from orthologous exon group to a single character.</p>
+<dd><p>Return a dictionary from orthologous regions (s-exon) to a single character.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_exon2char</span><span class="p">([</span><span class="s1">&#39;1_0/1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;2_0&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 <span class="go">[&#39;1_0&#39;, &#39;1_1&#39;, &#39;2_0&#39;]</span>
