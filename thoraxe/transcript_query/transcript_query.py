@@ -647,7 +647,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(args.species, curgene)
     if extable is None:
-        exit(1)
+        sys.exit(1)
     extable = _rename(extable)
     exonstableout.write(extable)
     exons_name = "%s:%s" % (args.species, args.genename)
