@@ -217,15 +217,12 @@ def _species2ensembldataset(species_name):
     Return the name of the ENSEMBL dataset in biomart.
 
     >>> _species2ensembldataset('homo_sapiens')
-    ['hsapiens_gene_ensembl']
-    >>> _species2ensembldataset('cebus_capucinus_imitator')
-    ['ccapucinus_gene_ensembl', 'cimitator_gene_ensembl']
+    ['hsapiens_gene_ensembl', 'hsapiens_eg_gene']
     """
     utils.species.check_species_name(species_name)
     names = species_name.split("_")
-    return [
-        names[0][0] + names[i] + "_gene_ensembl" for i in range(1, len(names))
-    ]
+    species = names[0][0] + names[1]
+    return [species + "_gene_ensembl", species + "_eg_gene"]
 
 
 # Small biomart function from keithshep
@@ -293,9 +290,11 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         if _check_biomart_response(response):
             return response
 
-    raise Exception(
+    warnings.warn(
         'It can not found {} in biomart (tried: {}).\nLast response:\n{}'.
         format(species_name, dataset_names, response))
+
+    return None
 
 
 # TO DO : passer toutes les fonctions avec un conteneur générique sur la
@@ -493,6 +492,9 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     for ortho in lorthologs:
         orthoid = ortho['target']['id']
         orthospecies = ortho['target']['species']
+        if len(orthospecies.split(
+                '_')) != 2:  # use only binomial species names
+            continue
         # orthotaxon = ortho['target']['taxon_id']
         ortho_transcripts.append(get_listoftranscripts(orthoid, orthospecies))
 
@@ -644,6 +646,8 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(args.species, curgene)
+    if extable is None:
+        exit(1)
     extable = _rename(extable)
     exonstableout.write(extable)
     exons_name = "%s:%s" % (args.species, args.genename)
@@ -652,6 +656,10 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     for ortholog in orthologs_filtered:
         orthoid = ortholog['target']['id']
         orthospecies = ortholog['target']['species']
+        if len(orthospecies.split(
+                '_')) != 2:  # use only binomial species names
+            _print_if(args.verbose, "  !skipping species %s" % (orthospecies))
+            continue
         # orthotaxon = ortholog['target']['taxon_id']
         ortho_name = "%s:%s" % (orthospecies, orthoid)
         _print_if(args.verbose,
@@ -664,6 +672,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
         ortho_exontable = get_biomart_exons_annot(orthospecies,
                                                   orthoid,
                                                   header=False)
+        if ortho_exontable is None:
+            continue
+
         _print_if(
             args.verbose, "  - %d lines in the exon table" %
             (ortho_exontable.count("\n") + 1))
