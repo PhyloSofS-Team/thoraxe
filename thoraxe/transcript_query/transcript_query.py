@@ -552,6 +552,17 @@ def _print_if(condition, *args):
         print(*args)
 
 
+def _store_errors(output_dir, species_name, geneid):
+    """Save a CSV file with the species & gene pairs that has failed."""
+    filename = os.path.join(output_dir, "errors.csv")
+    if not os.path.isfile(filename):
+        with open(filename, "w") as file:
+            file.write('Species,GeneID\n')
+
+    with open(filename, "a") as file:
+        file.write('{},{}\n'.format(species_name, geneid))
+
+
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
 def main():  # pylint: disable=too-many-locals,too-many-statements
@@ -646,6 +657,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     exfasta = get_exons_sequences(lexid)
     extable = get_biomart_exons_annot(args.species, curgene)
     if extable is None:
+        _store_errors(query_result_subdir, args.species, curgene)
         sys.exit(1)
     extable = _rename(extable)
     exonstableout.write(extable)
@@ -668,6 +680,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
                                                   orthoid,
                                                   header=False)
         if ortho_exontable is None:
+            warnings.warn('Download failed for {} in {}! '.format(
+                orthoid, orthospecies))
+            _store_errors(query_result_subdir, orthospecies, orthoid)
             continue
 
         _print_if(
