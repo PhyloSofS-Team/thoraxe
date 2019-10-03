@@ -189,15 +189,15 @@
 <dt id="thoraxe.utils.species.check_species_name">
 <code class="sig-prename descclassname">thoraxe.utils.species.</code><code class="sig-name descname">check_species_name</code><span class="sig-paren">(</span><em class="sig-param">species_name</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.species.check_species_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the species_name has the correct format.</p>
-<p>The expected name is binomial but it can also include the subspecies name
-(trinomial). If the species_name doesn’t conform the expected format an
+<p>The expected name is binomial. Trinomial names aren’t used but they don’t
+raise an error. If the species_name doesn’t conform the expected format an
 error is raised.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">check_species_name</span><span class="p">(</span><span class="s1">&#39;homo_sapiens&#39;</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">check_species_name</span><span class="p">(</span><span class="s1">&#39;colobus_angolensis_palliatus&#39;</span><span class="p">)</span>
-<span class="go">True</span>
+<span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">check_species_name</span><span class="p">(</span><span class="s1">&#39;cricetulus_griseus_chok1gshd&#39;</span><span class="p">)</span>
-<span class="go">True</span>
+<span class="go">False</span>
 </pre></div>
 </div>
 </dd></dl>
