@@ -16,6 +16,7 @@ import sys
 import time
 import warnings
 from collections import Counter
+from datetime import datetime
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -125,6 +126,7 @@ def _request_ensembl_redirect(*args, **kargs):
 
 def generic_ensembl_rest_request(extension, params, header):
     "Perform a generic request."
+    assert extension.startswith('/')
     return _request_ensembl_redirect(SERVER + extension,
                                      params=params,
                                      headers=header)
@@ -563,6 +565,19 @@ def _store_errors(output_dir, species_name, geneid):
         file.write('{},{}\n'.format(species_name, geneid))
 
 
+def save_ensembl_version(output_folder):
+    """Save a ensembl_version.txt file with the version number of Ensembl."""
+    request = generic_ensembl_rest_request('/info/eg_version', {}, HJSON)
+    res = request.json()
+    with open(os.path.join(output_folder, 'ensembl_version.csv'),
+              'w') as outfile:
+        outfile.write('Download_date,Download_time,Ensembl_version\n')
+        now = datetime.now()
+        outfile.write('{},{},{}\n'.format(now.strftime('%d-%m-%Y'),
+                                          now.strftime('%H:%M'),
+                                          res['version']))
+
+
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
 def main():  # pylint: disable=too-many-locals,too-many-statements
@@ -599,6 +614,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if not os.path.exists(cdirectory):
         os.makedirs(query_result_subdir)
 
+    save_ensembl_version(query_result_subdir)
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
     print("Writing the gene tree")
