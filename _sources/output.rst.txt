@@ -23,6 +23,7 @@ indicated species:
 
     PAX6
     └── Ensembl
+        ├ ensembl_version.csv
         ├── exonstable.tsv
         ├── sequences.fasta
         ├── tree.nh
