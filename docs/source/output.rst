@@ -121,6 +121,10 @@ pipeline. In particular, `cluster_plots.html` has the interactive plots of the
 chimeric alignments, with the possibility to show the `constitutive` value
 calculated for each subexon.
 
+.. warning: `cluster_plots.html` loads the `cluster_data.js` file that includes 
+all the information needed to plot all the generated multiple sequence alignments 
+using *Plotly*. It can freeze the tab when a lot of sequences/species are used or 
+if the computer hasn't enough resources available.
 
 
 .. _Ensembl: https://www.ensembl.org/index.html
