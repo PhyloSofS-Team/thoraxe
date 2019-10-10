@@ -54,7 +54,8 @@ def test_first_level(example_folder):
 @pytest.mark.skipif(_is_travis(), reason="Skipping this test on Travis CI.")
 def test_second_level(example_folder):
     content = glob.glob(os.path.join(example_folder, '*', '*'))
-    assert len(content) == 4
+    assert len(content) == 5
+    assert any(elem.endswith('ensembl_version.csv') for elem in content)
     assert any(elem.endswith('tree.nh') for elem in content)
     assert any(elem.endswith('tsl.csv') for elem in content)
     assert any(elem.endswith('.fasta') for elem in content)

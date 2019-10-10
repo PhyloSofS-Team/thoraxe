@@ -29,6 +29,8 @@ indicated species:
         ├── tree.nh
         └── tsl.csv
 
+The `ensembl_version.csv` file contains a table with information about the 
+download date and hour together with the *Ensembl* version.
 
 thoraxe
 -------
