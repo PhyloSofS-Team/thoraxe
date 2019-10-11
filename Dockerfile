@@ -15,8 +15,6 @@ RUN apt-get update && \
     python3-setuptools \
     python3-dev \
     build-essential \
-    # ca-certificates is needed to use git clone without SSL CA cert problems
-    ca-certificates \
     # ThorAxe's dependencies:
     clustalo \
     # Utilities:
@@ -29,10 +27,9 @@ COPY docker_banner.sh docker_banner.sh
 
 RUN cat /app/docker_banner.sh >> ~/.bashrc
 
-RUN git clone https://github.com/PhyloSofS-Team/thoraxe.git && \
-    # install numpy before socket-bio (ThorAxe's dependency)
-    python3 -m pip install numpy && \
-    python3 -m pip install ./thoraxe
+# install numpy before socket-bio (ThorAxe's dependency)
+RUN python3 -m pip install numpy && \
+    python3 -m pip install thoraxe
 
 WORKDIR /project
 
