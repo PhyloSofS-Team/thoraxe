@@ -21,11 +21,10 @@ def set_out_dir():
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
     aligner = 'clustalo'
-    if _is_windows():  # In Windows 10 with clutalo installed in WSL (Ubuntu)
-        try:
-            if thoraxe.subexons.alignment._get_wsl_name('wsl') is not None:
-                aligner = 'wsl clustalo'
-        except Exception:  # AppVeyor
+    if _is_windows():  # Windows 10 with clutalo installed in WSL (Ubuntu)
+        if shutil.which('wsl') is not None:
+            aligner = 'wsl clustalo'
+        else:  # AppVeyor
             muscle = 'C:\\projects\\thoraxe\\muscle.exe'
             if os.path.exists(muscle):
                 aligner = muscle + ' -in '
