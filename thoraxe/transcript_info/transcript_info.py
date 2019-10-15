@@ -354,10 +354,13 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
     beginning, it is deleted on the returned sequence.
 
     >>> # Example based in ENSPSME00000216679 and ENSPSME00000216683
-    >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': 'AATTGATATATAAGGAAGTTATGGACTTGGAAGAGAGAACCAAGAATGGAGTCATACGGGGGCAGCCTTCTCCTTTAGGTTG'}
-    >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': 'TCAAAAGACACATTCTGTAGTGTTGTAA'}
+    >>> seq_one = 'AATTGATATATAAGGAAGTTATGGACTTGGAAGAGAGAACCAAGAATGGAGTCATACGG'
+    >>> seq_one = seq_one + 'GGGCAGCCTTCTCCTTTAGGTTG'
+    >>> seq_two = 'TCAAAAGACACATTCTGTAGTGTTGTAA'
+    >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': seq_one}
+    >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': seq_two}
     >>> row_list = [row_one, row_two]
-    >>> _manage_start_phase_positive_strand(row_list, 1, 'TCAAAAGACACATTCTGTAGTGTTGTAA', False)
+    >>> _manage_start_phase_positive_strand(row_list, 1, seq_two, False)
     'TGTCAAAAGACACATTCTGTAGTGTTGTAA'
     """
     start_phase = row_list[row_index]['StartPhase']
