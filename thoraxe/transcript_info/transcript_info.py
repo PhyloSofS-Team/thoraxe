@@ -292,10 +292,11 @@ def _manage_start_phase_negative_strand(cds_seq, start_phase):
     """
     Cut the CDS sequence depending on the exon start phase.
 
-    If the phase is different from 0, the codon shared between exons is
-    assigned to the exon at the left. That means that our CDS sequence should
-    not include the partial codon at the beginning. This function returns the
-    cds_sequence without the partial codon when the start_phase is 1 or 2.
+    If the phase is different from 0 and gene in the negative strand, the
+    codon shared between exons is assigned to the exon at the left. That means
+    that our CDS sequence should not include the partial codon at the
+    beginning. This function returns the cds_seq without the partial codon when
+    the start_phase is 1 or 2.
 
     >>> _manage_start_phase_negative_strand('XXXYYY', 0)
     'XXXYYY'
@@ -321,7 +322,7 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     That means that our CDS sequence should complete its partial codon using
     bases from the beginning of the next exon. This function returns the
     cds_seq with the complete codon at the end when the end_phase is 1 or 2.
-    If the last exon of the transcript as an incomplete codon at the end, it is
+    If the last exon of the transcript has an incomplete codon at the end, it is
     deleted on the returned sequence.
 
     NOTE: _check_phases_by_position should be used beipt_infore this function
@@ -342,6 +343,17 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
 def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
                                         start_exon):
     """
+    Complete the first codon of the CDS sequence depending on the start phase.
+
+    If the phase is different from 0 and the gene in the positive strand, the
+    codon shared between exons is assigned to the exon at the right (this exon).
+    That means that our CDS sequence should complete its partial codon using
+    bases from the end of the previous exon. This function returns the
+    cds_seq with the complete codon at the beginning when the end_phase is 1 or
+    2. If the first exon of the transcript has an incomplete codon at the
+    beginning, it is deleted on the returned sequence.
+
+    >>> # Example based in ENSPSME00000216679 and ENSPSME00000216683
     >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': 'AATTGATATATAAGGAAGTTATGGACTTGGAAGAGAGAACCAAGAATGGAGTCATACGGGGGCAGCCTTCTCCTTTAGGTTG'}
     >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': 'TCAAAAGACACATTCTGTAGTGTTGTAA'}
     >>> row_list = [row_one, row_two]

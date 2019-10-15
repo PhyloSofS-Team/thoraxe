@@ -20,14 +20,15 @@ def set_out_dir():
 
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
-    aligner = "clustalo"
+    aligner = 'clustalo'
     if _is_windows():  # In Windows 10 with clutalo installed in WSL (Ubuntu)
-        if thoraxe.subexons.alignment._get_wsl_name('wsl') is not None:
-            aligner = "wsl clustalo"
-        else:  # AppVeyor
-            muscle = "C:\\projects\\thoraxe\\muscle.exe"
+        try:
+            if thoraxe.subexons.alignment._get_wsl_name('wsl') is not None:
+                aligner = 'wsl clustalo'
+        except FileNotFoundError:  # AppVeyor
+            muscle = 'C:\\projects\\thoraxe\\muscle.exe'
             if os.path.exists(muscle):
-                aligner = muscle + " -in "
+                aligner = muscle + ' -in '
 
     filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
