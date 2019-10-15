@@ -323,6 +323,20 @@ calculate the subexon phases.</p>
 </pre></div>
 </div>
 <dl class="function">
+<dt id="thoraxe.transcript_info.phases.bases_to_complete_next_codon">
+<code class="sig-prename descclassname">thoraxe.transcript_info.phases.</code><code class="sig-name descname">bases_to_complete_next_codon</code><span class="sig-paren">(</span><em class="sig-param">phase</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_next_codon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bases at the exon end that completes the next codon.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----X</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># e.g. X-----XX</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="thoraxe.transcript_info.phases.bases_to_complete_previous_codon">
 <code class="sig-prename descclassname">thoraxe.transcript_info.phases.</code><code class="sig-name descname">bases_to_complete_previous_codon</code><span class="sig-paren">(</span><em class="sig-param">phase</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_previous_codon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the bases at exon start that completes the previous codon.</p>
