@@ -68,6 +68,23 @@ def bases_to_complete_previous_codon(phase):  # pylint: disable=invalid-name
     raise ValueError("Only phases 0, 1 and 2 are allowed.")
 
 
+def bases_to_complete_next_codon(phase):  # pylint: disable=invalid-name
+    """
+    Return the bases at the exon end that completes the next codon.
+
+    >>> bases_to_complete_next_codon(0) # e.g. -----XXX
+    0
+    >>> bases_to_complete_next_codon(2) # e.g. XX-----X
+    2
+    >>> bases_to_complete_next_codon(1) # e.g. X-----XX
+    1
+    """
+    if phase in {0, 1, 2}:
+        return phase
+
+    raise ValueError("Only phases 0, 1 and 2 are allowed.")
+
+
 def calculate_phase(cdna_len, previous_end_phase):
     """
     Calculate exon start and end phases using the intron phase.

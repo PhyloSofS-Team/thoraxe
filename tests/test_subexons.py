@@ -75,7 +75,7 @@ def test_subexon_clusters(clustered_trx_data):
     assert exon_row['SubexonID'] == 'ENSMMUE00000040064_SE_15_16'
     assert exon_row['SubexonIDCluster'] == 'ENSMMUE00000040064_SE_15_16'
     assert str(exon_row['SubexonProteinSequence']
-               ) == 'VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR*'
+               ) == 'AVINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR*'
     assert str(exon_row['SubexonSequence']) == (
         'CAGTGATCAATGGCTCTCAGCATCCATCGTCATCGTCGTCTGTCAATGATGTGTCTTCAA'
         'TGTCAACAGATCCGACTTTGGCCTCGGATACAGACAGCAGTCTAGAAGCATCAGCTGGGC'

@@ -288,7 +288,7 @@ def _is_first_or_last_exon(row_list, row_index):
     return start_exon, end_exon
 
 
-def _manage_start_phase(cds_seq, start_phase):
+def _manage_start_phase_negative_strand(cds_seq, start_phase):
     """
     Cut the CDS sequence depending on the exon start phase.
 
@@ -297,11 +297,11 @@ def _manage_start_phase(cds_seq, start_phase):
     not include the partial codon at the beginning. This function returns the
     cds_sequence without the partial codon when the start_phase is 1 or 2.
 
-    >>> _manage_start_phase('XXXYYY', 0)
+    >>> _manage_start_phase_negative_strand('XXXYYY', 0)
     'XXXYYY'
-    >>> _manage_start_phase('XXYYY', 1)
+    >>> _manage_start_phase_negative_strand('XXYYY', 1)
     'YYY'
-    >>> _manage_start_phase('XYYY', 2)
+    >>> _manage_start_phase_negative_strand('XYYY', 2)
     'YYY'
     """
     if start_phase == 1:
@@ -312,15 +312,15 @@ def _manage_start_phase(cds_seq, start_phase):
     return cds_seq  # do not change CDS sequence if exon start phase is 0 or -1
 
 
-def _manage_end_phase(row_list, row_index, cds_seq, end_exon):
+def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     """
     Complete the last codon of the CDS sequence depending on the end phase.
 
-    If the phase is different from 0, the codon shared between exons is
-    assigned to the exon at the left (this exon). That means that our CDS
-    sequence should complete its partial codon using bases from the beginning
-    of the next exon. This function returns the cds_sequence with the complete
-    codon at the end when the end_phase is 1 or 2.
+    If the phase is different from 0 and the gene in the negative strand, the
+    codon shared between exons is assigned to the exon at the left (this exon).
+    That means that our CDS sequence should complete its partial codon using
+    bases from the beginning of the next exon. This function returns the
+    cds_seq with the complete codon at the end when the end_phase is 1 or 2.
     If the last exon of the transcript as an incomplete codon at the end, it is
     deleted on the returned sequence.
 
@@ -337,6 +337,51 @@ def _manage_end_phase(row_list, row_index, cds_seq, end_exon):
             cds_seq = cds_seq + next_exon_sequence[0:n_bases]
 
     return cds_seq
+
+
+def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
+                                        start_exon):
+    """
+    >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': 'AATTGATATATAAGGAAGTTATGGACTTGGAAGAGAGAACCAAGAATGGAGTCATACGGGGGCAGCCTTCTCCTTTAGGTTG'}
+    >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': 'TCAAAAGACACATTCTGTAGTGTTGTAA'}
+    >>> row_list = [row_one, row_two]
+    >>> _manage_start_phase_positive_strand(row_list, 1, 'TCAAAAGACACATTCTGTAGTGTTGTAA', False)
+    'TGTCAAAAGACACATTCTGTAGTGTTGTAA'
+    """
+    start_phase = row_list[row_index]['StartPhase']
+    if start_phase in {1, 2}:
+        if start_exon:
+            n_bases = phases.bases_to_complete_previous_codon(start_phase)
+            cds_seq = cds_seq[n_bases:]  # delete incomplete codon
+        else:
+            n_bases = phases.bases_to_complete_next_codon(start_phase)
+            previous_exon_sequence = row_list[row_index - 1]['ExonSequence']
+            cds_seq = previous_exon_sequence[-n_bases:] + cds_seq
+
+    return cds_seq
+
+
+def _manage_end_phase_positive_strand(cds_seq, end_phase):
+    """
+    Cut the CDS sequence depending on the exon end phase.
+
+    If the phase is different from 0 and the gene in the positive strand,
+    the codon shared between exons is assigned to the exon at the right.
+    That means that our CDS sequence should not include the partial codon
+    at the end. This function returns the cds_seq without the partial codon
+    when the end_phase is 1 or 2.
+
+    >>> _manage_end_phase_positive_strand('XXXY', 1)
+    'XXX'
+    >>> _manage_end_phase_positive_strand('XXXYY', 2)
+    'XXX'
+    >>> _manage_end_phase_positive_strand('XXXYYY', 0)
+    'XXXYYY'
+    """
+    if end_phase in {1, 2}:
+        return cds_seq[:-phases.bases_to_complete_next_codon(end_phase)]
+
+    return cds_seq  # do not change CDS sequence if exon start phase is 0 or -1
 
 
 def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
@@ -427,12 +472,22 @@ def add_protein_seq(data_frame,
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
-            # assigned to the exon at the left:
+            # assigned to the exon at the left for the negative strand and
+            # the exon at the right for the positive strand (i.e. to the
+            # exon that changes because of the phase change):
 
             _check_phases_by_position(row, end_exon, allow_incomplete_cds)
 
-            cds_seq = _manage_start_phase(cds_seq, row['StartPhase'])
-            cds_seq = _manage_end_phase(row_list, row_index, cds_seq, end_exon)
+            if row['Strand'] == -1:
+                cds_seq = _manage_start_phase_negative_strand(
+                    cds_seq, row['StartPhase'])
+                cds_seq = _manage_end_phase_negative_strand(
+                    row_list, row_index, cds_seq, end_exon)
+            else:
+                cds_seq = _manage_end_phase_positive_strand(
+                    cds_seq, row['EndPhase'])
+                cds_seq = _manage_start_phase_positive_strand(
+                    row_list, row_index, cds_seq, start_exon)
 
         # Add the translated CDS :
         if isinstance(cds_seq, str):
