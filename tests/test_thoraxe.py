@@ -25,7 +25,7 @@ def test_thoraxe(monkeypatch, request, set_out_dir):
         try:
             if thoraxe.subexons.alignment._get_wsl_name('wsl') is not None:
                 aligner = 'wsl clustalo'
-        except FileNotFoundError:  # AppVeyor
+        except Exception:  # AppVeyor
             muscle = 'C:\\projects\\thoraxe\\muscle.exe'
             if os.path.exists(muscle):
                 aligner = muscle + ' -in '
