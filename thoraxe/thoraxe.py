@@ -412,6 +412,59 @@ def update_subexon_table(subexon_table, cluster2data):
     return subexon_table
 
 
+def _add_s_exon_phases_and_coordinates(tidy_table):
+    """
+    Add s-exon genomic coordinates and phases to the tidy table.
+
+    An s-exon, defined at the protein level, can be an entire sub-exon or a
+    part of it. In cases where an s-exon is identical to a sub-exon, the
+    genomic coordinates and the phases are the same. However, when a sub-exon
+    is split into several s-exons, coordinates and phases need to be calculated:
+
+    **Example 1: s-exons in the positive strand.**
+
+    The following sub-exon shares codons with the previous and following
+    sub-exon. In this example, ``-`` represents introns and lower case
+    characters represent exon nucleotides. The start and end phases are ``1``
+    and ``2`` respectively:
+
+    ``...v----vvwwwxxxyyyzz-----z...``
+
+    Because we are in the positive strand, the residue ``V`` coming from the
+    ``vvv`` shared codon is assigned to this sub-exon protein sequence. In the
+    same way, the ``Z`` residue coming from the ``zzz`` shared exon is assigned
+    to the beginning of the next sub-exon:
+
+    ``VWXY``
+
+    Let's say that this sub-exon is composed of two s-exons: ``VW`` and ``XY``.
+    Then the corresponding genomic sequences are ``vvwww`` and ``xxxyyyzz`` and
+    the ``(start, end)`` phases are ``(1, 0)`` and ``(0, 2)``.
+
+    **Example 2: s-exons in the negative strand.**
+
+    If the same sequence belongs to the negative strand, the sub-exon protein
+    sequence is going to contain ``Z`` but not ``V``: ``WXYZ``. Therefore,
+    possible s-exons are ``W`` and ``XYZ`` and the corresponding genomic
+    sequences will be ``vvwww`` and ``xxxyyyzz`` and the ``(start, end)``
+    phases will be ``(1, 0)`` and ``(0, 2)``.
+    """
+    tidy_table['S_exon_CodingStart'] = None
+    tidy_table['S_exon_CodingEnd'] = None
+    tidy_table['S_exon_StartPhase'] = None
+    tidy_table['S_exon_EndPhase'] = None
+    tidy_table['S_exon_Genomic_Sequence'] = None
+
+    for _, group in tidy_table.groupby('SubexonIDCluster'):
+        group_indices = group.index
+        if len(group_indices) > 1:
+            for row_index in group_indices:
+                pass
+                # tidy_table.at[row_index, 'S_exon_CodingStart'] = None
+
+    return tidy_table
+
+
 def main():
     """Perform Pipeline."""
     args = parse_command_line().parse_args()
