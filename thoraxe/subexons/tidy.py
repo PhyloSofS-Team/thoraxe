@@ -18,7 +18,7 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
         by=["GeneID", "TranscriptIDCluster", "SubexonRank"])
 
     tidy_table = pd.DataFrame(columns=[
-        'Species', "GeneID", "TranscriptIDCluster", "ExonIDCluster",
+        "Species", "GeneID", "TranscriptIDCluster", "ExonIDCluster",
         "SubexonIDCluster", "S_exon", "Strand", "TranscriptsInGene",
         "ExonRank", "Cluster", "StartPhase", "EndPhase", "SubexonRank",
         "SubexonSequence", "SubexonProteinSequence", "SubexonCodingStart",

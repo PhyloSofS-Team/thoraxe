@@ -201,8 +201,6 @@ def _subexon_info(  # pylint: disable=too-many-locals
                 'SubexonID': exon_id + '_SE_' + str(interval_number),
                 'IntervalNumber': interval_number,
                 'ExonID': exon_id,
-                'GenomicCodingStart': interval.start,
-                'GenomicCodingEnd': interval.end,
                 'Cluster': exon_row['Cluster'],
 
                 # CDS sequence of the subexon:
@@ -214,6 +212,16 @@ def _subexon_info(  # pylint: disable=too-many-locals
                 'cDNA_CodingStart': 0,
                 'cDNA_CodingEnd': len(seq) - 1
             }
+            if exon_row['Strand'] == 1:
+                subexon_info.update({
+                    'GenomicCodingStart': interval.start,
+                    'GenomicCodingEnd': interval.end
+                })
+            else:
+                subexon_info.update({
+                    'GenomicCodingStart': interval.end,
+                    'GenomicCodingEnd': interval.start
+                })
             for row in gene_df[gene_df['ExonID'] == exon_id].itertuples():
                 transcript_row_info = _get_info_from_row(row, columns_to_keep)
                 transcript_row_info.update(subexon_info)
@@ -402,7 +410,7 @@ def _fill_with_new_subexon_data(old2new, rowi, rowj):
     if rowi['Strand'] == 1:
         doit = (rowj['SubexonCodingStart'] - rowi['SubexonCodingEnd'] == 1)
     else:
-        doit = (rowi['SubexonCodingStart'] - rowj['SubexonCodingEnd'] == 1)
+        doit = (rowi['SubexonCodingEnd'] - rowj['SubexonCodingStart'] == 1)
 
     if doit:
         keys = [
@@ -420,8 +428,8 @@ def _fill_with_new_subexon_data(old2new, rowi, rowj):
             previous['EndPhase'] = actual['EndPhase']
             actual['StartPhase'] = previous['StartPhase']
         else:
-            actual['SubexonCodingEnd'] = previous['SubexonCodingEnd']
-            previous['SubexonCodingStart'] = actual['SubexonCodingStart']
+            actual['SubexonCodingStart'] = previous['SubexonCodingStart']
+            previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
             actual['EndPhase'] = previous['EndPhase']
             previous['StartPhase'] = actual['StartPhase']
         merged_protein = previous['SubexonProteinSequence'] + actual[
