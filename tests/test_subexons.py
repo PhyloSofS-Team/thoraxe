@@ -162,6 +162,46 @@ def test_subexon_clusters(clustered_trx_data):
         assert qvqq['ExonIDCluster'].iloc[
             index] == 'ENSMUSE00000689835/ENSMUSE00000689841'
 
+    # ENSMUSE00000689835 unmerged coordinates:
+    #
+    # G|CACAG GTGCAGCAATGA
+    #      Q   V  Q  Q  *
+    #
+    # phases:
+    #  1     0           0
+    # coordinates:
+    #   33333 333333333333
+    #   33333 333333333333
+    #   33333 333333333333
+    #   88888 888888888888
+    #   22222 222222222222
+    #   33333 333333333333
+    #   22222 111111111100
+    #   43210 987654321098
+
+    q_df = not_merged.loc[not_merged['SubexonID'] ==
+                          'ENSMUSE00000689835_SE_2', :]
+    vqq_df = not_merged.loc[not_merged['SubexonID'] ==
+                            'ENSMUSE00000689835_SE_1', :]
+
+    assert _st(q_df.StartPhase) == 1
+    assert _st(q_df.EndPhase) == 0
+    assert _st(vqq_df.StartPhase) == 0
+    assert _st(vqq_df.EndPhase) == 0
+
+    assert _st(q_df.SubexonCodingStart) == 33382324
+    assert _st(q_df.SubexonCodingEnd) == 33382320
+    assert _st(vqq_df.SubexonCodingStart) == 33382319
+    assert _st(vqq_df.SubexonCodingEnd) == 33382308
+
+    # ENSMUSE00000689835 merged coordinates:
+
+    assert _st(qvqq.StartPhase) == 1
+    assert _st(qvqq.EndPhase) == 0
+
+    assert _st(qvqq.SubexonCodingStart) == 33382324
+    assert _st(qvqq.SubexonCodingEnd) == 33382308
+
     # VINGSQHPSSSSSVNDVSSMSTDPTLASDTDSSLEASAGPLGCCR
     exon_row = subexon_table[subexon_table['ExonID'] ==
                              'ENSMMUE00000040064'].iloc[0]

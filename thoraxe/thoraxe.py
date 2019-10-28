@@ -6,9 +6,11 @@ import argparse
 import os
 from ast import literal_eval
 import numpy as np
-from thoraxe import transcript_info
+
 from thoraxe import subexons
 from thoraxe import utils
+from thoraxe import transcript_info
+from thoraxe.transcript_info import phases
 
 
 def parse_command_line():
@@ -412,7 +414,7 @@ def update_subexon_table(subexon_table, cluster2data):
     return subexon_table
 
 
-def _add_s_exon_phases_and_coordinates(tidy_table):
+def _add_s_exon_phases_and_coordinates(tbl):
     """
     Add s-exon genomic coordinates and phases to the tidy table.
 
@@ -449,20 +451,92 @@ def _add_s_exon_phases_and_coordinates(tidy_table):
     sequences will be ``vvwww`` and ``xxxyyyzz`` and the ``(start, end)``
     phases will be ``(1, 0)`` and ``(0, 2)``.
     """
-    tidy_table['S_exon_CodingStart'] = None
-    tidy_table['S_exon_CodingEnd'] = None
-    tidy_table['S_exon_StartPhase'] = None
-    tidy_table['S_exon_EndPhase'] = None
-    tidy_table['S_exon_Genomic_Sequence'] = None
+    tbl['S_exon_CodingStart'] = None
+    tbl['S_exon_CodingEnd'] = None
+    tbl['S_exon_StartPhase'] = None
+    tbl['S_exon_EndPhase'] = None
+    tbl['S_exon_Genomic_Sequence'] = None
 
-    for _, group in tidy_table.groupby('SubexonIDCluster'):
+    for _, group in tbl.groupby(['SubexonIDCluster', 'TranscriptIDCluster']):
         group_indices = group.index
-        if len(group_indices) > 1:
-            for row_index in group_indices:
-                pass
-                # tidy_table.at[row_index, 'S_exon_CodingStart'] = None
+        n_rows = len(group_indices)
+        if n_rows > 1:
+            end_coord = 0
+            remaining_seq = ''
+            for row_number, i in enumerate(group_indices):
+                if row_number == 0:  # first s-exon
+                    tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[i, 'StartPhase']
+                    tbl.at[i, 'S_exon_EndPhase'] = 0
+                    (end_coord, s_exon_seq,
+                     remaining_seq) = _get_first_s_exon(tbl.loc[i, :])
+                    tbl.at[i, 'S_exon_CodingStart'] = tbl.loc[
+                        i, 'SubexonCodingStart']
+                    tbl.at[i, 'S_exon_CodingEnd'] = end_coord
+                    tbl.at[i, 'S_exon_Genomic_Sequence'] = s_exon_seq
+                elif row_number == (n_rows - 1):  # last s-exon
+                    tbl.at[i, 'S_exon_StartPhase'] = 0
+                    tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'EndPhase']
+                    tbl.at[i, 'S_exon_CodingStart'] = end_coord + 1
+                    tbl.at[i, 'S_exon_CodingEnd'] = tbl.loc[i,
+                                                            'SubexonCodingEnd']
+                    tbl.at[i, 'S_exon_Genomic_Sequence'] = remaining_seq
 
-    return tidy_table
+                else:
+                    tbl.at[i, 'S_exon_StartPhase'] = 0
+                    tbl.at[i, 'S_exon_EndPhase'] = 0
+                    (start_coord, end_coord, s_exon_seq,
+                     remaining_seq) = _get_internal_s_exon(
+                         tbl.loc[i, :], end_coord, remaining_seq)
+                    tbl.at[i, 'S_exon_CodingStart'] = start_coord
+                    tbl.at[i, 'S_exon_CodingEnd'] = end_coord
+                    tbl.at[i, 'S_exon_Genomic_Sequence'] = s_exon_seq
+        elif n_rows == 1:
+            i = group_indices[0]
+            tbl.at[i, 'S_exon_CodingStart'] = tbl.loc[i, 'SubexonCodingStart']
+            tbl.at[i, 'S_exon_CodingEnd'] = tbl.loc[i, 'SubexonCodingEnd']
+            tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[i, 'StartPhase']
+            tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'EndPhase']
+            tbl.at[i, 'S_exon_Genomic_Sequence'] = tbl.loc[i,
+                                                           'SubexonSequence']
+
+    return tbl
+
+
+def _get_first_s_exon(row):
+    """
+    Calculate the genomic end coordinate of the first s-exon
+
+    Also returns the genomic nucleotide sequences of the s-exon and the rest of
+    the sub-exon.
+    """
+    genomic_seq = row["SubexonSequence"]
+    start_coordinates = row['SubexonCodingStart']
+    start_phase = row['StartPhase']
+    s_exon_len = len(row['S_exon_Sequence'])
+
+    if row['Strand'] == 1:
+        needed_bases = (s_exon_len - 1) * 3
+    else:
+        needed_bases = s_exon_len * 3
+
+    skip_bases = phases.bases_to_complete_previous_codon(start_phase)
+    total_len = skip_bases + needed_bases
+    end_coordinates = start_coordinates + total_len - 1
+
+    return end_coordinates, genomic_seq[:total_len], genomic_seq[total_len:]
+
+
+def _get_internal_s_exon(row, previous_end, seq):
+    """
+    Calculate the genomic coordinates of internal s-exons
+
+    Also returns the genomic nucleotide sequences of the s-exon and the rest of
+    the sub-exon.
+    """
+    total_len = len(row['S_exon_Sequence']) * 3
+    start_coordinates = previous_end + 1
+    end_coordinates = previous_end + total_len
+    return start_coordinates, end_coordinates, seq[:total_len], seq[total_len:]
 
 
 def main():
@@ -525,6 +599,7 @@ def main():
             output_folder)
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
+    _add_s_exon_phases_and_coordinates(tidy_table)
     tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"))
 
 

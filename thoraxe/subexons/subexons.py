@@ -269,7 +269,6 @@ def _add_phases(subexon_df,
     while row_number < n_rows:
         row_index = subexon_df.index[row_number]
         row = subexon_df.loc[row_index, :]
-
         cdna_len = len(row[seq_column])
 
         if row_number == 0:
@@ -425,13 +424,11 @@ def _fill_with_new_subexon_data(old2new, rowi, rowj):
         if rowi['Strand'] == 1:
             previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
             actual['SubexonCodingStart'] = previous['SubexonCodingStart']
-            previous['EndPhase'] = actual['EndPhase']
-            actual['StartPhase'] = previous['StartPhase']
         else:
             actual['SubexonCodingStart'] = previous['SubexonCodingStart']
             previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
-            actual['EndPhase'] = previous['EndPhase']
-            previous['StartPhase'] = actual['StartPhase']
+        previous['EndPhase'] = actual['EndPhase']
+        actual['StartPhase'] = previous['StartPhase']
         merged_protein = previous['SubexonProteinSequence'] + actual[
             'SubexonProteinSequence']
         previous['SubexonProteinSequence'] = merged_protein
