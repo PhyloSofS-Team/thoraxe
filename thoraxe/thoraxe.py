@@ -476,7 +476,8 @@ def _add_s_exon_phases_and_coordinates(tbl):
                 elif row_number == (n_rows - 1):  # last s-exon
                     tbl.at[i, 'S_exon_StartPhase'] = 0
                     tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'EndPhase']
-                    tbl.at[i, 'S_exon_CodingStart'] = end_coord + 1
+                    tbl.at[i, 'S_exon_CodingStart'] = end_coord + \
+                        tbl.loc[i, 'Strand']
                     tbl.at[i, 'S_exon_CodingEnd'] = tbl.loc[i,
                                                             'SubexonCodingEnd']
                     tbl.at[i, 'S_exon_Genomic_Sequence'] = remaining_seq
@@ -508,8 +509,16 @@ def _get_first_s_exon(row):
 
     Also returns the genomic nucleotide sequences of the s-exon and the rest of
     the sub-exon.
+
+    >>> row = {'SubexonSequence': 'TTGCCGTCATGAGCAG'}
+    >>> row.update({'SubexonCodingStart': 2379656})
+    >>> row.update({'StartPhase': 1})
+    >>> row.update({'S_exon_Sequence': 'AV'})
+    >>> row.update({'Strand': -1})
+    >>> _get_first_s_exon(row)
+    (2379649, 'TTGCCGTC', 'ATGAGCAG')
     """
-    genomic_seq = row["SubexonSequence"]
+    genomic_seq = row['SubexonSequence']
     start_coordinates = row['SubexonCodingStart']
     start_phase = row['StartPhase']
     s_exon_len = len(row['S_exon_Sequence'])
@@ -521,7 +530,11 @@ def _get_first_s_exon(row):
 
     skip_bases = phases.bases_to_complete_previous_codon(start_phase)
     total_len = skip_bases + needed_bases
-    end_coordinates = start_coordinates + total_len - 1
+
+    if row['Strand'] == 1:
+        end_coordinates = start_coordinates + total_len - 1
+    else:
+        end_coordinates = start_coordinates - total_len + 1
 
     return end_coordinates, genomic_seq[:total_len], genomic_seq[total_len:]
 
@@ -532,10 +545,19 @@ def _get_internal_s_exon(row, previous_end, seq):
 
     Also returns the genomic nucleotide sequences of the s-exon and the rest of
     the sub-exon.
+
+    >>> row = {'S_exon_Sequence': 'MS'}
+    >>> row.update({'Strand': -1})
+    >>> _get_internal_s_exon(row, 2379649, 'ATGAGCAG')
+    (2379648, 2379643, 'ATGAGC', 'AG')
     """
     total_len = len(row['S_exon_Sequence']) * 3
-    start_coordinates = previous_end + 1
-    end_coordinates = previous_end + total_len
+    if row['Strand'] == 1:
+        start_coordinates = previous_end + 1
+        end_coordinates = previous_end + total_len
+    else:
+        start_coordinates = previous_end - 1
+        end_coordinates = previous_end - total_len
     return start_coordinates, end_coordinates, seq[:total_len], seq[total_len:]
 
 
