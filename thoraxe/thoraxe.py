@@ -511,12 +511,19 @@ def _get_first_s_exon(row):
     the sub-exon.
 
     >>> row = {'SubexonSequence': 'TTGCCGTCATGAGCAG'}
-    >>> row.update({'SubexonCodingStart': 2379656})
-    >>> row.update({'StartPhase': 1})
-    >>> row.update({'S_exon_Sequence': 'AV'})
-    >>> row.update({'Strand': -1})
+    >>> row['SubexonCodingStart'] = 2379656
+    >>> row['StartPhase'] = 1
+    >>> row['S_exon_Sequence'] = 'AV'
+    >>> row['Strand'] = -1
     >>> _get_first_s_exon(row)
     (2379649, 'TTGCCGTC', 'ATGAGCAG')
+    >>> row = {'SubexonSequence': 'CACAGGTGCAGCAGTGA'}
+    >>> row['SubexonCodingStart'] = 48434879
+    >>> row['StartPhase'] = 1
+    >>> row['S_exon_Sequence'] = 'AQ'
+    >>> row['Strand'] = 1
+    >>> _get_first_s_exon(row)
+    (48434883, 'CACAG', 'GTGCAGCAGTGA')
     """
     genomic_seq = row['SubexonSequence']
     start_coordinates = row['SubexonCodingStart']
@@ -547,9 +554,12 @@ def _get_internal_s_exon(row, previous_end, seq):
     the sub-exon.
 
     >>> row = {'S_exon_Sequence': 'MS'}
-    >>> row.update({'Strand': -1})
+    >>> row['Strand'] = -1
     >>> _get_internal_s_exon(row, 2379649, 'ATGAGCAG')
     (2379648, 2379643, 'ATGAGC', 'AG')
+    >>> row['Strand'] = 1
+    >>> _get_internal_s_exon(row, 2379649, 'ATGAGCAG')
+    (2379650, 2379655, 'ATGAGC', 'AG')
     """
     total_len = len(row['S_exon_Sequence']) * 3
     if row['Strand'] == 1:
