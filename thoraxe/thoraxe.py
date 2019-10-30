@@ -465,7 +465,8 @@ def _add_s_exon_phases_and_coordinates(tbl):
             remaining_seq = ''
             for row_number, i in enumerate(group_indices):
                 if row_number == 0:  # first s-exon
-                    tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[i, 'StartPhase']
+                    tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[
+                        i, 'SubexonStartPhase']
                     tbl.at[i, 'S_exon_EndPhase'] = 0
                     (end_coord, s_exon_seq,
                      remaining_seq) = _get_first_s_exon(tbl.loc[i, :])
@@ -475,7 +476,8 @@ def _add_s_exon_phases_and_coordinates(tbl):
                     tbl.at[i, 'S_exon_Genomic_Sequence'] = s_exon_seq
                 elif row_number == (n_rows - 1):  # last s-exon
                     tbl.at[i, 'S_exon_StartPhase'] = 0
-                    tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'EndPhase']
+                    tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i,
+                                                           'SubexonEndPhase']
                     tbl.at[i, 'S_exon_CodingStart'] = end_coord + \
                         tbl.loc[i, 'Strand']
                     tbl.at[i, 'S_exon_CodingEnd'] = tbl.loc[i,
@@ -495,8 +497,8 @@ def _add_s_exon_phases_and_coordinates(tbl):
             i = group_indices[0]
             tbl.at[i, 'S_exon_CodingStart'] = tbl.loc[i, 'SubexonCodingStart']
             tbl.at[i, 'S_exon_CodingEnd'] = tbl.loc[i, 'SubexonCodingEnd']
-            tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[i, 'StartPhase']
-            tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'EndPhase']
+            tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[i, 'SubexonStartPhase']
+            tbl.at[i, 'S_exon_EndPhase'] = tbl.loc[i, 'SubexonEndPhase']
             tbl.at[i, 'S_exon_Genomic_Sequence'] = tbl.loc[i,
                                                            'SubexonSequence']
 
@@ -512,14 +514,14 @@ def _get_first_s_exon(row):
 
     >>> row = {'SubexonSequence': 'TTGCCGTCATGAGCAG'}
     >>> row['SubexonCodingStart'] = 2379656
-    >>> row['StartPhase'] = 1
+    >>> row['SubexonStartPhase'] = 1
     >>> row['S_exon_Sequence'] = 'AV'
     >>> row['Strand'] = -1
     >>> _get_first_s_exon(row)
     (2379649, 'TTGCCGTC', 'ATGAGCAG')
     >>> row = {'SubexonSequence': 'CACAGGTGCAGCAGTGA'}
     >>> row['SubexonCodingStart'] = 48434879
-    >>> row['StartPhase'] = 1
+    >>> row['SubexonStartPhase'] = 1
     >>> row['S_exon_Sequence'] = 'AQ'
     >>> row['Strand'] = 1
     >>> _get_first_s_exon(row)
@@ -527,7 +529,7 @@ def _get_first_s_exon(row):
     """
     genomic_seq = row['SubexonSequence']
     start_coordinates = row['SubexonCodingStart']
-    start_phase = row['StartPhase']
+    start_phase = row['SubexonStartPhase']
     s_exon_len = len(row['S_exon_Sequence'])
 
     if row['Strand'] == 1:

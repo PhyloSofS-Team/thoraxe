@@ -63,4 +63,11 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
             tidy_row['S_exon_End'] = stop
             tidy_table = tidy_table.append(tidy_row, ignore_index=True)
 
+    tidy_table.rename(columns={
+        "StartPhase": "SubexonStartPhase",
+        "EndPhase": "SubexonEndPhase",
+        "S_exon": "S_exonID"
+    },
+                      inplace=True)
+
     return tidy_table
