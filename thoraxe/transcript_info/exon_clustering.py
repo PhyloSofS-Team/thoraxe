@@ -102,6 +102,8 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                          inplace=True,
                          ascending=False)
 
+    trx_data['LowIdentity'] = 0
+
     row_list = trx_data.to_dict('records')
 
     cluster_count = 0
@@ -124,8 +126,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
         for j in range(i + 1, nrows):
             j_index = trx_data.index[j]
-            if row_list[j]['SeqLength'] < minimum_len or trx_data.at[
-                    j_index, 'Cluster'] != 0:
+            if ((row_list[j]['SeqLength'] < minimum_len)
+                    or ((trx_data.at[j_index, 'Cluster'] != 0)
+                        and not trx_data.at[j_index, 'LowIdentity'])):
                 continue
 
             aln = query(row_list[j]['ProteinSequences'])
@@ -140,6 +143,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
             if (target_coverage >= coverage_cutoff
                     and pid >= percent_identity_cutoff):
+                if (trx_data.at[j_index, 'LowIdentity']
+                        and trx_data.at[j_index, 'PercentIdentity'] > pid):
+                    continue
                 trx_data.at[j_index, 'Cluster'] = cluster
                 trx_data.at[j_index, 'QueryExon'] = query_exon
                 trx_data.at[j_index, 'TargetCoverage'] = target_coverage
@@ -148,10 +154,15 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                             'AlignedQuery'] = aln.aligned_query_sequence
                 trx_data.at[j_index,
                             'AlignedTarget'] = aln.aligned_target_sequence
+                if pid < min(100, percent_identity_cutoff + 15):
+                    trx_data.at[j_index, 'LowIdentity'] = 1
+                else:
+                    trx_data.at[j_index, 'LowIdentity'] = 0
 
     trx_data.sort_values('InputOrder', inplace=True)
-    trx_data.drop(['InputOrder', 'ProteinSequences', 'SeqLength'],
-                  axis=1,
-                  inplace=True)
+    trx_data.drop(
+        ['InputOrder', 'ProteinSequences', 'SeqLength', 'LowIdentity'],
+        axis=1,
+        inplace=True)
 
     return trx_data
