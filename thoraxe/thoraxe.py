@@ -573,7 +573,7 @@ def _get_internal_s_exon(row, previous_end, seq):
     return start_coordinates, end_coordinates, seq[:total_len], seq[total_len:]
 
 
-def main():
+def main():  # pylint: disable=too-many-locals
     """Perform Pipeline."""
     args = parse_command_line().parse_args()
 
@@ -621,16 +621,19 @@ def main():
     subexon_table = update_subexon_table(subexon_table, cluster2data)
     subexon_table = subexons.alignment.impute_missing_s_exon(subexon_table)
 
-    node2genes, edge2genes = subexons.graph.nodes_and_edges2genes(
-        subexon_table)
-    subexons.graph.splice_graph_gml(
-        os.path.join(output_folder, "splice_graph.gml"), node2genes,
-        edge2genes)
+    (node2genes, edge2genes, node2transcripts, edge2transcripts
+     ) = subexons.graph.nodes_and_edges2genes_and_transcripts(subexon_table)
 
     if args.phylosofs:
-        subexons.phylosofs.phylosofs_inputs(
+        s_exon_2_char = subexons.phylosofs.phylosofs_inputs(
             subexon_table, os.path.join(input_folder, 'Ensembl'),
             output_folder)
+    else:
+        s_exon_2_char = {}
+
+    subexons.graph.splice_graph_gml(
+        os.path.join(output_folder, "splice_graph.gml"), node2genes,
+        edge2genes, node2transcripts, edge2transcripts, s_exon_2_char)
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     _add_s_exon_phases_and_coordinates(tidy_table)

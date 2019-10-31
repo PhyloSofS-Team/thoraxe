@@ -15,8 +15,31 @@ from thoraxe.utils import split
 
 CHARS = [
     char for char in string.printable if char not in {
-        ' ', '\t', '\n', '\r', '\x0b', '\x0c', '\\', '*', '>', '"', "'", ',',
-        '-', '_', '/', ';', '#', '$', '.', '&', '!', '@'
+        ' ',
+        '\t',
+        '\n',
+        '\r',
+        '\x0b',
+        '\x0c',
+        '\\',
+        '*',
+        '>',
+        '"',
+        "'",
+        ',',
+        '-',
+        '_',
+        '/',
+        ';',
+        '#',
+        '$',
+        '.',
+        '&',
+        '!',
+        '@',
+        # GML splice-graph
+        '[',
+        ']'
     }
 ]
 
@@ -243,3 +266,5 @@ def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
 
     _transcript_pir(exon_data, os.path.join(output_path, 'transcripts.pir'),
                     exon2char, transcript2phylosofs)
+
+    return exon2char

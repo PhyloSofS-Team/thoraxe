@@ -8,42 +8,57 @@ import logging
 from functools import reduce
 
 
-def nodes_and_edges2genes(data):
+def nodes_and_edges2genes_and_transcripts(data):
     """
-    Return two dictionaries, ones from nodes and other from edges to genes.
+    Return four dictionaries:
+
+    - nodes to genes
+    - edges to genes
+    - nodes to transcripts
+    - edges to transcripts
     """
     node2genes = collections.defaultdict(set)
     edge2genes = collections.defaultdict(set)
+    node2transcripts = collections.defaultdict(set)
+    edge2transcripts = collections.defaultdict(set)
     for gene_id, gene in data.groupby('GeneID'):  # noqa pylint: disable=too-many-nested-blocks
-        for _, transcript in gene.groupby('TranscriptID'):
+        for transcript_id, transcript in gene.groupby('TranscriptID'):
             subexons = transcript.sort_values('SubexonRank')['S_exons']
 
             previous = 'start'
             node2genes[previous].update({gene_id})
+            node2transcripts[previous].update({transcript_id})
             for _, subexon in enumerate(subexons):
                 orthologs = subexon.split('/')
                 for ortholog in orthologs:
                     node2genes[ortholog].update({gene_id})
                     edge2genes[(previous, ortholog)].update({gene_id})
+                    node2transcripts[ortholog].update({transcript_id})
+                    edge2transcripts[(previous,
+                                      ortholog)].update({transcript_id})
                     previous = ortholog
 
             node2genes['stop'].update({gene_id})
             edge2genes[(previous, 'stop')].update({gene_id})
+            node2transcripts['stop'].update({transcript_id})
+            edge2transcripts[(previous, 'stop')].update({transcript_id})
 
-    return node2genes, edge2genes
+    return node2genes, edge2genes, node2transcripts, edge2transcripts
 
 
-def _get_genes(node2genes):
+def _get_elements(node2elements):
     """
-    Return a set of genes from the node to (set of) genes dictionary.
+    Return a set of elements from the node to (set of) elements dictionary.
 
-    >>> sorted(_get_genes({'a':{1, 2}, 'b':{2, 3}, 'c':{1}, 'd':{4}}))
+    >>> sorted(_get_elements({'a':{1, 2}, 'b':{2, 3}, 'c':{1}, 'd':{4}}))
     [1, 2, 3, 4]
     """
-    return reduce(set.union, node2genes.values())
+    return reduce(set.union, node2elements.values())
 
 
-def splice_graph_gml(filename, node2genes, edge2genes):
+def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
+        filename, node2genes, edge2genes, node2transcripts, edge2transcripts,
+        s_exon_2_char):
     """
     Store the splice graph in GML (Graph Modelling Language) format.
 
@@ -56,7 +71,8 @@ def splice_graph_gml(filename, node2genes, edge2genes):
             '.gml extension was added, the splice graph will be stored at %s',
             filename)
 
-    n_genes = len(_get_genes(node2genes))
+    n_genes = len(_get_elements(node2genes))
+    n_transcripts = len(_get_elements(node2transcripts))
 
     with open(filename, 'w') as gml:
         gml.write('''
@@ -69,24 +85,46 @@ def splice_graph_gml(filename, node2genes, edge2genes):
         node_id = 1
         for node, genes in node2genes.items():
             conservation = 100.0 * (len(genes) / n_genes)
+            transcripts = node2transcripts[node]
+            transcript_fraction = 100.0 * (len(transcripts) / n_transcripts)
+            genes_str = ','.join(sorted(genes))
+            transcripts_str = ','.join(sorted(transcripts))
             gml.write('''
                 node [
                     id {}
                     label "{}"
                     conservation {}
+                    transcript_fraction {}
+                    genes "{}"
+                    transcripts "{}"
+            '''.format(node_id, node, conservation, transcript_fraction,
+                       genes_str, transcripts_str))
+            if s_exon_2_char and node not in ['start', 'stop']:
+                gml.write('''
+                        phylosofs "{}"
+                '''.format(s_exon_2_char[node]))
+            gml.write('''
                 ]
-            '''.format(node_id, node, conservation))
+            ''')
             node2id[node] = node_id
             node_id += 1
         for edge, genes in edge2genes.items():
             conservation = 100.0 * (len(genes) / n_genes)
+            transcripts = edge2transcripts[edge]
+            transcript_fraction = 100.0 * (len(transcripts) / n_transcripts)
+            genes_str = ','.join(sorted(genes))
+            transcripts_str = ','.join(sorted(transcripts))
             gml.write('''
                 edge [
                     source {}
                     target {}
                     conservation {}
+                    transcript_fraction {}
+                    genes "{}"
+                    transcripts "{}"
                 ]
-            '''.format(node2id[edge[0]], node2id[edge[1]], conservation))
+            '''.format(node2id[edge[0]], node2id[edge[1]], conservation,
+                       transcript_fraction, genes_str, transcripts_str))
         gml.write('''
         ]
         ''')
