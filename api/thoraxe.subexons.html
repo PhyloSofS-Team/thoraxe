@@ -329,14 +329,20 @@ The first subexon appears before of the second in at least one transcript.</p>
 <span id="thoraxe-subexons-graph-module"></span><h2>thoraxe.subexons.graph module<a class="headerlink" href="#module-thoraxe.subexons.graph" title="Permalink to this headline">¶</a></h2>
 <p>graph: Functions to store the splice graph with conservation information.</p>
 <dl class="function">
-<dt id="thoraxe.subexons.graph.nodes_and_edges2genes">
-<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">nodes_and_edges2genes</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.nodes_and_edges2genes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return two dictionaries, ones from nodes and other from edges to genes.</p>
+<dt id="thoraxe.subexons.graph.nodes_and_edges2genes_and_transcripts">
+<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">nodes_and_edges2genes_and_transcripts</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.nodes_and_edges2genes_and_transcripts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return four dictionaries:</p>
+<ul class="simple">
+<li><p>nodes to genes</p></li>
+<li><p>edges to genes</p></li>
+<li><p>nodes to transcripts</p></li>
+<li><p>edges to transcripts</p></li>
+</ul>
 </dd></dl>
 
 <dl class="function">
 <dt id="thoraxe.subexons.graph.splice_graph_gml">
-<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">splice_graph_gml</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">node2genes</em>, <em class="sig-param">edge2genes</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.splice_graph_gml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">splice_graph_gml</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">node2genes</em>, <em class="sig-param">edge2genes</em>, <em class="sig-param">node2transcripts</em>, <em class="sig-param">edge2transcripts</em>, <em class="sig-param">s_exon_2_char</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.splice_graph_gml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the splice graph in GML (Graph Modelling Language) format.</p>
 <p>It stores the conservation level information for nodes and edges, where
 conservation is the fraction of species that has that particular feature.</p>
