@@ -36,11 +36,10 @@ BIOMART_HUMAN = "hsapiens_gene_ensembl"
 
 
 def _requests_retry(
-        retries=20,
-        backoff_factor=1,
+        retries=12,
+        backoff_factor=0.2,
         # github.com/Ensembl/ensembl-rest/wiki/HTTP-Response-Codes
-        # OLD: (500, 501, 502, 503, 504, 401, 403, 404),
-        status_forcelist=(403, 408, 503),
+        status_forcelist=(400, 403, 408, 418, 429, 500, 503),
         session=None):
     """
     Request with retry and wait.
@@ -117,10 +116,13 @@ def _request_ensembl_redirect(*args, **kargs):
                                       *args,
                                       **kargs,
                                       allow_redirects=False)
+
     if response.ok:
         return response
 
     warnings.warn('Failed request for args: {} kargs: {}'.format(args, kargs))
+    warnings.warn('Failed request output: {}'.format(response))
+
     return None
 
 
@@ -310,7 +312,7 @@ def get_geneids_from_symbol(species, symbol, **params):
     From a species and a symbol, return the set of geneids corresponding
     to the gene symbol given.
     Uses the /xrefs/symbol RESTfull command
-    exple: get_geneids_from_symbol("human", "MAPK8")
+    example: get_geneids_from_symbol("human", "MAPK8")
     """
     params.setdefault('object_type', 'gene')
     ext_geneid = '/xrefs/symbol/{0}/{1}?'.format(species, symbol)
@@ -709,6 +711,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
             dictseq2fasta(dseq, ortho_name, fastaout)
     fastaout.close()
     exonstableout.close()
+    print("------------------- transcript_query finished -------------------")
 
 
 if __name__ == '__main__':
