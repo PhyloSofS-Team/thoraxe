@@ -3,25 +3,6 @@ import pytest
 import numpy as np
 import thoraxe as tx
 
-#------------- IPYTHON ---------------------------------------------------------------------
-import os
-import numpy as np
-import thoraxe as tx
-
-
-def kif1b_ipython3_test():
-    data_dir = os.path.join('.', 'data')
-    kif1b_dir = os.path.join(data_dir, 'KIF1B', 'Ensembl')
-    return {
-        'root': os.path.join(data_dir, 'KIF1B'),
-        'tsl': os.path.join(kif1b_dir, 'tsl.csv'),
-        'exontable': os.path.join(kif1b_dir, 'exonstable.tsv'),
-        'seqs': os.path.join(kif1b_dir, 'sequences.fasta')
-    }
-
-kif1b = kif1b_ipython3_test()
-#-------------------------------------------------------------------------------------------
-
 @pytest.fixture(scope='module')
 def kif1b(request):
     filename = request.module.__file__
