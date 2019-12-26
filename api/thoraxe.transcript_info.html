@@ -181,7 +181,7 @@
 <dt id="thoraxe.transcript_info.clusters.cluster2str">
 <code class="sig-prename descclassname">thoraxe.transcript_info.clusters.</code><code class="sig-name descname">cluster2str</code><span class="sig-paren">(</span><em class="sig-param">cluster</em>, <em class="sig-param">delim='/'</em>, <em class="sig-param">item2str=&lt;class 'str'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.cluster2str" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a cluster (set) and return a string representation.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">})</span>
 <span class="go">&#39;1/10/100&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">},</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
 <span class="go">&#39;1;10;100&#39;</span>
@@ -196,7 +196,7 @@
 <dt id="thoraxe.transcript_info.clusters.fill_clusters">
 <code class="sig-prename descclassname">thoraxe.transcript_info.clusters.</code><code class="sig-name descname">fill_clusters</code><span class="sig-paren">(</span><em class="sig-param">clusters</em>, <em class="sig-param">element_i</em>, <em class="sig-param">element_j</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.fill_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill the list of clusters (sets) with two elements from the same cluster.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fill_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="go">[{1, 10}]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fill_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
@@ -225,7 +225,7 @@
 <code class="sig-prename descclassname">thoraxe.transcript_info.clusters.</code><code class="sig-name descname">set_to_delete</code><span class="sig-paren">(</span><em class="sig-param">set_list</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.set_to_delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the set to delete given a list of sets.</p>
 <p>It keeps the first element of the set.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">set_to_delete</span><span class="p">([{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">}])</span> <span class="c1"># it keeps 1 and 4</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">set_to_delete</span><span class="p">([{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">}])</span> <span class="c1"># it keeps 1 and 4</span>
 <span class="go">{2, 3, 5}</span>
 </pre></div>
 </div>
@@ -239,7 +239,7 @@
 <dt id="thoraxe.transcript_info.exon_clustering.coverage">
 <code class="sig-prename descclassname">thoraxe.transcript_info.exon_clustering.</code><code class="sig-name descname">coverage</code><span class="sig-paren">(</span><em class="sig-param">seq</em>, <em class="sig-param">seq_len</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.coverage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return coverage of the sequence in the alignment.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coverage</span><span class="p">(</span><span class="s2">&quot;AAAA----&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coverage</span><span class="p">(</span><span class="s2">&quot;AAAA----&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
 <span class="go">50.0</span>
 </pre></div>
 </div>
@@ -272,7 +272,7 @@ coverage_cutoff and percent_identity_cutoff (default to 80.0 and
 <dt id="thoraxe.transcript_info.exon_clustering.percent_identity">
 <code class="sig-prename descclassname">thoraxe.transcript_info.exon_clustering.</code><code class="sig-name descname">percent_identity</code><span class="sig-paren">(</span><em class="sig-param">query</em>, <em class="sig-param">target</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.percent_identity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return percent identity of the aligned sequnces.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">percent_identity</span><span class="p">(</span><span class="s2">&quot;AA---&quot;</span><span class="p">,</span> <span class="s2">&quot;AAAA-&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">percent_identity</span><span class="p">(</span><span class="s2">&quot;AA---&quot;</span><span class="p">,</span> <span class="s2">&quot;AAAA-&quot;</span><span class="p">)</span>
 <span class="go">50.0</span>
 </pre></div>
 </div>
@@ -326,7 +326,7 @@ calculate the subexon phases.</p>
 <dt id="thoraxe.transcript_info.phases.bases_to_complete_next_codon">
 <code class="sig-prename descclassname">thoraxe.transcript_info.phases.</code><code class="sig-name descname">bases_to_complete_next_codon</code><span class="sig-paren">(</span><em class="sig-param">phase</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_next_codon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the bases at the exon end that completes the next codon.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----X</span>
 <span class="go">2</span>
@@ -340,7 +340,7 @@ calculate the subexon phases.</p>
 <dt id="thoraxe.transcript_info.phases.bases_to_complete_previous_codon">
 <code class="sig-prename descclassname">thoraxe.transcript_info.phases.</code><code class="sig-name descname">bases_to_complete_previous_codon</code><span class="sig-paren">(</span><em class="sig-param">phase</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_previous_codon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the bases at exon start that completes the previous codon.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
 <span class="go">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----X</span>
 <span class="go">1</span>
@@ -376,7 +376,7 @@ XX——Xyyyzzz</p>
 </dd>
 </dl>
 <p>NOTE: This function can not calculate a phase of -1.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXXyyy----zzz</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXXyyy----zzz</span>
 <span class="go">(0, 0)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----Xyyyzz----z</span>
 <span class="go">(2, 2)</span>
@@ -556,7 +556,7 @@ of the default_values column (default: default value).</p></li>
 </ul>
 </dd>
 </dl>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cluster_list</span> <span class="o">=</span> <span class="p">[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store_cluster</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_list</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
