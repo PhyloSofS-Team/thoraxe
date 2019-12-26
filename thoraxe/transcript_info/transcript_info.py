@@ -548,6 +548,28 @@ def _different_coordinates(row_i, row_j):
     return False
 
 
+def _get_comparable_seq(seq_i, seq_j, start_phase, end_phase):
+    """
+    Return the residues of the exon/subexon that can be shared.
+
+    It takes into account that first/last residue could be different
+    if the start/end phase is different from 0 or -1.
+
+    >>> _get_comparable_seq("ASMGSLTSSPSSL", "TSMGSLTSSPSSC", 1, 2)
+    ('SMGSLTSSPSS', 'SMGSLTSSPSS')
+    """
+
+    if start_phase in [1, 2]:
+        seq_i = seq_i[1:]
+        seq_j = seq_j[1:]
+
+    if end_phase in [1, 2]:
+        seq_i = seq_i[:-1]
+        seq_j = seq_j[:-1]
+
+    return seq_i, seq_j
+
+
 def _identical_seqs(rowi, rowj, seq_column='ExonProteinSequence'):  # pylint: disable=too-many-return-statements
     """Check if the sequences in rows i (rowi) and j (rowj) are identical."""
     if _different_phases(rowi, rowj):
@@ -562,19 +584,9 @@ def _identical_seqs(rowi, rowj, seq_column='ExonProteinSequence'):  # pylint: di
     if len(seq_i) != len(seq_j):
         return False
 
-    # equal sequence ?
-    # ----------------
-    #
-    # It takes into account that last residue could be different
-    # if the end phase is different from 0 or -1.
-    if rowi['EndPhase'] in [0, -1]:
-        if seq_i != seq_j:
-            return False
-    else:
-        if seq_i[:-1] != seq_j[:-1]:
-            return False
+    seq_i, seq_j = _get_comparable_seq(seq_i, seq_j, rowi['StartPhase'], rowi['EndPhase'])
 
-    return True
+    return seq_i == seq_j
 
 
 def find_identical_exons(data_frame,
