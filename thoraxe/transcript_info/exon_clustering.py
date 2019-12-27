@@ -17,7 +17,20 @@ def coverage(seq, seq_len):
     >>> coverage("AAAA----", 8)
     50.0
     """
-    return 100.0 * (len(seq) - seq.count('-')) / seq_len
+    res = len(seq.replace('-', ''))
+    return 100.0 * res / seq_len
+
+
+def coverage_shortest(seq_query, seq_target, seq_len):
+    """
+    Return coverage of the shortest sequence in the alignment.
+
+    >>> coverage_shortest("AAAA----", "AAAAAAAA", 8)
+    50.0
+    """
+    res_query = len(seq_query.replace('-', ''))
+    res_target = len(seq_target.replace('-', ''))
+    return 100.0 * min(res_query, res_target) / seq_len
 
 
 def percent_identity(query, target):
@@ -41,6 +54,40 @@ def percent_identity(query, target):
                 aln_len -= 1
 
     return 100.0 * (identical / aln_len)
+
+
+def _align(seq_a, seq_b, gap_open_penalty, gap_extend_penalty,
+           substitution_matrix):
+    "Align the sequnces using StripedSmithWaterman from scikit-bio."
+    query = StripedSmithWaterman(seq_a,
+                                 gap_open_penalty=gap_open_penalty,
+                                 gap_extend_penalty=gap_extend_penalty,
+                                 substitution_matrix=substitution_matrix)
+
+    aln = query(seq_b)
+
+    return aln.aligned_query_sequence, aln.aligned_target_sequence
+
+
+def _align_and_order(  # pylint: disable=too-many-arguments
+        seq_i, len_i, seq_j, len_j, gap_open_penalty, gap_extend_penalty,
+        substitution_matrix):
+    """
+    Return the aligned sequences and the target sequence length.
+
+    This is because of issue: https://github.com/biocore/scikit-bio/issues/1654
+    """
+    seq_a, seq_b = (seq_i, seq_j) if len_i < len_j else (seq_j, seq_i)
+
+    aln_query, aln_target = _align(seq_a, seq_b, gap_open_penalty,
+                                   gap_extend_penalty, substitution_matrix)
+
+    if len(aln_query) != len(aln_target):
+        aln_query, aln_target = _align(seq_b, seq_a, gap_open_penalty,
+                                       gap_extend_penalty, substitution_matrix)
+        return aln_query, aln_target
+
+    return aln_query, aln_target
 
 
 def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
@@ -108,12 +155,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
     cluster_count = 0
     for i in range(nrows):
-        if row_list[i]['SeqLength'] < minimum_len:
+        len_i = row_list[i]['SeqLength']
+        if len_i < minimum_len:
             continue
-        query = StripedSmithWaterman(row_list[i]['ProteinSequences'],
-                                     gap_open_penalty=gap_open_penalty,
-                                     gap_extend_penalty=gap_extend_penalty,
-                                     substitution_matrix=substitution_matrix)
 
         query_exon = row_list[i]['ExonID']
         i_index = trx_data.index[i]
@@ -126,20 +170,20 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
         for j in range(i + 1, nrows):
             j_index = trx_data.index[j]
-            if ((row_list[j]['SeqLength'] < minimum_len)
+            len_j = row_list[j]['SeqLength']
+            if ((len_j < minimum_len)
                     or ((trx_data.at[j_index, 'Cluster'] != 0)
                         and not trx_data.at[j_index, 'LowIdentity'])):
                 continue
 
-            aln = query(row_list[j]['ProteinSequences'])
+            aln_query, aln_target = _align_and_order(
+                row_list[i]['ProteinSequences'], len_i,
+                row_list[j]['ProteinSequences'], len_j, gap_open_penalty,
+                gap_extend_penalty, substitution_matrix)
 
-            # Because of the sort by SeqLength with ascending=False, the target
-            # j is always <= i, i.e. j is the shortest sequence of the pair.
-            target_coverage = coverage(aln.aligned_target_sequence,
-                                       row_list[j]['SeqLength'])
+            target_coverage = coverage_shortest(aln_query, aln_target, len_j)
 
-            pid = percent_identity(aln.aligned_query_sequence,
-                                   aln.aligned_target_sequence)
+            pid = percent_identity(aln_query, aln_target)
 
             if (target_coverage >= coverage_cutoff
                     and pid >= percent_identity_cutoff):
@@ -150,10 +194,8 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                 trx_data.at[j_index, 'QueryExon'] = query_exon
                 trx_data.at[j_index, 'TargetCoverage'] = target_coverage
                 trx_data.at[j_index, 'PercentIdentity'] = pid
-                trx_data.at[j_index,
-                            'AlignedQuery'] = aln.aligned_query_sequence
-                trx_data.at[j_index,
-                            'AlignedTarget'] = aln.aligned_target_sequence
+                trx_data.at[j_index, 'AlignedQuery'] = aln_query
+                trx_data.at[j_index, 'AlignedTarget'] = aln_target
                 if pid < min(100, percent_identity_cutoff + 15):
                     trx_data.at[j_index, 'LowIdentity'] = 1
                 else:

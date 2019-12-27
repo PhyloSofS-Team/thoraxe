@@ -186,8 +186,8 @@ def test_exon_clustering(mapk8):
             # The aligned seq should be in the exon
             subset = group[np.logical_not(nans)]
             for _, exon in subset.groupby('ExonIDCluster'):
-                assert np.any([
-                    row.AlignedTarget.replace('-',
-                                              '') in row.ExonProteinSequence
-                    for row in exon.itertuples()
-                ])
+                assert np.any([((row.AlignedTarget.replace(
+                    '-', '') in row.ExonProteinSequence)
+                                or (row.AlignedQuery.replace(
+                                    '-', '')) in row.ExonProteinSequence)
+                               for row in exon.itertuples()])
