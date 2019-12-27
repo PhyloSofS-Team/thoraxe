@@ -320,7 +320,8 @@ def _add_transcript_fraction(subexon_df):
 def _find_exon(subexon_table, subexon_id_cluster):
     """Return a list with the 'ExonID's of a particular subexon."""
     return subexon_table.loc[subexon_table['SubexonIDCluster'] ==
-                             subexon_id_cluster, 'ExonID'].unique().tolist()
+                             subexon_id_cluster, 'ExonIDCluster'].unique(
+                             ).tolist()
 
 
 def _update_to_merge_list(to_merge, subexon_1, subexon_2):
@@ -390,7 +391,7 @@ def _find_subexons_to_merge(subexon_table, delim='/'):
         exons = _find_exon(subexon_table, subexon)
         if len(exons) == 1:
             exon = exons[0]
-            exon_table = subexon_table[subexon_table['ExonID'] == exon]
+            exon_table = subexon_table[subexon_table['ExonIDCluster'] == exon]
             exon_table = exon_table.drop_duplicates(
                 'SubexonIDCluster')  # keep the first transcript
             exon_tables = _only_contigous_subexons(exon_table)
