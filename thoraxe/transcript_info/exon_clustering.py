@@ -149,7 +149,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                          inplace=True,
                          ascending=False)
 
-    trx_data['LowIdentity'] = 0
+    trx_data['KeepSearching'] = 0
 
     row_list = trx_data.to_dict('records')
 
@@ -173,7 +173,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             len_j = row_list[j]['SeqLength']
             if ((len_j < minimum_len)
                     or ((trx_data.at[j_index, 'Cluster'] != 0)
-                        and not trx_data.at[j_index, 'LowIdentity'])):
+                        and not trx_data.at[j_index, 'KeepSearching'])):
                 continue
 
             aln_query, aln_target = _align_and_order(
@@ -187,7 +187,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
             if (target_coverage >= coverage_cutoff
                     and pid >= percent_identity_cutoff):
-                if (trx_data.at[j_index, 'LowIdentity']
+                if (trx_data.at[j_index, 'KeepSearching']
                         and trx_data.at[j_index, 'PercentIdentity'] > pid):
                     continue
                 trx_data.at[j_index, 'Cluster'] = cluster
@@ -196,14 +196,14 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                 trx_data.at[j_index, 'PercentIdentity'] = pid
                 trx_data.at[j_index, 'AlignedQuery'] = aln_query
                 trx_data.at[j_index, 'AlignedTarget'] = aln_target
-                if pid < min(100, percent_identity_cutoff + 15):
-                    trx_data.at[j_index, 'LowIdentity'] = 1
+                if pid <= min(100, percent_identity_cutoff + 30):
+                    trx_data.at[j_index, 'KeepSearching'] = 1
                 else:
-                    trx_data.at[j_index, 'LowIdentity'] = 0
+                    trx_data.at[j_index, 'KeepSearching'] = 0
 
     trx_data.sort_values('InputOrder', inplace=True)
     trx_data.drop(
-        ['InputOrder', 'ProteinSequences', 'SeqLength', 'LowIdentity'],
+        ['InputOrder', 'ProteinSequences', 'SeqLength', 'KeepSearching'],
         axis=1,
         inplace=True)
 
