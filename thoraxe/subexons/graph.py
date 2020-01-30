@@ -8,17 +8,48 @@ import logging
 from functools import reduce
 
 
-def nodes_and_edges2genes_and_transcripts(data):
+def gene2n_transcripts(data):
     """
-    Return four dictionaries:
+    Return a dictionary from gene id to number of transcripts in the gene.
+    """
+    return data.groupby(
+        'GeneID').apply(lambda df: len(set(df.TranscriptIDCluster))).to_dict()
+
+
+def edge2stats(edge2gene_list):
+    """
+    Return two dictionaries.
+
+    - edge to set of genes
+    - edge to dict from gene to number of transcripts in the gene with that edge
+    """
+    edge2genes = {}
+    edge2gene_abundance = {}
+
+    for edge, gene_list in edge2gene_list.items():
+        edge2genes[edge] = set(gene_list)
+        edge2gene_abundance[edge] = collections.Counter(gene_list)
+
+    return edge2genes, edge2gene_abundance
+
+
+def nodes_and_edges2genes_and_transcripts(  # pylint: disable=too-many-locals
+        data):
+    """
+    Return five dictionaries:
 
     - nodes to genes
     - edges to genes
     - nodes to transcripts
     - edges to transcripts
+    - edges to conservation/abundance score
+
+
     """
+    gene2transcripts = gene2n_transcripts(data)
+
     node2genes = collections.defaultdict(set)
-    edge2genes = collections.defaultdict(set)
+    edge2gene_list = collections.defaultdict(list)
     node2transcripts = collections.defaultdict(set)
     edge2transcripts = collections.defaultdict(set)
     for gene_id, gene in data.groupby('GeneID'):  # noqa pylint: disable=too-many-nested-blocks
@@ -32,16 +63,18 @@ def nodes_and_edges2genes_and_transcripts(data):
                 orthologs = subexon.split('/')
                 for ortholog in orthologs:
                     node2genes[ortholog].update({gene_id})
-                    edge2genes[(previous, ortholog)].update({gene_id})
+                    edge2gene_list[(previous, ortholog)].append(gene_id)
                     node2transcripts[ortholog].update({transcript_id})
                     edge2transcripts[(previous,
                                       ortholog)].update({transcript_id})
                     previous = ortholog
 
             node2genes['stop'].update({gene_id})
-            edge2genes[(previous, 'stop')].update({gene_id})
+            edge2gene_list[(previous, 'stop')].append(gene_id)
             node2transcripts['stop'].update({transcript_id})
             edge2transcripts[(previous, 'stop')].update({transcript_id})
+
+    edge2genes, edge2gene_abundance = edge2stats(edge2gene_list)
 
     return node2genes, edge2genes, node2transcripts, edge2transcripts
 
