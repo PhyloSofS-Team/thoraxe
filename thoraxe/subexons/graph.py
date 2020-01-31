@@ -8,7 +8,7 @@ import logging
 from functools import reduce
 
 
-def gene2n_transcripts(data):
+def _gene2n_transcripts(data):
     """
     Return a dictionary from gene id to number of transcripts in the gene.
     """
@@ -16,7 +16,7 @@ def gene2n_transcripts(data):
         'GeneID').apply(lambda df: len(set(df.TranscriptIDCluster))).to_dict()
 
 
-def edge2stats(edge2gene_list):
+def _edge2stats(edge2gene_list):
     """
     Return two dictionaries.
 
@@ -24,13 +24,30 @@ def edge2stats(edge2gene_list):
     - edge to dict from gene to number of transcripts in the gene with that edge
     """
     edge2genes = {}
-    edge2gene_abundance = {}
+    edge2gene_abundance = {}  # edge to transcript abundance in each gene
 
     for edge, gene_list in edge2gene_list.items():
         edge2genes[edge] = set(gene_list)
         edge2gene_abundance[edge] = collections.Counter(gene_list)
 
     return edge2genes, edge2gene_abundance
+
+
+def _transcript_weighted_conservation(gene2transcriptnumber,
+                                      edge2gene_abundance):
+    """"
+    Return the transcript weighted conservation score of each edge as a dict.
+    """
+    edge2trx_cons = {}
+    n_genes = len(gene2transcriptnumber)
+    for (edge, gene_abundance) in edge2gene_abundance.items():
+        transcript_fraction_sum = 0.0
+        for (gene, transcript_abundance) in gene_abundance.items():
+            transcript_fraction_sum += (transcript_abundance /
+                                        gene2transcriptnumber[gene])
+        edge2trx_cons[edge] = transcript_fraction_sum / n_genes
+
+    return edge2trx_cons
 
 
 def nodes_and_edges2genes_and_transcripts(  # pylint: disable=too-many-locals
@@ -42,11 +59,9 @@ def nodes_and_edges2genes_and_transcripts(  # pylint: disable=too-many-locals
     - edges to genes
     - nodes to transcripts
     - edges to transcripts
-    - edges to conservation/abundance score
-
-
+    - edges to the transcript weighted conservation score
     """
-    gene2transcripts = gene2n_transcripts(data)
+    gene2transcriptnumber = _gene2n_transcripts(data)
 
     node2genes = collections.defaultdict(set)
     edge2gene_list = collections.defaultdict(list)
@@ -74,9 +89,13 @@ def nodes_and_edges2genes_and_transcripts(  # pylint: disable=too-many-locals
             node2transcripts['stop'].update({transcript_id})
             edge2transcripts[(previous, 'stop')].update({transcript_id})
 
-    edge2genes, edge2gene_abundance = edge2stats(edge2gene_list)
+    edge2genes, edge2gene_abundance = _edge2stats(edge2gene_list)
 
-    return node2genes, edge2genes, node2transcripts, edge2transcripts
+    edge2trx_cons = _transcript_weighted_conservation(gene2transcriptnumber,
+                                                      edge2gene_abundance)
+
+    return (node2genes, edge2genes, node2transcripts, edge2transcripts,
+            edge2trx_cons)
 
 
 def _get_elements(node2elements):
@@ -91,7 +110,7 @@ def _get_elements(node2elements):
 
 def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
         filename, node2genes, edge2genes, node2transcripts, edge2transcripts,
-        s_exon_2_char):
+        edge2trx_cons, s_exon_2_char):
     """
     Store the splice graph in GML (Graph Modelling Language) format.
 
@@ -126,11 +145,11 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
                 node [
                     id {}
                     label "{}"
-                    conservation {}
                     transcript_fraction {}
+                    conservation {}
                     genes "{}"
                     transcripts "{}"
-            '''.format(node_id, node, conservation, transcript_fraction,
+            '''.format(node_id, node, transcript_fraction, conservation,
                        genes_str, transcripts_str))
             if s_exon_2_char and node not in ['start', 'stop']:
                 gml.write('''
@@ -145,19 +164,22 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
             conservation = 100.0 * (len(genes) / n_genes)
             transcripts = edge2transcripts[edge]
             transcript_fraction = 100.0 * (len(transcripts) / n_transcripts)
+            transcript_weighted_conservation = edge2trx_cons[edge]
             genes_str = ','.join(sorted(genes))
             transcripts_str = ','.join(sorted(transcripts))
             gml.write('''
                 edge [
                     source {}
                     target {}
-                    conservation {}
                     transcript_fraction {}
+                    conservation {}
+                    transcript_weighted_conservation {}
                     genes "{}"
                     transcripts "{}"
                 ]
-            '''.format(node2id[edge[0]], node2id[edge[1]], conservation,
-                       transcript_fraction, genes_str, transcripts_str))
+            '''.format(node2id[edge[0]], node2id[edge[1]], transcript_fraction,
+                       conservation, transcript_weighted_conservation,
+                       genes_str, transcripts_str))
         gml.write('''
         ]
         ''')
