@@ -189,8 +189,9 @@ def _find_alternative_paths(graph,
                 for path in nx.all_simple_paths(graph, src, dst):
                     if _is_alternative_path(graph, path, canonical_set, i, j,
                                             min_genes):
-                        paths['CanonicalPath'].append(canonical_path[i:j + 1])
-                        paths['AlternativePath'].append(path)
+                        paths['CanonicalPath'].append(",".join(
+                            canonical_path[i:j + 1]))
+                        paths['AlternativePath'].append(",".join(path))
                         paths['ASE'].append(
                             _define_aes(graph, canonical_path, i, j, path))
     return pd.DataFrame(paths)
