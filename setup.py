@@ -26,7 +26,7 @@ setup(name='thoraxe',
       setup_requires=['pytest-runner'],
       install_requires=[
           'pandas', 'biopython>1.44', 'requests', 'numpy', 'recordclass',
-          'scikit-bio', 'urllib3'
+          'scikit-bio', 'urllib3', 'networkx'
       ],
       test_suite='tests',
       tests_require=[
