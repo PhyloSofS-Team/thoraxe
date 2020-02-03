@@ -55,6 +55,12 @@ def parse_command_line():
                         help='Minimum exon length.',
                         type=int,
                         default=4)
+    parser.add_argument('-g',
+                        '--mingenes',
+                        help='Minimum number of genes to consider a path in '
+                        'the splice graph.',
+                        type=int,
+                        default=1)
     parser.add_argument(
         '-c',
         '--coverage',
@@ -631,14 +637,21 @@ def main():  # pylint: disable=too-many-locals
     else:
         s_exon_2_char = {}
 
-    subexons.graph.splice_graph_gml(
-        os.path.join(output_folder,
-                     "splice_graph.gml"), node2genes, edge2genes,
-        node2transcripts, edge2transcripts, edge2trx_cons, s_exon_2_char)
+    splice_graph_filename = os.path.join(output_folder, "splice_graph.gml")
+
+    subexons.graph.splice_graph_gml(splice_graph_filename, node2genes,
+                                    edge2genes, node2transcripts,
+                                    edge2transcripts, edge2trx_cons,
+                                    s_exon_2_char)
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     _add_s_exon_phases_and_coordinates(tidy_table)
     tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"))
+
+    ases_table = subexons.ases.conserved_ases(tidy_table,
+                                              splice_graph_filename,
+                                              min_genes=args.mingenes)
+    ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"))
 
 
 if __name__ == '__main___':

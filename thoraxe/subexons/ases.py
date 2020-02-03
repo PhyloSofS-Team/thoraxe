@@ -106,7 +106,14 @@ def _get_sources_and_destinies(graph, canonical_path, min_genes=1):
     return sources, destinies
 
 
-def _is_alternative_path(  # pylint: disable=too-many-arguments
+def _get_genes(graph, src, dst):
+    """
+    Return the set of genes in the edge (src, dst).
+    """
+    return set(graph.get_edge_data(src, dst)['genes'].split(','))
+
+
+def _is_alternative_path(  # noqa pylint: disable=too-many-arguments
         graph,
         path,
         canonical_set,
@@ -114,32 +121,47 @@ def _is_alternative_path(  # pylint: disable=too-many-arguments
         j,
         min_genes=1):
     """
-    True if path is a good alternative path to the canonical path in the graph.
+    Return the set of genes if the given path is alternative to the canonical.
+
+    Otherwise, it returns an empty set (False).
     """
     internal_nodes = path[1:-1]
 
     if (not internal_nodes) and (j - i == 1):
-        return False
+        return set()
 
     for node in internal_nodes:
         if node in canonical_set:
-            return False
+            return set()
 
     n_nodes = len(path)
-    if n_nodes == 2:
-        return _n_genes(graph, path[0], path[1]) >= min_genes
 
-    genes = set(graph.get_edge_data(path[0], path[1])['genes'].split(','))
+    genes = _get_genes(graph, path[0], path[1])
+
+    if len(genes) < min_genes:
+        return set()
+
+    for k in range(2, n_nodes):
+        genes.intersection_update(_get_genes(graph, path[k - 1], path[k]))
+
     if len(genes) >= min_genes:
-        for k in range(2, n_nodes):
-            genes.intersection_update(
-                graph.get_edge_data(path[k - 1], path[k])['genes'].split(','))
-            if len(genes) < min_genes:
-                return False
-    else:
-        return False
+        return genes
 
-    return len(genes) >= min_genes
+    return set()
+
+
+def _genes_canonical(memo, graph, canonical_path, i, j):
+    """
+    Return the set of genes in the canonical path, it does memoization.
+    """
+    if (i, j) not in memo:
+        genes = _get_genes(graph, canonical_path[i], canonical_path[i + 1])
+        for k in range(i + 1, j):
+            genes.intersection_update(
+                _get_genes(graph, canonical_path[k], canonical_path[k + 1]))
+        memo[(i, j)] = genes
+
+    return memo[(i, j)]
 
 
 def _is_mutually_exclusive(graph, canonical_internal, alternative_internal):
@@ -173,31 +195,57 @@ def _define_aes(graph, canonical_path, i, j, alternative_path):
     return "alternative"
 
 
-def _find_alternative_paths(graph,
-                            sources,
-                            destinies,
-                            canonical_path,
-                            min_genes=1):
+def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many-locals
+        graph,
+        sources,
+        destinies,
+        canonical_path,
+        min_genes=1,
+        delim='/'):
     """
     Return a list of alternative paths.
     """
-    paths = {'CanonicalPath': [], 'AlternativePath': [], 'ASE': []}
+    memo = {}
+    paths = {
+        'CanonicalPath': [],
+        'AlternativePath': [],
+        'ASE': [],
+        'AlternativePathGeneNumber': [],
+        'AlternativePathGenes': [],
+        'CanonicalPathGeneNumber': [],
+        'CanonicalPathGenes': []
+    }
     canonical_set = set(canonical_path)
     for (src, i) in sources.items():
         for (dst, j) in destinies.items():
             if i < j:
                 for path in nx.all_simple_paths(graph, src, dst):
-                    if _is_alternative_path(graph, path, canonical_set, i, j,
-                                            min_genes):
-                        paths['CanonicalPath'].append(",".join(
-                            canonical_path[i:j + 1]))
-                        paths['AlternativePath'].append(",".join(path))
+                    genes = _is_alternative_path(graph, path, canonical_set, i,
+                                                 j, min_genes)
+                    if genes:
+                        canonical_genes = _genes_canonical(
+                            memo, graph, canonical_path, i, j)
+                        paths['CanonicalPath'].append(
+                            delim.join(canonical_path[i:j + 1]))
+                        paths['AlternativePath'].append(delim.join(path))
                         paths['ASE'].append(
                             _define_aes(graph, canonical_path, i, j, path))
-    return pd.DataFrame(paths)
+                        paths['AlternativePathGeneNumber'].append(len(genes))
+                        paths['AlternativePathGenes'].append(
+                            delim.join(sorted(genes)))
+                        paths['CanonicalPathGeneNumber'].append(
+                            len(canonical_genes))
+                        paths['CanonicalPathGenes'].append(
+                            delim.join(sorted(canonical_genes)))
+    data_frame = pd.DataFrame(paths)
+    data_frame.sort_values(
+        ['AlternativePathGeneNumber', 'CanonicalPath', 'AlternativePath'],
+        ascending=False,
+        inplace=True)
+    return data_frame
 
 
-def conserved_ases(table, graph_file_name, min_genes=1):
+def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     """
     Return a DataFrame of the conserved alternative splicing events detected.
     """
@@ -206,4 +254,4 @@ def conserved_ases(table, graph_file_name, min_genes=1):
     sources, destinies = _get_sources_and_destinies(graph, canonical_path,
                                                     min_genes)
     return _find_alternative_paths(graph, sources, destinies, canonical_path,
-                                   min_genes)
+                                   min_genes, delim)
