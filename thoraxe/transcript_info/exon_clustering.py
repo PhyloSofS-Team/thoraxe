@@ -83,8 +83,9 @@ def _align_and_order(  # pylint: disable=too-many-arguments
                                    gap_extend_penalty, substitution_matrix)
 
     if len(aln_query) != len(aln_target):
-        aln_query, aln_target = _align(seq_b, seq_a, gap_open_penalty,
-                                       gap_extend_penalty, substitution_matrix)
+        aln_query, aln_target = _align(  # noqa pylint: disable=bad-option-value,arguments-out-of-order
+            seq_b, seq_a, gap_open_penalty, gap_extend_penalty,
+            substitution_matrix)
         return aln_query, aln_target
 
     return aln_query, aln_target

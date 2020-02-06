@@ -3,6 +3,8 @@ import shutil
 import sys
 import platform
 import pytest
+import subprocess
+import warnings
 
 import thoraxe
 
@@ -22,10 +24,17 @@ def set_out_dir():
 def test_thoraxe(monkeypatch, request, set_out_dir):
     aligner = 'clustalo'
     if _is_windows():
-        if shutil.which('wsl') is not None:  # (LOCAL) clutalo installed in WSL
-            aligner = 'wsl clustalo'
+        if shutil.which('wsl') is not None:  # Clustal Omega in the WSL
+            status, _ = subprocess.getstatusoutput(['wsl', 'clustalo', '-h'])
+            if status == 0:
+                aligner = 'wsl clustalo'
+            else:
+                raise Exception('You should install clustalo in the Windows '
+                                'Subsystem for Linux to run this test.')
         else:  # AppVeyor
             muscle = 'C:\\projects\\thoraxe\\muscle.exe'
+            warnings.warn('Assuming that the test is running in AppVeyor with '
+                          'muscle installed at {}'.format(muscle))
             if os.path.exists(muscle):
                 aligner = muscle + ' -in '
 

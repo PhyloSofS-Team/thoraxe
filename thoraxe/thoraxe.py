@@ -646,12 +646,15 @@ def main():  # pylint: disable=too-many-locals
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     _add_s_exon_phases_and_coordinates(tidy_table)
-    tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"))
+    tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"),
+                      index=False)
 
-    ases_table = subexons.ases.conserved_ases(tidy_table,
-                                              splice_graph_filename,
-                                              min_genes=args.mingenes)
-    ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"))
+    path_table, ases_table = subexons.ases.conserved_ases(
+        tidy_table, splice_graph_filename, min_genes=args.mingenes)
+    path_table.to_csv(os.path.join(output_folder, "path_table.csv"),
+                      index=False)
+    ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"),
+                      index=False)
 
 
 if __name__ == '__main___':
