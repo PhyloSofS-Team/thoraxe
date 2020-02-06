@@ -246,6 +246,16 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="thoraxe.transcript_info.exon_clustering.coverage_shortest">
+<code class="sig-prename descclassname">thoraxe.transcript_info.exon_clustering.</code><code class="sig-name descname">coverage_shortest</code><span class="sig-paren">(</span><em class="sig-param">seq_query</em>, <em class="sig-param">seq_target</em>, <em class="sig-param">seq_len</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.coverage_shortest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return coverage of the shortest sequence in the alignment.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coverage_shortest</span><span class="p">(</span><span class="s2">&quot;AAAA----&quot;</span><span class="p">,</span> <span class="s2">&quot;AAAAAAAA&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="go">50.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
 <dt id="thoraxe.transcript_info.exon_clustering.exon_clustering">
 <code class="sig-prename descclassname">thoraxe.transcript_info.exon_clustering.</code><code class="sig-name descname">exon_clustering</code><span class="sig-paren">(</span><em class="sig-param">trx_data</em>, <em class="sig-param">minimum_len=4</em>, <em class="sig-param">coverage_cutoff=80.0</em>, <em class="sig-param">percent_identity_cutoff=30.0</em>, <em class="sig-param">gap_open_penalty=10</em>, <em class="sig-param">gap_extend_penalty=1</em>, <em class="sig-param">substitution_matrix=None</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.exon_clustering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cluster exons based on their sequence identity after local alignment.</p>

@@ -10,6 +10,12 @@ thoraxe.subexons.alignment module
 .. automodule:: thoraxe.subexons.alignment
    :members:
 
+thoraxe.subexons.ases module
+----------------------------
+
+.. automodule:: thoraxe.subexons.ases
+   :members:
+
 thoraxe.subexons.graph module
 -----------------------------
 

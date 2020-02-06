@@ -325,24 +325,52 @@ The first subexon appears before of the second in at least one transcript.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-thoraxe.subexons.ases">
+<span id="thoraxe-subexons-ases-module"></span><h2>thoraxe.subexons.ases module<a class="headerlink" href="#module-thoraxe.subexons.ases" title="Permalink to this headline">¶</a></h2>
+<p>ases: Function to detect conserved alternative splicing events.</p>
+<p>It finds the canonical path in the splice graph to detect conserved ASEs.</p>
+<dl class="function">
+<dt id="thoraxe.subexons.ases.conserved_ases">
+<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">conserved_ases</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">graph_file_name</em>, <em class="sig-param">min_genes=1</em>, <em class="sig-param">delim='/'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.conserved_ases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return two DataFrames.</p>
+<ul class="simple">
+<li><p>A table of transcripts/paths.</p></li>
+<li><p>A table of the conserved alternative splicing events detected.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="thoraxe.subexons.ases.get_canonical_path">
+<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">get_canonical_path</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">graph</em>, <em class="sig-param">delim='/'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.get_canonical_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the path table and the canonical path.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="thoraxe.subexons.ases.get_transcript_scores">
+<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">get_transcript_scores</code><span class="sig-paren">(</span><em class="sig-param">table</em>, <em class="sig-param">graph</em>, <em class="sig-param">delim='/'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.get_transcript_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a DataFrame with the needed data to choose the canonical path.</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-thoraxe.subexons.graph">
 <span id="thoraxe-subexons-graph-module"></span><h2>thoraxe.subexons.graph module<a class="headerlink" href="#module-thoraxe.subexons.graph" title="Permalink to this headline">¶</a></h2>
 <p>graph: Functions to store the splice graph with conservation information.</p>
 <dl class="function">
 <dt id="thoraxe.subexons.graph.nodes_and_edges2genes_and_transcripts">
 <code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">nodes_and_edges2genes_and_transcripts</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.nodes_and_edges2genes_and_transcripts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return four dictionaries:</p>
+<dd><p>Return five dictionaries:</p>
 <ul class="simple">
 <li><p>nodes to genes</p></li>
 <li><p>edges to genes</p></li>
 <li><p>nodes to transcripts</p></li>
 <li><p>edges to transcripts</p></li>
+<li><p>edges to the transcript weighted conservation score</p></li>
 </ul>
 </dd></dl>
 
 <dl class="function">
 <dt id="thoraxe.subexons.graph.splice_graph_gml">
-<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">splice_graph_gml</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">node2genes</em>, <em class="sig-param">edge2genes</em>, <em class="sig-param">node2transcripts</em>, <em class="sig-param">edge2transcripts</em>, <em class="sig-param">s_exon_2_char</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.splice_graph_gml" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.graph.</code><code class="sig-name descname">splice_graph_gml</code><span class="sig-paren">(</span><em class="sig-param">filename</em>, <em class="sig-param">node2genes</em>, <em class="sig-param">edge2genes</em>, <em class="sig-param">node2transcripts</em>, <em class="sig-param">edge2transcripts</em>, <em class="sig-param">edge2trx_cons</em>, <em class="sig-param">s_exon_2_char</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.graph.splice_graph_gml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the splice graph in GML (Graph Modelling Language) format.</p>
 <p>It stores the conservation level information for nodes and edges, where
 conservation is the fraction of species that has that particular feature.</p>

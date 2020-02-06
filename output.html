@@ -187,14 +187,16 @@ download date and hour together with the <em>Ensembl</em> version.</p>
 <h2>thoraxe<a class="headerlink" href="#thoraxe" title="Permalink to this headline">¶</a></h2>
 <p>We can run <cite>thoraxe</cite> in the <cite>PAX6</cite> folder that <cite>transcript_query</cite> created with
 the <em>Ensembl</em> data:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">thoraxe</span> <span class="o">-</span><span class="n">i</span> <span class="n">PAX6</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">thoraxe</span> <span class="o">-</span><span class="n">i</span> <span class="n">PAX6</span> <span class="o">--</span><span class="n">phylosofs</span> <span class="o">--</span><span class="n">plot_chimerics</span>
 </pre></div>
 </div>
 <p><em>ThorAxe</em> is going to look for the <cite>Ensembl</cite> folder with the input data and is
 going to create a <cite>thoraxe</cite> folder containing the final and intermediate
-results of the study.</p>
+results of the study. The <cite>–phylosofs</cite> and <cite>–plot_chimerics</cite> arguments are
+optionals.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PAX6
 ├── Ensembl
+│   ├── ensembl_version.csv
 │   ├── exonstable.tsv
 │   ├── sequences.fasta
 │   ├── tree.nh
@@ -213,16 +215,18 @@ results of the study.</p>
     │   ├── subexon_table_1.csv
     │   ⋮
     │   └── transcript_table.csv
-    ├── s_exon_table.csv
+    ├── ases_table.csv
     ├── msa
     │   ├── msa_s_exon_10_0.fasta
     │   ⋮
     │   └── msa_s_exon_9_0.fasta
+    ├── path_table.csv
     ├── phylosofs
     │   ├── s_exons.tsv
     │   ├── transcripts.pir
     │   ├── transcripts.txt
     │   └── tree.nh
+    ├── s_exon_table.csv
     └── splice_graph.gml
 </pre></div>
 </div>
@@ -236,16 +240,25 @@ transcripts/species using the human-readable <em>Graph Modelling Language</em> (
 format. Each node and edge has conservation information, where conservation
 means the fraction of species showing that particular node (s-exon) or
 connection.</p>
+<p>The <cite>path_table.csv</cite> contains information about each transcript as a path in
+the splice graph. The first row indicates the <em>canonical path</em>. The canonical
+path is used to detect alternative splicing events automatically, and it is
+the one present in the largest number of genes/species with the highest
+minimal value of transcript weighted conservation, and it is the longest. The
+alternative splicing events are stored in the <cite>ases_table.csv</cite> file where the
+canonical path and the alternative are indicated, together with conservation
+(number of genes showing the path) information.</p>
 <p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
 <cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
 look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
 <div class="section" id="phylosofs">
 <h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h3>
-<p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and mollecular
-modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. In particular, these files use a single
-unicode character to represent each s-exon. The mapping between the id
-for <em>PhyloSofS</em> and the one of <em>ThorAxe</em> (<em>ExonCluster*_*ChimericBlock</em>) is in
-the <cite>s_exons.tsv</cite> file.</p>
+<p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and molecular
+modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. It is only generated when the <cite>–phylosofs</cite>
+optional argument is used.
+These PhyloSofS’s files use a single unicode character to represent each s-exon.
+The mapping between the id for <em>PhyloSofS</em> and the one of <em>ThorAxe</em>
+(<em>ExonCluster*_*ChimericBlock</em>) is in the <cite>s_exons.tsv</cite> file.</p>
 <p>The <cite>transcripts.pir</cite> has the annotated sequence using the PIR format.</p>
 <p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
 </div>
@@ -254,7 +267,8 @@ the <cite>s_exons.tsv</cite> file.</p>
 <p>The <cite>_intermediate</cite> folder has intermediate files and states from the <em>ThorAxe</em>
 pipeline. In particular, <cite>cluster_plots.html</cite> has the interactive plots of the
 chimeric alignments, with the possibility to show the <cite>constitutive</cite> value
-calculated for each subexon.</p>
+calculated for each subexon. This plot is only generated when the
+<cite>–plot_chimerics</cite> optional argument is indicated.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><cite>cluster_plots.html</cite> loads the <cite>cluster_data.js</cite> file that includes

@@ -29,7 +29,7 @@ indicated species:
         ├── tree.nh
         └── tsl.csv
 
-The `ensembl_version.csv` file contains a table with information about the 
+The `ensembl_version.csv` file contains a table with information about the
 download date and hour together with the *Ensembl* version.
 
 thoraxe
@@ -40,16 +40,18 @@ the *Ensembl* data:
 
 ::
 
-    thoraxe -i PAX6
+    thoraxe -i PAX6 --phylosofs --plot_chimerics
 
 *ThorAxe* is going to look for the `Ensembl` folder with the input data and is
 going to create a `thoraxe` folder containing the final and intermediate
-results of the study.
+results of the study. The `--phylosofs` and `--plot_chimerics` arguments are
+optionals.
 
 ::
 
     PAX6
     ├── Ensembl
+    │   ├── ensembl_version.csv
     │   ├── exonstable.tsv
     │   ├── sequences.fasta
     │   ├── tree.nh
@@ -68,16 +70,18 @@ results of the study.
         │   ├── subexon_table_1.csv
         │   ⋮
         │   └── transcript_table.csv
-        ├── s_exon_table.csv
+        ├── ases_table.csv
         ├── msa
         │   ├── msa_s_exon_10_0.fasta
         │   ⋮
         │   └── msa_s_exon_9_0.fasta
+        ├── path_table.csv
         ├── phylosofs
         │   ├── s_exons.tsv
         │   ├── transcripts.pir
         │   ├── transcripts.txt
         │   └── tree.nh
+        ├── s_exon_table.csv
         └── splice_graph.gml
 
 
@@ -94,6 +98,15 @@ format. Each node and edge has conservation information, where conservation
 means the fraction of species showing that particular node (s-exon) or
 connection.
 
+The `path_table.csv` contains information about each transcript as a path in
+the splice graph. The first row indicates the *canonical path*. The canonical
+path is used to detect alternative splicing events automatically, and it is
+the one present in the largest number of genes/species with the highest
+minimal value of transcript weighted conservation, and it is the longest. The
+alternative splicing events are stored in the `ases_table.csv` file where the
+canonical path and the alternative are indicated, together with conservation
+(number of genes showing the path) information.
+
 The `msa` folder has a multiple sequence alignment for each s-exon, e.g.
 `msa_s_exon_10_0.fasta`. This MSAs can be easily used as a seed to
 look for homologous sequences in different databases by using hmmsearch_.
@@ -102,11 +115,12 @@ look for homologous sequences in different databases by using hmmsearch_.
 phylosofs
 ~~~~~~~~~
 
-The `phylosofs` folder has the needed inputs for the structural and mollecular
-modelling pipelines of PhyloSofS_. In particular, these files use a single
-unicode character to represent each s-exon. The mapping between the id
-for *PhyloSofS* and the one of *ThorAxe* (*ExonCluster*_*ChimericBlock*) is in
-the `s_exons.tsv` file.
+The `phylosofs` folder has the needed inputs for the structural and molecular
+modelling pipelines of PhyloSofS_. It is only generated when the `--phylosofs`
+optional argument is used.
+These PhyloSofS's files use a single unicode character to represent each s-exon.
+The mapping between the id for *PhyloSofS* and the one of *ThorAxe*
+(*ExonCluster*_*ChimericBlock*) is in the `s_exons.tsv` file.
 
 The `transcripts.pir` has the annotated sequence using the PIR format.
 
@@ -119,12 +133,13 @@ Intermediate outputs
 The `_intermediate` folder has intermediate files and states from the *ThorAxe*
 pipeline. In particular, `cluster_plots.html` has the interactive plots of the
 chimeric alignments, with the possibility to show the `constitutive` value
-calculated for each subexon.
+calculated for each subexon. This plot is only generated when the
+`--plot_chimerics` optional argument is indicated.
 
 .. warning::
-    `cluster_plots.html` loads the `cluster_data.js` file that includes 
-    all the information needed to plot all the generated multiple sequence alignments 
-    using *Plotly*. It can freeze the tab when a lot of sequences/species are used or 
+    `cluster_plots.html` loads the `cluster_data.js` file that includes
+    all the information needed to plot all the generated multiple sequence alignments
+    using *Plotly*. It can freeze the tab when a lot of sequences/species are used or
     if the computer hasn't enough resources available.
 
 
