@@ -41,6 +41,10 @@ def test_ases(mapk8):
         ases_df.AlternativePathGeneNumber, reverse=True)
 
     assert all(
-        path_table.reset_index(drop=True) == pd.read_csv(mapk8['path_table']))
+        path_table.reset_index(
+            drop=True) == pd.read_csv(mapk8['path_table']).reset_index(
+                drop=True))
     assert all(
-        ases_df.reset_index(drop=True) == pd.read_csv(mapk8['ases_table']))
+        ases_df.reset_index(
+            drop=True) == pd.read_csv(mapk8['ases_table']).reset_index(
+                drop=True))
