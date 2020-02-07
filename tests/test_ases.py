@@ -40,5 +40,7 @@ def test_ases(mapk8):
     assert list(ases_df.AlternativePathGeneNumber) == sorted(
         ases_df.AlternativePathGeneNumber, reverse=True)
 
-    assert all(path_table.values == pd.read_csv(mapk8['path_table']).values)
-    assert all(ases_df.values == pd.read_csv(mapk8['ases_table']).values)
+    cmp = path_table.values == pd.read_csv(mapk8['path_table']).values
+    assert cmp.all()
+    cmp = ases_df.values == pd.read_csv(mapk8['ases_table']).values
+    assert cmp.all()
