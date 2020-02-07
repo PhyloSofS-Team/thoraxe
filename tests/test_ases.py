@@ -42,7 +42,18 @@ def test_ases(mapk8):
 
     data_path_table = pd.read_csv(mapk8['path_table'])
     data_ases_table = pd.read_csv(mapk8['ases_table'])
-    assert all(path_table.columns == data_path_table.columns)
-    assert all(ases_df.columns == data_ases_table.columns)
+    assert sorted(path_table.columns) == sorted(data_path_table.columns)
+    assert sorted(ases_df.columns) == sorted(data_ases_table.columns)
     assert path_table.size == data_path_table.size
     assert ases_df.size == data_ases_table.size
+    for col in [
+            'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
+            'PathGeneNumber'
+    ]:
+        assert all(path_table[col].values == data_path_table[col].values)
+    for col in [
+            'CanonicalPath', 'AlternativePath', 'ASE',
+            'CanonicalPathGeneNumber', 'CanonicalPathGenes',
+            'AlternativePathGeneNumber', 'AlternativePathGenes'
+    ]:
+        assert all(ases_df[col].values == data_ases_table[col].values)

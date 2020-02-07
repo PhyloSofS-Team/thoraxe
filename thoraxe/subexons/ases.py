@@ -92,7 +92,10 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     if bless_humans:
         data_frame.drop(columns=['IsHuman'], inplace=True)
 
-    return data_frame
+    return data_frame.reindex(columns=[
+        'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
+        'MinimumTranscriptWeightedConservation', 'PathGeneNumber'
+    ])
 
 
 def get_canonical_path(table, graph, delim='/'):
@@ -273,7 +276,11 @@ def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many
         ['AlternativePathGeneNumber', 'CanonicalPath', 'AlternativePath'],
         ascending=False,
         inplace=True)
-    return data_frame
+    return data_frame.reindex(columns=[
+        'CanonicalPath', 'AlternativePath', 'ASE', 'CanonicalPathGeneNumber',
+        'CanonicalPathGenes', 'AlternativePathGeneNumber',
+        'AlternativePathGenes'
+    ])
 
 
 def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
