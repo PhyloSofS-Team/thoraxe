@@ -290,7 +290,11 @@ def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     - A table of transcripts/paths.
     - A table of the conserved alternative splicing events detected.
     """
-    graph = nx.read_gml(graph_file_name)
+    with open(graph_file_name, 'r') as gml:
+        lines = [
+            line.encode('ascii') for line in gml if "phylosofs" not in line
+        ]
+    graph = nx.read_gml(lines)
     path_table, canonical_path = get_canonical_path(table, graph)
     sources, destinies = _get_sources_and_destinies(graph, canonical_path,
                                                     min_genes)

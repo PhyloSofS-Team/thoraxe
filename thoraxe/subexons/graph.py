@@ -153,8 +153,8 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
                        genes_str, transcripts_str))
             if s_exon_2_char and node not in ['start', 'stop']:
                 gml.write('''
-                        phylosofs "{}"
-                '''.format(s_exon_2_char[node]))
+                    phylosofs "{}"
+            '''.format(s_exon_2_char[node]))
             gml.write('''
                 ]
             ''')
