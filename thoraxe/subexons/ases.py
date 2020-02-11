@@ -283,6 +283,17 @@ def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many
     ])
 
 
+def read_splice_graph(graph_file_name):
+    """
+    Read ThorAxe's splice graph using NetworkX.
+    """
+    with open(graph_file_name, 'r') as gml:
+        lines = [
+            line.encode('ascii') for line in gml if "phylosofs" not in line
+        ]
+    return nx.read_gml(lines)
+
+
 def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     """
     Return two DataFrames.
@@ -290,11 +301,7 @@ def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     - A table of transcripts/paths.
     - A table of the conserved alternative splicing events detected.
     """
-    with open(graph_file_name, 'r') as gml:
-        lines = [
-            line.encode('ascii') for line in gml if "phylosofs" not in line
-        ]
-    graph = nx.read_gml(lines)
+    graph = read_splice_graph(graph_file_name)
     path_table, canonical_path = get_canonical_path(table, graph)
     sources, destinies = _get_sources_and_destinies(graph, canonical_path,
                                                     min_genes)
