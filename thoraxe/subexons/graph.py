@@ -126,7 +126,7 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
     n_genes = len(_get_elements(node2genes))
     n_transcripts = len(_get_elements(node2transcripts))
 
-    with open(filename, 'w') as gml:
+    with open(filename, 'w', encoding="utf-8") as gml:
         gml.write('''
         graph [
             directed 1
