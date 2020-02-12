@@ -287,7 +287,7 @@ def read_splice_graph(graph_file_name):
     """
     Read ThorAxe's splice graph using NetworkX.
     """
-    with open(graph_file_name, 'r') as gml:
+    with open(graph_file_name, 'r', encoding="utf-8") as gml:
         lines = [
             line.encode('ascii') for line in gml if "phylosofs" not in line
         ]
