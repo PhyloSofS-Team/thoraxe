@@ -627,9 +627,6 @@ def main():  # pylint: disable=too-many-locals
     subexon_table = update_subexon_table(subexon_table, cluster2data)
     subexon_table = subexons.alignment.impute_missing_s_exon(subexon_table)
 
-    (node2genes, edge2genes, node2transcripts, edge2transcripts, edge2trx_cons
-     ) = subexons.graph.nodes_and_edges2genes_and_transcripts(subexon_table)
-
     if args.phylosofs:
         s_exon_2_char = subexons.phylosofs.phylosofs_inputs(
             subexon_table, os.path.join(input_folder, 'Ensembl'),
@@ -637,17 +634,20 @@ def main():  # pylint: disable=too-many-locals
     else:
         s_exon_2_char = {}
 
+    tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
+    _add_s_exon_phases_and_coordinates(tidy_table)
+    tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"),
+                      index=False)
+
+    (node2genes, edge2genes, node2transcripts, edge2transcripts, edge2trx_cons
+     ) = subexons.graph.nodes_and_edges2genes_and_transcripts(tidy_table)
+
     splice_graph_filename = os.path.join(output_folder, "splice_graph.gml")
 
     subexons.graph.splice_graph_gml(splice_graph_filename, node2genes,
                                     edge2genes, node2transcripts,
                                     edge2transcripts, edge2trx_cons,
                                     s_exon_2_char)
-
-    tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
-    _add_s_exon_phases_and_coordinates(tidy_table)
-    tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"),
-                      index=False)
 
     path_table, ases_table = subexons.ases.conserved_ases(
         tidy_table, splice_graph_filename, min_genes=args.mingenes)

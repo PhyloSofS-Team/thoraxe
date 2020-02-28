@@ -229,8 +229,23 @@ def _define_aes(graph, canonical_path, i, j, alternative_path):
     return "alternative"
 
 
+def _setup_graph(graph):
+    """
+    Return a copy of the graph with a distance atribute for all_shortest_paths.
+    """
+    new_graph = graph.copy(as_view=False)
+    nx.set_edge_attributes(
+        new_graph, {(s, t): {
+            'distance':
+            1.0 -
+            new_graph.get_edge_data(s, t)['transcript_weighted_conservation']
+        }
+                    for (s, t) in new_graph.edges()})
+    return new_graph
+
+
 def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many-locals
-        graph,
+        splice_graph,
         sources,
         destinies,
         canonical_path,
@@ -250,10 +265,14 @@ def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many
         'CanonicalPathGenes': []
     }
     canonical_set = set(canonical_path)
+    graph = _setup_graph(splice_graph)
     for (src, i) in sources.items():
         for (dst, j) in destinies.items():
             if i < j:
-                for path in nx.all_simple_paths(graph, src, dst):
+                for path in nx.all_shortest_paths(graph,
+                                                  src,
+                                                  dst,
+                                                  weight='distance'):
                     genes = _is_alternative_path(graph, path, canonical_set, i,
                                                  j, min_genes)
                     if genes:

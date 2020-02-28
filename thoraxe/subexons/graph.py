@@ -69,7 +69,7 @@ def nodes_and_edges2genes_and_transcripts(  # pylint: disable=too-many-locals
     edge2transcripts = collections.defaultdict(set)
     for gene_id, gene in data.groupby('GeneID'):  # noqa pylint: disable=too-many-nested-blocks
         for transcript_id, transcript in gene.groupby('TranscriptIDCluster'):
-            subexons = transcript.sort_values('SubexonRank')['S_exons']
+            subexons = transcript.sort_values('S_exon_Rank')['S_exonID']
 
             previous = 'start'
             node2genes[previous].update({gene_id})
