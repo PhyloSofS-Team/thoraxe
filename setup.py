@@ -15,7 +15,7 @@ setup(name='thoraxe',
           'License :: OSI Approved :: MIT License',
           'Natural Language :: English', 'Programming Language :: Python :: 3'
       ],
-      python_requires='>=3.5',
+      python_requires=">=3.6.1", # pandas
       entry_points={
           'console_scripts': [
               'transcript_query=thoraxe.transcript_query:main',
