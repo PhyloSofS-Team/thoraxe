@@ -121,16 +121,22 @@ exonic regions and not necessarily junctions between genomic exons. *GML* is a
 rich format, and we used it to store useful metadata for nodes and edges:
 
 
-================================ ===============================
-            Metadata               Description
-================================ ===============================
+================================ ===============================================
+            Metadata                              Description
+================================ ===============================================
 label                            The s-exon ID (only for nodes).
-transcript_fraction              |TRFR|
-conservation                     |CONS|
-transcript_weighted_conservation |TRWC|
-genes                            |GENE|
-transcripts                      |TRAN|
-================================ ===============================
+transcript_fraction              It is the number of transcripts showing that
+                                 node/edge over the total number of transcripts,
+                                 taking into account all the genes.
+conservation                     Fraction of genes showing that node/edge.
+transcript_weighted_conservation As `conservation` but each gene is weighted
+                                 using the fraction of transcripts in that
+                                 gene showing that edge (only for edges).
+genes                            List of genes, separated by commas,
+                                 showing that node/edge.
+transcripts                      List of transcripts, separated by commas,
+                                 showing that node/edge.
+================================ ===============================================
 
 
 .. note::
@@ -171,20 +177,3 @@ calculated for each subexon. This plot is only generated when the
 .. _Ensembl: https://www.ensembl.org/index.html
 .. _hmmsearch: //www.ebi.ac.uk/Tools/hmmer/search/hmmsearch
 .. _PhyloSofS: https://github.com/PhyloSofS-Team/PhyloSofS
-
-.. |TRFR| replace::
-    It is the number of transcripts showing that
-    node/edge over the total number of transcripts,
-    taking into account all the genes.
-.. |CONS| replace::
-    It is the fraction of genes showing that node/edge.
-.. |TRWC| replace::
-    As `conservation` but each gene is weighted
-    using the fraction of transcripts in that
-    gene showing that edge (only for edges).
-.. |GENE| replace::
-    List of genes, separated by commas,
-    showing that node/edge.
-.. |TRAN| replace::
-    List of transcripts, separated by commas,
-    showing that node/edge.
