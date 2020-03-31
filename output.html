@@ -247,7 +247,7 @@ connection.</p>
 the splice graph. The first row indicates the <em>canonical path</em>. The canonical
 path is used to detect alternative splicing events automatically, and it is
 the one present in the largest number of genes/species with the highest
-minimal value of transcript weighted conservation, and it is the longest. The
+minimal value of <cite>transcript_weighted_conservation</cite>, and it is the longest. The
 alternative splicing events are stored in the <cite>ases_table.csv</cite> file where the
 canonical path and the alternative are indicated, together with conservation
 (number of genes showing the path) information.</p>
@@ -263,48 +263,38 @@ exonic regions and not necessarily junctions between genomic exons. <em>GML</em>
 rich format, and we used it to store useful metadata for nodes and edges:</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 52%" />
-<col style="width: 11%" />
-<col style="width: 11%" />
-<col style="width: 25%" />
+<col style="width: 51%" />
+<col style="width: 49%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Metadata</p></th>
-<th class="head"><p>Nodes</p></th>
-<th class="head"><p>Edges</p></th>
 <th class="head"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>label</p></td>
-<td><p>True</p></td>
-<td><p>False</p></td>
-<td><p>The s-exon ID.</p></td>
+<td><p>The s-exon ID (only for nodes).</p></td>
 </tr>
 <tr class="row-odd"><td><p>transcript_fraction</p></td>
-<td><p>True</p></td>
-<td><p>True</p></td>
-<td><p>It is the number of transcripts showing that node/edge over the total number of transcripts, taking into account all the genes.</p></td>
+<td><p>It is the number of transcripts showing that
+node/edge over the total number of transcripts,
+taking into account all the genes.</p></td>
 </tr>
 <tr class="row-even"><td><p>conservation</p></td>
-<td><p>True</p></td>
-<td><p>True</p></td>
 <td><p>It is the fraction of genes showing that node/edge.</p></td>
 </tr>
 <tr class="row-odd"><td><p>transcript_weighted_conservation</p></td>
-<td><p>False</p></td>
-<td><p>True</p></td>
-<td><p>As <cite>conservation</cite> but each gene is weighted using the fraction of transcripts in that gene showing that edge.</p></td>
+<td><p>As <cite>conservation</cite> but each gene is weighted
+using the fraction of transcripts in that
+gene showing that edge (only for edges).</p></td>
 </tr>
 <tr class="row-even"><td><p>genes</p></td>
-<td><p>True</p></td>
-<td><p>True</p></td>
-<td><p>List of genes, separated by commas, showing that node/edge.</p></td>
+<td><p>List of genes, separated by commas,
+showing that node/edge.</p></td>
 </tr>
 <tr class="row-odd"><td><p>transcripts</p></td>
-<td><p>True</p></td>
-<td><p>True</p></td>
-<td><p>List of transcripts, separated by commas, showing that node/edge.</p></td>
+<td><p>List of transcripts, separated by commas,
+showing that node/edge.</p></td>
 </tr>
 </tbody>
 </table>
