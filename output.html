@@ -86,8 +86,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Output description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#transcript-query">transcript_query</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#thoraxe">thoraxe</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#splice-graph">Splice graph</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -251,19 +254,78 @@ canonical path and the alternative are indicated, together with conservation
 <p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
 <cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
 look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
+<div class="section" id="splice-graph">
+<h3>Splice graph<a class="headerlink" href="#splice-graph" title="Permalink to this headline">¶</a></h3>
+<p><em>ThorAxe</em> splice graph as <em>s-exons</em>, rather than exon, as nodes. Using <em>s-exon</em>
+allows us to represent transcripts from different species in the same splice
+graph. As a consequence, the edges indicate the connectivity between these
+exonic regions and not necessarily junctions between genomic exons. <em>GML</em> is a
+rich format, and we used it to store useful metadata for nodes and edges:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 52%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metadata</p></th>
+<th class="head"><p>Nodes</p></th>
+<th class="head"><p>Edges</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>label</p></td>
+<td><p>True</p></td>
+<td><p>False</p></td>
+<td><p>The s-exon ID.</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcript_fraction</p></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+<td><p>It is the number of transcripts showing that node/edge over the total number of transcripts, taking into account all the genes.</p></td>
+</tr>
+<tr class="row-even"><td><p>conservation</p></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+<td><p>It is the fraction of genes showing that node/edge.</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcript_weighted_conservation</p></td>
+<td><p>False</p></td>
+<td><p>True</p></td>
+<td><p>As <cite>conservation</cite> but each gene is weighted using the fraction of transcripts in that gene showing that edge.</p></td>
+</tr>
+<tr class="row-even"><td><p>genes</p></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+<td><p>List of genes, separated by commas, showing that node/edge.</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcripts</p></td>
+<td><p>True</p></td>
+<td><p>True</p></td>
+<td><p>List of transcripts, separated by commas, showing that node/edge.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <em>ThorAxe’s</em> <cite>transcript_query</cite> is run with <cite>–orthology 1:1</cite> (default),
+the number of genes is identical to the number of species in the dataset.</p>
+</div>
 <div class="section" id="phylosofs">
-<h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h3>
+<h4>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h4>
 <p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and molecular
 modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. It is only generated when the <cite>–phylosofs</cite>
 optional argument is used.
 These PhyloSofS’s files use a single unicode character to represent each s-exon.
 The mapping between the id for <em>PhyloSofS</em> and the one of <em>ThorAxe</em>
-(<em>ExonCluster*_*ChimericBlock</em>) is in the <cite>s_exons.tsv</cite> file.</p>
+(<em>ExonCluster_ChimericBlock</em>) is in the <cite>s_exons.tsv</cite> file.</p>
 <p>The <cite>transcripts.pir</cite> has the annotated sequence using the PIR format.</p>
 <p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
 </div>
 <div class="section" id="intermediate-outputs">
-<h3>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this headline">¶</a></h3>
+<h4>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this headline">¶</a></h4>
 <p>The <cite>_intermediate</cite> folder has intermediate files and states from the <em>ThorAxe</em>
 pipeline. In particular, <cite>cluster_plots.html</cite> has the interactive plots of the
 chimeric alignments, with the possibility to show the <cite>constitutive</cite> value
@@ -275,6 +337,7 @@ calculated for each subexon. This plot is only generated when the
 all the information needed to plot all the generated multiple sequence alignments
 using <em>Plotly</em>. It can freeze the tab when a lot of sequences/species are used or
 if the computer hasn’t enough resources available.</p>
+</div>
 </div>
 </div>
 </div>

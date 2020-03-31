@@ -111,6 +111,32 @@ The `msa` folder has a multiple sequence alignment for each s-exon, e.g.
 `msa_s_exon_10_0.fasta`. This MSAs can be easily used as a seed to
 look for homologous sequences in different databases by using hmmsearch_.
 
+Splice graph
+............
+
+*ThorAxe* splice graph as *s-exons*, rather than exon, as nodes. Using *s-exon*
+allows us to represent transcripts from different species in the same splice
+graph. As a consequence, the edges indicate the connectivity between these
+exonic regions and not necessarily junctions between genomic exons. *GML* is a
+rich format, and we used it to store useful metadata for nodes and edges:
+
+
+================================ ======= ======= ===============
+            Metadata              Nodes   Edges    Description
+================================ ======= ======= ===============
+label                            True    False   The s-exon ID.
+transcript_fraction              True    True    |TRFR|
+conservation                     True    True    |CONS|
+transcript_weighted_conservation False   True    |TRWC|
+genes                            True    True    |GENE|
+transcripts                      True    True    |TRAN|
+================================ ======= ======= ===============
+
+
+.. note::
+    If *ThorAxe's* `transcript_query` is run with `--orthology 1:1` (default),
+    the number of genes is identical to the number of species in the dataset.
+
 
 phylosofs
 ~~~~~~~~~
@@ -120,12 +146,11 @@ modelling pipelines of PhyloSofS_. It is only generated when the `--phylosofs`
 optional argument is used.
 These PhyloSofS's files use a single unicode character to represent each s-exon.
 The mapping between the id for *PhyloSofS* and the one of *ThorAxe*
-(*ExonCluster*_*ChimericBlock*) is in the `s_exons.tsv` file.
+(*ExonCluster_ChimericBlock*) is in the `s_exons.tsv` file.
 
 The `transcripts.pir` has the annotated sequence using the PIR format.
 
 The list of transcripts for each gene is in `transcripts.txt`
-
 
 Intermediate outputs
 ~~~~~~~~~~~~~~~~~~~~
@@ -146,3 +171,9 @@ calculated for each subexon. This plot is only generated when the
 .. _Ensembl: https://www.ensembl.org/index.html
 .. _hmmsearch: //www.ebi.ac.uk/Tools/hmmer/search/hmmsearch
 .. _PhyloSofS: https://github.com/PhyloSofS-Team/PhyloSofS
+
+.. |TRFR| replace:: It is the number of transcripts showing that node/edge over the total number of transcripts, taking into account all the genes.
+.. |CONS| replace:: It is the fraction of genes showing that node/edge.
+.. |TRWC| replace:: As `conservation` but each gene is weighted using the fraction of transcripts in that gene showing that edge.
+.. |GENE| replace:: List of genes, separated by commas, showing that node/edge.
+.. |TRAN| replace:: List of transcripts, separated by commas, showing that node/edge.

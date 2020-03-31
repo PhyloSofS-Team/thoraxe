@@ -5,7 +5,7 @@ Installation
 Dependencies
 ------------
 
-You need *Python 3.5* or higher to use *ThorAxe*. You also need:
+You need **Python 3.6.1 or higher** to use *ThorAxe*. You also need:
 
 Clustal Omega
 ~~~~~~~~~~~~~
