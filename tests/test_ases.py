@@ -45,8 +45,6 @@ def test_ases(mapk8):
     assert sorted(path_table.columns) == sorted(data_path_table.columns)
     assert sorted(ases_df.columns) == sorted(data_ases_table.columns)
     assert path_table.size == data_path_table.size
-    print(ases_df)
-    print(data_ases_table)
     assert ases_df.shape[0] == data_ases_table.shape[0]
     for col in [
             'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
