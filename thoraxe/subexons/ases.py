@@ -237,10 +237,10 @@ def _setup_graph(graph):
     nx.set_edge_attributes(
         new_graph, {(s, t): {
             'distance':
-            1.0 -
-            new_graph.get_edge_data(s, t)['transcript_weighted_conservation']
+            1.0
+            - new_graph.get_edge_data(s, t)['transcript_weighted_conservation']
         }
-                    for (s, t) in new_graph.edges()})
+            for (s, t) in new_graph.edges()})
     return new_graph
 
 
@@ -312,96 +312,105 @@ def read_splice_graph(graph_file_name):
         ]
     return nx.read_gml(lines)
 
-def _ase_type(aseCan,aseAlter):
-	aseType = ""
-	if len(aseCan) == 2:
-		aseType = "Insert"
-	elif len(aseAlter) == 2:
-		aseType = "Del"
-	elif aseAlter[0] == "start":
-		if aseAlter[-1] == "stop":
-			aseType = "Full"
-		else:
-			aseType = "AlterS"
-	elif aseAlter[-1] == "stop":
-			aseType = "AlterE"
-	else:
-		aseType = "AlterI"
-	return(aseType)
 
-def _exclusive(paths,set1,set2):
-	myPaths = set()
-	# we initialize the status at partially muually exclusive
-	me = "pMe"
-	for se in set1:
-		myPaths = myPaths.union(set(filter(lambda x:'/'+se+'/' in x, paths)))
-	set2filt = []
-	for se in set2:
-		if not list(filter(lambda x:'/'+se+'/' in x, myPaths)):
-			set2filt.append(se)
-	if len(set2filt)>0:
-		# if none of the elements in se were removed
-		if len(set2)==len(set2filt):
-			# then the sets are fully mutually exclusive
-			me = "ME"
-		# conditional return: if the set2filt is empty, the function returns none
-		return(','.join(set1),','.join(set2filt),me)
+def _ase_type(ase_canonical, ase_alternative):
+    ase_type = ""
+    if len(ase_canonical) == 2:
+        ase_type = "Insert"
+    elif len(ase_alternative) == 2:
+        ase_type = "Del"
+    elif ase_alternative[0] == "start":
+        if ase_alternative[-1] == "stop":
+            ase_type = "Full"
+        else:
+            ase_type = "AlterS"
+    elif ase_alternative[-1] == "stop":
+        ase_type = "AlterE"
+    else:
+        ase_type = "AlterI"
+    return(ase_type)
+
+
+def _exclusive(paths, set1, set2):
+    selected_paths = set()
+    # we initialize the status at partially muually exclusive
+    me = "pMe"
+    for se in set1:
+        selected_paths = selected_paths.union(
+            set(filter(lambda x: '/' + se + '/' in x, paths)))
+    set2filt = []
+    for se in set2:
+        if not list(filter(lambda x: '/' + se + '/' in x, selected_paths)):
+            set2filt.append(se)
+    if len(set2filt) > 0:
+        # if none of the elements in se were removed
+        if len(set2) == len(set2filt):
+            # then the sets are fully mutually exclusive
+            me = "ME"
+        # conditional return: if the set2filt is empty, the function returns none
+        return(','.join(set1), ','.join(set2filt), me)
+
 
 def _detect_ase(path_table):
-    canonical = path_table.Path[0].split('/')
-    lines = path_table.Path
+    paths = path_table.Path
+    canonical = paths[0].split('/')
     # create a dico of events, where each key is a tuple (canonical_path, alternative_path)
     # and the values are the number of occurrences
     events = {}
     exclu = set()
-    for line in lines[1:]:
-	path = line.split("/")
-	# we start at 1 because 0 is necessarily the start
-	i = 1
-	j = 1
-	while i<len(path):
-		if path[i]!=canonical[j]:
-			istop = i
-			jstop = j
-			# find the next common s-exons
-			while not path[istop] in canonical[jstop:]:
-				istop+=1
-			# find its index in the canonical path
-			jstop = canonical.index(path[istop])
-			# create alternative path
-			aseAlter = path[(i-1):(istop+1)]
-			# check whether all its s-exons are present in at least one species
-			if True: # check s-exon freq here! # set(aseAlter).issubset(de.keys()): # set to True if you want all events
-				# create the canonical (main) path
-				aseCan = canonical[(j-1):(jstop+1)]
-				# create the event as a tuple of canonical (main) and alternative paths
-				event = ("/".join(aseCan),"/".join(aseAlter))
-				# max number of s-exons involved
-				ne = max(len(aseCan[1:-1]),len(aseAlter[1:-1]))
-				# update the number of occurrences of the event
-				if event in events:
-					events[event][0] += 1
-				# create it in the dictionary if it is detected for the first time
-				else:
-					# determine its type according the classical classification
-					aseType = _ase_type(aseCan,aseAlter)
-					# number of occurrences, type of ase, mutually exclusive status
-					# the latter will remain "-" in case of deletion, insertion, and alternative but not exclusive at all
-					events[event] =  [1,aseType,"-",ne,0]
-					# determine whether part of all of the alternative path is
-					# mutually exclusive with the canonical (main) path
-					if aseType in ["AlterS","AlterI","AlterE"]:
-						# ratio between the max and the other one
-						events[event][4]=max(ne/len(aseCan[1:-1]),ne/len(aseAlter[1:-1]))
-						aseExclu = _exclusive(lines,aseCan[1:-1],aseAlter[1:-1])
-						if aseExclu:
-							exclu.add(aseExclu[:2])
-							events[event][2]=aseExclu[2]
-			i = istop+1
-			j = jstop+1
-		else:
-			i+=1
-			j+=1
+    for joined_path in paths[1:]:
+        path = joined_path.split("/")
+        # we start at 1 because 0 is necessarily the start
+        i = 1
+        j = 1
+        while i < len(path):
+            if path[i] != canonical[j]:
+                istop = i
+                jstop = j
+                # find the next common s-exons
+                while not path[istop] in canonical[jstop:]:
+                    istop += 1
+                # find its index in the canonical path
+                jstop = canonical.index(path[istop])
+                # create alternative path
+                ase_alternative = path[(i - 1):(istop + 1)]
+                # check whether all its s-exons are present in at least one species
+                # check s-exon freq here! # set(ase_alternative).issubset(de.keys()): # set to True if you want all events
+                if True:
+                    # create the canonical (main) path
+                    ase_canonical = canonical[(j - 1):(jstop + 1)]
+                    # create the event as a tuple of canonical (main) and alternative paths
+                    event = ("/".join(ase_canonical),
+                             "/".join(ase_alternative))
+                    # max number of s-exons involved
+                    ne = max(len(ase_canonical[1:-1]),
+                             len(ase_alternative[1:-1]))
+                    # update the number of occurrences of the event
+                    if event in events:
+                        events[event][0] += 1
+                    # create it in the dictionary if it is detected for the first time
+                    else:
+                        # determine its type according the classical classification
+                        ase_type = _ase_type(ase_canonical, ase_alternative)
+                        # number of occurrences, type of ase, mutually exclusive status
+                        # the latter will remain "-" in case of deletion, insertion, and alternative but not exclusive at all
+                        events[event] = [1, ase_type, "-", ne, 0]
+                        # determine whether part of all of the alternative path is
+                        # mutually exclusive with the canonical (main) path
+                        if ase_type in ["AlterS", "AlterI", "AlterE"]:
+                            # ratio between the max and the other one
+                            events[event][4] = max(
+                                ne / len(ase_canonical[1:-1]), ne / len(ase_alternative[1:-1]))
+                            aseExclu = _exclusive(
+                                paths, ase_canonical[1:-1], ase_alternative[1:-1])
+                            if aseExclu:
+                                exclu.add(aseExclu[:2])
+                                events[event][2] = aseExclu[2]
+                i = istop + 1
+                j = jstop + 1
+            else:
+                i += 1
+                j += 1
     return (events, exclu)
 
 
