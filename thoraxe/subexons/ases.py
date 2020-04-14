@@ -1,3 +1,4 @@
+from collections import namedtuple
 """
 ases: Function to detect conserved alternative splicing events.
 
@@ -316,102 +317,195 @@ def read_splice_graph(graph_file_name):
 def _ase_type(ase_canonical, ase_alternative):
     ase_type = ""
     if len(ase_canonical) == 2:
-        ase_type = "Insert"
+        ase_type = "insertion"
     elif len(ase_alternative) == 2:
-        ase_type = "Del"
+        ase_type = "deletion"
     elif ase_alternative[0] == "start":
         if ase_alternative[-1] == "stop":
-            ase_type = "Full"
+            ase_type = "fully_alternative"
         else:
-            ase_type = "AlterS"
+            ase_type = "alternative_start"
     elif ase_alternative[-1] == "stop":
-        ase_type = "AlterE"
+        ase_type = "alternative_end"
     else:
-        ase_type = "AlterI"
+        ase_type = "alternative"
     return(ase_type)
 
 
-def _exclusive(paths, set1, set2):
+def _get_s_exon_paths(s_exon, path_list, s_exon2path):
+    """
+    Return the set of path with a given s_exon.
+
+    It uses s_exon2path to memoize the result.
+    """
+    if s_exon not in s_exon2path:
+        s_exon2path[s_exon] = set(filter(lambda x: '/' + s_exon + '/' in x, path_list)))
+
+    return s_exon2path[s_exon]
+
+
+def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
+    key = (s_exon_a, s_exon_b)
+    if key not in exclusives:
+        a_paths = _get_s_exon_paths(s_exon_a, path_list, s_exon2path)
+        b_paths = _get_s_exon_paths(s_exon_b, path_list, s_exon2path)
+        common_paths = a_paths.intersection(b_paths)
+        exclusives[key] = len(common_paths) == 0
+
+    return exclusives[key]
+
+
+def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives, s_exon2path):
+    exclusive_canonical = []
+    exclusive_alternative = []
+    me_status = "mutually_exclusive"
+    for alt in alternative_s_exons:
+        for can in canonical_s_exons:
+            if _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
+                exclusive_canonical.append(can)
+                exclusive_alternative.append(alt)
+            else:
+                me_status = "partially_mutually_exclusive"
+
+    return exclusive_canonical, exclusive_alternative, me_status
+
+
+def _exclusive(paths, canonical_s_exons, alternative_s_exons):
     selected_paths = set()
-    # we initialize the status at partially muually exclusive
+    # we initialize the status at partially mutually exclusive
     me = "pMe"
-    for se in set1:
+    for se in canonical_s_exons:
         selected_paths = selected_paths.union(
             set(filter(lambda x: '/' + se + '/' in x, paths)))
-    set2filt = []
-    for se in set2:
+    alternative_filtered = []
+    for se in alternative_s_exons:
         if not list(filter(lambda x: '/' + se + '/' in x, selected_paths)):
-            set2filt.append(se)
-    if len(set2filt) > 0:
+            alternative_filtered.append(se)
+    if len(alternative_filtered) > 0:
         # if none of the elements in se were removed
-        if len(set2) == len(set2filt):
+        if len(alternative_s_exons) == len(alternative_filtered):
             # then the sets are fully mutually exclusive
             me = "ME"
-        # conditional return: if the set2filt is empty, the function returns none
-        return(','.join(set1), ','.join(set2filt), me)
+        # conditional return: if the alternative_filtered is empty, the function returns none
+        return(','.join(canonical_s_exons), ','.join(alternative_filtered), me)
 
 
-def _detect_ase(path_table):
-    paths = path_table.Path
-    canonical = paths[0].split('/')
-    # create a dico of events, where each key is a tuple (canonical_path, alternative_path)
-    # and the values are the number of occurrences
+PathData = namedtuple('PathData', ['Genes', 'Transcripts'])
+
+
+def _get_path_dict(path_table):
+    """
+    Return a list of paths and a Dict from a path to its PathData namedtuple.
+
+    Paths are reperesented with strings, where each node is separated by `/`.
+    The path list is useful to keep path order and to make paths accessible by
+    index. Each `PathData` `namedtuple` in the `dict` contains the list of
+    genes and `TranscriptIDCluster`s.
+    """
+    path_list = []
+    path_dict = dict()
+    for row in path_table.itertuples():
+        if row.Path not in path_dict:
+            path_list.append(row.Path)
+            path_dict[row.Path] = PathData(
+                {row.GeneID}, {row.TranscriptIDCluster})
+        else:
+            path_dict[row.Path].Genes.add(row.GeneID)
+            path_dict[row.Path].Transcripts.add(row.TranscriptIDCluster)
+    return path_list, path_dict
+
+
+def _subpath_data(subpath, path_dict, subpath_dict):
+    """
+    Return the `PathData` for the given subpath.
+
+    This function memoizes using `subpath_dict`.
+    """
+       if subpath not in subpath_dict:
+            subpath_dict[subpath] = PathData(set(), set())
+            for (path, path_data) in path_dict.items():
+                if subpath in path:
+                    subpath_dict[subpath].Genes.update(path_data.Genes)
+                    subpath_dict[subpath].Transcripts.update(
+                        path_data.Transcripts)
+        return subpath_dict[subpath]
+
+
+def _detect_ase(path_table, min_genes=1, delim='/'):
+    subpath_dict = {}  # memoization dict for _subpath_data
+    exclusives = {}  # memoization dict for _exclusive
+    s_exon2path = {}  # memoization dict for _exclusive
+    path_list, path_dict = _get_path_dict(path_table)
+    # the first path is the canonical path
+    canonical = path_list[0].split('/')
+    canonical_node2index = {node : idx for (idx, node) in enumerate(canonical)}
+    # create a dico of events, where each key is a tuple
+    # (canonical_path, alternative_path) and the value is a tuple of:
+    # - a PathData tuple for each path
+    # - the type of alternative splicing event
+    # - a note about the mutually exclusivity of the event
+    # - the mutually exclusive s-exons in the canonical
+    # - and in the alternative paths
     events = {}
-    exclu = set()
-    for joined_path in paths[1:]:
+    for joined_path in path_list[1:]:
+        possibly_exclusive = set(["alternative_start", "alternative", "alternative_end", "fully_alternative"])
         path = joined_path.split("/")
-        # we start at 1 because 0 is necessarily the start
+        # we start at 1 because 0 is necessarily the "start"
         i = 1
         j = 1
-        while i < len(path):
+        path_len = len(path)
+        while i < path_len:
             if path[i] != canonical[j]:
                 istop = i
                 jstop = j
                 # find the next common s-exons
-                while not path[istop] in canonical[jstop:]:
-                    istop += 1
-                # find its index in the canonical path
-                jstop = canonical.index(path[istop])
+                for k in range(istop, path_len):
+                    can_index = canonical_node2index.get(path[k], -1)
+                    istop = k
+                    if can_index >= jstop:
+                        jstop = can_index  # its index in the canonical path
+                        break
                 # create alternative path
                 ase_alternative = path[(i - 1):(istop + 1)]
-                # check whether all its s-exons are present in at least one species
-                # check s-exon freq here! # set(ase_alternative).issubset(de.keys()): # set to True if you want all events
-                if True:
+                joined_alternative = "/".join(ase_alternative)
+                # check whether all its s-exons are present in at least one
+                # species
+                alternative_data = _subpath_data(joined_alternative, path_dict,
+                    subpath_dict)
+                if len(alternative_data.Genes) > min_genes:
                     # create the canonical (main) path
                     ase_canonical = canonical[(j - 1):(jstop + 1)]
-                    # create the event as a tuple of canonical (main) and alternative paths
-                    event = ("/".join(ase_canonical),
-                             "/".join(ase_alternative))
-                    # max number of s-exons involved
-                    ne = max(len(ase_canonical[1:-1]),
-                             len(ase_alternative[1:-1]))
-                    # update the number of occurrences of the event
-                    if event in events:
-                        events[event][0] += 1
-                    # create it in the dictionary if it is detected for the first time
-                    else:
-                        # determine its type according the classical classification
+                    joined_canonical = "/".join(ase_canonical)
+                    # create the event as a tuple of canonical (main) and
+                    # alternative paths
+                    event = (joined_canonical, joined_alternative)
+                    # create it in the dictionary if it is detected for the
+                    # first time
+                    if event not in events:
+                        # get data for the canonical path
+                        canonical_data = _subpath_data(joined_canonical,
+                            path_dict, subpath_dict)
+                        # determine the ASE type according the classical
+                        # classification
                         ase_type = _ase_type(ase_canonical, ase_alternative)
-                        # number of occurrences, type of ase, mutually exclusive status
-                        # the latter will remain "-" in case of deletion, insertion, and alternative but not exclusive at all
-                        events[event] = [1, ase_type, "-", ne, 0]
-                        # determine whether part of all of the alternative path is
-                        # mutually exclusive with the canonical (main) path
-                        if ase_type in ["AlterS", "AlterI", "AlterE"]:
-                            # ratio between the max and the other one
-                            events[event][4] = max(
-                                ne / len(ase_canonical[1:-1]), ne / len(ase_alternative[1:-1]))
-                            aseExclu = _exclusive(
-                                paths, ase_canonical[1:-1], ase_alternative[1:-1])
-                            if aseExclu:
-                                exclu.add(aseExclu[:2])
-                                events[event][2] = aseExclu[2]
+                        # determine whether part of all of the alternative path
+                        # is mutually exclusive with the canonical (main) path
+                        me_status = ""
+                        if ase_type in possibly_exclusive:
+                            canonical_s_exons = ase_canonical[1:-1]
+                            alternative_s_exons = ase_alternative[1:-1]
+                            exclusive_can, exclusive_alt, me_status = _exclusive(
+                                canonical_s_exons, alternative_s_exons,
+                                path_list, exclusives, s_exon2path)
+                        # TO DO
+                        events[event] = (alternative_data, canonical_data,
+                            me_status, exclusive_can, exclusive_alt)
                 i = istop + 1
                 j = jstop + 1
             else:
                 i += 1
                 j += 1
-    return (events, exclu)
+    return events
 
 
 def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
