@@ -1,12 +1,15 @@
-from collections import namedtuple
 """
 ases: Function to detect conserved alternative splicing events.
 
 It finds the canonical path in the splice graph to detect conserved ASEs.
 """
+
 import collections
 import networkx as nx
 import pandas as pd
+
+
+PathData = collections.namedtuple('PathData', ['Genes', 'Transcripts'])
 
 
 def _get_seq(string):
@@ -25,7 +28,7 @@ def _get_seq(string):
 
 
 def get_transcript_scores(  # pylint: disable=too-many-locals
-        table, graph, delim='/'):
+    table, graph, delim='/'):
     """
     Return a DataFrame with the needed data to choose the canonical path.
     """
@@ -75,8 +78,8 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
                 int(subdf.Species.iloc[0] == 'homo_sapiens'))
 
     data_frame = pd.DataFrame(data)
-    path2ngenes = data_frame.groupby(
-        'Path').apply(lambda df: len(set(df.GeneID))).to_dict()
+    path2ngenes = data_frame.groupby('Path').apply(
+        lambda df: len(set(df.GeneID))).to_dict()
     data_frame = data_frame.assign(
         PathGeneNumber=[path2ngenes[path] for path in data_frame.Path])
 
@@ -99,210 +102,6 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     ])
 
 
-def get_canonical_path(table, graph, delim='/'):
-    """
-    Return the path table and the canonical path.
-    """
-    trx_data = get_transcript_scores(table, graph)
-    path = trx_data.Path.iloc[0]
-    return trx_data, path.split(delim)
-
-
-def _n_genes(graph, src, dst):
-    """
-    Return the number of genes showing a particular edge (src, dst).
-    """
-    return graph.get_edge_data(src, dst)['genes'].count(',') + 1
-
-
-def _get_sources_and_destinies(graph, canonical_path, min_genes=1):
-    """
-    Return a list of sources and destinies in the canonical path.
-    """
-    sources = collections.OrderedDict()
-    destinies = collections.OrderedDict()
-    for (i, node) in enumerate(canonical_path):
-
-        outneighbors = set(graph.successors(node))
-        if node != 'stop':
-            outneighbors.remove(canonical_path[i + 1])
-        if sum(
-                _n_genes(graph, node, dst) >= min_genes
-                for dst in outneighbors) >= 1:
-            sources[node] = i
-
-        in_neighbors = set(graph.predecessors(node))
-        if node != 'start':
-            in_neighbors.remove(canonical_path[i - 1])
-        if sum(
-                _n_genes(graph, src, node) >= min_genes
-                for src in in_neighbors) >= 1:
-            destinies[node] = i
-    return sources, destinies
-
-
-def _get_genes(graph, src, dst):
-    """
-    Return the set of genes in the edge (src, dst).
-    """
-    return set(graph.get_edge_data(src, dst)['genes'].split(','))
-
-
-def _is_alternative_path(  # noqa pylint: disable=too-many-arguments
-        graph,
-        path,
-        canonical_set,
-        i,
-        j,
-        min_genes=1):
-    """
-    Return the set of genes if the given path is alternative to the canonical.
-
-    Otherwise, it returns an empty set (False).
-    """
-    internal_nodes = path[1:-1]
-
-    if (not internal_nodes) and (j - i == 1):
-        return set()
-
-    for node in internal_nodes:
-        if node in canonical_set:
-            return set()
-
-    n_nodes = len(path)
-
-    genes = _get_genes(graph, path[0], path[1])
-
-    if len(genes) < min_genes:
-        return set()
-
-    for k in range(2, n_nodes):
-        genes.intersection_update(_get_genes(graph, path[k - 1], path[k]))
-
-    if len(genes) >= min_genes:
-        return genes
-
-    return set()
-
-
-def _genes_canonical(memo, graph, canonical_path, i, j):
-    """
-    Return the set of genes in the canonical path, it does memoization.
-    """
-    if (i, j) not in memo:
-        genes = _get_genes(graph, canonical_path[i], canonical_path[i + 1])
-        for k in range(i + 1, j):
-            genes.intersection_update(
-                _get_genes(graph, canonical_path[k], canonical_path[k + 1]))
-        memo[(i, j)] = genes
-
-    return memo[(i, j)]
-
-
-def _is_mutually_exclusive(graph, canonical_internal, alternative_internal):
-    """
-    Return true if the is no edges between the paths.
-    """
-    for i in canonical_internal:
-        for j in alternative_internal:
-            if graph.has_edge(i, j) or graph.has_edge(j, i):
-                return False
-    return True
-
-
-def _define_aes(graph, canonical_path, i, j, alternative_path):
-    """
-    Return a string indicating the kind of alternative splicing event.
-    """
-    canonical_internal = canonical_path[i + 1:j]
-    alternative_internal = alternative_path[1:-1]
-    if canonical_path[i] == 'start':
-        return "alternative_start"
-    if canonical_path[j] == 'stop':
-        return "alternative_end"
-    if not canonical_internal:
-        return "insertion"
-    if not alternative_internal:
-        return "deletion"
-    if _is_mutually_exclusive(graph, canonical_internal, alternative_internal):
-        return "mutually_exclusive"
-
-    return "alternative"
-
-
-def _setup_graph(graph):
-    """
-    Return a copy of the graph with a distance atribute for all_shortest_paths.
-    """
-    new_graph = graph.copy(as_view=False)
-    nx.set_edge_attributes(
-        new_graph, {(s, t): {
-            'distance':
-            1.0
-            - new_graph.get_edge_data(s, t)['transcript_weighted_conservation']
-        }
-            for (s, t) in new_graph.edges()})
-    return new_graph
-
-
-def _find_alternative_paths(  # noqa pylint: disable=too-many-arguments,too-many-locals
-        splice_graph,
-        sources,
-        destinies,
-        canonical_path,
-        min_genes=1,
-        delim='/'):
-    """
-    Return a list of alternative paths.
-    """
-    memo = {}
-    paths = {
-        'CanonicalPath': [],
-        'AlternativePath': [],
-        'ASE': [],
-        'AlternativePathGeneNumber': [],
-        'AlternativePathGenes': [],
-        'CanonicalPathGeneNumber': [],
-        'CanonicalPathGenes': []
-    }
-    canonical_set = set(canonical_path)
-    graph = _setup_graph(splice_graph)
-    for (src, i) in sources.items():
-        for (dst, j) in destinies.items():
-            if i < j:
-                for path in nx.all_shortest_paths(graph,
-                                                  src,
-                                                  dst,
-                                                  weight='distance'):
-                    genes = _is_alternative_path(graph, path, canonical_set, i,
-                                                 j, min_genes)
-                    if genes:
-                        canonical_genes = _genes_canonical(
-                            memo, graph, canonical_path, i, j)
-                        paths['CanonicalPath'].append(
-                            delim.join(canonical_path[i:j + 1]))
-                        paths['AlternativePath'].append(delim.join(path))
-                        paths['ASE'].append(
-                            _define_aes(graph, canonical_path, i, j, path))
-                        paths['AlternativePathGeneNumber'].append(len(genes))
-                        paths['AlternativePathGenes'].append(
-                            delim.join(sorted(genes)))
-                        paths['CanonicalPathGeneNumber'].append(
-                            len(canonical_genes))
-                        paths['CanonicalPathGenes'].append(
-                            delim.join(sorted(canonical_genes)))
-    data_frame = pd.DataFrame(paths)
-    data_frame.sort_values(
-        ['AlternativePathGeneNumber', 'CanonicalPath', 'AlternativePath'],
-        ascending=False,
-        inplace=True)
-    return data_frame.reindex(columns=[
-        'CanonicalPath', 'AlternativePath', 'ASE', 'CanonicalPathGeneNumber',
-        'CanonicalPathGenes', 'AlternativePathGeneNumber',
-        'AlternativePathGenes'
-    ])
-
-
 def read_splice_graph(graph_file_name):
     """
     Read ThorAxe's splice graph using NetworkX.
@@ -315,6 +114,9 @@ def read_splice_graph(graph_file_name):
 
 
 def _ase_type(ase_canonical, ase_alternative):
+    """
+    Return the type of ASE, it does not define mutual exclusivity.
+    """
     ase_type = ""
     if len(ase_canonical) == 2:
         ase_type = "insertion"
@@ -329,7 +131,7 @@ def _ase_type(ase_canonical, ase_alternative):
         ase_type = "alternative_end"
     else:
         ase_type = "alternative"
-    return(ase_type)
+    return (ase_type)
 
 
 def _get_s_exon_paths(s_exon, path_list, s_exon2path):
@@ -339,13 +141,19 @@ def _get_s_exon_paths(s_exon, path_list, s_exon2path):
     It uses s_exon2path to memoize the result.
     """
     if s_exon not in s_exon2path:
-        s_exon2path[s_exon] = set(filter(lambda x: '/' + s_exon + '/' in x, path_list)))
+        s_exon2path[s_exon] = set(
+            filter(lambda x: '/' + s_exon + '/' in x, path_list))
 
     return s_exon2path[s_exon]
 
 
 def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
     key = (s_exon_a, s_exon_b)
+    """
+    Return True if both s-exons are mutually exclusive.
+
+    `exclusives` and `s_exon2path` are dictionaries used to memoize results.
+    """
     if key not in exclusives:
         a_paths = _get_s_exon_paths(s_exon_a, path_list, s_exon2path)
         b_paths = _get_s_exon_paths(s_exon_b, path_list, s_exon2path)
@@ -355,42 +163,25 @@ def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
     return exclusives[key]
 
 
-def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives, s_exon2path):
+def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives,
+               s_exon2path):
+    """
+    Return a three elements tuple about the mutually exclusivity of the ASE.
+    """
     exclusive_canonical = []
     exclusive_alternative = []
     me_status = "mutually_exclusive"
     for alt in alternative_s_exons:
         for can in canonical_s_exons:
-            if _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
+            if _are_eclusives(can, alt, path_list, exclusives, s_exon2path):
                 exclusive_canonical.append(can)
                 exclusive_alternative.append(alt)
             else:
                 me_status = "partially_mutually_exclusive"
+    if len(exclusive_canonical) == 0:  # == exclusive_alternative
+        me_status = ""
 
     return exclusive_canonical, exclusive_alternative, me_status
-
-
-def _exclusive(paths, canonical_s_exons, alternative_s_exons):
-    selected_paths = set()
-    # we initialize the status at partially mutually exclusive
-    me = "pMe"
-    for se in canonical_s_exons:
-        selected_paths = selected_paths.union(
-            set(filter(lambda x: '/' + se + '/' in x, paths)))
-    alternative_filtered = []
-    for se in alternative_s_exons:
-        if not list(filter(lambda x: '/' + se + '/' in x, selected_paths)):
-            alternative_filtered.append(se)
-    if len(alternative_filtered) > 0:
-        # if none of the elements in se were removed
-        if len(alternative_s_exons) == len(alternative_filtered):
-            # then the sets are fully mutually exclusive
-            me = "ME"
-        # conditional return: if the alternative_filtered is empty, the function returns none
-        return(','.join(canonical_s_exons), ','.join(alternative_filtered), me)
-
-
-PathData = namedtuple('PathData', ['Genes', 'Transcripts'])
 
 
 def _get_path_dict(path_table):
@@ -407,8 +198,8 @@ def _get_path_dict(path_table):
     for row in path_table.itertuples():
         if row.Path not in path_dict:
             path_list.append(row.Path)
-            path_dict[row.Path] = PathData(
-                {row.GeneID}, {row.TranscriptIDCluster})
+            path_dict[row.Path] = PathData({row.GeneID},
+                                           {row.TranscriptIDCluster})
         else:
             path_dict[row.Path].Genes.add(row.GeneID)
             path_dict[row.Path].Transcripts.add(row.TranscriptIDCluster)
@@ -421,35 +212,49 @@ def _subpath_data(subpath, path_dict, subpath_dict):
 
     This function memoizes using `subpath_dict`.
     """
-       if subpath not in subpath_dict:
-            subpath_dict[subpath] = PathData(set(), set())
-            for (path, path_data) in path_dict.items():
-                if subpath in path:
-                    subpath_dict[subpath].Genes.update(path_data.Genes)
-                    subpath_dict[subpath].Transcripts.update(
-                        path_data.Transcripts)
-        return subpath_dict[subpath]
+    if subpath not in subpath_dict:
+        subpath_dict[subpath] = PathData(set(), set())
+        for (path, path_data) in path_dict.items():
+            if subpath in path:
+                subpath_dict[subpath].Genes.update(path_data.Genes)
+                subpath_dict[subpath].Transcripts.update(path_data.Transcripts)
+    return subpath_dict[subpath]
 
 
-def _detect_ase(path_table, min_genes=1, delim='/'):
+def detect_ases(path_table, min_genes=1, delim='/'):
+    """
+    Return a dictionary from ASEs to their data.
+
+    It takes as imput a pandas DataFrame object with the path table.
+    Each key of the output dictionary is a tuple
+    (canonical_path, alternative_path) and the value is a tuple of:
+
+     - one PathData tuple for the canonical path
+     - and one for the alternative path;
+     - the type of alternative splicing event, e.g. "insertion";
+     - the mutually exclusivity of the event ("" for non mutually exclusive);
+     - one list of mutually exclusive s-exons in canonical paths
+     - and one for the alternative paths.
+
+    The last two list are paired, i.e. the two first s-exons are mutually
+    exclusive.
+    """
     subpath_dict = {}  # memoization dict for _subpath_data
     exclusives = {}  # memoization dict for _exclusive
     s_exon2path = {}  # memoization dict for _exclusive
     path_list, path_dict = _get_path_dict(path_table)
     # the first path is the canonical path
-    canonical = path_list[0].split('/')
-    canonical_node2index = {node : idx for (idx, node) in enumerate(canonical)}
+    canonical = path_list[0].split(delim)
+    canonical_node2index = {node: idx for (idx, node) in enumerate(canonical)}
     # create a dico of events, where each key is a tuple
-    # (canonical_path, alternative_path) and the value is a tuple of:
-    # - a PathData tuple for each path
-    # - the type of alternative splicing event
-    # - a note about the mutually exclusivity of the event
-    # - the mutually exclusive s-exons in the canonical
-    # - and in the alternative paths
+    # (canonical_path, alternative_path) and the value is a tuple
     events = {}
     for joined_path in path_list[1:]:
-        possibly_exclusive = set(["alternative_start", "alternative", "alternative_end", "fully_alternative"])
-        path = joined_path.split("/")
+        possibly_exclusive = set([
+            "alternative_start", "alternative", "alternative_end",
+            "fully_alternative"
+        ])
+        path = joined_path.split(delim)
         # we start at 1 because 0 is necessarily the "start"
         i = 1
         j = 1
@@ -467,15 +272,15 @@ def _detect_ase(path_table, min_genes=1, delim='/'):
                         break
                 # create alternative path
                 ase_alternative = path[(i - 1):(istop + 1)]
-                joined_alternative = "/".join(ase_alternative)
+                joined_alternative = delim.join(ase_alternative)
                 # check whether all its s-exons are present in at least one
                 # species
                 alternative_data = _subpath_data(joined_alternative, path_dict,
-                    subpath_dict)
+                                                 subpath_dict)
                 if len(alternative_data.Genes) > min_genes:
                     # create the canonical (main) path
                     ase_canonical = canonical[(j - 1):(jstop + 1)]
-                    joined_canonical = "/".join(ase_canonical)
+                    joined_canonical = delim.join(ase_canonical)
                     # create the event as a tuple of canonical (main) and
                     # alternative paths
                     event = (joined_canonical, joined_alternative)
@@ -484,28 +289,73 @@ def _detect_ase(path_table, min_genes=1, delim='/'):
                     if event not in events:
                         # get data for the canonical path
                         canonical_data = _subpath_data(joined_canonical,
-                            path_dict, subpath_dict)
+                                                       path_dict, subpath_dict)
                         # determine the ASE type according the classical
                         # classification
                         ase_type = _ase_type(ase_canonical, ase_alternative)
                         # determine whether part of all of the alternative path
                         # is mutually exclusive with the canonical (main) path
                         me_status = ""
+                        me_can = []
+                        me_alt = []
                         if ase_type in possibly_exclusive:
                             canonical_s_exons = ase_canonical[1:-1]
                             alternative_s_exons = ase_alternative[1:-1]
-                            exclusive_can, exclusive_alt, me_status = _exclusive(
+                            me_can, me_alt, me_status = _exclusive(
                                 canonical_s_exons, alternative_s_exons,
                                 path_list, exclusives, s_exon2path)
-                        # TO DO
-                        events[event] = (alternative_data, canonical_data,
-                            me_status, exclusive_can, exclusive_alt)
+                        events[event] = (canonical_data, alternative_data,
+                                         ase_type, me_status, me_can, me_alt)
                 i = istop + 1
                 j = jstop + 1
             else:
                 i += 1
                 j += 1
     return events
+
+
+def create_ases_table(events, delim='/'):
+    """
+    Create an ASE data frame from the dictionary returned by `detect_ases`.
+    """
+    paths = {
+        'CanonicalPath': [],
+        'AlternativePath': [],
+        'ASE': [],
+        'MutualExclusivity': [],
+        'MutualExclusiveCanonical': [],
+        'MutualExclusiveAlternative': [],
+        'CanonicalPathTranscripts': [],
+        'AlternativePathTranscripts': [],
+        'CanonicalPathGenes': [],
+        'AlternativePathGenes': [],
+        'CommonGenes': [],
+        'NumberOfCommonGenes': [],
+    }
+    for (key, value) in events.items():
+        paths['CanonicalPath'].append(key[0])
+        paths['AlternativePath'].append(key[1])
+        paths['ASE'].append(value[2])
+        paths['MutualExclusivity'].append(value[3])
+        paths['MutualExclusiveCanonical'].append(delim.join(value[4]))
+        paths['MutualExclusiveAlternative'].append(delim.join(value[5]))
+        paths['CanonicalPathTranscripts'].append(
+            delim.join(sorted(value[0].Transcripts)))
+        paths['AlternativePathTranscripts'].append(
+            delim.join(sorted(value[1].Transcripts)))
+        can_genes = value[0].Genes
+        alt_genes = value[1].Genes
+        paths['CanonicalPathGenes'].append(delim.join(sorted(can_genes)))
+        paths['AlternativePathGenes'].append(delim.join(sorted(alt_genes)))
+        common_genes = can_genes.intersection(alt_genes)
+        paths['CommonGenes'].append(delim.join(sorted(common_genes)))
+        paths['NumberOfCommonGenes'].append(len(common_genes))
+    data_frame = pd.DataFrame(paths)
+    data_frame.sort_values(
+        ['NumberOfCommonGenes', 'CanonicalPath', 'AlternativePath'],
+        ascending=False,
+        inplace=True)
+    return data_frame
 
 
 def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
@@ -516,9 +366,7 @@ def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     - A table of the conserved alternative splicing events detected.
     """
     graph = read_splice_graph(graph_file_name)
-    path_table, canonical_path = get_canonical_path(table, graph)
-    sources, destinies = _get_sources_and_destinies(graph, canonical_path,
-                                                    min_genes)
-    return path_table, _find_alternative_paths(graph, sources, destinies,
-                                               canonical_path, min_genes,
-                                               delim)
+    path_table = get_transcript_scores(table, graph)
+    events = detect_ases(path_table, min_genes=min_genes, delim=delim)
+    ases_table = create_ases_table(events, delim=delim)
+    return path_table, ases_table
