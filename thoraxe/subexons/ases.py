@@ -27,7 +27,7 @@ def _get_seq(string):
 
 
 def get_transcript_scores(  # pylint: disable=too-many-locals
-    table, graph, delim='/'):
+        table, graph, delim='/'):
     """
     Return a DataFrame with the needed data to choose the canonical path.
     """
@@ -147,12 +147,12 @@ def _get_s_exon_paths(s_exon, path_list, s_exon2path):
 
 
 def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
-    key = (s_exon_a, s_exon_b)
     """
     Return True if both s-exons are mutually exclusive.
 
     `exclusives` and `s_exon2path` are dictionaries used to memoize results.
     """
+    key = (s_exon_a, s_exon_b)
     if key not in exclusives:
         a_paths = _get_s_exon_paths(s_exon_a, path_list, s_exon2path)
         b_paths = _get_s_exon_paths(s_exon_b, path_list, s_exon2path)
@@ -234,19 +234,19 @@ def _transcript_weighted_conservation(subpath_data, gene2transcripts):
     """
     Return the transcript weighted conservation of a given subpath.
     """
-    sum = 0.0
+    acc = 0.0
     for gene in subpath_data.Genes:
         gene_transcripts = gene2transcripts[gene]
-        sum += (
+        acc += (
             (len(gene_transcripts.intersection(subpath_data.Transcripts))) /
             len(gene_transcripts))
-    return sum / len(gene2transcripts)
+    return acc / len(gene2transcripts)
 
 
 def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
-    path_table,
-    min_genes=1,
-    delim='/'):
+        path_table,
+        min_genes=1,
+        delim='/'):
     """
     Return a dictionary from ASEs to their data.
 
