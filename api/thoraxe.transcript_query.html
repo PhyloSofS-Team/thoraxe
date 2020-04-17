@@ -180,41 +180,41 @@
 <p>Un premier jeu de fonctions pour faire des requêtes directement avec
 l’API RESTfull de ENSEMBL afin de récupérer tous les gènes homologues
 à un gene donné (par son nom courant)</p>
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.dictseq2fasta">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">dictseq2fasta</code><span class="sig-paren">(</span><em class="sig-param">dseq</em>, <em class="sig-param">geneid</em>, <em class="sig-param">out</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.dictseq2fasta" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">dictseq2fasta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dseq</span></em>, <em class="sig-param"><span class="n">geneid</span></em>, <em class="sig-param"><span class="n">out</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.dictseq2fasta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write fasta sequences from the exons.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.filter_ortho">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">filter_ortho</code><span class="sig-paren">(</span><em class="sig-param">dortho</em>, <em class="sig-param">species=None</em>, <em class="sig-param">relationship='1:n'</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.filter_ortho" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">filter_ortho</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dortho</span></em>, <em class="sig-param"><span class="n">species</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">relationship</span><span class="o">=</span><span class="default_value">'1:n'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.filter_ortho" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter the dictionary of orthologues according to the list of names.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.generic_ensembl_rest_request">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">generic_ensembl_rest_request</code><span class="sig-paren">(</span><em class="sig-param">extension</em>, <em class="sig-param">params</em>, <em class="sig-param">header</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.generic_ensembl_rest_request" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">generic_ensembl_rest_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">extension</span></em>, <em class="sig-param"><span class="n">params</span></em>, <em class="sig-param"><span class="n">header</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.generic_ensembl_rest_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a generic request.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_biomart_exons_annot">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_biomart_exons_annot</code><span class="sig-paren">(</span><em class="sig-param">species_name</em>, <em class="sig-param">geneid</em>, <em class="sig-param">header=True</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_biomart_exons_annot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_biomart_exons_annot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">species_name</span></em>, <em class="sig-param"><span class="n">geneid</span></em>, <em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_biomart_exons_annot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return transcript information from a ensembl geneid and species name.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_exons_sequences">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_exons_sequences</code><span class="sig-paren">(</span><em class="sig-param">listensexons</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_exons_sequences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_exons_sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listensexons</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_exons_sequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return exon sequences.</p>
 <p>From a list of ensembl exons id, it gets the list of exons with their
 sequences.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_geneids_from_symbol">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_geneids_from_symbol</code><span class="sig-paren">(</span><em class="sig-param">species</em>, <em class="sig-param">symbol</em>, <em class="sig-param">**params</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_geneids_from_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_geneids_from_symbol</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">species</span></em>, <em class="sig-param"><span class="n">symbol</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_geneids_from_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return gene ID from symbol.</p>
 <p>From a species and a symbol, return the set of geneids corresponding
 to the gene symbol given.
@@ -222,39 +222,39 @@ Uses the /xrefs/symbol RESTfull command
 example: get_geneids_from_symbol(“human”, “MAPK8”)</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_genetree">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_genetree</code><span class="sig-paren">(</span><em class="sig-param">ensgeneid</em>, <em class="sig-param">**params</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_genetree" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_genetree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensgeneid</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_genetree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the gene tree.</p>
 <p>Get the gene tree around the gene geneid as of now, the whole tree
 is returned.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_listofexons">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_listofexons</code><span class="sig-paren">(</span><em class="sig-param">ensgeneid</em>, <em class="sig-param">**params</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_listofexons" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_listofexons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensgeneid</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_listofexons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return list of exons.</p>
 <p>From an ensembl gene id, gets the list of exons that are composing this
 gene by default restricted to the coding exons.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_listoftranscripts">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_listoftranscripts</code><span class="sig-paren">(</span><em class="sig-param">ensgeneid</em>, <em class="sig-param">species</em>, <em class="sig-param">**params</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_listoftranscripts" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_listoftranscripts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensgeneid</span></em>, <em class="sig-param"><span class="n">species</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_listoftranscripts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return list of transcripts.</p>
 <p>From an ensembl gene id, gets the list of transcripts overlapping
 this gene.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_orthologs">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_orthologs</code><span class="sig-paren">(</span><em class="sig-param">ensgeneid</em>, <em class="sig-param">**params</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_orthologs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_orthologs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensgeneid</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_orthologs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the orthologs from the gene with id ensgeneid.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.get_transcripts_orthologs">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_transcripts_orthologs</code><span class="sig-paren">(</span><em class="sig-param">ensgeneid</em>, <em class="sig-param">lorthologs</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_transcripts_orthologs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">get_transcripts_orthologs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensgeneid</span></em>, <em class="sig-param"><span class="n">lorthologs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.get_transcripts_orthologs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return transcript list from orthologs.</p>
 <p>Wrapper function to call multiple times get_listoftranscripts, given
 a ensembl geneid and a list of orthologs provided by get_orthologs
@@ -275,9 +275,9 @@ data structure:</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.lodict2csv">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">lodict2csv</code><span class="sig-paren">(</span><em class="sig-param">listofdicts</em>, <em class="sig-param">out</em>, <em class="sig-param">fnames=None</em>, <em class="sig-param">header=True</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.lodict2csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">lodict2csv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">listofdicts</span></em>, <em class="sig-param"><span class="n">out</span></em>, <em class="sig-param"><span class="n">fnames</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">header</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.lodict2csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a dictionary list with csv formatting to the stream out.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -290,13 +290,13 @@ otherwise all keys occuring at least once are used.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.main">
 <code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main script function to download transcript data from ENSEMBL.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.parse_command_line">
 <code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">parse_command_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.parse_command_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse command line.</p>
@@ -304,15 +304,15 @@ otherwise all keys occuring at least once are used.</p></li>
 returns the argparse parser.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.save_ensembl_version">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">save_ensembl_version</code><span class="sig-paren">(</span><em class="sig-param">output_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.save_ensembl_version" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">save_ensembl_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output_folder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.save_ensembl_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save a ensembl_version.txt file with the version number of Ensembl.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="thoraxe.transcript_query.transcript_query.write_tsl_file">
-<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">write_tsl_file</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">l_of_sptr</em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.write_tsl_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_query.transcript_query.</code><code class="sig-name descname">write_tsl_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">l_of_sptr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_query.transcript_query.write_tsl_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a TSL file from a list of transcripts.</p>
 </dd></dl>
 

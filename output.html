@@ -86,11 +86,15 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Output description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#transcript-query">transcript_query</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#thoraxe">thoraxe</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#splice-graph">Splice graph</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tables">Tables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#s-exon-table">S-exon table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#path-table">Path table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#table-of-alternative-splicing-events">Table of Alternative Splicing Events</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#splice-graph">Splice graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
 </ul>
 </li>
 </ul>
@@ -184,7 +188,15 @@ indicated species:</p>
 </pre></div>
 </div>
 <p>The <cite>ensembl_version.csv</cite> file contains a table with information about the
-download date and hour together with the <em>Ensembl</em> version.</p>
+download date and hour together with the <em>Ensembl Genomes</em> version.</p>
+<p><cite>sequences.fasta</cite> contains the CDS sequence of each downloaded exon. You can
+find the used genome assembly in the sequence name/description. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="n">homo_sapiens</span><span class="p">:</span><span class="n">MAPK8</span> <span class="n">ENSE00003837028</span> <span class="n">chromosome</span><span class="p">:</span><span class="n">GRCh38</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">48306753</span><span class="p">:</span><span class="mi">48306821</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">CGGCGACCACCCCGGACGGCCCCTGTCCCCGCTGGCGGGCTTCCCTGTCGCCGTTCGCTGCGCTGCCGG</span>
+</pre></div>
+</div>
+<p>It’s the entry for <strong>MAPK8</strong> exon <cite>ENSE00003837028</cite> from chromosome <strong>10</strong> in
+the assembly <strong>GRCh38</strong>.</p>
 </div>
 <div class="section" id="thoraxe">
 <h2>thoraxe<a class="headerlink" href="#thoraxe" title="Permalink to this headline">¶</a></h2>
@@ -233,16 +245,29 @@ optionals.</p>
     └── splice_graph.gml
 </pre></div>
 </div>
+<p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
+<cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
+look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
+<div class="section" id="tables">
+<h3>Tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h3>
+<p><em>ThorAxe</em> outputs three tidy (denormalized) tables rather than a normalized
+database: <cite>s_exon_table.csv</cite>, <cite>path_table.csv</cite> and <cite>ases_table.csv</cite>.  These
+tables are comma-separated files easily read by <a class="reference external" href="https://www.r-project.org/">R</a>, <a class="reference external" href="https://www.python.org/">Python</a> (using <a class="reference external" href="https://pandas.pydata.org/">pandas</a>) or
+<a class="reference external" href="https://julialang.org/">Julia</a> (using <a class="reference external" href="https://github.com/JuliaData/CSV.jl">CSV</a> and <a class="reference external" href="https://github.com/JuliaData/DataFrames.jl">DataFrames</a>) among other software tools. When a cell
+should include a list of elements, <em>ThorAxe</em> uses by default the character <cite>/</cite>
+as the delimiter between the list elements. The stored list can easily
+re-create by using <cite>strsplit</cite> in <em>R</em>, the <cite>split</cite> string method in <em>Python</em> or
+the <cite>split</cite> function in <em>Julia</em>.</p>
+<div class="section" id="s-exon-table">
+<h4>S-exon table<a class="headerlink" href="#s-exon-table" title="Permalink to this headline">¶</a></h4>
 <p>The <cite>s_exon_table.csv</cite> file has the tidy (denormalized) output data for
 the <strong>orthologous exonic regions (s-exons)</strong>. Each row is an observation of an
 s-exon in a particular transcript. Rows are in order, following the s-exon rank.
 That means that the concatenation of the s-exon sequences for each
 transcript gives the protein isoform sequence.</p>
-<p>The <cite>splice_graph.gml</cite> is the splice graph of s-exons in all the
-transcripts/species using the human-readable <em>Graph Modelling Language</em> (GML)
-format. Each node and edge has conservation information, where conservation
-means the fraction of species showing that particular node (s-exon) or
-connection.</p>
+</div>
+<div class="section" id="path-table">
+<h4>Path table<a class="headerlink" href="#path-table" title="Permalink to this headline">¶</a></h4>
 <p>The <cite>path_table.csv</cite> contains information about each transcript as a path in
 the splice graph. The first row indicates the <em>canonical path</em>. The canonical
 path is used to detect alternative splicing events automatically, and it is
@@ -251,16 +276,43 @@ minimal value of <cite>transcript_weighted_conservation</cite>, and it is the lo
 alternative splicing events are stored in the <cite>ases_table.csv</cite> file where the
 canonical path and the alternative are indicated, together with conservation
 (number of genes showing the path) information.</p>
-<p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
-<cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
-look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
+</div>
+<div class="section" id="table-of-alternative-splicing-events">
+<h4>Table of Alternative Splicing Events<a class="headerlink" href="#table-of-alternative-splicing-events" title="Permalink to this headline">¶</a></h4>
+<p>ThorAxe automatically detects alternative splicing events by comparing each
+transcript/path to the canonical path in the splice graph. The <cite>ases_table.csv</cite>
+file stores these detected events. The table identifies each event using the
+first two columns: <cite>CanonicalPath</cite> and <cite>AlternativePath</cite>. These columns store
+the list of nodes that forms the alternative subpaths in the canonical and
+<em>alternative</em> (non-canonical) path. First, <em>ThorAxe</em> classifies each event,
+respect to the canonical path, as <cite>insertion</cite>, <cite>deletion</cite> ,
+<cite>fully_alternative</cite>, <cite>alternative_start</cite>, <cite>alternative_end</cite> or simply
+<cite>alternative</cite>.  The <cite>ASE</cite> column stores this classification. The events,
+excepting insertions and deletions, are further classified according to their
+number of mutually exclusive s-exons pairs into: <cite>mutually_exclusive</cite>,
+<cite>partially_mutually_exclusive</cite> and not mutually exclusive (empty cell). The
+<cite>MutualExclusivity</cite> column stores this classification. The
+<cite>MutualExclusiveCanonical</cite> and <cite>MutualExclusiveAlternative</cite> columns stores two
+paired list indicating the mutually exclusive s-exon pairs. For example, an
+event having <cite>15_0/15_1</cite> in <cite>MutualExclusiveCanonical</cite> and <cite>7_5/7_5</cite> in
+<cite>MutualExclusiveAlternative</cite>, means that s-exon <cite>15_0</cite> is mutually exclusive
+with s-exon <cite>7_5</cite> and that <cite>15_1</cite> is also mutually exclusive with <cite>7_5</cite>. Here,
+mutually exclusive means that there is no transcript in the path table showing
+both s-exons.</p>
+</div>
+</div>
 <div class="section" id="splice-graph">
 <h3>Splice graph<a class="headerlink" href="#splice-graph" title="Permalink to this headline">¶</a></h3>
 <p><em>ThorAxe</em> splice graph as <em>s-exons</em>, rather than exon, as nodes. Using <em>s-exon</em>
 allows us to represent transcripts from different species in the same splice
 graph. As a consequence, the edges indicate the connectivity between these
-exonic regions and not necessarily junctions between genomic exons. <em>GML</em> is a
-rich format, and we used it to store useful metadata for nodes and edges:</p>
+exonic regions and not necessarily junctions between genomic exons. <em>ThorAxe</em>
+splice graph has conservation information, where conservation means the
+fraction or transcript weighted fraction of species showing a particular node
+(s-exon) or connection. The <cite>splice_graph.gml</cite> file stores this splice graph
+of s-exons using the human-readable <em>Graph Modelling Language</em> (GML) format.
+<em>GML</em> is a rich format, and we used it to store useful metadata for nodes and
+edges:</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 41%" />
@@ -303,8 +355,9 @@ showing that node/edge.</p></td>
 <p>If <em>ThorAxe’s</em> <cite>transcript_query</cite> is run with <cite>–orthology 1:1</cite> (default),
 the number of genes is identical to the number of species in the dataset.</p>
 </div>
+</div>
 <div class="section" id="phylosofs">
-<h4>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h4>
+<h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this headline">¶</a></h3>
 <p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and molecular
 modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. It is only generated when the <cite>–phylosofs</cite>
 optional argument is used.
@@ -315,7 +368,7 @@ The mapping between the id for <em>PhyloSofS</em> and the one of <em>ThorAxe</em
 <p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
 </div>
 <div class="section" id="intermediate-outputs">
-<h4>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this headline">¶</a></h4>
+<h3>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this headline">¶</a></h3>
 <p>The <cite>_intermediate</cite> folder has intermediate files and states from the <em>ThorAxe</em>
 pipeline. In particular, <cite>cluster_plots.html</cite> has the interactive plots of the
 chimeric alignments, with the possibility to show the <cite>constitutive</cite> value
@@ -327,7 +380,6 @@ calculated for each subexon. This plot is only generated when the
 all the information needed to plot all the generated multiple sequence alignments
 using <em>Plotly</em>. It can freeze the tab when a lot of sequences/species are used or
 if the computer hasn’t enough resources available.</p>
-</div>
 </div>
 </div>
 </div>
