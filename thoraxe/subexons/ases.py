@@ -8,7 +8,6 @@ import collections
 import networkx as nx
 import pandas as pd
 
-
 PathData = collections.namedtuple('PathData', ['Genes', 'Transcripts'])
 
 
@@ -131,7 +130,7 @@ def _ase_type(ase_canonical, ase_alternative):
         ase_type = "alternative_end"
     else:
         ase_type = "alternative"
-    return (ase_type)
+    return ase_type
 
 
 def _get_s_exon_paths(s_exon, path_list, s_exon2path):
@@ -221,7 +220,33 @@ def _subpath_data(subpath, path_dict, subpath_dict):
     return subpath_dict[subpath]
 
 
-def detect_ases(path_table, min_genes=1, delim='/'):
+def _gene2transcripts(path_table):
+    """
+    Return a Dict from `GeneID` to `TranscriptIDCluster` from the `path_table`.
+    """
+    gene2transcripts = collections.defaultdict(set)
+    for row in path_table.itertuples():
+        gene2transcripts[row.GeneID].add(row.TranscriptIDCluster)
+    return gene2transcripts
+
+
+def _transcript_weighted_conservation(subpath_data, gene2transcripts):
+    """
+    Return the transcript weighted conservation of a given subpath.
+    """
+    sum = 0.0
+    for gene in subpath_data.Genes:
+        gene_transcripts = gene2transcripts[gene]
+        sum += (
+            (len(gene_transcripts.intersection(subpath_data.Transcripts))) /
+            len(gene_transcripts))
+    return sum / len(gene2transcripts)
+
+
+def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
+    path_table,
+    min_genes=1,
+    delim='/'):
     """
     Return a dictionary from ASEs to their data.
 
@@ -231,6 +256,8 @@ def detect_ases(path_table, min_genes=1, delim='/'):
 
      - one PathData tuple for the canonical path
      - and one for the alternative path;
+     - the transcript weighted conservation for the canonical sub-path,
+     - and for the alternative sub-path,
      - the type of alternative splicing event, e.g. "insertion";
      - the mutually exclusivity of the event ("" for non mutually exclusive);
      - one list of mutually exclusive s-exons in canonical paths
@@ -242,6 +269,7 @@ def detect_ases(path_table, min_genes=1, delim='/'):
     subpath_dict = {}  # memoization dict for _subpath_data
     exclusives = {}  # memoization dict for _exclusive
     s_exon2path = {}  # memoization dict for _exclusive
+    gene2transcripts = _gene2transcripts(path_table)
     path_list, path_dict = _get_path_dict(path_table)
     # the first path is the canonical path
     canonical = path_list[0].split(delim)
@@ -304,8 +332,15 @@ def detect_ases(path_table, min_genes=1, delim='/'):
                             me_can, me_alt, me_status = _exclusive(
                                 canonical_s_exons, alternative_s_exons,
                                 path_list, exclusives, s_exon2path)
+                        # transcript weighted conservation for both sub-paths
+                        twc_can = _transcript_weighted_conservation(
+                            canonical_data, gene2transcripts)
+                        twc_alt = _transcript_weighted_conservation(
+                            alternative_data, gene2transcripts)
+                        # store alternative splicing event
                         events[event] = (canonical_data, alternative_data,
-                                         ase_type, me_status, me_can, me_alt)
+                                         twc_can, twc_alt, ase_type, me_status,
+                                         me_can, me_alt)
                 i = istop + 1
                 j = jstop + 1
             else:
@@ -325,8 +360,8 @@ def create_ases_table(events, delim='/'):
         'MutualExclusivity': [],
         'MutualExclusiveCanonical': [],
         'MutualExclusiveAlternative': [],
-        'CanonicalPathTranscripts': [],
-        'AlternativePathTranscripts': [],
+        'CanonicalPathTranscriptWeightedConservation': [],
+        'AlternativePathTranscriptWeightedConservation': [],
         'CanonicalPathGenes': [],
         'AlternativePathGenes': [],
         'CommonGenes': [],
@@ -335,14 +370,12 @@ def create_ases_table(events, delim='/'):
     for (key, value) in events.items():
         paths['CanonicalPath'].append(key[0])
         paths['AlternativePath'].append(key[1])
-        paths['ASE'].append(value[2])
-        paths['MutualExclusivity'].append(value[3])
-        paths['MutualExclusiveCanonical'].append(delim.join(value[4]))
-        paths['MutualExclusiveAlternative'].append(delim.join(value[5]))
-        paths['CanonicalPathTranscripts'].append(
-            delim.join(sorted(value[0].Transcripts)))
-        paths['AlternativePathTranscripts'].append(
-            delim.join(sorted(value[1].Transcripts)))
+        paths['ASE'].append(value[4])
+        paths['MutualExclusivity'].append(value[5])
+        paths['MutualExclusiveCanonical'].append(delim.join(value[6]))
+        paths['MutualExclusiveAlternative'].append(delim.join(value[7]))
+        paths['CanonicalPathTranscriptWeightedConservation'].append(value[2])
+        paths['AlternativePathTranscriptWeightedConservation'].append(value[3])
         can_genes = value[0].Genes
         alt_genes = value[1].Genes
         paths['CanonicalPathGenes'].append(delim.join(sorted(can_genes)))
@@ -355,6 +388,7 @@ def create_ases_table(events, delim='/'):
         ['NumberOfCommonGenes', 'CanonicalPath', 'AlternativePath'],
         ascending=False,
         inplace=True)
+    data_frame.drop(columns=['NumberOfCommonGenes'], inplace=True)
     return data_frame
 
 

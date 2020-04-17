@@ -1,5 +1,6 @@
 import os
 import pytest
+import numpy as np
 import pandas as pd
 import networkx as nx
 from thoraxe import subexons
@@ -37,8 +38,26 @@ def test_ases(mapk8):
 
     assert list(trx_df.PathGeneNumber) == sorted(trx_df.PathGeneNumber,
                                                  reverse=True)
-    assert list(ases_df.AlternativePathGeneNumber) == sorted(
-        ases_df.AlternativePathGeneNumber, reverse=True)
+    common_gene_num = [len(genes.split('/')) for genes in ases_df.CommonGenes]
+    assert common_gene_num == sorted(common_gene_num, reverse=True)
+
+    select = np.logical_and(ases_df.CanonicalPath == '7_3/15_0/15_1/stop',
+                            ases_df.AlternativePath == '7_3/5_0/stop')
+    assert len(ases_df.MutualExclusivity[select]) == 1
+    assert all(ases_df.MutualExclusivity[select] == "")
+    assert all(ases_df.ASE[select] == "alternative_end")
+    select = np.logical_and(ases_df.CanonicalPath == '13_0/7_2',
+                            ases_df.AlternativePath == '13_0/9_0/7_2')
+    assert not any(select)
+    select = np.logical_and(ases_df.CanonicalPath == '4_0/12_1/3_0',
+                            ases_df.AlternativePath == '4_0/12_0/3_0')
+    assert all(ases_df.MutualExclusivity[select] == "mutually_exclusive")
+    assert all(ases_df.ASE[select] == "alternative")
+    select = np.logical_and(ases_df.CanonicalPath == '7_3/15_0/15_1/stop',
+                            ases_df.AlternativePath == '7_3/7_4/7_5/stop')
+    assert all(
+        ases_df.MutualExclusivity[select] == "partially_mutually_exclusive")
+    assert all(ases_df.ASE[select] == "alternative_end")
 
     data_path_table = pd.read_csv(mapk8['path_table'])
     data_ases_table = pd.read_csv(mapk8['ases_table'])
@@ -51,9 +70,15 @@ def test_ases(mapk8):
             'PathGeneNumber'
     ]:
         assert all(path_table[col].values == data_path_table[col].values)
-    for col in [
-            'CanonicalPath', 'AlternativePath', 'ASE',
-            'CanonicalPathGeneNumber', 'CanonicalPathGenes',
-            'AlternativePathGeneNumber', 'AlternativePathGenes'
+    for col in [  # non-missing and non float columns
+            'CanonicalPath', 'AlternativePath', 'ASE', 'CanonicalPathGenes',
+            'AlternativePathGenes'
     ]:
         assert all(ases_df[col].values == data_ases_table[col].values)
+    for col in [  # float columns
+            'CanonicalPathTranscriptWeightedConservation',
+            'AlternativePathTranscriptWeightedConservation'
+    ]:
+        np.isclose(ases_df[col].values,
+                   data_ases_table[col].values,
+                   rtol=0.0001)
