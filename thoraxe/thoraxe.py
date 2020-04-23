@@ -145,6 +145,21 @@ def get_subexons(  # pylint: disable=too-many-arguments
     return merge_clusters(subexon_table)
 
 
+def _merge_clusters_in_list(cluster_lists):
+    """Return a list of sets, each set has the clusters to merge."""
+    output_list = []
+    for input_list in cluster_lists:
+        input_set = set(input_list)
+        added = False
+        for output_set in output_list:
+            if output_set.intersection(input_set):
+                output_set.update(input_set)
+                added = True
+        if not added:
+            output_list.append(input_set)
+    return output_list
+
+
 def merge_clusters(subexon_table):
     """Merge 'Cluster's that share subexons."""
     clusters_df = subexon_table.groupby('SubexonIDCluster').agg(
@@ -152,7 +167,9 @@ def merge_clusters(subexon_table):
     cluster_lists = clusters_df.loc[map(lambda x: len(
         x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
             repr).drop_duplicates().apply(lambda x: sorted(literal_eval(x)))
-    for clusters in cluster_lists:
+    cluster_sets = _merge_clusters_in_list(cluster_lists)
+    for cluster_set in cluster_sets:
+        clusters = sorted(cluster_set)
         cluster_id = clusters[0]
         for cluster in clusters[1:]:
             cluster_index = subexon_table.index[subexon_table['Cluster'] ==
@@ -236,6 +253,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
                                               min_col_number=min_col_number)
 
 
+
 def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
@@ -286,8 +304,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
                 for index in cluster_index
             ]
             for index in cluster_index[delete]:
-                subexon_table.at[index, 'Cluster'] = -1 * subexon_table.loc[
-                    index, 'Cluster']
+                subexon_table.at[index, 'Cluster'] = -1 * abs(subexon_table.loc[
+                    index, 'Cluster'])
             cluster_index = cluster_index[np.logical_not(delete)]
             to_delete = _create_and_test_chimeric_msa(
                 cluster2data,
