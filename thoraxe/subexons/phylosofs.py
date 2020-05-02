@@ -78,42 +78,41 @@ CHARS = sorted(set(CHARS))
 MAX_EXONS = len(CHARS)
 
 
-def get_exon2char(exons):
+def get_s_exon2char(s_exons):
     """
     Return a dictionary from orthologous regions (s-exon) to a single character.
 
-    >>> result = get_exon2char(['1_0/1_1', '2_0'])
+    >>> result = get_s_exon2char(['1_0', '1_1', '2_0'])
     >>> sorted(result)
     ['1_0', '1_1', '2_0']
-    >>> [result[exon] for exon in sorted(result)]
+    >>> [result[s_exon] for s_exon in sorted(result)]
     ['%', '(', ')']
     """
-    s_exons = {}
+    s_exons_chars = {}
     i = 0
-    for exon in exons:
-        for subexon in str(exon).split('/'):
-            if subexon not in s_exons:
-                if i < MAX_EXONS:
-                    s_exons[subexon] = CHARS[i]
-                    i += 1
-                else:
-                    raise Exception(
-                        'PhyloSofS can not parse more than {} s-exons.'.format(
-                            MAX_EXONS))
-    return s_exons
+    for s_exon in s_exons:
+        if s_exon not in s_exons_chars:
+            if i < MAX_EXONS:
+                s_exons_chars[s_exon] = CHARS[i]
+                i += 1
+            else:
+                raise Exception(
+                    'PhyloSofS can not parse more than {} s-exons.'.format(
+                        MAX_EXONS))
+    return s_exons_chars
 
 
-def get_transcript2phylosofs(data, exon2char):
+def get_transcript2phylosofs(data, s_exon2char):
     """
     Return a dictionary from transcript id to its phylosofs representation.
     """
     transcript2phylosofs = {}
     for _, gene in data.groupby('GeneID'):
-        for transcript_id, transcript in gene.groupby('TranscriptID'):
+        for transcript_id, transcript in gene.groupby('TranscriptIDCluster'):
             phylosofs = []
-            for subexon in transcript.sort_values('SubexonRank')['S_exons']:
+            for subexon in transcript.sort_values('S_exon_Rank')['S_exonID']:
                 for ortholog in subexon.split('/'):
-                    phylosofs.append(exon2char[ortholog])
+                    phylosofs.append(s_exon2char[ortholog])
             transcript2phylosofs[transcript_id] = ''.join(phylosofs)
     return transcript2phylosofs
 
@@ -181,22 +180,20 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     return output_tree
 
 
-def _fill_sequence_and_annotation(df_group, exon2char):
+def _fill_sequence_and_annotation(df_group, s_exon2char):
     """Create a list of sequences and s-exons (annotation)."""
-    exon_annot = []
+    s_exon_annot = []
     seqs = []
     for row in df_group.itertuples():
-        seq = str(row.SubexonProteinSequence).replace('*', '')
-        exons = split.split_exons(row.S_exons)
-        exon_lengths = split.split_lengths(row.S_exon_Lengths, seq)
-        for exon, length in zip(exons, exon_lengths):
-            for _ in range(length):
-                exon_annot.append(exon2char[exon])
+        s_exon = s_exon2char[row.S_exonID]
+        seq = str(row.S_exon_Sequence).replace('*', '')
+        for _ in range(len(seq)):
+            s_exon_annot.append(s_exon)
         seqs.append(seq)
-    return "".join(seqs), "".join(exon_annot)
+    return "".join(seqs), "".join(s_exon_annot)
 
 
-def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
+def _transcript_pir(s_exon_data, output_file, s_exon2char, transcript2phylosofs):
     """
     Create a PIR file with transcript sequences.
 
@@ -207,14 +204,14 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
         with warnings.catch_warnings():
             # Bio/Seq.py : class Seq : __hash__ : warnings.warn
             warnings.simplefilter('ignore', BiopythonWarning)
-            groups = exon_data.loc[:, [
-                'GeneID', 'TranscriptID', 'SubexonProteinSequence',
-                'SubexonRank', 'S_exons', 'S_exon_Lengths', 'S_exon_Sequences'
+            groups = s_exon_data.loc[:, [
+                'GeneID', 'TranscriptIDCluster', 'S_exon_Sequence',
+                'S_exon_Rank', 'S_exonID'
             ]].drop_duplicates().sort_values(
-                by=['GeneID', 'TranscriptID', 'SubexonRank']).groupby(
-                    ['GeneID', 'TranscriptID'])
+                by=['GeneID', 'TranscriptIDCluster', 'S_exon_Rank']).groupby(
+                    ['GeneID', 'TranscriptIDCluster'])
         for (gene, transcript), group in groups:
-            seq, annot = _fill_sequence_and_annotation(group, exon2char)
+            seq, annot = _fill_sequence_and_annotation(group, s_exon2char)
             file.write(">P1;{} {} {}\n".format(
                 gene, transcript, transcript2phylosofs[transcript]))
             file.write(annot + "\n")
@@ -222,16 +219,17 @@ def _transcript_pir(exon_data, output_file, exon2char, transcript2phylosofs):
     return output_file
 
 
-def _save_transcripts(exon_data, output_file, transcript2phylosofs):
+def _save_transcripts(s_exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
     with open(output_file, 'w', encoding='utf-8') as file:
-        gene_transcripts = exon_data.loc[:, ['GeneID', 'TranscriptID'
-                                             ]].sort_values(
-                                                 by=['GeneID', 'TranscriptID'
-                                                     ]).drop_duplicates()
+        gene_transcripts = s_exon_data.loc[:, ['GeneID', 'TranscriptIDCluster'
+                                               ]].sort_values(
+            by=['GeneID',
+                'TranscriptIDCluster'
+                ]).drop_duplicates()
         for gene, group in gene_transcripts.groupby('GeneID'):
             file.write("{} ".format(gene))
-            transcripts = group['TranscriptID']
+            transcripts = group['TranscriptIDCluster']
             n_transcripts = len(transcripts)
             for i in range(n_transcripts):
                 file.write(transcript2phylosofs[transcripts.iloc[i]])
@@ -242,29 +240,29 @@ def _save_transcripts(exon_data, output_file, transcript2phylosofs):
     return output_file
 
 
-def phylosofs_inputs(exon_data, ensembl_folder, output_folder):
+def phylosofs_inputs(s_exon_data, ensembl_folder, output_folder):
     """
     Create the input files needed for running PhyloSofS in a phylosofs folder.
     """
     output_path = folders.create_subfolder(output_folder, 'phylosofs')
 
-    exon2char = get_exon2char(exon_data['S_exons'].unique())
-    transcript2phylosofs = get_transcript2phylosofs(exon_data, exon2char)
+    s_exon2char = get_s_exon2char(s_exon_data['S_exonID'].unique())
+    transcript2phylosofs = get_transcript2phylosofs(s_exon_data, s_exon2char)
 
     prune_tree(os.path.join(ensembl_folder, 'tree.nh'),
                os.path.join(output_path, 'tree.nh'),
                os.path.join(ensembl_folder, 'exonstable.tsv'),
-               exon_data['GeneID'].unique())
+               s_exon_data['GeneID'].unique())
 
     with open(os.path.join(output_path, 's_exons.tsv'), 'w',
               encoding='utf-8') as file:
-        for exon, char in exon2char.items():
+        for exon, char in s_exon2char.items():
             file.write("{}\t{}\n".format(exon, char))
 
-    _save_transcripts(exon_data, os.path.join(output_path, 'transcripts.txt'),
+    _save_transcripts(s_exon_data, os.path.join(output_path, 'transcripts.txt'),
                       transcript2phylosofs)
 
-    _transcript_pir(exon_data, os.path.join(output_path, 'transcripts.pir'),
-                    exon2char, transcript2phylosofs)
+    _transcript_pir(s_exon_data, os.path.join(output_path, 'transcripts.pir'),
+                    s_exon2char, transcript2phylosofs)
 
-    return exon2char
+    return s_exon2char

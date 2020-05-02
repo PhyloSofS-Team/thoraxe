@@ -645,17 +645,17 @@ def main():  # pylint: disable=too-many-locals
     subexon_table = update_subexon_table(subexon_table, cluster2data)
     subexon_table = subexons.alignment.impute_missing_s_exon(subexon_table)
 
-    if args.phylosofs:
-        s_exon_2_char = subexons.phylosofs.phylosofs_inputs(
-            subexon_table, os.path.join(input_folder, 'Ensembl'),
-            output_folder)
-    else:
-        s_exon_2_char = {}
-
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
     _add_s_exon_phases_and_coordinates(tidy_table)
     tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"),
                       index=False)
+
+    if args.phylosofs:
+        s_exon_2_char = subexons.phylosofs.phylosofs_inputs(
+            tidy_table, os.path.join(input_folder, 'Ensembl'),
+            output_folder)
+    else:
+        s_exon_2_char = {}
 
     (node2genes, edge2genes, node2transcripts, edge2transcripts, edge2trx_cons
      ) = subexons.graph.nodes_and_edges2genes_and_transcripts(tidy_table)
