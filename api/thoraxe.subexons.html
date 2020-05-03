@@ -427,13 +427,13 @@ conservation is the fraction of species that has that particular feature.</p>
 <span id="thoraxe-subexons-phylosofs-module"></span><h2>thoraxe.subexons.phylosofs module<a class="headerlink" href="#module-thoraxe.subexons.phylosofs" title="Permalink to this headline">¶</a></h2>
 <p>phylosofs: Functions to generate PhyloSofS input.</p>
 <dl class="py function">
-<dt id="thoraxe.subexons.phylosofs.get_exon2char">
-<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">get_exon2char</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exons</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.get_exon2char" title="Permalink to this definition">¶</a></dt>
+<dt id="thoraxe.subexons.phylosofs.get_s_exon2char">
+<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">get_s_exon2char</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s_exons</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.get_s_exon2char" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary from orthologous regions (s-exon) to a single character.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_exon2char</span><span class="p">([</span><span class="s1">&#39;1_0/1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;2_0&#39;</span><span class="p">])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">get_s_exon2char</span><span class="p">([</span><span class="s1">&#39;1_0&#39;</span><span class="p">,</span> <span class="s1">&#39;1_1&#39;</span><span class="p">,</span> <span class="s1">&#39;2_0&#39;</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 <span class="go">[&#39;1_0&#39;, &#39;1_1&#39;, &#39;2_0&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">exon</span><span class="p">]</span> <span class="k">for</span> <span class="n">exon</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="n">s_exon</span><span class="p">]</span> <span class="k">for</span> <span class="n">s_exon</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">)]</span>
 <span class="go">[&#39;%&#39;, &#39;(&#39;, &#39;)&#39;]</span>
 </pre></div>
 </div>
@@ -441,13 +441,13 @@ conservation is the fraction of species that has that particular feature.</p>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.phylosofs.get_transcript2phylosofs">
-<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">get_transcript2phylosofs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">exon2char</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.get_transcript2phylosofs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">get_transcript2phylosofs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">s_exon2char</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.get_transcript2phylosofs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary from transcript id to its phylosofs representation.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.phylosofs.phylosofs_inputs">
-<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">phylosofs_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exon_data</span></em>, <em class="sig-param"><span class="n">ensembl_folder</span></em>, <em class="sig-param"><span class="n">output_folder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.phylosofs_inputs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.phylosofs.</code><code class="sig-name descname">phylosofs_inputs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s_exon_data</span></em>, <em class="sig-param"><span class="n">ensembl_folder</span></em>, <em class="sig-param"><span class="n">output_folder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.phylosofs.phylosofs_inputs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the input files needed for running PhyloSofS in a phylosofs folder.</p>
 </dd></dl>
 
