@@ -11,7 +11,6 @@ from Bio import Phylo
 from Bio import BiopythonWarning
 
 from thoraxe.utils import folders
-from thoraxe.utils import split
 
 CHARS = [
     char for char in string.printable if char not in {
