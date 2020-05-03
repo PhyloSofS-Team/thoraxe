@@ -193,7 +193,8 @@ def _fill_sequence_and_annotation(df_group, s_exon2char):
     return "".join(seqs), "".join(s_exon_annot)
 
 
-def _transcript_pir(s_exon_data, output_file, s_exon2char, transcript2phylosofs):
+def _transcript_pir(s_exon_data, output_file, s_exon2char,
+                    transcript2phylosofs):
     """
     Create a PIR file with transcript sequences.
 
@@ -222,11 +223,11 @@ def _transcript_pir(s_exon_data, output_file, s_exon2char, transcript2phylosofs)
 def _save_transcripts(s_exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
     with open(output_file, 'w', encoding='utf-8') as file:
-        gene_transcripts = s_exon_data.loc[:, ['GeneID', 'TranscriptIDCluster'
-                                               ]].sort_values(
-            by=['GeneID',
-                'TranscriptIDCluster'
-                ]).drop_duplicates()
+        gene_transcripts = s_exon_data.loc[:,
+                                           ['GeneID', 'TranscriptIDCluster'
+                                            ]].sort_values(by=[
+                                                'GeneID', 'TranscriptIDCluster'
+                                            ]).drop_duplicates()
         for gene, group in gene_transcripts.groupby('GeneID'):
             file.write("{} ".format(gene))
             transcripts = group['TranscriptIDCluster']
@@ -259,7 +260,8 @@ def phylosofs_inputs(s_exon_data, ensembl_folder, output_folder):
         for exon, char in s_exon2char.items():
             file.write("{}\t{}\n".format(exon, char))
 
-    _save_transcripts(s_exon_data, os.path.join(output_path, 'transcripts.txt'),
+    _save_transcripts(s_exon_data, os.path.join(output_path,
+                                                'transcripts.txt'),
                       transcript2phylosofs)
 
     _transcript_pir(s_exon_data, os.path.join(output_path, 'transcripts.pir'),
