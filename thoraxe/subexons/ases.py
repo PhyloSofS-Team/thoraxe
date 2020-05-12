@@ -146,7 +146,8 @@ def _get_s_exon_paths(s_exon, path_list, s_exon2path):
     return s_exon2path[s_exon]
 
 
-def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
+def _are_eclusives(s_exon_a, s_exon_b, path_list, path_dict, min_genes,
+                   min_transcripts, exclusives, s_exon2path):
     """
     Return True if both s-exons are mutually exclusive.
 
@@ -157,7 +158,8 @@ def _are_eclusives(s_exon_a, s_exon_b, path_list, exclusives, s_exon2path):
         a_paths = _get_s_exon_paths(s_exon_a, path_list, s_exon2path)
         b_paths = _get_s_exon_paths(s_exon_b, path_list, s_exon2path)
         common_paths = a_paths.intersection(b_paths)
-        exclusives[key] = len(common_paths) == 0
+        paths_data = _genes_and_transcripts(common_paths, path_dict)
+        exclusives[key] = _min_filter(paths_data, min_genes, min_transcripts)
 
     return exclusives[key]
 
@@ -166,6 +168,8 @@ def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives,
                s_exon2path):
     """
     Return a three elements tuple about the mutually exclusivity of the ASE.
+
+    `exclusives` and `s_exon2path` are dictionaries used to memoize results.
     """
     exclusive_canonical = []
     exclusive_alternative = []
@@ -203,6 +207,19 @@ def _get_path_dict(path_table):
             path_dict[row.Path].Genes.add(row.GeneID)
             path_dict[row.Path].Transcripts.add(row.TranscriptIDCluster)
     return path_list, path_dict
+
+
+def _genes_and_transcripts(paths, path_dict):
+    """
+    Return a PathData object with the genes and transcripts in `paths`.
+    """
+    genes = set()
+    transcripts = set()
+    for path in paths:
+        path_data = path_dict[path]
+        genes.update(path_data.Genes)
+        transcripts.update(path_data.Transcripts)
+    return PathData(genes, transcripts)
 
 
 def _subpath_data(subpath, path_dict, subpath_dict):
@@ -243,9 +260,23 @@ def _transcript_weighted_conservation(subpath_data, gene2transcripts):
     return acc / len(gene2transcripts)
 
 
+def _min_filter(path_data, min_genes, min_transcripts):
+    """
+    Return `True` is path_data has more than min_genes and min_transcripts.
+    """
+    if min_genes > 1:
+        if len(path_data.Genes) < min_genes:
+            return False
+    if min_transcripts > 1:
+        if len(path_data.Transcripts) < min_transcripts:
+            return False
+    return True
+
+
 def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
         path_table,
-        min_genes=1,
+        min_genes=0,
+        min_transcripts=1,
         delim='/'):
     """
     Return a dictionary from ASEs to their data.
@@ -305,7 +336,7 @@ def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
                 # species
                 alternative_data = _subpath_data(joined_alternative, path_dict,
                                                  subpath_dict)
-                if len(alternative_data.Genes) > min_genes:
+                if _min_filter(alternative_data, min_genes, min_transcripts):
                     # create the canonical (main) path
                     ase_canonical = canonical[(j - 1):(jstop + 1)]
                     joined_canonical = delim.join(ase_canonical)
@@ -392,7 +423,11 @@ def create_ases_table(events, delim='/'):
     return data_frame
 
 
-def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
+def conserved_ases(table,
+                   graph_file_name,
+                   min_genes=1,
+                   min_transcripts=2,
+                   delim='/'):
     """
     Return two DataFrames.
 
@@ -401,6 +436,9 @@ def conserved_ases(table, graph_file_name, min_genes=1, delim='/'):
     """
     graph = read_splice_graph(graph_file_name)
     path_table = get_transcript_scores(table, graph)
-    events = detect_ases(path_table, min_genes=min_genes, delim=delim)
+    events = detect_ases(path_table,
+                         min_genes=min_genes,
+                         min_transcripts=min_transcripts,
+                         delim=delim)
     ases_table = create_ases_table(events, delim=delim)
     return path_table, ases_table

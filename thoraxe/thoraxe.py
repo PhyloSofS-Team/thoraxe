@@ -61,6 +61,12 @@ def parse_command_line():
                         'the splice graph.',
                         type=int,
                         default=1)
+    parser.add_argument('-t',
+                        '--mintranscripts',
+                        help='Minimum number of transcripts to consider a '
+                        'path in the splice graph.',
+                        type=int,
+                        default=2)
     parser.add_argument(
         '-c',
         '--coverage',
@@ -164,8 +170,8 @@ def merge_clusters(subexon_table):
     """Merge 'Cluster's that share subexons."""
     clusters_df = subexon_table.groupby('SubexonIDCluster').agg(
         {'Cluster': lambda col: set(val for val in col if val != 0)})
-    cluster_lists = clusters_df.loc[map(lambda x: len(
-        x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
+    cluster_lists = clusters_df.loc[
+        map(lambda x: len(x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
             repr).drop_duplicates().apply(lambda x: sorted(literal_eval(x)))
     cluster_sets = _merge_clusters_in_list(cluster_lists)
     for cluster_set in cluster_sets:
@@ -253,7 +259,6 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
                                               min_col_number=min_col_number)
 
 
-
 def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         output_folder,
         subexon_table,
@@ -304,8 +309,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
                 for index in cluster_index
             ]
             for index in cluster_index[delete]:
-                subexon_table.at[index, 'Cluster'] = -1 * abs(subexon_table.loc[
-                    index, 'Cluster'])
+                subexon_table.at[index, 'Cluster'] = -1 * abs(
+                    subexon_table.loc[index, 'Cluster'])
             cluster_index = cluster_index[np.logical_not(delete)]
             to_delete = _create_and_test_chimeric_msa(
                 cluster2data,
@@ -489,8 +494,9 @@ def _add_s_exon_phases_and_coordinates(tbl):
             remaining_seq = ''
             for row_number, i in enumerate(group_indices):
                 if row_number == 0:  # first s-exon
-                    tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[
-                        i, 'SubexonStartPhase']
+                    tbl.at[i,
+                           'S_exon_StartPhase'] = tbl.loc[i,
+                                                          'SubexonStartPhase']
                     tbl.at[i, 'S_exon_EndPhase'] = 0
                     (end_coord, s_exon_seq,
                      remaining_seq) = _get_first_s_exon(tbl.loc[i, :])
@@ -652,8 +658,7 @@ def main():  # pylint: disable=too-many-locals
 
     if args.phylosofs:
         s_exon_2_char = subexons.phylosofs.phylosofs_inputs(
-            tidy_table, os.path.join(input_folder, 'Ensembl'),
-            output_folder)
+            tidy_table, os.path.join(input_folder, 'Ensembl'), output_folder)
     else:
         s_exon_2_char = {}
 
@@ -668,7 +673,10 @@ def main():  # pylint: disable=too-many-locals
                                     s_exon_2_char)
 
     path_table, ases_table = subexons.ases.conserved_ases(
-        tidy_table, splice_graph_filename, min_genes=args.mingenes)
+        tidy_table,
+        splice_graph_filename,
+        min_genes=args.mingenes,
+        min_transcripts=args.mintranscripts)
     path_table.to_csv(os.path.join(output_folder, "path_table.csv"),
                       index=False)
     ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"),
