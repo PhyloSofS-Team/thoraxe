@@ -348,7 +348,7 @@ The first subexon appears before of the second in at least one transcript.</p>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.ases.conserved_ases">
-<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">conserved_ases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">graph_file_name</span></em>, <em class="sig-param"><span class="n">min_genes</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">delim</span><span class="o">=</span><span class="default_value">'/'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.conserved_ases" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">conserved_ases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">table</span></em>, <em class="sig-param"><span class="n">graph_file_name</span></em>, <em class="sig-param"><span class="n">min_genes</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">min_transcripts</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">delim</span><span class="o">=</span><span class="default_value">'/'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.conserved_ases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return two DataFrames.</p>
 <ul class="simple">
 <li><p>A table of transcripts/paths.</p></li>
@@ -364,7 +364,7 @@ The first subexon appears before of the second in at least one transcript.</p>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.ases.detect_ases">
-<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">detect_ases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_table</span></em>, <em class="sig-param"><span class="n">min_genes</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">delim</span><span class="o">=</span><span class="default_value">'/'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.detect_ases" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">detect_ases</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path_table</span></em>, <em class="sig-param"><span class="n">min_genes</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">min_transcripts</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">delim</span><span class="o">=</span><span class="default_value">'/'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.detect_ases" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary from ASEs to their data.</p>
 <p>It takes as imput a pandas DataFrame object with the path table.
 Each key of the output dictionary is a tuple
