@@ -146,8 +146,9 @@ def _get_s_exon_paths(s_exon, path_list, s_exon2path):
     return s_exon2path[s_exon]
 
 
-def _are_eclusives(s_exon_a, s_exon_b, path_list, path_dict, min_genes,
-                   min_transcripts, exclusives, s_exon2path):
+def _are_eclusives(  # pylint: disable=too-many-arguments
+        s_exon_a, s_exon_b, path_list, path_dict, min_genes, min_transcripts,
+        exclusives, s_exon2path):
     """
     Return True if both s-exons are mutually exclusive.
 
@@ -159,13 +160,15 @@ def _are_eclusives(s_exon_a, s_exon_b, path_list, path_dict, min_genes,
         b_paths = _get_s_exon_paths(s_exon_b, path_list, s_exon2path)
         common_paths = a_paths.intersection(b_paths)
         paths_data = _genes_and_transcripts(common_paths, path_dict)
-        exclusives[key] = _min_filter(paths_data, min_genes, min_transcripts)
+        exclusives[key] = not _min_filter(paths_data, min_genes,
+                                          min_transcripts)
 
     return exclusives[key]
 
 
-def _exclusive(canonical_s_exons, alternative_s_exons, path_list, path_dict,
-               min_genes, min_transcripts, exclusives, s_exon2path):
+def _exclusive(  # pylint: disable=too-many-arguments
+        canonical_s_exons, alternative_s_exons, path_list, path_dict,
+        min_genes, min_transcripts, exclusives, s_exon2path):
     """
     Return a three elements tuple about the mutually exclusivity of the ASE.
 

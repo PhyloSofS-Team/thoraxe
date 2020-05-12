@@ -584,7 +584,8 @@ def _identical_seqs(rowi, rowj, seq_column='ExonProteinSequence'):  # pylint: di
     if len(seq_i) != len(seq_j):
         return False
 
-    seq_i, seq_j = _get_comparable_seq(seq_i, seq_j, rowi['StartPhase'], rowi['EndPhase'])
+    seq_i, seq_j = _get_comparable_seq(seq_i, seq_j, rowi['StartPhase'],
+                                       rowi['EndPhase'])
 
     return seq_i == seq_j
 
@@ -638,11 +639,14 @@ def delete_incomplete_sequences(data_frame):
         incomplete_seqs.index[incomplete_seqs['ExonProteinSequence']]).union(
             incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
 
-    data_frame.drop([
-        i for i in data_frame.index
-        if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
-    ],
-                    inplace=True)
+    if incomplete_transcripts:
+        clusters.inform_about_deletions(incomplete_transcripts,
+                                        "Incomplete transcripts were found:")
+        data_frame.drop([
+            i for i in data_frame.index
+            if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
+        ],
+                        inplace=True)
 
 
 def delete_badquality_sequences(data_frame):
@@ -658,11 +662,15 @@ def delete_badquality_sequences(data_frame):
     badquality_transcripts = set(
         badquality_seqs.index[badquality_seqs['ExonProteinSequence']])
 
-    data_frame.drop([
-        i for i in data_frame.index
-        if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
-    ],
-                    inplace=True)
+    if badquality_transcripts:
+        clusters.inform_about_deletions(
+            badquality_transcripts,
+            "Transcripts with bad quality sequences were found:")
+        data_frame.drop([
+            i for i in data_frame.index
+            if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
+        ],
+                        inplace=True)
 
 
 def find_identical_sequences(data_frame):
