@@ -164,8 +164,8 @@ def _are_eclusives(s_exon_a, s_exon_b, path_list, path_dict, min_genes,
     return exclusives[key]
 
 
-def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives,
-               s_exon2path):
+def _exclusive(canonical_s_exons, alternative_s_exons, path_list, path_dict,
+               min_genes, min_transcripts, exclusives, s_exon2path):
     """
     Return a three elements tuple about the mutually exclusivity of the ASE.
 
@@ -176,7 +176,8 @@ def _exclusive(canonical_s_exons, alternative_s_exons, path_list, exclusives,
     me_status = "mutually_exclusive"
     for alt in alternative_s_exons:
         for can in canonical_s_exons:
-            if _are_eclusives(can, alt, path_list, exclusives, s_exon2path):
+            if _are_eclusives(can, alt, path_list, path_dict, min_genes,
+                              min_transcripts, exclusives, s_exon2path):
                 exclusive_canonical.append(can)
                 exclusive_alternative.append(alt)
             else:
@@ -362,7 +363,8 @@ def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
                             alternative_s_exons = ase_alternative[1:-1]
                             me_can, me_alt, me_status = _exclusive(
                                 canonical_s_exons, alternative_s_exons,
-                                path_list, exclusives, s_exon2path)
+                                path_list, path_dict, min_genes,
+                                min_transcripts, exclusives, s_exon2path)
                         # transcript weighted conservation for both sub-paths
                         twc_can = _transcript_weighted_conservation(
                             canonical_data, gene2transcripts)
