@@ -59,9 +59,6 @@ def test_ases(mapk8):
     # mutually_exclusive because ENSXETT00000046905 from ENSXETG00000021691
     # is the only transcript with 15_0/15_1 at the  same time.
     assert all(ases_df.ASE[select] == "alternative_end")
-    select = np.logical_and(ases_df.CanonicalPath == '13_0/7_2',
-                            ases_df.AlternativePath == '13_0/9_0/7_2')
-    assert not any(select)
     select = np.logical_and(ases_df.CanonicalPath == '4_0/12_1/3_0',
                             ases_df.AlternativePath == '4_0/12_0/3_0')
     assert all(ases_df.MutualExclusivity[select] == "mutually_exclusive")
