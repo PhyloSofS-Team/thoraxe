@@ -46,6 +46,7 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     if bless_humans:
         data['IsHuman'] = []
 
+    print(transcript_table)
     transcript2tsl = transcript_table.loc[:,
                                           ["TranscriptIDCluster", "TSL"
                                            ]].set_index("TranscriptIDCluster"
