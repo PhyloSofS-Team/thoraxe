@@ -27,22 +27,31 @@ def _get_seq(string):
 
 
 def get_transcript_scores(  # pylint: disable=too-many-locals
-        table, graph, delim='/'):
+        s_exon_table,
+        transcript_table,
+        graph,
+        delim='/'):
     """
     Return a DataFrame with the needed data to choose the canonical path.
     """
-    bless_humans = 'homo_sapiens' in set(table.Species)
+    bless_humans = 'homo_sapiens' in set(s_exon_table.Species)
     data = {
         'GeneID': [],
         'TranscriptIDCluster': [],
         'TranscriptLength': [],
         'MinimumTranscriptWeightedConservation': [],
+        'TSL': [],
         'Path': []
     }
     if bless_humans:
         data['IsHuman'] = []
 
-    for (trx, subdf) in table.groupby('TranscriptIDCluster'):
+    transcript2tsl = transcript_table.loc[:,
+                                          ["TranscriptIDCluster", "TSL"
+                                           ]].set_index("TranscriptIDCluster"
+                                                        ).to_dict()['TSL']
+
+    for (trx, subdf) in s_exon_table.groupby('TranscriptIDCluster'):
         n_rows = len(subdf)
         s_exon_len = [len(_get_seq(subdf.S_exon_Sequence.iloc[0]))]
         path = ["start", subdf.S_exonID.iloc[0]]
@@ -71,6 +80,7 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         data['TranscriptIDCluster'].append(trx)
         data['TranscriptLength'].append(sum(s_exon_len))
         data['MinimumTranscriptWeightedConservation'].append(min(score))
+        data['TSL'].append(transcript2tsl[trx])
         data['Path'].append(delim.join(path))
         if bless_humans:
             data['IsHuman'].append(
@@ -428,7 +438,8 @@ def create_ases_table(events, delim='/'):
     return data_frame
 
 
-def conserved_ases(table,
+def conserved_ases(s_exon_table,
+                   transcript_table,
                    graph_file_name,
                    min_genes=1,
                    min_transcripts=2,
@@ -440,7 +451,7 @@ def conserved_ases(table,
     - A table of the conserved alternative splicing events detected.
     """
     graph = read_splice_graph(graph_file_name)
-    path_table = get_transcript_scores(table, graph)
+    path_table = get_transcript_scores(s_exon_table, transcript_table, graph)
     events = detect_ases(path_table,
                          min_genes=min_genes,
                          min_transcripts=min_transcripts,

@@ -47,9 +47,9 @@ def test_read_transcript_info(mapk8):
                                                     mapk8['exontable'],
                                                     mapk8['seqs'])
 
-    assert trx_data.loc[trx_data['TranscriptID'] ==
-                        'ENST00000374179', 'Flags'].unique(
-                        )[0] == '1 (assigned to previous version 7)'
+    assert trx_data.loc[
+        trx_data['TranscriptID'] == 'ENST00000374179',
+        'TSL'].unique()[0] == '1 (assigned to previous version 7)'
 
     # Only h. sapiens & m. musculus have TSL information:
     assert all(trx_data.Species.unique() == ['homo_sapiens', 'mus_musculus'])
@@ -103,13 +103,13 @@ def test_non_coding_exons_camk2a(camk2a):
 
     # The two first exons of ENSSSCT00000052397 are non-coding
     assert ''.join(
-        str(exon)
-        for exon in trx_data.loc[trx_data['TranscriptID'] ==
-                                 'ENSSSCT00000052397', 'ExonProteinSequence']
-    ) == ('MLLFLALWALVPCLVLLSLYFYSSAGGKSGGNKKNDGVKKRKSSSSVQLMESSESTNTTI'
-          'EDEDTKVRKQEIIKVTEQLIEAISNGDFESYTKMCDPGMTAFEPEALGNLVEGLDFHRFY'
-          'FENLWSRNSKPVHTTILNPHIHLMGDESACIAYIRITQYLDAGGIPRTAQSEETRVWHRR'
-          'DGKWQIVHFHRSGAPSVLPH*')
+        str(exon) for exon in trx_data.loc[
+            trx_data['TranscriptID'] == 'ENSSSCT00000052397',
+            'ExonProteinSequence']) == (
+                'MLLFLALWALVPCLVLLSLYFYSSAGGKSGGNKKNDGVKKRKSSSSVQLMESSESTNTTI'
+                'EDEDTKVRKQEIIKVTEQLIEAISNGDFESYTKMCDPGMTAFEPEALGNLVEGLDFHRFY'
+                'FENLWSRNSKPVHTTILNPHIHLMGDESACIAYIRITQYLDAGGIPRTAQSEETRVWHRR'
+                'DGKWQIVHFHRSGAPSVLPH*')
 
 
 def test_non_coding_exons_gprin1(gprin1):
@@ -121,26 +121,26 @@ def test_non_coding_exons_gprin1(gprin1):
     # The last two exons of ENSMUST00000099506 are non-coding.
     # The unique coding exon has UTR at both ends.
     assert ''.join(
-        str(exon) for exon in
-        trx_data.loc[trx_data['TranscriptIDCluster'].
-                     map(lambda ids: 'ENSMUST00000099506' in ids.split('/')
-                         ), 'ExonProteinSequence']
-    ) == ('MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
-          'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
-          'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
-          'VSPGGDNAGSLRKVETISSGKMDPKTENVMHSRRERPGSTGEGDLVSLRENDMKPPDNTD'
-          'SASTKKTDPEFSGKLTPGSSGKTELVSSVTVAPVTSENVNPVCSGGAGPAAVGNSETLSS'
-          'VKKDPQLLGKKEAVSSGEGGSVSVRMAETVSARQPEGMFPAKTDSTSSNSTGPSGRADPV'
-          'SLRNSELVSPVKPERLSSGQAERVSLVKTETLSSGKEDPRSSRRVDHTTVTGNMQTSQKG'
-          'NPESSGKTDLGSSSSGDTRSLGTWGSLSAAKAEVTEGKGDPQPWKKASLPASEKTDPLAS'
-          'SKAGSASQGKAETVSPGEVDAMTLGKTVPTSSGKTALVSPGKVDLMTSERAEGIPELQAS'
-          'EKGNPVNSTRVDTGATGSTEPKSGVKVITQIPGATSPGKVETPSLQKEQPQLSEKTDPSR'
-          'KVDPPTTVEPVSLGKADSASPSPRKAESQTSAKTVPQAPDKATSSLRQSDGTPYSSAQPQ'
-          'RDTRSIGSLPEREPSASTSQKDLAAAAAQKSPSAEAAAPPPGPRTRDNFTKAPSWDAGAP'
-          'PPREDAGTQAGAQACVSVAVSPMSPQDGAGGPAFSFQAAPRAPSPAPRPPSRRDAGLQVS'
-          'LGAAETRSVATGPMTPQAAAPPAVPPVFPEVRVRPGSVLAAALAPQEATEPVRDVSWDEK'
-          'GMTWEVYGASMEVEVLGMAIQKHLERQIEEHGRQGAPAPAPPPAVRAGPGRAGSVRTAPA'
-          'EGAAKRPPGLFRALLQSVRRPRCCSRAGPTAE*')
+        str(exon) for exon in trx_data.loc[
+            trx_data['TranscriptIDCluster'].
+            map(lambda ids: 'ENSMUST00000099506' in ids.split('/')),
+            'ExonProteinSequence']) == (
+                'MRDCCSSPKAIPAPPRHALDQSLGMDPRHTSSSGAAEGASCSERPAGSLACPSPNCSPLP'
+                'ETPRAHGALTSDNSGTTLFGKPEPMSSAEATPTASEIRNPVFSGKMDGNSLKQADSTSTR'
+                'KEEAGSLRNEESMLKGKAEPMIYGKGEPGTVGRVDCTASGAENSGSLGKVDMPCSSKVDI'
+                'VSPGGDNAGSLRKVETISSGKMDPKTENVMHSRRERPGSTGEGDLVSLRENDMKPPDNTD'
+                'SASTKKTDPEFSGKLTPGSSGKTELVSSVTVAPVTSENVNPVCSGGAGPAAVGNSETLSS'
+                'VKKDPQLLGKKEAVSSGEGGSVSVRMAETVSARQPEGMFPAKTDSTSSNSTGPSGRADPV'
+                'SLRNSELVSPVKPERLSSGQAERVSLVKTETLSSGKEDPRSSRRVDHTTVTGNMQTSQKG'
+                'NPESSGKTDLGSSSSGDTRSLGTWGSLSAAKAEVTEGKGDPQPWKKASLPASEKTDPLAS'
+                'SKAGSASQGKAETVSPGEVDAMTLGKTVPTSSGKTALVSPGKVDLMTSERAEGIPELQAS'
+                'EKGNPVNSTRVDTGATGSTEPKSGVKVITQIPGATSPGKVETPSLQKEQPQLSEKTDPSR'
+                'KVDPPTTVEPVSLGKADSASPSPRKAESQTSAKTVPQAPDKATSSLRQSDGTPYSSAQPQ'
+                'RDTRSIGSLPEREPSASTSQKDLAAAAAQKSPSAEAAAPPPGPRTRDNFTKAPSWDAGAP'
+                'PPREDAGTQAGAQACVSVAVSPMSPQDGAGGPAFSFQAAPRAPSPAPRPPSRRDAGLQVS'
+                'LGAAETRSVATGPMTPQAAAPPAVPPVFPEVRVRPGSVLAAALAPQEATEPVRDVSWDEK'
+                'GMTWEVYGASMEVEVLGMAIQKHLERQIEEHGRQGAPAPAPPPAVRAGPGRAGSVRTAPA'
+                'EGAAKRPPGLFRALLQSVRRPRCCSRAGPTAE*')
 
 
 def test_exon_clustering(mapk8):
@@ -155,8 +155,8 @@ def test_exon_clustering(mapk8):
 
     # Exon can not have more than one cluster
     assert all(
-        clustered.groupby(
-            'ExonID').apply(lambda df: len(df['Cluster'].unique()) == 1))
+        clustered.groupby('ExonID').apply(
+            lambda df: len(df['Cluster'].unique()) == 1))
 
     # Non-clustered exons have Cluster == 0 and QueryExon == ''
     assert all(row.QueryExon == '' for row in clustered.itertuples()
@@ -165,16 +165,15 @@ def test_exon_clustering(mapk8):
                if row.QueryExon == '')
 
     # Sequences with less than 4 residues are non-clustered by default
-    assert all(
-        clustered.loc[clustered['ExonProteinSequence'].map(len) < 4, 'Cluster']
-        == 0)
+    assert all(clustered.loc[clustered['ExonProteinSequence'].map(len) < 4,
+                             'Cluster'] == 0)
 
     for _, group in clustered.groupby('Cluster'):
         nans = np.isnan(group['PercentIdentity'])
         # There is a nan in PercentIdentity when a sequence initialize its own
         # cluster, so the QueryExon and the ExonID should be the same
-        assert np.all(
-            group.loc[nans, 'QueryExon'] == group.loc[nans, 'ExonID'])
+        assert np.all(group.loc[nans, 'QueryExon'] == group.loc[nans,
+                                                                'ExonID'])
         # Also, if there are more exons, the exons with nan should be the
         # QueryExon of other exon in the cluster. It can not be alone.
         if len(group) > 1:
@@ -186,8 +185,8 @@ def test_exon_clustering(mapk8):
             # The aligned seq should be in the exon
             subset = group[np.logical_not(nans)]
             for _, exon in subset.groupby('ExonIDCluster'):
-                assert np.any([((row.AlignedTarget.replace(
-                    '-', '') in row.ExonProteinSequence)
+                assert np.any([((row.AlignedTarget.replace('-', '')
+                                 in row.ExonProteinSequence)
                                 or (row.AlignedQuery.replace(
                                     '-', '')) in row.ExonProteinSequence)
                                for row in exon.itertuples()])

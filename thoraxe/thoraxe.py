@@ -674,6 +674,7 @@ def main():  # pylint: disable=too-many-locals
 
     path_table, ases_table = subexons.ases.conserved_ases(
         tidy_table,
+        transcript_table,
         splice_graph_filename,
         min_genes=args.mingenes,
         min_transcripts=args.mintranscripts)

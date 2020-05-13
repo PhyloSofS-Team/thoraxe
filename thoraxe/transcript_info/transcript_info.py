@@ -115,15 +115,15 @@ def read_tsl_file(tsl_file,
         for row in tsl_data.itertuples()
     ]]
 
-    selected_flags = [
-        # explicit convert to float, sometimes Flags are read as str
-        _get_flag(row.Flags) <= maximum_tsl_level
-        for row in tsl_data.itertuples()
-    ]
+    # explicit convert to float, sometimes Flags are read as str
+    tsl_data["TSL"] = tsl_data.Flags.map(_get_flag)
+    tsl_data.drop(columns=['Flags'], inplace=True)
+    selected_flags = tsl_data.TSL <= maximum_tsl_level
+
     if remove_na:
         tsl_data = tsl_data[selected_flags]
     else:
-        missing_tsl = tsl_data.Flags.isna()
+        missing_tsl = tsl_data.TSL.isna()
         tsl_data = tsl_data[selected_flags | missing_tsl]
 
     return tsl_data
