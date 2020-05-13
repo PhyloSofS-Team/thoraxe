@@ -32,6 +32,7 @@ def test_ases(mapk8):
     graph = nx.read_gml(mapk8['splice_graph'])
     trx_df = subexons.ases.get_transcript_scores(s_exon_df, trx_df, graph)
     path_table, ases_df = subexons.ases.conserved_ases(s_exon_df,
+                                                       trx_df,
                                                        mapk8['splice_graph'],
                                                        min_genes=2,
                                                        min_transcripts=1)
