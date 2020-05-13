@@ -13,17 +13,24 @@ def mapk8(request):
     data_dir = os.path.join(test_dir, 'data')
     mapk8_dir = os.path.join(data_dir, 'MAPK8_output', 'thoraxe')
     return {
-        'splice_graph': os.path.join(mapk8_dir, 'splice_graph.gml'),
-        's_exon_table': os.path.join(mapk8_dir, 's_exon_table.csv'),
-        'ases_table': os.path.join(mapk8_dir, 'ases_table.csv'),
-        'path_table': os.path.join(mapk8_dir, 'path_table.csv')
+        'splice_graph':
+        os.path.join(mapk8_dir, 'splice_graph.gml'),
+        's_exon_table':
+        os.path.join(mapk8_dir, 's_exon_table.csv'),
+        'ases_table':
+        os.path.join(mapk8_dir, 'ases_table.csv'),
+        'path_table':
+        os.path.join(mapk8_dir, 'path_table.csv'),
+        'transcript_table':
+        os.path.join(mapk8_dir, '_intermediate', 'transcript_table.csv')
     }
 
 
 def test_ases(mapk8):
     s_exon_df = pd.read_csv(mapk8['s_exon_table'])
+    s_exon_df = pd.read_csv(mapk8['transcript_table'])
     graph = nx.read_gml(mapk8['splice_graph'])
-    trx_df = subexons.ases.get_transcript_scores(s_exon_df, graph)
+    trx_df = subexons.ases.get_transcript_scores(s_exon_df, trx_df, graph)
     path_table, ases_df = subexons.ases.conserved_ases(s_exon_df,
                                                        mapk8['splice_graph'],
                                                        min_genes=2,

@@ -49,7 +49,7 @@ def test_read_transcript_info(mapk8):
 
     assert trx_data.loc[
         trx_data['TranscriptID'] == 'ENST00000374179',
-        'TSL'].unique()[0] == '1 (assigned to previous version 7)'
+        'TSL'].unique()[0] == 1.0  # '1 (assigned to previous version 7)'
 
     # Only h. sapiens & m. musculus have TSL information:
     assert all(trx_data.Species.unique() == ['homo_sapiens', 'mus_musculus'])
