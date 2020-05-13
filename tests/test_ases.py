@@ -28,14 +28,15 @@ def mapk8(request):
 
 def test_ases(mapk8):
     s_exon_df = pd.read_csv(mapk8['s_exon_table'])
-    trx_df = pd.read_csv(mapk8['transcript_table'])
+    transcript_table = pd.read_csv(mapk8['transcript_table'])
     graph = nx.read_gml(mapk8['splice_graph'])
-    trx_df = subexons.ases.get_transcript_scores(s_exon_df, trx_df, graph)
+    trx_df = subexons.ases.get_transcript_scores(s_exon_df, transcript_table,
+                                                 graph)
     path_table, ases_df = subexons.ases.conserved_ases(s_exon_df,
-                                                       trx_df,
+                                                       transcript_table,
                                                        mapk8['splice_graph'],
-                                                       min_genes=2,
-                                                       min_transcripts=1)
+                                                       min_genes=1,
+                                                       min_transcripts=2)
 
     assert all(trx_df == path_table)
 
