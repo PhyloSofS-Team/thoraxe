@@ -74,7 +74,7 @@ def test_ases(mapk8):
     assert path_table.size == data_path_table.size
     assert ases_df.shape[0] == data_ases_table.shape[0]
     for col in [
-            'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'TSL', 'Path',
+            'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
             'PathGeneNumber'
     ]:
         assert all(path_table[col].values == data_path_table[col].values)
