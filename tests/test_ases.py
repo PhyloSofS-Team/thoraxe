@@ -40,8 +40,6 @@ def test_ases(mapk8):
 
     assert all(trx_df == path_table)
 
-    assert 'IsHuman' not in trx_df.columns
-
     select = trx_df.Path == 'start/8_0/1_0/14_0/2_0/4_0/4_1/stop'
     assert all(trx_df.PathGeneNumber[select] == 1)
     assert all(trx_df.MinimumTranscriptWeightedConservation[select] ==
@@ -76,7 +74,7 @@ def test_ases(mapk8):
     assert path_table.size == data_path_table.size
     assert ases_df.shape[0] == data_ases_table.shape[0]
     for col in [
-            'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
+            'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'TSL', 'Path',
             'PathGeneNumber'
     ]:
         assert all(path_table[col].values == data_path_table[col].values)
