@@ -39,6 +39,8 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         'TranscriptIDCluster': [],
         'TranscriptLength': [],
         'MinimumTranscriptWeightedConservation': [],
+        'MinimumConservation': [],
+        'MinimumTranscriptFraction': [],
         'TSL': [],
         'Path': []
     }
@@ -57,6 +59,14 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
                 'start',
                 subdf.S_exonID.iloc[0])['transcript_weighted_conservation']
         ]
+        conservation = [
+            graph.get_edge_data('start',
+                                subdf.S_exonID.iloc[0])['conservation']
+        ]
+        transcript_fraction = [
+            graph.get_edge_data('start',
+                                subdf.S_exonID.iloc[0])['transcript_fraction']
+        ]
         if n_rows >= 2:
             for i in range(1, n_rows):
                 s_exon_1 = subdf.S_exonID.iloc[i - 1]
@@ -67,16 +77,29 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
                     graph.get_edge_data(
                         s_exon_1,
                         s_exon_2)['transcript_weighted_conservation'])
+                conservation.append(
+                    graph.get_edge_data(s_exon_1, s_exon_2)['conservation'])
+                transcript_fraction.append(
+                    graph.get_edge_data(s_exon_1,
+                                        s_exon_2)['transcript_fraction'])
 
         score.append(
             graph.get_edge_data(subdf.S_exonID.iloc[n_rows - 1],
                                 'stop')['transcript_weighted_conservation'])
+        conservation.append(
+            graph.get_edge_data(subdf.S_exonID.iloc[n_rows - 1],
+                                'stop')['conservation'])
+        transcript_fraction.append(
+            graph.get_edge_data(subdf.S_exonID.iloc[n_rows - 1],
+                                'stop')['transcript_fraction'])
         path.append('stop')
 
         data['GeneID'].append(subdf.GeneID.iloc[0])
         data['TranscriptIDCluster'].append(trx)
         data['TranscriptLength'].append(sum(s_exon_len))
         data['MinimumTranscriptWeightedConservation'].append(min(score))
+        data['MinimumConservation'].append(min(conservation))
+        data['MinimumTranscriptFraction'].append(min(transcript_fraction))
         data['TSL'].append(transcript2tsl[trx])
         data['Path'].append(delim.join(path))
 
