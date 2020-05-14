@@ -34,7 +34,6 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     """
     Return a DataFrame with the needed data to choose the canonical path.
     """
-    bless_humans = 'homo_sapiens' in set(s_exon_table.Species)
     data = {
         'GeneID': [],
         'TranscriptIDCluster': [],
@@ -43,8 +42,6 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         'TSL': [],
         'Path': []
     }
-    if bless_humans:
-        data['IsHuman'] = []
 
     transcript2tsl = transcript_table.loc[:,
                                           ["TranscriptIDCluster", "TSL"
@@ -82,9 +79,6 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         data['MinimumTranscriptWeightedConservation'].append(min(score))
         data['TSL'].append(transcript2tsl[trx])
         data['Path'].append(delim.join(path))
-        if bless_humans:
-            data['IsHuman'].append(
-                int(subdf.Species.iloc[0] == 'homo_sapiens'))
 
     data_frame = pd.DataFrame(data)
     path2ngenes = data_frame.groupby('Path').apply(
@@ -94,19 +88,14 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
 
     column_order = [
         'PathGeneNumber', 'MinimumTranscriptWeightedConservation',
-        'TranscriptLength'
+        'TranscriptLength', 'TSL'
     ]
-    if bless_humans:
-        column_order.insert(2, 'IsHuman')
 
     data_frame.drop_duplicates(inplace=True)
     data_frame.sort_values(column_order, ascending=False, inplace=True)
 
-    if bless_humans:
-        data_frame.drop(columns=['IsHuman'], inplace=True)
-
     return data_frame.reindex(columns=[
-        'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'Path',
+        'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'TSL', 'Path',
         'MinimumTranscriptWeightedConservation', 'PathGeneNumber'
     ])
 
