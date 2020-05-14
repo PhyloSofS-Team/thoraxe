@@ -121,10 +121,19 @@ def read_tsl_file(tsl_file,
     selected_flags = tsl_data.TSL <= maximum_tsl_level
 
     if remove_na:
+        to_delete = set(tsl_data.TranscriptID[~selected_flags])
         tsl_data = tsl_data[selected_flags]
     else:
         missing_tsl = tsl_data.TSL.isna()
+        to_delete = set(tsl_data.TranscriptID[~(selected_flags | missing_tsl)])
         tsl_data = tsl_data[selected_flags | missing_tsl]
+
+    if to_delete:
+        clusters.inform_about_deletions(
+            to_delete,
+            "There are transcripts with TSL greater than {}{}:".format(
+                maximum_tsl_level,
+                " or no TSL information" if remove_na else ""))
 
     return tsl_data
 
