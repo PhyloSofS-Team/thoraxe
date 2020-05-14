@@ -438,12 +438,13 @@ def create_ases_table(events, delim='/'):
     return data_frame
 
 
-def conserved_ases(s_exon_table,
-                   transcript_table,
-                   graph_file_name,
-                   min_genes=1,
-                   min_transcripts=2,
-                   delim='/'):
+def conserved_ases(  # pylint: disable=too-many-arguments
+        s_exon_table,
+        transcript_table,
+        graph_file_name,
+        min_genes=1,
+        min_transcripts=2,
+        delim='/'):
     """
     Return two DataFrames.
 
