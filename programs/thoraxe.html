@@ -169,6 +169,7 @@ set of transcripts from orthologous genes in a set of species.</p>
                <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MINLEN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">MINGENES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">MINTRANSCRIPTS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COVERAGE</span><span class="p">]</span>
                <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">IDENTITY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapopen</span> <span class="n">GAPOPEN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapextend</span> <span class="n">GAPEXTEND</span><span class="p">]</span>
                <span class="p">[</span><span class="o">--</span><span class="n">padding</span> <span class="n">PADDING</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_chimerics</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">canonical_criteria</span> <span class="n">CANONICAL_CRITERIA</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -232,6 +233,10 @@ set of transcripts from orthologous genes in a set of species.</p>
 </dd>
 <dt><kbd>-l, --specieslist</kbd></dt>
 <dd><p>It could be a list of more than one species separated by commas and without spaces, e.g. homo_sapiens,mus_musculus, or a single file with the species list (one species per line). If nothing is indicated, all the available species are used.</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>--canonical_criteria</kbd></dt>
+<dd><p>List of column names of the <cite>path_table</cite> separated by commas used to sort the row. If nothing is indicated, the folowwing list is used: PathGeneNumber,MinimumTranscriptWeightedConservation,TranscriptLength</p>
 <p>Default: “”</p>
 </dd>
 </dl>
