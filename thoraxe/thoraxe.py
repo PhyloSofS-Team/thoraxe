@@ -117,7 +117,13 @@ def parse_command_line():
         'with the species list (one species per line). If nothing is '
         'indicated, all the available species are used.',
         default='')
-
+    parser.add_argument(
+        '--canonical_criteria',
+        help='List of column names of the `path_table` separated by commas '
+        'used to sort the row. If nothing is indicated, the folowwing list is '
+        'used: PathGeneNumber,MinimumTranscriptWeightedConservation,'
+        'TranscriptLength',
+        default='')
     return parser
 
 
@@ -686,7 +692,9 @@ def main():  # pylint: disable=too-many-locals
         transcript_table,
         splice_graph_filename,
         min_genes=args.mingenes,
-        min_transcripts=args.mintranscripts)
+        min_transcripts=args.mintranscripts,
+        column_order=args.canonical_criteria.split(",")
+        if args.canonical_criteria else None)
     path_table.to_csv(os.path.join(output_folder, "path_table.csv"),
                       index=False)
     ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"),

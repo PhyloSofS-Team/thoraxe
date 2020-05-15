@@ -30,6 +30,7 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         s_exon_table,
         transcript_table,
         graph,
+        column_order=None,
         delim='/'):
     """
     Return a DataFrame with the needed data to choose the canonical path.
@@ -109,16 +110,18 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     data_frame = data_frame.assign(
         PathGeneNumber=[path2ngenes[path] for path in data_frame.Path])
 
-    column_order = [
-        'PathGeneNumber', 'MinimumTranscriptWeightedConservation',
-        'TranscriptLength', 'TSL'
-    ]
+    if column_order is None:
+        column_order = [
+            'PathGeneNumber', 'MinimumTranscriptWeightedConservation',
+            'TranscriptLength'
+        ]
 
     data_frame.drop_duplicates(inplace=True)
     data_frame.sort_values(column_order, ascending=False, inplace=True)
 
     return data_frame.reindex(columns=[
         'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'TSL', 'Path',
+        'MinimumConservation', 'MinimumTranscriptFraction',
         'MinimumTranscriptWeightedConservation', 'PathGeneNumber'
     ])
 
@@ -456,6 +459,7 @@ def conserved_ases(  # pylint: disable=too-many-arguments
         graph_file_name,
         min_genes=1,
         min_transcripts=2,
+        column_order=None,
         delim='/'):
     """
     Return two DataFrames.
@@ -464,7 +468,10 @@ def conserved_ases(  # pylint: disable=too-many-arguments
     - A table of the conserved alternative splicing events detected.
     """
     graph = read_splice_graph(graph_file_name)
-    path_table = get_transcript_scores(s_exon_table, transcript_table, graph)
+    path_table = get_transcript_scores(s_exon_table,
+                                       transcript_table,
+                                       graph,
+                                       column_order=column_order)
     events = detect_ases(path_table,
                          min_genes=min_genes,
                          min_transcripts=min_transcripts,
