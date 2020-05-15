@@ -68,14 +68,11 @@ def _in_species_list(species, species_list=None):
     return species in species_list
 
 
-def read_tsl_file(tsl_file,
-                  maximum_tsl_level,
-                  remove_na=False,
-                  species_list=None):
+def read_tsl_file(tsl_file, max_tsl_level, remove_na=False, species_list=None):
     """
     Read a csv file with the Transcript Support Level (TSL) data.
 
-    `maximum_tsl_level` determines the maximum Transcript Support Level (TSL)
+    `max_tsl_level` determines the maximum Transcript Support Level (TSL)
     level to keep. The options are:
 
     - 1.0 : All splice junctions of the transcript are supported by at
@@ -91,7 +88,7 @@ def read_tsl_file(tsl_file,
 
     It returns a pandas DataFrame with MultiIndex: ('Species', 'TranscriptID').
     """
-    assert maximum_tsl_level in {1.0, 2.0, 3.0, 4.0, 5.0}
+    assert max_tsl_level in {1.0, 2.0, 3.0, 4.0, 5.0}
 
     # TO DO : Modify EnsemblRESTTranscriptQueries.py to make stable the input
     #         of this function:
@@ -118,7 +115,7 @@ def read_tsl_file(tsl_file,
     # explicit convert to float, sometimes Flags are read as str
     tsl_data["TSL"] = tsl_data.Flags.map(_get_flag)
     tsl_data.drop(columns=['Flags'], inplace=True)
-    selected_flags = tsl_data.TSL <= maximum_tsl_level
+    selected_flags = tsl_data.TSL <= max_tsl_level
 
     if remove_na:
         to_delete = set(tsl_data.TranscriptID[~selected_flags])
@@ -132,8 +129,7 @@ def read_tsl_file(tsl_file,
         clusters.inform_about_deletions(
             to_delete,
             "There are transcripts with TSL greater than {}{}:".format(
-                maximum_tsl_level,
-                " or no TSL information" if remove_na else ""))
+                max_tsl_level, " or no TSL information" if remove_na else ""))
 
     return tsl_data
 

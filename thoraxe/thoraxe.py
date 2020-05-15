@@ -50,6 +50,12 @@ def parse_command_line():
                         help='Path to Clustal Omega.',
                         type=str,
                         default='clustalo')
+    parser.add_argument('-s',
+                        '--maxtsl',
+                        help='Maximum Transcript Support Level (TSL) to use '
+                        'when TSL is available for a transcript.',
+                        type=int,
+                        default=3)
     parser.add_argument('-m',
                         '--minlen',
                         help='Minimum exon length.',
@@ -115,13 +121,14 @@ def parse_command_line():
     return parser
 
 
-def get_transcripts(input_folder, species_list=None):
+def get_transcripts(input_folder, max_tsl_level=3.0, species_list=None):
     """Return a DataFrame with the transcript information."""
     ensembl_info = os.path.join(input_folder, 'Ensembl')
     return transcript_info.read_transcript_info(
         os.path.join(ensembl_info, 'tsl.csv'),
         os.path.join(ensembl_info, 'exonstable.tsv'),
         os.path.join(ensembl_info, 'sequences.fasta'),
+        max_tsl_level=max_tsl_level,
         remove_na=False,
         species_list=species_list)
 
@@ -616,7 +623,9 @@ def main():  # pylint: disable=too-many-locals
     intermediate_output_path = utils.folders.create_subfolder(
         output_folder, '_intermediate')
 
-    transcript_table = get_transcripts(input_folder, species_list=species_list)
+    transcript_table = get_transcripts(input_folder,
+                                       float(args.maxtsl),
+                                       species_list=species_list)
     subexon_table = get_subexons(transcript_table,
                                  minimum_len=args.minlen,
                                  coverage_cutoff=args.coverage,
