@@ -165,10 +165,10 @@
 set of transcripts from orthologous genes in a set of species.</p>
 </div></blockquote>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">thoraxe</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUTPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ALIGNER</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MINLEN</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">MINGENES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">MINTRANSCRIPTS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COVERAGE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">IDENTITY</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">--</span><span class="n">gapopen</span> <span class="n">GAPOPEN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapextend</span> <span class="n">GAPEXTEND</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">padding</span> <span class="n">PADDING</span><span class="p">]</span>
-               <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_chimerics</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">thoraxe</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUTPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ALIGNER</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">MAXTSL</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MINLEN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">MINGENES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">MINTRANSCRIPTS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COVERAGE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">IDENTITY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapopen</span> <span class="n">GAPOPEN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapextend</span> <span class="n">GAPEXTEND</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">padding</span> <span class="n">PADDING</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">plot_chimerics</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -185,6 +185,10 @@ set of transcripts from orthologous genes in a set of species.</p>
 <dt><kbd>-a, --aligner</kbd></dt>
 <dd><p>Path to Clustal Omega.</p>
 <p>Default: “clustalo”</p>
+</dd>
+<dt><kbd>-s, --maxtsl</kbd></dt>
+<dd><p>Maximum Transcript Support Level (TSL) to use when TSL is available for a transcript.</p>
+<p>Default: 3</p>
 </dd>
 <dt><kbd>-m, --minlen</kbd></dt>
 <dd><p>Minimum exon length.</p>
