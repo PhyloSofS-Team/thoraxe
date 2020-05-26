@@ -7,6 +7,7 @@ It finds the canonical path in the splice graph to detect conserved ASEs.
 import collections
 import networkx as nx
 import pandas as pd
+import numpy as np
 
 PathData = collections.namedtuple('PathData', ['Genes', 'Transcripts'])
 
@@ -40,16 +41,21 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         'TranscriptIDCluster': [],
         'TranscriptLength': [],
         'MinimumTranscriptWeightedConservation': [],
-        'MinimumConservation': [],
         'MinimumTranscriptFraction': [],
+        'MinimumConservation': [],
+        'TranscriptWeightedConservationSum': [],
+        'TranscriptFractionSum': [],
+        'ConservationSum': [],
+        'MeanTranscriptWeightedConservation': [],
+        'MeanTranscriptFraction': [],
+        'MeanConservation': [],
         'TSL': [],
         'Path': []
     }
 
-    transcript2tsl = transcript_table.loc[:,
-                                          ["TranscriptIDCluster", "TSL"
-                                           ]].set_index("TranscriptIDCluster"
-                                                        ).to_dict()['TSL']
+    transcript2tsl = transcript_table.loc[:, [
+        "TranscriptIDCluster", "TSL"
+    ]].set_index("TranscriptIDCluster").to_dict()['TSL']
 
     for (trx, subdf) in s_exon_table.groupby('TranscriptIDCluster'):
         n_rows = len(subdf)
@@ -101,6 +107,12 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         data['MinimumTranscriptWeightedConservation'].append(min(score))
         data['MinimumConservation'].append(min(conservation))
         data['MinimumTranscriptFraction'].append(min(transcript_fraction))
+        data['TranscriptWeightedConservationSum'].append(sum(score))
+        data['ConservationSum'].append(sum(conservation))
+        data['TranscriptFractionSum'].append(sum(transcript_fraction))
+        data['MeanTranscriptWeightedConservation'].append(np.mean(score))
+        data['MeanConservation'].append(np.mean(conservation))
+        data['MeanTranscriptFraction'].append(np.mean(transcript_fraction))
         data['TSL'].append(transcript2tsl[trx])
         data['Path'].append(delim.join(path))
 
@@ -122,7 +134,10 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
     return data_frame.reindex(columns=[
         'GeneID', 'TranscriptIDCluster', 'TranscriptLength', 'TSL', 'Path',
         'MinimumConservation', 'MinimumTranscriptFraction',
-        'MinimumTranscriptWeightedConservation', 'PathGeneNumber'
+        'MinimumTranscriptWeightedConservation', 'ConservationSum',
+        'TranscriptFractionSum', 'TranscriptWeightedConservationSum',
+        'MeanConservation', 'MeanTranscriptFraction',
+        'MeanTranscriptWeightedConservation', 'PathGeneNumber'
     ])
 
 
