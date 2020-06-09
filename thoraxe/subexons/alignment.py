@@ -44,8 +44,9 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1, col_index],
-                     transcript.iloc[row_index, col_index]))
+                    (transcript.iloc[row_index - 1,
+                                     col_index], transcript.iloc[row_index,
+                                                                 col_index]))
     return set(connected_pairs)
 
 
@@ -401,8 +402,8 @@ def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
     index2cluster = dict(
         zip(subexon_df['SubexonIndex'], subexon_df['SubexonIDCluster']))
     for seq_index in range(0, n_seq):
-        _fill_msa_matrix(msa_matrix, chimerics, msa,
-                         seq_index, lambda index: index2cluster[index])
+        _fill_msa_matrix(msa_matrix, chimerics, msa, seq_index,
+                         lambda index: index2cluster[index])
 
     return msa_matrix
 
@@ -661,8 +662,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (
-        subexon_df['GeneID'] == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
+                                                       == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
@@ -702,3 +703,255 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
                                    '{}_{}'.format(cluster, i))
 
     return subexon_df
+
+
+# Fix sub-exon blocks in the chimeric MSA
+
+
+def _same_subexon(a, b):
+    """
+    Return True if the sub-exon ids are identical or missing (NaNs).
+
+    >>> import numpy as np
+    >>> _same_subexon(np.nan, np.nan)
+    True
+    >>> _same_subexon(np.nan, 2.0)
+    False
+    >>> _same_subexon(2.0, 2.0)
+    True
+    >>> _same_subexon(2.0, 8.0)
+    False
+    """
+    if np.isnan(a) and np.isnan(b):
+        return True
+    return a == b
+
+
+def resume_seq(matrix_row):
+    """
+    Return the sub-exon and gap blocks in the msa matrix.
+
+    The function return three lists, a list of sub-exon ids and NaNs, i.e.
+    the block id, a list with the column indices where the block starts and a
+    list with the block ends.
+
+    >>> resume_seq([1.0, 1.0, 1.0, np.nan, np.nan, np.nan, 1.0, 2.0, 2.0, 2.0])
+    ([1.0, nan, 1.0, 2.0], [0, 3, 6, 7], [3, 6, 7, 10])
+    """
+    subexons = []
+    starts = []
+    ends = []
+    for (i, subexon) in enumerate(matrix_row):
+        if i == 0:
+            subexons.append(subexon)
+            starts.append(i)
+        else:
+            if not _same_subexon(subexon, subexons[-1]):
+                subexons.append(subexon)
+                ends.append(i)
+                starts.append(i)
+    ends.append(len(matrix_row))
+    return (subexons, starts, ends)
+
+
+ProblematicSubexonBlock = collections.namedtuple('ProblematicSubexonBlock', [
+    'sequence_index', 'subexon', 'subexon_blocks', 'block_type',
+    'subexon_block_start', 'subexon_block_end', 'gap_block_start',
+    'gap_block_end'
+])
+
+
+def _is_problematic(starts, ends, block_index, first, max_res_block,
+                    min_gap_block):
+    """
+    Return True is the sub-exon block is problematic.
+    
+    In particular, a sub-exon block is problematic if it has <= max_res_block 
+    and it is separeated from the rest of the sub-exon by a gap block 
+    => min_gap_block.
+
+    >>> _is_problematic([0, 3, 6, 7], [3, 6, 7, 10], 0, True, 2, 2)
+    False
+    >>> _is_problematic([0, 3, 6, 7], [3, 6, 7, 10], 2, False, 2, 2)
+    True
+    """
+    subexon_len = ends[block_index] - starts[block_index]
+    if first:
+        gaps_len = ends[block_index + 1] - starts[block_index + 1]
+    else:
+        gaps_len = ends[block_index - 1] - starts[block_index - 1]
+    return (subexon_len <= max_res_block) and (gaps_len >= min_gap_block)
+
+
+def _store_problematic(problematic_list, sequence, subexon, subexon_blocks,
+                       starts, ends, first_block, last_block, max_res_block,
+                       min_gap_block):
+    """
+    Store problematic sub-exon blocks in the problematic_list.
+    """
+    if subexon_blocks > 1:
+        if _is_problematic(starts, ends, first_block, True, max_res_block,
+                           min_gap_block):
+            problematic_list.append(
+                ProblematicSubexonBlock(sequence, subexon, subexon_blocks,
+                                        "first_block", starts[first_block],
+                                        ends[first_block],
+                                        starts[first_block + 1],
+                                        ends[first_block + 1]))
+        if _is_problematic(starts, ends, last_block, False, max_res_block,
+                           min_gap_block):
+            problematic_list.append(
+                ProblematicSubexonBlock(sequence, subexon, subexon_blocks,
+                                        "last_block", starts[last_block],
+                                        ends[last_block],
+                                        starts[last_block - 1],
+                                        ends[last_block - 1]))
+
+
+def problematic_subexon_blocks(
+        subexons,
+        starts,
+        ends,
+        sequence,
+        max_res_block=2,  # to move
+        min_gap_block=5  # to consider
+):
+    """
+    Return a list of ProblematicSubexonBlocks.
+    
+    In particular, a sub-exon block is problematic if it has <= max_res_block 
+    and it is separeated from the rest of the sub-exon by a gap block 
+    => min_gap_block.
+
+    >>> import numpy as np
+    >>> problematic_subexon_blocks([1.0, np.nan, 1.0, 2.0], [0, 3, 9, 10], \
+[3, 9, 10, 13], 0)
+    [ProblematicSubexonBlock(sequence_index=0, subexon=1.0, subexon_blocks=2, \
+block_type='last_block', subexon_block_start=9, subexon_block_end=10, \
+gap_block_start=3, gap_block_end=9)]
+    """
+    first_block = -1
+    last_block = -1
+    subexon_blocks = 0
+    previous_subexon = np.nan
+    problematic_list = []
+    for (i, (subexon, start, end)) in enumerate(zip(subexons, starts, ends)):
+        if not np.isnan(subexon):
+            if not _same_subexon(subexon, previous_subexon):
+                _store_problematic(problematic_list, sequence,
+                                   previous_subexon, subexon_blocks, starts,
+                                   ends, first_block, last_block,
+                                   max_res_block, min_gap_block)
+                previous_subexon = subexon
+                first_block = i
+                subexon_blocks = 1
+            else:
+                subexon_blocks += 1
+                last_block = i
+    _store_problematic(problematic_list, sequence, previous_subexon,
+                       subexon_blocks, starts, ends, first_block, last_block,
+                       max_res_block, min_gap_block)
+    return problematic_list
+
+
+def cluster_subexon_blocks(blocks):
+    """
+    Cluster sub-exon blocks starting or ending in the same column.
+    """
+    clusters = collections.defaultdict(list)
+    for block in blocks:
+        if block.block_type == 'first_block':
+            clusters[block.subexon_block_end].append(block)
+        if block.block_type == 'last_block':
+            clusters[block.subexon_block_start].append(block)
+    return clusters
+
+
+def problematic_block_clusters(
+        msa_matrix,
+        max_res_block=2,  # to move
+        min_gap_block=5  # to consider
+):
+    """
+    Return a Dict of problematic sub-exon block clusters.
+    """
+    blocks = []
+    for (i, matrix_row) in enumerate(msa_matrix):
+        subexons, starts, ends = resume_seq(matrix_row)
+        blocks.extend(
+            problematic_subexon_blocks(subexons,
+                                       starts,
+                                       ends,
+                                       i,
+                                       max_res_block=max_res_block,
+                                       min_gap_block=min_gap_block))
+    return cluster_subexon_blocks(blocks)
+
+
+def move_block(matrix, row, block_start, block_end, destination_start,
+               destination_end):
+    """
+    Move in-place a block in the (numpy) matrix.
+
+    >>> import numpy as np
+    >>> mat = np.matrix([[0,1,2,3,4], [5,6,7,8,9]])
+    >>> move_block(mat, 0, 0, 2, 3, 5)
+    matrix([[3, 4, 2, 0, 1],
+            [5, 6, 7, 8, 9]])
+    >>> move_block(mat, 1, 0, 2, 3, 5)
+    matrix([[3, 4, 2, 0, 1],
+            [8, 9, 7, 5, 6]])
+    """
+    subexon_block = np.copy(matrix[row, block_start:block_end])
+    gap_block = np.copy(matrix[row, destination_start:destination_end])
+    matrix[row, block_start:block_end] = gap_block
+    matrix[row, destination_start:destination_end] = subexon_block
+    return matrix
+
+
+def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
+    """
+    Swap a sub-exon block within its gap block.
+
+    The movement depends on the problematic sub-exon block position, e.g.:
+    ```
+    from: [1.0, 1.0, 1.0, nan, nan, nan, 1.0, 2.0, 2.0, 2.0] # last_block
+    to:   [1.0, 1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0]
+
+    from: [1.0, 1.0, 1.0, 2.0, nan, nan, nan, 2.0, 2.0, 2.0] # first_block
+    to:   [1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0, 2.0]
+    ```
+    """
+    block_start = subexon_block.subexon_block_start
+    block_end = subexon_block.subexon_block_end
+    block_len = block_end - block_start
+    if subexon_block.block_type == 'first_block':
+        destination_start = subexon_block.gap_block_end - block_len
+        destination_end = subexon_block.gap_block_end
+    else:
+        destination_start = subexon_block.gap_block_start
+        destination_end = subexon_block.gap_block_start + block_len
+    move_block(msa_numpy, subexon_block.sequence_index, block_start, block_end,
+               destination_start, destination_end)
+    move_block(msa_matrix, subexon_block.sequence_index, block_start,
+               block_end, destination_start, destination_end)
+
+
+def move_problematic_block_clusters(
+        msa,
+        msa_matrix,
+        max_res_block=2,  # to move
+        min_gap_block=5  # to consider
+):
+    """
+    Find and move all the problematic block clusters in a chimeric MSA.
+    """
+    block_clusters = problematic_block_clusters(msa_matrix,
+                                                max_res_block=max_res_block,
+                                                min_gap_block=min_gap_block)
+    msa_numpy = np.array([list(rec) for rec in msa], np.character)
+    for (_, subexon_blocks) in block_clusters.items():
+        for subexon_block in subexon_blocks:
+            move_subexon_block(msa_numpy, msa_matrix, subexon_block)
+        # TO DO: Scoring!
+    return (msa_numpy, msa_matrix)
