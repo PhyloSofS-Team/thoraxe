@@ -204,6 +204,65 @@
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock">
+<em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">ProblematicSubexonBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence_index</span></em>, <em class="sig-param"><span class="n">subexon</span></em>, <em class="sig-param"><span class="n">subexon_blocks</span></em>, <em class="sig-param"><span class="n">block_type</span></em>, <em class="sig-param"><span class="n">subexon_block_start</span></em>, <em class="sig-param"><span class="n">subexon_block_end</span></em>, <em class="sig-param"><span class="n">gap_block_start</span></em>, <em class="sig-param"><span class="n">gap_block_end</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.block_type">
+<em class="property">property </em><code class="sig-name descname">block_type</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.block_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_end">
+<em class="property">property </em><code class="sig-name descname">gap_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_start">
+<em class="property">property </em><code class="sig-name descname">gap_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.sequence_index">
+<em class="property">property </em><code class="sig-name descname">sequence_index</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.sequence_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon">
+<em class="property">property </em><code class="sig-name descname">subexon</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_end">
+<em class="property">property </em><code class="sig-name descname">subexon_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_start">
+<em class="property">property </em><code class="sig-name descname">subexon_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_blocks">
+<em class="property">property </em><code class="sig-name descname">subexon_blocks</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.cluster_subexon_blocks">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">cluster_subexon_blocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">blocks</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.cluster_subexon_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster sub-exon blocks starting or ending in the same column.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt id="thoraxe.subexons.alignment.column_clusters">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">column_clusters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">colpatterns</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.column_clusters" title="Permalink to this definition">¶</a></dt>
@@ -262,6 +321,41 @@ sequence and a Dict from ‘SubexonIndex’ to …</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="thoraxe.subexons.alignment.move_block">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">move_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix</span></em>, <em class="sig-param"><span class="n">row</span></em>, <em class="sig-param"><span class="n">block_start</span></em>, <em class="sig-param"><span class="n">block_end</span></em>, <em class="sig-param"><span class="n">destination_start</span></em>, <em class="sig-param"><span class="n">destination_end</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.move_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move in-place a block in the (numpy) matrix.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">move_block</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">matrix([[3, 4, 2, 0, 1],</span>
+<span class="go">        [5, 6, 7, 8, 9]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">move_block</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">matrix([[3, 4, 2, 0, 1],</span>
+<span class="go">        [8, 9, 7, 5, 6]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.move_problematic_block_clusters">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">move_problematic_block_clusters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa</span></em>, <em class="sig-param"><span class="n">msa_matrix</span></em>, <em class="sig-param"><span class="n">max_res_block</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">min_gap_block</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.move_problematic_block_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and move all the problematic block clusters in a chimeric MSA.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.move_subexon_block">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">move_subexon_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa_numpy</span></em>, <em class="sig-param"><span class="n">msa_matrix</span></em>, <em class="sig-param"><span class="n">subexon_block</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.move_subexon_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Swap a sub-exon block within its gap block.</p>
+<p>The movement depends on the problematic sub-exon block position, e.g.:
+<a href="#id1"><span class="problematic" id="id2">``</span></a>`
+from: [1.0, 1.0, 1.0, nan, nan, nan, 1.0, 2.0, 2.0, 2.0] # last_block
+to:   [1.0, 1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0]</p>
+<p>from: [1.0, 1.0, 1.0, 2.0, nan, nan, nan, 2.0, 2.0, 2.0] # first_block
+to:   [1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0, 2.0]
+<a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="thoraxe.subexons.alignment.msa2sequences">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">msa2sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa</span></em>, <em class="sig-param"><span class="n">gene_ids</span></em>, <em class="sig-param"><span class="n">padding</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.msa2sequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str sequences from msa.</p>
@@ -275,10 +369,43 @@ sequence and a Dict from ‘SubexonIndex’ to …</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="thoraxe.subexons.alignment.problematic_block_clusters">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">problematic_block_clusters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa_matrix</span></em>, <em class="sig-param"><span class="n">max_res_block</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">min_gap_block</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.problematic_block_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a Dict of problematic sub-exon block clusters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.problematic_subexon_blocks">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">problematic_subexon_blocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subexons</span></em>, <em class="sig-param"><span class="n">starts</span></em>, <em class="sig-param"><span class="n">ends</span></em>, <em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">max_res_block</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">min_gap_block</span><span class="o">=</span><span class="default_value">5</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.problematic_subexon_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of ProblematicSubexonBlocks.</p>
+<p>In particular, a sub-exon block is problematic if it has &lt;= max_res_block
+and it is separeated from the rest of the sub-exon by a gap block
+=&gt; min_gap_block.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">problematic_subexon_blocks</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">[ProblematicSubexonBlock(sequence_index=0, subexon=1.0, subexon_blocks=2, block_type=&#39;last_block&#39;, subexon_block_start=9, subexon_block_end=10, gap_block_start=3, gap_block_end=9)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt id="thoraxe.subexons.alignment.read_msa_fasta">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">read_msa_fasta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa_file</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.read_msa_fasta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a BioPython’s alignment object from the fasta msa_file.</p>
 <p>Return None if the file is empty.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.resume_seq">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">resume_seq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">matrix_row</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.resume_seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sub-exon and gap blocks in the msa matrix.</p>
+<p>The function return three lists, a list of sub-exon ids and NaNs, i.e.
+the block id, a list with the column indices where the block starts and a
+list with the block ends.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resume_seq</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+<span class="go">([1.0, nan, 1.0, 2.0], [0, 3, 6, 7], [3, 6, 7, 10])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
