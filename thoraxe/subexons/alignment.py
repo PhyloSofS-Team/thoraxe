@@ -44,9 +44,8 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1,
-                                     col_index], transcript.iloc[row_index,
-                                                                 col_index]))
+                    (transcript.iloc[row_index - 1, col_index],
+                     transcript.iloc[row_index, col_index]))
     return set(connected_pairs)
 
 
@@ -662,8 +661,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
-                                                       == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (
+        subexon_df['GeneID'] == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
@@ -708,7 +707,7 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
 # Fix sub-exon blocks in the chimeric MSA
 
 
-def _same_subexon(a, b):
+def _same_subexon(id_a, id_b):
     """
     Return True if the sub-exon ids are identical or missing (NaNs).
 
@@ -722,9 +721,9 @@ def _same_subexon(a, b):
     >>> _same_subexon(2.0, 8.0)
     False
     """
-    if np.isnan(a) and np.isnan(b):
+    if np.isnan(id_a) and np.isnan(id_b):
         return True
-    return a == b
+    return id_a == id_b
 
 
 def resume_seq(matrix_row):
@@ -761,8 +760,8 @@ ProblematicSubexonBlock = collections.namedtuple('ProblematicSubexonBlock', [
 ])
 
 
-def _is_problematic(starts, ends, block_index, first, max_res_block,
-                    min_gap_block):
+def _is_problematic(  # pylint: disable=too-many-arguments
+        starts, ends, block_index, first, max_res_block, min_gap_block):
     """
     Return True is the sub-exon block is problematic.
     
@@ -783,9 +782,9 @@ def _is_problematic(starts, ends, block_index, first, max_res_block,
     return (subexon_len <= max_res_block) and (gaps_len >= min_gap_block)
 
 
-def _store_problematic(problematic_list, sequence, subexon, subexon_blocks,
-                       starts, ends, first_block, last_block, max_res_block,
-                       min_gap_block):
+def _store_problematic(  # pylint: disable=too-many-arguments  
+        problematic_list, sequence, subexon, subexon_blocks, starts, ends,
+        first_block, last_block, max_res_block, min_gap_block):
     """
     Store problematic sub-exon blocks in the problematic_list.
     """
@@ -808,7 +807,7 @@ def _store_problematic(problematic_list, sequence, subexon, subexon_blocks,
                                         ends[last_block - 1]))
 
 
-def problematic_subexon_blocks(
+def problematic_subexon_blocks(  # pylint: disable=too-many-arguments  
         subexons,
         starts,
         ends,
@@ -835,7 +834,7 @@ gap_block_start=3, gap_block_end=9)]
     subexon_blocks = 0
     previous_subexon = np.nan
     problematic_list = []
-    for (i, (subexon, start, end)) in enumerate(zip(subexons, starts, ends)):
+    for (i, (subexon, _, _)) in enumerate(zip(subexons, starts, ends)):
         if not np.isnan(subexon):
             if not _same_subexon(subexon, previous_subexon):
                 _store_problematic(problematic_list, sequence,
@@ -888,8 +887,9 @@ def problematic_block_clusters(
     return cluster_subexon_blocks(blocks)
 
 
-def move_block(matrix, row, block_start, block_end, destination_start,
-               destination_end):
+def move_block(  # pylint: disable=too-many-arguments  
+        matrix, row, block_start, block_end, destination_start,
+        destination_end):
     """
     Move in-place a block in the (numpy) matrix.
 
