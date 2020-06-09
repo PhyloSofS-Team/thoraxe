@@ -764,9 +764,9 @@ def _is_problematic(  # pylint: disable=too-many-arguments
         starts, ends, block_index, first, max_res_block, min_gap_block):
     """
     Return True is the sub-exon block is problematic.
-    
-    In particular, a sub-exon block is problematic if it has <= max_res_block 
-    and it is separeated from the rest of the sub-exon by a gap block 
+
+    In particular, a sub-exon block is problematic if it has <= max_res_block
+    and it is separeated from the rest of the sub-exon by a gap block
     => min_gap_block.
 
     >>> _is_problematic([0, 3, 6, 7], [3, 6, 7, 10], 0, True, 2, 2)
@@ -782,7 +782,7 @@ def _is_problematic(  # pylint: disable=too-many-arguments
     return (subexon_len <= max_res_block) and (gaps_len >= min_gap_block)
 
 
-def _store_problematic(  # pylint: disable=too-many-arguments  
+def _store_problematic(  # pylint: disable=too-many-arguments
         problematic_list, sequence, subexon, subexon_blocks, starts, ends,
         first_block, last_block, max_res_block, min_gap_block):
     """
@@ -807,7 +807,7 @@ def _store_problematic(  # pylint: disable=too-many-arguments
                                         ends[last_block - 1]))
 
 
-def problematic_subexon_blocks(  # pylint: disable=too-many-arguments  
+def problematic_subexon_blocks(  # pylint: disable=too-many-arguments
         subexons,
         starts,
         ends,
@@ -817,9 +817,9 @@ def problematic_subexon_blocks(  # pylint: disable=too-many-arguments
 ):
     """
     Return a list of ProblematicSubexonBlocks.
-    
-    In particular, a sub-exon block is problematic if it has <= max_res_block 
-    and it is separeated from the rest of the sub-exon by a gap block 
+
+    In particular, a sub-exon block is problematic if it has <= max_res_block
+    and it is separeated from the rest of the sub-exon by a gap block
     => min_gap_block.
 
     >>> import numpy as np
@@ -887,7 +887,7 @@ def problematic_block_clusters(
     return cluster_subexon_blocks(blocks)
 
 
-def move_block(  # pylint: disable=too-many-arguments  
+def move_block(  # pylint: disable=too-many-arguments
         matrix, row, block_start, block_end, destination_start,
         destination_end):
     """
