@@ -2,6 +2,8 @@
 alignment: Module to create the subexon MSA with Clustal Omega.
 """
 
+  # pylint: disable=too-many-lines
+
 import collections
 import logging
 import os
@@ -807,6 +809,28 @@ def _store_problematic(  # pylint: disable=too-many-arguments
                                         ends[last_block - 1]))
 
 
+def _choose_one(blocks):
+    """
+    Search for two-blocks sub-exons that has both blocks and choose one.
+
+    It chooses the smaller one or the first one.
+    """
+    subexon2blocks = collections.Counter(
+        [block.subexon for block in blocks if block.subexon_blocks == 2])
+    problematic = [
+        subexon for (subexon, blocks) in subexon2blocks.items() if blocks == 2
+    ]
+    pos2len = {}
+    for subexon in problematic:
+        pos2len = {
+            pos: block.subexon_block_end - block.subexon_block_start
+            for (pos, block) in enumerate(blocks) if block.subexon == subexon
+        }
+        pos_to_delete = max(pos2len, key=lambda key: pos2len[key])
+        del blocks[pos_to_delete]
+    return blocks
+
+
 def problematic_subexon_blocks(  # pylint: disable=too-many-arguments
         subexons,
         starts,
@@ -850,6 +874,7 @@ gap_block_start=3, gap_block_end=9)]
     _store_problematic(problematic_list, sequence, previous_subexon,
                        subexon_blocks, starts, ends, first_block, last_block,
                        max_res_block, min_gap_block)
+    _choose_one(problematic_list)
     return problematic_list
 
 
@@ -914,13 +939,13 @@ def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
     Swap a sub-exon block within its gap block.
 
     The movement depends on the problematic sub-exon block position, e.g.:
+
     ```
     from: [1.0, 1.0, 1.0, nan, nan, nan, 1.0, 2.0, 2.0, 2.0] # last_block
     to:   [1.0, 1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0]
 
     from: [1.0, 1.0, 1.0, 2.0, nan, nan, nan, 2.0, 2.0, 2.0] # first_block
     to:   [1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0, 2.0]
-    
     ```
     """
     block_start = subexon_block.subexon_block_start
@@ -970,7 +995,7 @@ def move_problematic_block_clusters(
     msa_numpy = np.array([list(rec) for rec in msa], np.character)
     for (_, subexon_blocks) in block_clusters.items():
         msa_copy = np.copy(msa_numpy)
-        matrix_copy = np.copy(matrix)
+        matrix_copy = np.copy(msa_matrix)
         starting_score = score_solution(matrix_copy)
         for subexon_block in subexon_blocks:
             move_subexon_block(msa_copy, matrix_copy, subexon_block)
