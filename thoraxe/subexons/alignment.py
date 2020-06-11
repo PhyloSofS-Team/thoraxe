@@ -813,7 +813,7 @@ def problematic_subexon_blocks(  # pylint: disable=too-many-arguments
         ends,
         sequence,
         max_res_block=2,  # to move
-        min_gap_block=5  # to consider
+        min_gap_block=2  # to consider
 ):
     """
     Return a list of ProblematicSubexonBlocks.
@@ -869,7 +869,7 @@ def cluster_subexon_blocks(blocks):
 def problematic_block_clusters(
         msa_matrix,
         max_res_block=2,  # to move
-        min_gap_block=5  # to consider
+        min_gap_block=2  # to consider
 ):
     """
     Return a Dict of problematic sub-exon block clusters.
@@ -920,6 +920,7 @@ def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
 
     from: [1.0, 1.0, 1.0, 2.0, nan, nan, nan, 2.0, 2.0, 2.0] # first_block
     to:   [1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0, 2.0]
+    
     ```
     """
     block_start = subexon_block.subexon_block_start
@@ -937,11 +938,28 @@ def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
                block_end, destination_start, destination_end)
 
 
+def score_solution(msa_matrix):
+    """
+    Return the number of times a sub-exon cross an s-exon boundary.
+    """
+    col_clusters = column_clusters(column_patterns(msa_matrix))
+    consensus = np.transpose(
+        np.matrix([cluster.consensus for cluster in col_clusters]))
+    n_sequences, n_s_exons = consensus.shape
+    score = 0
+    if (n_s_exons > 1) and (n_sequences > 1):
+        for seq in range(0, n_sequences):
+            for col in range(1, n_s_exons):
+                if consensus[seq, col - 1] == consensus[seq, col]:
+                    score += 1
+    return score
+
+
 def move_problematic_block_clusters(
         msa,
         msa_matrix,
         max_res_block=2,  # to move
-        min_gap_block=5  # to consider
+        min_gap_block=2  # to consider
 ):
     """
     Find and move all the problematic block clusters in a chimeric MSA.
@@ -951,7 +969,13 @@ def move_problematic_block_clusters(
                                                 min_gap_block=min_gap_block)
     msa_numpy = np.array([list(rec) for rec in msa], np.character)
     for (_, subexon_blocks) in block_clusters.items():
+        msa_copy = np.copy(msa_numpy)
+        matrix_copy = np.copy(matrix)
+        starting_score = score_solution(matrix_copy)
         for subexon_block in subexon_blocks:
-            move_subexon_block(msa_numpy, msa_matrix, subexon_block)
-        # TO DO: Scoring!
+            move_subexon_block(msa_copy, matrix_copy, subexon_block)
+        actual_score = score_solution(matrix_copy)
+        if actual_score < starting_score:
+            msa_numpy = msa_copy
+            msa_matrix = matrix_copy
     return (msa_numpy, msa_matrix)
