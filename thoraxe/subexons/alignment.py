@@ -879,7 +879,7 @@ gap_block_start=3, gap_block_end=9)]
 
 
 def _complete_block_coords(block):
-    if block.type == "first_block":
+    if block.block_type == "first_block":
         return range(block.subexon_block_start, block.gap_block_end)
     return range(block.gap_block_start, block.subexon_block_end)
 
