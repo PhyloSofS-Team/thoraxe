@@ -2,7 +2,7 @@
 alignment: Module to create the subexon MSA with Clustal Omega.
 """
 
-  # pylint: disable=too-many-lines
+# pylint: disable=too-many-lines
 
 import collections
 import logging
@@ -878,17 +878,59 @@ gap_block_start=3, gap_block_end=9)]
     return problematic_list
 
 
-def cluster_subexon_blocks(blocks):
+def _complete_block_coords(block):
+    if block.type == "first_block":
+        return range(block.subexon_block_start, block.gap_block_end)
+    return range(block.gap_block_start, block.subexon_block_end)
+
+
+def cluster_subexon_blocks(blocks, margin=2):
     """
     Cluster sub-exon blocks starting or ending in the same column.
     """
-    clusters = collections.defaultdict(list)
+    clusters = []
+    columns = []
     for block in blocks:
-        if block.block_type == 'first_block':
-            clusters[block.subexon_block_end].append(block)
-        if block.block_type == 'last_block':
-            clusters[block.subexon_block_start].append(block)
-    return clusters
+        cluster_number = -1
+        block_coords = _complete_block_coords(block)
+        start = block_coords.start
+        end = block_coords.stop
+        for (index, cols) in enumerate(columns):
+            if (start in cols) or (end in cols):
+                cluster_number = index
+        if cluster_number == -1:
+            clusters.append([block])
+            columns.append(range(max(0, start - margin), end + margin))
+        else:
+            clusters[cluster_number].append(block)
+            cols = columns[cluster_number]
+            columns[cluster_number] = range(
+                max(0, min(cols.start, start - margin)),
+                max(cols.stop, end + margin))
+    return _merge_block_clusters(clusters, columns)
+
+
+def _merge_block_clusters(clusters, columns):
+    """
+    Merge cluster sharing columns, return the list of clusters.
+    """
+    n_clusters = len(clusters)
+    to_delete = set([])
+    for actual_cluster in range(1, n_clusters):
+        cols = set(columns[actual_cluster])
+        for previous_cluster in range(actual_cluster):
+            prev_cols = columns[previous_cluster]
+            if previous_cluster not in to_delete:
+                if cols.intersection(prev_cols):
+                    clusters[previous_cluster].extend(clusters[actual_cluster])
+                    columns[previous_cluster] = range(
+                        max(0, min(min(cols), prev_cols.start)),
+                        max(max(cols), prev_cols.end))
+                    to_delete.update(actual_cluster)
+                    break
+    return [
+        clus for (index, clus) in enumerate(clusters) if index not in to_delete
+    ]
 
 
 def problematic_block_clusters(
@@ -993,7 +1035,7 @@ def move_problematic_block_clusters(
                                                 max_res_block=max_res_block,
                                                 min_gap_block=min_gap_block)
     msa_numpy = np.array([list(rec) for rec in msa], np.character)
-    for (_, subexon_blocks) in block_clusters.items():
+    for subexon_blocks in block_clusters:
         msa_copy = np.copy(msa_numpy)
         matrix_copy = np.copy(msa_matrix)
         starting_score = score_solution(matrix_copy)
