@@ -46,8 +46,9 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1, col_index],
-                     transcript.iloc[row_index, col_index]))
+                    (transcript.iloc[row_index - 1,
+                                     col_index], transcript.iloc[row_index,
+                                                                 col_index]))
     return set(connected_pairs)
 
 
@@ -663,8 +664,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (
-        subexon_df['GeneID'] == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
+                                                       == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
@@ -1005,19 +1006,36 @@ def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
                block_end, destination_start, destination_end)
 
 
+def get_subexon_boundaries(col_clusters):
+    """   
+    Returns a dict from (sequence number, subexon id) to start and end columns.
+    """
+    boundaries = dict()
+    for cluster in col_clusters:
+        for (seq, subexon) in enumerate(cluster.consensus):
+            if not np.isnan(subexon):
+                if (seq, subexon) in boundaries:
+                    boundaries[(seq, subexon)][1] = cluster.end
+                else:
+                    boundaries[(seq, subexon)] = [cluster.start, cluster.end]
+    return boundaries
+
+
 def score_solution(msa_matrix):
     """
     Return the number of times a sub-exon cross an s-exon boundary.
     """
-    col_clusters = column_clusters(column_patterns(msa_matrix))
-    consensus = np.transpose(
-        np.matrix([cluster.consensus for cluster in col_clusters]))
-    n_sequences, n_s_exons = consensus.shape
+    col_patterns = alignment.column_patterns(msa_matrix)
+    col_clusters = alignment.column_clusters(col_patterns)
+    n_s_exons = len(col_clusters)
+    n_sequences = len(col_clusters[1].consensus)
     score = 0
     if (n_s_exons > 1) and (n_sequences > 1):
-        for seq in range(0, n_sequences):
-            for col in range(1, n_s_exons):
-                if consensus[seq, col - 1] == consensus[seq, col]:
+        subexon_boundaries = get_subexon_boundaries(col_clusters)
+        for cluster in range(1, n_s_exons):
+            for ((seq, subexon), coords) in subexon_boundaries.items():
+                start = col_clusters[cluster].start
+                if coords[0] < start and start <= coords[1]:
                     score += 1
     return score
 
