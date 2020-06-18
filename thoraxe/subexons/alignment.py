@@ -555,6 +555,20 @@ def _equal_without_nans(col_i, col_j):
     Returns False otherwise or if there are no elements in common between the
     columns. Also, it returns True if col_i or col_j are only gap/padding 
     columns, i.e. full nan columns.
+
+    >>> import numpy as np
+    >>> _equal_without_nans(np.array([1, 2, 3]), np.array([1, 2, 3]))
+    True
+    >>> _equal_without_nans(np.array([1, np.nan, 3]), np.array([1, 2, np.nan]))
+    True
+    >>> _equal_without_nans(np.array([1, 2]), np.array([np.nan, np.nan]))
+    True
+    >>> _equal_without_nans(np.array([np.nan, np.nan]), np.array([1, 2]))
+    True
+    >>> _equal_without_nans(np.array([0, 2, 3]), np.array([1, 2, 3]))
+    False
+    >>> _equal_without_nans(np.array([0, np.nan, 3]), np.array([1, 2, np.nan]))
+    False
     """
     nan_i = np.isnan(col_i)
     nan_j = np.isnan(col_j)
