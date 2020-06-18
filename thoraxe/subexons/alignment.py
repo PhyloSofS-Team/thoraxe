@@ -553,11 +553,16 @@ def _equal_without_nans(col_i, col_j):
     Return True if the columns are equal without comparing rows with nans.
 
     Returns False otherwise or if there are no elements in common between the
-    columns.
+    columns. Also, it returns True if col_i or col_j are only gap/padding 
+    columns, i.e. full nan columns.
     """
-    nans = np.isnan(col_i) | np.isnan(col_j)
-    elements_i = col_i[~nans]
-    elements_j = col_j[~nans]
+    nan_i = np.isnan(col_i)
+    nan_j = np.isnan(col_j)
+    if np.all(nan_i) or np.all(nan_j):
+        return True
+    nan_rows = nan_i | nan_j
+    elements_i = col_i[~nan_rows]
+    elements_j = col_j[~nan_rows]
     if elements_i.size > 0:
         return np.array_equal(elements_i, elements_j)
     return False
@@ -570,24 +575,22 @@ def _colcluster(colpattern):
 
 
 def column_clusters(colpatterns):
-    """Return a ColCluster liste from a ColPattern list."""
+    """Return a ColCluster list from a ColPattern list."""
     n_patterns = len(colpatterns)
     colpattern = colpatterns[0]
     clusters = [_colcluster(colpattern)]
     if n_patterns > 1:
         for i in range(1, n_patterns):
             colpattern = colpatterns[i]
-            if not np.all(np.isnan(colpattern.pattern)):
-                cluster = clusters[-1]
-                if (colpattern.start - cluster.end == 1
-                        and _equal_without_nans(cluster.consensus,
-                                                colpattern.pattern)):
-                    nans = np.isnan(cluster.consensus)
-                    cluster.consensus[nans] = colpattern.pattern[nans]
-                    cluster.patterns.append(colpattern)
-                    cluster.end = colpattern.end
-                else:
-                    clusters.append(_colcluster(colpattern))
+            cluster = clusters[-1]
+            if (colpattern.start - cluster.end == 1 and _equal_without_nans(
+                    cluster.consensus, colpattern.pattern)):
+                nans = np.isnan(cluster.consensus)
+                cluster.consensus[nans] = colpattern.pattern[nans]
+                cluster.patterns.append(colpattern)
+                cluster.end = colpattern.end
+            else:
+                clusters.append(_colcluster(colpattern))
     return clusters
 
 
