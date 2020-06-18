@@ -1025,15 +1025,15 @@ def score_solution(msa_matrix):
     """
     Return the number of times a sub-exon cross an s-exon boundary.
     """
-    col_patterns = alignment.column_patterns(msa_matrix)
-    col_clusters = alignment.column_clusters(col_patterns)
+    col_patterns = column_patterns(msa_matrix)
+    col_clusters = column_clusters(col_patterns)
     n_s_exons = len(col_clusters)
     n_sequences = len(col_clusters[1].consensus)
     score = 0
     if (n_s_exons > 1) and (n_sequences > 1):
         subexon_boundaries = get_subexon_boundaries(col_clusters)
         for cluster in range(1, n_s_exons):
-            for ((seq, subexon), coords) in subexon_boundaries.items():
+            for coords in subexon_boundaries.values():
                 start = col_clusters[cluster].start
                 if coords[0] < start and start <= coords[1]:
                     score += 1
