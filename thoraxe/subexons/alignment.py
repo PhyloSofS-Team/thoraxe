@@ -1069,7 +1069,7 @@ def move_problematic_block_clusters(
     block_clusters = problematic_block_clusters(msa_matrix,
                                                 max_res_block=max_res_block,
                                                 min_gap_block=min_gap_block)
-    msa_numpy = np.array([list(rec) for rec in msa], dtype=str)
+    msa_numpy = np.array([list(rec) for rec in msa], np.character)
     for subexon_blocks in block_clusters:
         msa_copy = np.copy(msa_numpy)
         matrix_copy = np.copy(msa_matrix)
@@ -1080,4 +1080,42 @@ def move_problematic_block_clusters(
         if actual_score < starting_score:
             msa_numpy[:, :] = msa_copy
             msa_matrix[:, :] = matrix_copy
+    return (msa_numpy, msa_matrix)
+
+
+def disintegration(msa_numpy, msa_matrix):
+    """
+    Disintegrate a one-residue length s-exons.
+
+    It merges their residues to the contiguous s-exons.
+    Return the modified MSA and sub-exon matrix.
+    """
+    col_patterns = column_patterns(msa_matrix)
+    col_clusters = column_clusters(col_patterns)
+    n_clusters = len(col_clusters)
+    if n_clusters > 2:
+        for index in range(1, n_clusters - 1):
+            cluster = col_clusters[index]
+            if cluster.start == cluster.end:
+                left_cluster = col_clusters[index - 1]
+                right_cluster = col_clusters[index + 1]
+                directions = [
+                    1 if center == right else 0
+                    for (left, center,
+                         right) in zip(left_cluster.consensus, cluster.
+                                       consensus, right_cluster.consensus)
+                ]
+                col = cluster.start
+                msa_matrix = np.insert(msa_matrix, col + 1, np.nan,
+                                       axis=1)  # can not be in-place
+                msa_numpy = np.insert(msa_numpy, col + 1, "-", axis=1)
+                for (row, direction) in enumerate(directions):
+                    if direction:  # is 1, then move
+                        msa_matrix[row, col + 1] = msa_matrix[row, col]
+                        msa_matrix[row, col] = np.nan
+                        msa_numpy[row, col + 1] = msa_numpy[row, col]
+                        msa_numpy[row, col] = "-"
+                msa_numpy, msa_matrix = disintegration(msa_numpy, msa_matrix)
+            else:
+                continue
     return (msa_numpy, msa_matrix)
