@@ -1069,7 +1069,7 @@ def move_problematic_block_clusters(
     block_clusters = problematic_block_clusters(msa_matrix,
                                                 max_res_block=max_res_block,
                                                 min_gap_block=min_gap_block)
-    msa_numpy = np.array([list(rec) for rec in msa], np.character)
+    msa_numpy = np.array([list(rec) for rec in msa], dtype=str)
     for subexon_blocks in block_clusters:
         msa_copy = np.copy(msa_numpy)
         matrix_copy = np.copy(msa_matrix)
@@ -1078,6 +1078,6 @@ def move_problematic_block_clusters(
             move_subexon_block(msa_copy, matrix_copy, subexon_block)
         actual_score = score_solution(matrix_copy)
         if actual_score < starting_score:
-            msa_numpy = msa_copy
-            msa_matrix = matrix_copy
+            msa_numpy[:, :] = msa_copy
+            msa_matrix[:, :] = matrix_copy
     return (msa_numpy, msa_matrix)
