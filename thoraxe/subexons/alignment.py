@@ -1045,7 +1045,7 @@ def score_solution(msa_matrix):
     col_patterns = column_patterns(msa_matrix)
     col_clusters = column_clusters(col_patterns)
     n_s_exons = len(col_clusters)
-    n_sequences = len(col_clusters[1].consensus)
+    n_sequences = len(col_clusters[0].consensus)
     score = 0
     if (n_s_exons > 1) and (n_sequences > 1):
         subexon_boundaries = get_subexon_boundaries(col_clusters)
