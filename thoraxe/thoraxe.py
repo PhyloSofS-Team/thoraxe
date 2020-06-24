@@ -120,9 +120,9 @@ def parse_command_line():
     parser.add_argument(
         '--canonical_criteria',
         help='List of column names of the `path_table` separated by commas '
-        'used to sort the row. If nothing is indicated, the folowwing list is '
-        'used: PathGeneNumber,MinimumTranscriptWeightedConservation,'
-        'TranscriptLength',
+        'used to sort the row. If nothing is indicated, the following list is '
+        'used: MinimumConservation,MinimumTranscriptWeightedConservation,'
+        'MeanTranscriptWeightedConservation,TranscriptLength,TSL',
         default='')
     return parser
 

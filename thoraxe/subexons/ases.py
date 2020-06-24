@@ -53,9 +53,10 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         'Path': []
     }
 
-    transcript2tsl = transcript_table.loc[:, [
-        "TranscriptIDCluster", "TSL"
-    ]].set_index("TranscriptIDCluster").to_dict()['TSL']
+    transcript2tsl = transcript_table.loc[:,
+                                          ["TranscriptIDCluster", "TSL"
+                                           ]].set_index("TranscriptIDCluster"
+                                                        ).to_dict()['TSL']
 
     for (trx, subdf) in s_exon_table.groupby('TranscriptIDCluster'):
         n_rows = len(subdf)
@@ -124,8 +125,8 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
 
     if column_order is None:
         column_order = [
-            'PathGeneNumber', 'MinimumTranscriptWeightedConservation',
-            'TranscriptLength'
+            'MinimumConservation', 'MinimumTranscriptWeightedConservation',
+            'MeanTranscriptWeightedConservation', 'TranscriptLength', 'TSL'
         ]
 
     data_frame.drop_duplicates(inplace=True)
