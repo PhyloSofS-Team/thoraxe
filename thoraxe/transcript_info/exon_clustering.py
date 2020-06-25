@@ -35,7 +35,7 @@ def coverage_shortest(seq_query, seq_target, seq_len):
 
 def percent_identity(query, target):
     """
-    Return percent identity of the aligned sequnces.
+    Return percent identity of the aligned sequences.
 
     >>> percent_identity("AA---", "AAAA-")
     50.0

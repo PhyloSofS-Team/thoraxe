@@ -5,6 +5,10 @@ ThorAxe pipeline and script functions.
 import argparse
 import os
 from ast import literal_eval
+from Bio.Alphabet import generic_protein
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Align import MultipleSeqAlignment
 import numpy as np
 
 from thoraxe import subexons
@@ -104,6 +108,12 @@ def parse_command_line():
         '--phylosofs',
         help='Save inputs to run PhyloSofS in the phylosofs folder.',
         action='store_true')
+    parser.add_argument('--no_movements',
+                        help='Do not move one/two residue sub-exon blocks.',
+                        action='store_false')
+    parser.add_argument('--no_disintegration',
+                        help='Do not disintegrate one-residue-length s-exons.',
+                        action='store_false')
     parser.add_argument(
         '--plot_chimerics',
         help='Save plotly/html plot for the chimeric alignments in the '
@@ -353,6 +363,8 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         gap_extend_penalty=1,
         aligner='clustalo',
         padding='XXXXXXXXXX',
+        movements=True,
+        disintegration=True,
         species_list=None):
     """Perform almost all the ThorAxe pipeline."""
 
@@ -394,6 +406,25 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         if msa is not None:
             gene_ids = subexons.alignment.get_gene_ids(msa)
             msa_matrix = subexons.alignment.create_msa_matrix(chimerics, msa)
+
+            if movements:
+                (msa_numpy, msa_matrix
+                 ) = subexons.alignment.move_problematic_block_clusters(
+                     msa, msa_matrix)
+            else:
+                msa_numpy = np.array([list(rec) for rec in msa], np.character)
+
+            if disintegration:
+                msa_numpy, msa_matrix = subexons.alignment.disintegration(
+                    msa_numpy, msa_matrix)
+
+            if movements or disintegration:
+                msa = MultipleSeqAlignment([
+                    SeqRecord(Seq(row.tostring().decode('utf-8'),
+                                  generic_protein),
+                              id=gene_id)
+                    for (gene_id, row) in zip(gene_ids, msa_numpy)
+                ])
 
             with open(
                     _outfile(intermediate_output_path, "gene_ids_", cluster,
@@ -658,6 +689,8 @@ def main():  # pylint: disable=too-many-locals
                                gap_extend_penalty=args.gapextend,
                                aligner=args.aligner,
                                padding='X' * args.padding,
+                               movements=not args.no_movements,
+                               disintegration=not args.no_disintegration,
                                species_list=species_list)
 
     if args.plot_chimerics:
