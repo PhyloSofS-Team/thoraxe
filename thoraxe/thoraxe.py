@@ -110,10 +110,10 @@ def parse_command_line():
         action='store_true')
     parser.add_argument('--no_movements',
                         help='Do not move one/two residue sub-exon blocks.',
-                        action='store_false')
+                        action='store_true')
     parser.add_argument('--no_disintegration',
                         help='Do not disintegrate one-residue-length s-exons.',
-                        action='store_false')
+                        action='store_true')
     parser.add_argument(
         '--plot_chimerics',
         help='Save plotly/html plot for the chimeric alignments in the '
