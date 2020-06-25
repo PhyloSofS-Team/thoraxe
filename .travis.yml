@@ -11,7 +11,7 @@ install:
   - git clone https://github.com/PhyloSofS-Team/ProGraphMSA.git prographmsa
   - chmod a+x ./prographmsa/bin/ProGraphMSA_64
   - sudo cp ./prographmsa/bin/ProGraphMSA_64 /bin/ProGraphMSA
-  - ProGraphMSA --help
+  - rm -fr prographmsa # clean up
   - python -m pip install coveralls codecov
   - python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
   - python -m pip install .
