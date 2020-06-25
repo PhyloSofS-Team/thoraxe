@@ -18,7 +18,7 @@ def _is_windows():
 def set_out_dir():
     out_dir = 'tmp'
     yield out_dir
-    shutil.rmtree(out_dir)
+    os.path.isdir(out_dir) and shutil.rmtree(out_dir)
 
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
@@ -34,7 +34,7 @@ def test_thoraxe(monkeypatch, request, set_out_dir):
                     'You should install ProGraphMSA in the Windows '
                     'Subsystem for Linux to run this test.')
         else:  # AppVeyor
-            return None
+            
 
     filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
