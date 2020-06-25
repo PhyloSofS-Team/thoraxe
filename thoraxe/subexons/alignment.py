@@ -46,9 +46,8 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1,
-                                     col_index], transcript.iloc[row_index,
-                                                                 col_index]))
+                    (transcript.iloc[row_index - 1, col_index],
+                     transcript.iloc[row_index, col_index]))
     return set(connected_pairs)
 
 
@@ -556,7 +555,7 @@ def _equal_without_nans(col_i, col_j):
     Return True if the columns are equal without comparing rows with nans.
 
     Returns False otherwise or if there are no elements in common between the
-    columns. Also, it returns True if col_i or col_j are only gap/padding 
+    columns. Also, it returns True if col_i or col_j are only gap/padding
     columns, i.e. full nan columns.
 
     >>> import numpy as np
@@ -684,8 +683,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
-                                                       == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (
+        subexon_df['GeneID'] == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
@@ -1027,7 +1026,7 @@ def move_subexon_block(msa_numpy, msa_matrix, subexon_block):
 
 
 def get_subexon_boundaries(col_clusters):
-    """   
+    """
     Returns a dict from (sequence number, subexon id) to start and end columns.
     """
     boundaries = dict()
