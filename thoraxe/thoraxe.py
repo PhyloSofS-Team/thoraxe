@@ -51,9 +51,9 @@ def parse_command_line():
         default='')
     parser.add_argument('-a',
                         '--aligner',
-                        help='Path to Clustal Omega.',
+                        help='Path to ProGraphMSA.',
                         type=str,
-                        default='clustalo')
+                        default='ProGraphMSA')
     parser.add_argument('-s',
                         '--maxtsl',
                         help='Maximum Transcript Support Level (TSL) to use '
@@ -224,7 +224,7 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
         subexon_df,
         gene2speciesname,
         connected_subexons,
-        aligner='clustalo',
+        aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
         species_list=None):
     """Return a modified subexon_df, the dict of chimerics and the msa."""
@@ -253,7 +253,7 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         connected_subexons,
         cutoff=30.0,
         min_col_number=4,
-        aligner='clustalo',
+        aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
         species_list=None):
     """
@@ -290,7 +290,7 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         clusters=None,
         cutoff=30.0,
         min_col_number=4,
-        aligner='clustalo',
+        aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
         species_list=None):
     """
@@ -361,7 +361,7 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         percent_identity_cutoff=30.0,
         gap_open_penalty=10,
         gap_extend_penalty=1,
-        aligner='clustalo',
+        aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
         movements=True,
         disintegration=True,

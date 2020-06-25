@@ -15,8 +15,6 @@ RUN apt-get update && \
     python3-setuptools \
     python3-dev \
     build-essential \
-    # ThorAxe's dependencies:
-    clustalo \
     # Utilities:
     tree \
     ipython3

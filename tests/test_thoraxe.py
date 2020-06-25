@@ -22,21 +22,19 @@ def set_out_dir():
 
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
-    aligner = 'clustalo'
+    aligner = 'ProGraphMSA'
     if _is_windows():
-        if shutil.which('wsl') is not None:  # Clustal Omega in the WSL
-            status, _ = subprocess.getstatusoutput(['wsl', 'clustalo', '-h'])
+        if shutil.which('wsl') is not None:  # ProGraphSA in the WSL
+            status, _ = subprocess.getstatusoutput(
+                ['wsl', 'ProGraphMSA', '-h'])
             if status == 0:
-                aligner = 'wsl clustalo'
+                aligner = 'wsl ProGraphMSA'
             else:
-                raise Exception('You should install clustalo in the Windows '
-                                'Subsystem for Linux to run this test.')
+                raise Exception(
+                    'You should install ProGraphMSA in the Windows '
+                    'Subsystem for Linux to run this test.')
         else:  # AppVeyor
-            muscle = 'C:\\projects\\thoraxe\\muscle.exe'
-            warnings.warn('Assuming that the test is running in AppVeyor with '
-                          'muscle installed at {}'.format(muscle))
-            if os.path.exists(muscle):
-                aligner = muscle + ' -in '
+            return None
 
     filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')

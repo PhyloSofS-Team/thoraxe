@@ -7,20 +7,14 @@ Dependencies
 
 You need **Python 3.6.1 or higher** to use *ThorAxe*. You also need:
 
-Clustal Omega
-~~~~~~~~~~~~~
+ProGraphMSA
+~~~~~~~~~~~
 
-To run *ThorAxe* you need `Clustal Omega`_. Follow the instructions on that
+To run *ThorAxe* you need `ProGraphMSA`_. Follow the instructions on that
 link to install it.
 
-If you are using **Ubuntu**, the easiest way to install *Clustal Omega* is:
-
-::
-
-   sudo apt-get install clustalo
-
-If you are using **Windows 10**, you can use `clustalo` through *Ubuntu* with
-the `Windows Subsystem for Linux`_.
+If you are using **Windows 10**, you can use `ProGraphMSA` through *Ubuntu*
+with the `Windows Subsystem for Linux`_.
 
 
 NumPy
@@ -99,7 +93,7 @@ easier the use of the `thoraxe` *Python* module.
 .. _Python 3: https://www.python.org/
 .. _Numpy: https://numpy.org/
 .. _scikit-bio: http://scikit-bio.org/
-.. _Clustal Omega: http://www.clustal.org/omega/
+.. _ProGraphMSA: https://github.com/acg-team/ProGraphMSA
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker image: https://hub.docker.com/r/diegozea/thoraxe
 .. _Docker website: https://www.docker.com

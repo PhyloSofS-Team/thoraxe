@@ -1,5 +1,5 @@
 """
-alignment: Module to create the subexon MSA with Clustal Omega.
+alignment: Module to create the subexon MSA with ProGraphMSA.
 """
 
 # pylint: disable=too-many-lines
@@ -141,7 +141,7 @@ def create_chimeric_sequences(  # pylint: disable=too-many-locals
         connected_subexons,
         padding='XXXXXXXXXX'):
     """
-    Create chimeric sequence for Clustal Omega.
+    Create chimeric sequence for ProGraphMSA.
 
     It returns a Dict from 'GeneID' to a tuple with the chimeric
     sequence and a Dict from 'SubexonIndex' to ...
@@ -220,7 +220,7 @@ def _get_wsl_name(executable_path):
     True
     >>> nwin or _get_wsl_name('C:\\WINDOWS\\SysNative\\bash.exe') == 'bash.exe'
     True
-    >>> nwin or _get_wsl_name('clustalo') is None
+    >>> nwin or _get_wsl_name('ProGraphMSA') is None
     True
     """
     executable_name = os.path.basename(os.path.abspath(executable_path))
@@ -262,26 +262,28 @@ def _win2wsl(path):
         '{} is not an absolute Windows path to a file.'.format(path))
 
 
-def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
+def run_aligner(chimerics,
+                output_path='alignment.fasta',
+                aligner='ProGraphMSA'):
     """
-    Run Clustal Omega in the chimeric sequences and return the output file.
+    Run ProGraphMSA in the chimeric sequences and return the output file.
 
-    You can pass arguments using aligner (default: 'clustalo'), e.g:
+    You can pass arguments using aligner (default: 'ProGraphMSA'), e.g:
     ::
 
-        aligner='clustalo --threads=4'
+        aligner='ProGraphMSA --mldist_gap'
 
-    You need Clustal Omega installed to run this function. You can install it
-    from: http://www.clustal.org/omega/
+    You need ProGraphMSA installed to run this function. You can install it
+    from: https://github.com/acg-team/ProGraphMSA
 
-    If you are using Windows 10 and you have installed Clustal Omega in
+    If you are using Windows 10 and you have installed ProGraphMSA in
     Ubuntu using the 'Windows Subsystem for Linux', you can try with the
     following options:
     ::
 
-        aligner='ubuntu.exe -c clustalo'
-        aligner='bash.exe -c clustalo'
-        aligner='wsl.exe clustalo'
+        aligner='ubuntu.exe -c ProGraphMSA'
+        aligner='bash.exe -c ProGraphMSA'
+        aligner='wsl.exe ProGraphMSA'
     """
     if len(chimerics) == 1:
         with open(output_path, 'w') as outfile:
@@ -295,14 +297,16 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
     wsl = _get_wsl_name(command[0])
     is_wsl = platform.system() == 'Windows' and wsl is not None
 
-    if 'clustalo' in command[-1]:
-        command.append('--in')
+    if '--input_order' not in command:
+        command.append('--input_order')
+    if '--fasta' not in command:
+        command.append('--fasta')
 
     if is_wsl:
         command[0] = _get_wsl_path(wsl)
-        command.append(_win2wsl(input_fasta))
-        command.append('>')
+        command.append('--output')
         command.append(_win2wsl(output_path))
+        command.append(_win2wsl(input_fasta))
         if wsl.lower().startswith('wsl'):
             subprocess.call(command)
         else:
@@ -311,17 +315,16 @@ def run_aligner(chimerics, output_path='alignment.fasta', aligner='clustalo'):
                                                 ' '.join(command[2:])))
     else:
         try:
+            command.append('--output')
+            command.append(output_path)
             command.append(input_fasta)
-            with open(output_path, 'wb') as outfile:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                for line in process.stdout:
-                    outfile.write(line)
-                process.wait()
+            subprocess.call(command)
         except (OSError, FileNotFoundError) as err:
             if shutil.which(command[0]) is None:
                 raise OSError(
-                    '{} not found. Please indicate a correct path or install it: {}'
-                    .format(aligner, 'http://www.clustal.org/omega/'))
+                    '{} not found. '.format(aligner) +
+                    'Please indicate the path to ProGraphMSA or install it ' +
+                    'from https://github.com/acg-team/ProGraphMSA')
             raise err
 
     return output_path
