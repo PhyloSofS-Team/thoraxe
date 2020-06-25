@@ -1054,7 +1054,7 @@ def score_solution(msa_matrix):
         for cluster in range(1, n_s_exons):
             for coords in subexon_boundaries.values():
                 start = col_clusters[cluster].start
-                if coords[0] < start and start <= coords[1]:
+                if coords[0] < start <= coords[1]:
                     score += 1
     return score
 
