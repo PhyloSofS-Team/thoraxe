@@ -45,15 +45,9 @@ def test_ases(mapk8):
     assert all(trx_df.MinimumTranscriptWeightedConservation[select] ==
                0.03333333333333333)
 
-    assert list(trx_df.PathGeneNumber) == sorted(trx_df.PathGeneNumber,
+    assert list(trx_df.MinimumConservation) == sorted(trx_df.MinimumConservation,
                                                  reverse=True)
-    common_gene_num = [len(genes.split('/')) for genes in ases_df.CommonGenes]
-    assert common_gene_num == sorted(common_gene_num, reverse=True)
 
-    select = np.logical_and(ases_df.CanonicalPath == '7_3/15_0/15_1/stop',
-                            ases_df.AlternativePath == '7_3/5_0/stop')
-    assert len(ases_df.MutualExclusivity[select]) == 1
-    assert all(ases_df.MutualExclusivity[select] == "mutually_exclusive")
     # mutually_exclusive because ENSXETT00000046905 from ENSXETG00000021691
     # is the only transcript with 15_0/15_1 at the  same time.
     assert all(ases_df.ASE[select] == "alternative_end")
