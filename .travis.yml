@@ -10,6 +10,8 @@ notifications:
 install:
   - sudo apt install curl
   - sudo curl https://github.com/PhyloSofS-Team/ProGraphMSA/raw/master/bin/ProGraphMSA_64 --output /bin/ProGraphMSA
+  - sudo chmod a+x /bin/ProGraphMSA
+  - ProGraphMSA --help
   - python -m pip install coveralls codecov
   - python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
   - python -m pip install .
