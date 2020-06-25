@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="thoraxe.transcript_info package" href="thoraxe.transcript_info.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> ThorAxe
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ThorAxe
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,6 +107,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -143,7 +146,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="modules.html">thoraxe</a> &raquo;</li>
         
@@ -175,7 +178,7 @@
 </div>
 <div class="section" id="module-thoraxe.subexons.alignment">
 <span id="thoraxe-subexons-alignment-module"></span><h2>thoraxe.subexons.alignment module<a class="headerlink" href="#module-thoraxe.subexons.alignment" title="Permalink to this headline">¶</a></h2>
-<p>alignment: Module to create the subexon MSA with Clustal Omega.</p>
+<p>alignment: Module to create the subexon MSA with ProGraphMSA.</p>
 <dl class="py class">
 <dt id="thoraxe.subexons.alignment.ColCluster">
 <em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">ColCluster</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">patterns</span></em>, <em class="sig-param"><span class="n">consensus</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.ColCluster" title="Permalink to this definition">¶</a></dt>
@@ -184,21 +187,21 @@
 <dl class="py class">
 <dt id="thoraxe.subexons.alignment.ColPattern">
 <em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">ColPattern</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pattern</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
 <dt id="thoraxe.subexons.alignment.ColPattern.end">
-<code class="sig-name descname">end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.end" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.end" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ColPattern.pattern">
-<code class="sig-name descname">pattern</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.pattern" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">pattern</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.pattern" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ColPattern.start">
-<code class="sig-name descname">start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.start" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ColPattern.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
@@ -207,51 +210,51 @@
 <dl class="py class">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock">
 <em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">ProblematicSubexonBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence_index</span></em>, <em class="sig-param"><span class="n">subexon</span></em>, <em class="sig-param"><span class="n">subexon_blocks</span></em>, <em class="sig-param"><span class="n">block_type</span></em>, <em class="sig-param"><span class="n">subexon_block_start</span></em>, <em class="sig-param"><span class="n">subexon_block_end</span></em>, <em class="sig-param"><span class="n">gap_block_start</span></em>, <em class="sig-param"><span class="n">gap_block_end</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.block_type">
-<code class="sig-name descname">block_type</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.block_type" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">block_type</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.block_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 3</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_end">
-<code class="sig-name descname">gap_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_end" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">gap_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 7</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_start">
-<code class="sig-name descname">gap_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_start" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">gap_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.gap_block_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 6</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.sequence_index">
-<code class="sig-name descname">sequence_index</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.sequence_index" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">sequence_index</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.sequence_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon">
-<code class="sig-name descname">subexon</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">subexon</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_end">
-<code class="sig-name descname">subexon_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_end" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">subexon_block_end</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 5</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_start">
-<code class="sig-name descname">subexon_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_start" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">subexon_block_start</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_block_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 4</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_blocks">
-<code class="sig-name descname">subexon_blocks</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_blocks" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">subexon_blocks</code><a class="headerlink" href="#thoraxe.subexons.alignment.ProblematicSubexonBlock.subexon_blocks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
@@ -266,7 +269,7 @@
 <dl class="py function">
 <dt id="thoraxe.subexons.alignment.column_clusters">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">column_clusters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">colpatterns</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.column_clusters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a ColCluster liste from a ColPattern list.</p>
+<dd><p>Return a ColCluster list from a ColPattern list.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -278,7 +281,7 @@
 <dl class="py function">
 <dt id="thoraxe.subexons.alignment.create_chimeric_sequences">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">create_chimeric_sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subexon_table</span></em>, <em class="sig-param"><span class="n">subexon_matrix</span></em>, <em class="sig-param"><span class="n">connected_subexons</span></em>, <em class="sig-param"><span class="n">padding</span><span class="o">=</span><span class="default_value">'XXXXXXXXXX'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.create_chimeric_sequences" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create chimeric sequence for Clustal Omega.</p>
+<dd><p>Create chimeric sequence for ProGraphMSA.</p>
 <p>It returns a Dict from ‘GeneID’ to a tuple with the chimeric
 sequence and a Dict from ‘SubexonIndex’ to …</p>
 </dd></dl>
@@ -303,6 +306,14 @@ sequence and a Dict from ‘SubexonIndex’ to …</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="thoraxe.subexons.alignment.disintegration">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">disintegration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa_numpy</span></em>, <em class="sig-param"><span class="n">msa_matrix</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.disintegration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disintegrate a one-residue length s-exons.</p>
+<p>It merges their residues to the contiguous s-exons.
+Return the modified MSA and sub-exon matrix.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="thoraxe.subexons.alignment.gene2species">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">gene2species</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transcript_data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.gene2species" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the a dict from ‘GeneID’ to ‘Species’.</p>
@@ -312,6 +323,12 @@ sequence and a Dict from ‘SubexonIndex’ to …</p>
 <dt id="thoraxe.subexons.alignment.get_gene_ids">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">get_gene_ids</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.get_gene_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a biopython MSA and return a list with the gene (sequence) ids.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.alignment.get_subexon_boundaries">
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">get_subexon_boundaries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">col_clusters</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.get_subexon_boundaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict from (sequence number, subexon id) to start and end columns.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -410,20 +427,20 @@ list with the block ends.</p>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.alignment.run_aligner">
-<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">run_aligner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chimerics</span></em>, <em class="sig-param"><span class="n">output_path</span><span class="o">=</span><span class="default_value">'alignment.fasta'</span></em>, <em class="sig-param"><span class="n">aligner</span><span class="o">=</span><span class="default_value">'clustalo'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.run_aligner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run Clustal Omega in the chimeric sequences and return the output file.</p>
-<p>You can pass arguments using aligner (default: ‘clustalo’), e.g:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;clustalo --threads=4&#39;</span>
+<code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">run_aligner</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chimerics</span></em>, <em class="sig-param"><span class="n">output_path</span><span class="o">=</span><span class="default_value">'alignment.fasta'</span></em>, <em class="sig-param"><span class="n">aligner</span><span class="o">=</span><span class="default_value">'ProGraphMSA'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.run_aligner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run ProGraphMSA in the chimeric sequences and return the output file.</p>
+<p>You can pass arguments using aligner (default: ‘ProGraphMSA’), e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;ProGraphMSA --mldist_gap&#39;</span>
 </pre></div>
 </div>
-<p>You need Clustal Omega installed to run this function. You can install it
-from: <a class="reference external" href="http://www.clustal.org/omega/">http://www.clustal.org/omega/</a></p>
-<p>If you are using Windows 10 and you have installed Clustal Omega in
+<p>You need ProGraphMSA installed to run this function. You can install it
+from: <a class="reference external" href="https://github.com/acg-team/ProGraphMSA">https://github.com/acg-team/ProGraphMSA</a></p>
+<p>If you are using Windows 10 and you have installed ProGraphMSA in
 Ubuntu using the ‘Windows Subsystem for Linux’, you can try with the
 following options:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;ubuntu.exe -c clustalo&#39;</span>
-<span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bash.exe -c clustalo&#39;</span>
-<span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;wsl.exe clustalo&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;ubuntu.exe -c ProGraphMSA&#39;</span>
+<span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;bash.exe -c ProGraphMSA&#39;</span>
+<span class="n">aligner</span><span class="o">=</span><span class="s1">&#39;wsl.exe ProGraphMSA&#39;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -465,15 +482,15 @@ The first subexon appears before of the second in at least one transcript.</p>
 <dl class="py class">
 <dt id="thoraxe.subexons.ases.PathData">
 <em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.ases.</code><code class="sig-name descname">PathData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Genes</span></em>, <em class="sig-param"><span class="n">Transcripts</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.ases.PathData" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
 <dt id="thoraxe.subexons.ases.PathData.Genes">
-<code class="sig-name descname">Genes</code><a class="headerlink" href="#thoraxe.subexons.ases.PathData.Genes" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">Genes</code><a class="headerlink" href="#thoraxe.subexons.ases.PathData.Genes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.ases.PathData.Transcripts">
-<code class="sig-name descname">Transcripts</code><a class="headerlink" href="#thoraxe.subexons.ases.PathData.Transcripts" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">Transcripts</code><a class="headerlink" href="#thoraxe.subexons.ases.PathData.Transcripts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
@@ -645,21 +662,21 @@ This function returns the list of ‘Cluster’s that have been modified.</p>
 <dl class="py class">
 <dt id="thoraxe.subexons.subexons.Interval">
 <em class="property">class </em><code class="sig-prename descclassname">thoraxe.subexons.subexons.</code><code class="sig-name descname">Interval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em>, <em class="sig-param"><span class="n">components</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.subexons.Interval" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
 <dt id="thoraxe.subexons.subexons.Interval.components">
-<code class="sig-name descname">components</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.components" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">components</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.components" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.subexons.Interval.end">
-<code class="sig-name descname">end</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.end" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">end</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.end" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="thoraxe.subexons.subexons.Interval.start">
-<code class="sig-name descname">start</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.start" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">start</code><a class="headerlink" href="#thoraxe.subexons.subexons.Interval.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
@@ -746,11 +763,19 @@ transcript_info.read_transcript_info.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -761,7 +786,6 @@ transcript_info.read_transcript_info.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,18 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="thoraxe" href="programs/programs.html" />
@@ -50,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> ThorAxe
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ThorAxe
           
 
           
@@ -73,6 +74,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -83,7 +85,7 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#clustal-omega">Clustal Omega</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prographmsa">ProGraphMSA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#numpy">NumPy</a></li>
 </ul>
 </li>
@@ -100,6 +102,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -138,7 +141,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Installation</li>
     
@@ -164,16 +167,12 @@
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>You need <strong>Python 3.6.1 or higher</strong> to use <em>ThorAxe</em>. You also need:</p>
-<div class="section" id="clustal-omega">
-<h3>Clustal Omega<a class="headerlink" href="#clustal-omega" title="Permalink to this headline">¶</a></h3>
-<p>To run <em>ThorAxe</em> you need <a class="reference external" href="http://www.clustal.org/omega/">Clustal Omega</a>. Follow the instructions on that
+<div class="section" id="prographmsa">
+<h3>ProGraphMSA<a class="headerlink" href="#prographmsa" title="Permalink to this headline">¶</a></h3>
+<p>To run <em>ThorAxe</em> you need <a class="reference external" href="https://github.com/acg-team/ProGraphMSA">ProGraphMSA</a>. Follow the instructions on that
 link to install it.</p>
-<p>If you are using <strong>Ubuntu</strong>, the easiest way to install <em>Clustal Omega</em> is:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">clustalo</span>
-</pre></div>
-</div>
-<p>If you are using <strong>Windows 10</strong>, you can use <cite>clustalo</cite> through <em>Ubuntu</em> with
-the <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Windows Subsystem for Linux</a>.</p>
+<p>If you are using <strong>Windows 10</strong>, you can use <cite>ProGraphMSA</cite> through <em>Ubuntu</em>
+with the <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">Windows Subsystem for Linux</a>.</p>
 </div>
 <div class="section" id="numpy">
 <h3>NumPy<a class="headerlink" href="#numpy" title="Permalink to this headline">¶</a></h3>
@@ -250,11 +249,19 @@ easier the use of the <cite>thoraxe</cite> <em>Python</em> module.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -265,7 +272,6 @@ easier the use of the <cite>thoraxe</cite> <em>Python</em> module.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
