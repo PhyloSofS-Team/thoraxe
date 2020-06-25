@@ -33,8 +33,7 @@ def test_thoraxe(monkeypatch, request, set_out_dir):
                 raise Exception(
                     'You should install ProGraphMSA in the Windows '
                     'Subsystem for Linux to run this test.')
-        else:  # AppVeyor
-            
+        # else == AppVeyor
 
     filename = request.module.__file__
     in_dir = os.path.join(os.path.dirname(filename), 'data', 'MAPK8')
