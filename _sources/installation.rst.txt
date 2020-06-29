@@ -21,7 +21,7 @@ NumPy
 ~~~~~
 
 You can use the `pip`_ module of `Python 3`_ to install `NumPy`_ before
-*ThorAxe*. The order is important because `numpy` should be installed before
+*ThorAxe*. The order is important because `NumPy` should be installed before
 `scikit-bio`_, a *ThorAxe* dependency:
 
 ::
@@ -91,7 +91,7 @@ easier the use of the `thoraxe` *Python* module.
 .. _GitHub repo: https://github.com/PhyloSofS-Team/thoraxe
 .. _pip: https://pip.pypa.io/en/stable/installing/
 .. _Python 3: https://www.python.org/
-.. _Numpy: https://numpy.org/
+.. _NumPy: https://numpy.org/
 .. _scikit-bio: http://scikit-bio.org/
 .. _ProGraphMSA: https://github.com/acg-team/ProGraphMSA
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/install-win10
