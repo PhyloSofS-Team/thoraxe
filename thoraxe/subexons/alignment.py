@@ -46,8 +46,9 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1, col_index],
-                     transcript.iloc[row_index, col_index]))
+                    (transcript.iloc[row_index - 1,
+                                     col_index], transcript.iloc[row_index,
+                                                                 col_index]))
     return set(connected_pairs)
 
 
@@ -683,8 +684,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (
-        subexon_df['GeneID'] == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
+                                                       == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
@@ -1085,6 +1086,37 @@ def move_problematic_block_clusters(
     return (msa_numpy, msa_matrix)
 
 
+def _ask_directions(left_consensus, center_consensus, right_consensus):
+    """
+    Return a vector with the directions in which the residue should be moved.
+
+    1: Move the residue to the gap column inserted at the right.
+    0: Keep the residue/gap position.
+
+    It returns an empty list if the residue can not be moved.
+
+    >>> import numpy as np
+    >>> _ask_directions([0.0, 2.0, 4.0], [0.0, 3.0, np.nan], [1.0, 3.0, 5.0])
+    [0, 1, 0]
+    >>> _ask_directions([0.0, 2.0, 4.0], [9.0, 3.0, np.nan], [1.0, 3.0, 5.0])
+    []
+    """
+    directions = []
+    for (left, center, right) in zip(left_consensus, center_consensus,
+                                     right_consensus):
+        direction = -1
+        if np.isnan(center):
+            direction = 0
+        if center == right:
+            direction = 1
+        if center == left:
+            direction = 0
+        if direction == -1:
+            return []
+        directions.append(direction)
+    return directions
+
+
 def disintegration(msa_numpy, msa_matrix):
     """
     Disintegrate a one-residue length s-exons.
@@ -1101,12 +1133,11 @@ def disintegration(msa_numpy, msa_matrix):
             if cluster.start == cluster.end:
                 left_cluster = col_clusters[index - 1]
                 right_cluster = col_clusters[index + 1]
-                directions = [
-                    1 if center == right else 0
-                    for (left, center,
-                         right) in zip(left_cluster.consensus, cluster.
-                                       consensus, right_cluster.consensus)
-                ]
+                directions = _ask_directions(left_cluster.consensus,
+                                             cluster.consensus,
+                                             right_cluster.consensus)
+                if not directions:
+                    continue
                 col = cluster.start
                 msa_matrix = np.insert(msa_matrix, col + 1, np.nan,
                                        axis=1)  # can not be in-place

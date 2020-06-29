@@ -122,6 +122,10 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     belongs to one cluster can be modified with the keyword arguments
     coverage_cutoff and percent_identity_cutoff (default to 80.0 and
     30.0, respectively).
+
+    Exons are aligned against others until they reach a percent identity
+    higher than percent_identity_cutoff plus 30, to allow low identity matches
+    to be replaced by better ones.
     """
     if substitution_matrix is None:
         substitution_matrix = blosum50
