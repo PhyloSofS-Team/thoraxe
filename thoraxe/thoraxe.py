@@ -232,14 +232,20 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
         subexon_df)
     chimerics = subexons.alignment.create_chimeric_sequences(
         subexon_df, subexon_matrix, connected_subexons, padding=padding)
-    chimerics = subexons.alignment.sort_species(chimerics, gene2speciesname,
-                                                species_list)
     msa_file = _outfile(output_folder, "chimeric_alignment_", cluster,
                         ".fasta")
-    subexons.alignment.run_aligner(chimerics,
-                                   aligner=aligner,
-                                   output_path=msa_file)
-    msa = subexons.alignment.read_msa_fasta(msa_file)
+    if chimerics:
+        chimerics = subexons.alignment.sort_species(chimerics,
+                                                    gene2speciesname,
+                                                    species_list)
+        subexons.alignment.run_aligner(chimerics,
+                                       aligner=aligner,
+                                       output_path=msa_file)
+        msa = subexons.alignment.read_msa_fasta(msa_file)
+    else:
+        if os.path.isfile(msa_file):
+            os.remove(msa_file)
+        msa = None
     return subexon_df, chimerics, msa
 
 
@@ -403,7 +409,7 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
                             species_list=species_list))
 
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
-        if msa is not None:
+        if (msa is not None) and chimerics:
             gene_ids = subexons.alignment.get_gene_ids(msa)
             msa_matrix = subexons.alignment.create_msa_matrix(chimerics, msa)
 
@@ -425,7 +431,7 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
                               id=gene_id)
                     for (gene_id, row) in zip(gene_ids, msa_numpy)
                 ])
-
+                # cluster2data[cluster] = (subexon_df, chimerics, msa)
             with open(
                     _outfile(intermediate_output_path, "gene_ids_", cluster,
                              ".txt"), 'w') as outfile:
@@ -445,6 +451,7 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
             subexon_df = subexons.alignment.save_s_exons(
                 subexon_df, sequences, gene_ids, colclusters, msa_output_path)
         else:
+            msa = None
             gene_ids = None
             msa_matrix = None
             colclusters = None
@@ -672,8 +679,6 @@ def main():  # pylint: disable=too-many-locals
 
     transcript_table.to_csv(
         os.path.join(intermediate_output_path, "transcript_table.csv"))
-    subexon_table.to_csv(
-        os.path.join(intermediate_output_path, "subexon_table.csv"))
 
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
@@ -692,6 +697,9 @@ def main():  # pylint: disable=too-many-locals
                                movements=not args.no_movements,
                                disintegration=not args.no_disintegration,
                                species_list=species_list)
+
+    subexon_table.to_csv(
+        os.path.join(intermediate_output_path, "subexon_table.csv"))
 
     if args.plot_chimerics:
         subexons.plot.plot_msa_subexons(cluster2data, intermediate_output_path)

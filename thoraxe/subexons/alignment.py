@@ -400,6 +400,8 @@ def _fill_msa_matrix(msa_matrix,
 
 def _get_msa_subexon_matrix(subexon_df, chimerics, msa):
     """Return the msa as a matrix of 'SubexonIDCluster'."""
+    if not chimerics:
+        return np.empty((0, 0), dtype=object)
     n_seq = len(msa)
     n_col = msa.get_alignment_length()
     msa_matrix = np.empty((n_seq, n_col), dtype=object)
@@ -525,6 +527,8 @@ def create_msa_matrix(chimerics, msa):
 
     Each cell has the subexon number (Index) or nan for gaps and padding.
     """
+    if not chimerics:
+        return np.empty((0, 0), dtype=object)
     n_seq = len(msa)
     n_col = msa.get_alignment_length()
     msa_matrix = np.zeros((n_seq, n_col))
@@ -591,9 +595,35 @@ def _colcluster(colpattern):
                       colpattern.start, colpattern.end)
 
 
+def _cluster_column_clusters(col_clusters):
+    """
+    Cluster column clusters that do not change sub-exons in their consensus.
+    """
+    n_clusters = len(col_clusters)
+    if not n_clusters:
+        return []
+    merged_clusters = [col_clusters[0]]
+    if n_clusters > 1:
+        for i in range(1, n_clusters):
+            current_cluster = col_clusters[i]
+            last_cluster = merged_clusters[-1]
+            if (current_cluster.start - last_cluster.end == 1
+                    and _equal_without_nans(last_cluster.consensus,
+                                            current_cluster.consensus)):
+                nans = np.isnan(last_cluster.consensus)
+                last_cluster.consensus[nans] = current_cluster.consensus[nans]
+                last_cluster.patterns.extend(current_cluster.patterns)
+                last_cluster.end = current_cluster.end
+            else:
+                merged_clusters.append(current_cluster)
+    return merged_clusters
+
+
 def column_clusters(colpatterns):
     """Return a ColCluster list from a ColPattern list."""
     n_patterns = len(colpatterns)
+    if not n_patterns:
+        return []
     colpattern = colpatterns[0]
     clusters = [_colcluster(colpattern)]
     if n_patterns > 1:
@@ -608,7 +638,7 @@ def column_clusters(colpatterns):
                 cluster.end = colpattern.end
             else:
                 clusters.append(_colcluster(colpattern))
-    return clusters
+    return _cluster_column_clusters(clusters)
 
 
 def _delete_padding(seq, padding):
@@ -705,24 +735,25 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
     Return subexon_df with the orthologous exonic region (s-exon) information.
     For each s-exon saves a fasta MSA in the output_folder.
     """
-    cluster = str(subexon_df['Cluster'][0])
+    if not subexon_df.empty:
+        cluster = str(subexon_df['Cluster'][0])
 
-    subexon_df = subexon_df.assign(S_exons=cluster,
-                                   S_exon_Lengths="",
-                                   S_exon_Sequences="")
+        subexon_df = subexon_df.assign(S_exons=cluster,
+                                       S_exon_Lengths="",
+                                       S_exon_Sequences="")
 
-    for (i, colcluster) in enumerate(colclusters):
-        with open(
-                os.path.join(output_folder,
-                             'msa_s_exon_{}_{}.fasta'.format(cluster, i)),
-                'w') as file:
-            for (j, subexon) in enumerate(colcluster.consensus):
-                if not np.isnan(subexon):
-                    gene = gene_ids[j]
-                    seq = sequences[j][colcluster.start:colcluster.end + 1]
-                    file.write('>{}\n{}\n'.format(gene, seq))
-                    _store_s_exons(subexon_df, seq, subexon, gene,
-                                   '{}_{}'.format(cluster, i))
+        for (i, colcluster) in enumerate(colclusters):
+            with open(
+                    os.path.join(output_folder,
+                                 'msa_s_exon_{}_{}.fasta'.format(cluster, i)),
+                    'w') as file:
+                for (j, subexon) in enumerate(colcluster.consensus):
+                    if not np.isnan(subexon):
+                        gene = gene_ids[j]
+                        seq = sequences[j][colcluster.start:colcluster.end + 1]
+                        file.write('>{}\n{}\n'.format(gene, seq))
+                        _store_s_exons(subexon_df, seq, subexon, gene,
+                                       '{}_{}'.format(cluster, i))
 
     return subexon_df
 

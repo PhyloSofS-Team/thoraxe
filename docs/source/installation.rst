@@ -11,10 +11,21 @@ ProGraphMSA
 ~~~~~~~~~~~
 
 To run *ThorAxe* you need `ProGraphMSA`_. Follow the instructions on that
-link to install it.
+link to install it or download one of the following compiled binaries:
 
-If you are using **Windows 10**, you can use `ProGraphMSA` through *Ubuntu*
-with the `Windows Subsystem for Linux`_.
+- `ProGraphMSA Linux 32 bits`_
+- `ProGraphMSA Linux 64 bits`_
+- `ProGraphMSA OSX`_
+
+It is important to rename the program to `ProGraphMSA` and to put it in the 
+path. If you are using **Windows 10**, you can use `ProGraphMSA` through 
+*Ubuntu* with the `Windows Subsystem for Linux`_. For example, to install the 
+64 bits version in *Ubuntu* you can do:
+
+::
+   wget  https://github.com/PhyloSofS-Team/ProGraphMSA/raw/master/bin/ProGraphMSA_64
+   chmod a+x ProGraphMSA_64
+   sudo mv ProGraphMSA_64 /bin/ProGraphMSA
 
 
 NumPy
@@ -25,7 +36,6 @@ You can use the `pip`_ module of `Python 3`_ to install `NumPy`_ before
 `scikit-bio`_, a *ThorAxe* dependency:
 
 ::
-
    python -m pip install numpy
 
 In *Ubuntu* you may need to use `python3` instead of `python`.
@@ -99,3 +109,6 @@ easier the use of the `thoraxe` *Python* module.
 .. _Docker website: https://www.docker.com
 .. _ipython3: https://ipython.readthedocs.io/en/stable/
 .. _PyPI: https://pypi.org/project/thoraxe/
+.. _ProGraphMSA Linux 32 bits: https://github.com/PhyloSofS-Team/ProGraphMSA/raw/master/bin/ProGraphMSA_32
+.. _ProGraphMSA Linux 64 bits: https://github.com/PhyloSofS-Team/ProGraphMSA/raw/master/bin/ProGraphMSA_64
+.. _ProGraphMSA OSX: https://github.com/PhyloSofS-Team/ProGraphMSA/raw/master/bin/ProGraphMSA_osx
