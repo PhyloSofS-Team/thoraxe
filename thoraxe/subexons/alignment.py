@@ -474,23 +474,32 @@ def _percent_identity_without_gaps(query, target):
             aln_len -= 1
         elif res_i == res_j:
             identical += 1
-    if aln_len > 0:
-        return 100.0 * (identical / aln_len)
-    return 0.0
+    if not aln_len:
+        return np.nan
+    return 100.0 * (identical / aln_len)
 
 
-def _should_keep_subexon(msa_matrix, cutoff=30.0):
+def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=True):
     """Return True if the subexon is aligned to a similar sequence."""
     n_seqs = msa_matrix.shape[0]
     if n_seqs == 1:
-        return False
+        return keep_single_subexons
+    tries = 0
     for i in range(0, n_seqs - 1):
         query = msa_matrix[i, :]
         for j in range(i + 1, n_seqs):
             target = msa_matrix[j, :]
             pid = _percent_identity_without_gaps(query, target)
+            if np.isnan(pid):
+                continue
             if pid >= cutoff:
                 return True
+            tries += 1
+    if not tries:
+        # keep_single_subexons=True : do not migrate sub-exons that align only
+        # with gaps.
+        return keep_single_subexons
+
     return False
 
 
