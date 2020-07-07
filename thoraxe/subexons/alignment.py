@@ -692,6 +692,7 @@ def msa2sequences(msa, gene_ids, padding):
     Return str sequences from msa.
 
     It also checks gene_ids and replaces padding by gaps.
+    Full gap columns are deleted.
     """
     sequences = []
     for i, seq in enumerate(msa):
@@ -753,6 +754,36 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
         subexon_df.loc[query, 'S_exon_Sequences'] = seq
 
 
+def _full_gap_columns(sequences):
+    """
+    Return a boolean list, where True indicates a full gap column.
+    """
+    gaps = [residue == '-' for residue in sequences[0]]
+    n_seqs = len(sequences)
+    if n_seqs > 1:
+        for i in range(1, n_seqs):
+            sequence = sequences[i]
+            for (j, residue) in enumerate(sequence):
+                if residue != '-':
+                    gaps[j] = False
+    return gaps
+
+
+def _delete_full_gap_columns(sequences):
+    """
+    Return the sequence without the full gap columns.
+    """
+    full_gaps = _full_gap_columns(sequences)
+    cleaned_seqs = []
+    for sequence in sequences:
+        cleaned_seq = []
+        for (full_gap, residue) in zip(full_gaps, sequence):
+            if not full_gap:
+                cleaned_seq.append(residue)
+        cleaned_seqs.append(''.join(cleaned_seq))
+    return cleaned_seqs
+
+
 def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
     """
     It saves the information about s-exons.
@@ -767,6 +798,8 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
         subexon_df = subexon_df.assign(S_exons=cluster,
                                        S_exon_Lengths="",
                                        S_exon_Sequences="")
+
+        sequences = _delete_full_gap_columns(sequences)
 
         for (i, colcluster) in enumerate(colclusters):
             with open(
