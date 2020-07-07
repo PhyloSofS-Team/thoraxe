@@ -5,8 +5,9 @@ It finds the canonical path in the splice graph to detect conserved ASEs.
 """
 
 import collections
-import networkx as nx
+
 import pandas as pd
+import networkx as nx
 import numpy as np
 
 PathData = collections.namedtuple('PathData', ['Genes', 'Transcripts'])
@@ -296,13 +297,15 @@ def _transcript_weighted_conservation(subpath_data, gene2transcripts):
     """
     Return the transcript weighted conservation of a given subpath.
     """
-    acc = 0.0
+    n_genes = len(gene2transcripts)
+    transcript_fraction_sum = 0.0
     for gene in subpath_data.Genes:
         gene_transcripts = gene2transcripts[gene]
-        acc += (
-            (len(gene_transcripts.intersection(subpath_data.Transcripts))) /
-            len(gene_transcripts))
-    return acc / len(gene2transcripts)
+        subpath_transcripts = len(
+            gene_transcripts.intersection(subpath_data.Transcripts))
+        gene_transcripts = len(gene_transcripts)
+        transcript_fraction_sum += (subpath_transcripts / gene_transcripts)
+    return transcript_fraction_sum / n_genes
 
 
 def _min_filter(path_data, min_genes, min_transcripts):

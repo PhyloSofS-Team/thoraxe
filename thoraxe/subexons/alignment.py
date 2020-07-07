@@ -20,8 +20,6 @@ from Bio import AlignIO
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
-from thoraxe import transcript_info
-
 ORTHO_GROUP_PATTERN = re.compile("^[0-9]+_[0-9]+")
 
 ColPattern = collections.namedtuple('ColPattern', ['pattern', 'start', 'end'])
@@ -496,8 +494,8 @@ def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=True):
                 return True
             tries += 1
     if not tries:
-        # keep_single_subexons=True : do not migrate sub-exons that align only
-        # with gaps.
+        # keep_single_subexons=True : do not migrate/discard sub-exons that
+        # align only with gaps.
         return keep_single_subexons
 
     return False
