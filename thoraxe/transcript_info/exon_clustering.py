@@ -9,6 +9,8 @@ import numpy as np
 from skbio.alignment import StripedSmithWaterman
 from skbio.alignment._pairwise import blosum50
 
+from thoraxe import subexons
+
 
 def coverage(seq, seq_len):
     """
@@ -91,6 +93,26 @@ def _align_and_order(  # pylint: disable=too-many-arguments
     return aln_query, aln_target
 
 
+def _merge_clusters(trx_data, clusters_to_merge):
+    """
+    Merge the clusters in the transcript table.
+    """
+    old2new = dict()
+    for group in clusters_to_merge:
+        clusters = sorted(group)
+        n_clusters = len(clusters)
+        if n_clusters > 1:
+            new_cluster_id = clusters[0]
+            for i in range(1, n_clusters):
+                old2new[clusters[i]] = new_cluster_id
+    nrows = len(trx_data)
+    for i in range(nrows):
+        i_index = trx_data.index[i]
+        cluster = trx_data.at[i_index, 'Cluster']
+        trx_data.at[i_index, 'Cluster'] = old2new.get(cluster, cluster)
+    return trx_data
+
+
 def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
         trx_data,
         minimum_len=4,
@@ -98,7 +120,8 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
         percent_identity_cutoff=30.0,
         gap_open_penalty=10,
         gap_extend_penalty=1,
-        substitution_matrix=None):
+        substitution_matrix=None,
+        merge_clusters=True):
     """
     Cluster exons based on their sequence identity after local alignment.
 
@@ -158,6 +181,8 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
     row_list = trx_data.to_dict('records')
 
+    clusters_to_merge = []
+
     cluster_count = 0
     for i in range(nrows):
         len_i = row_list[i]['SeqLength']
@@ -195,6 +220,11 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                 if (trx_data.at[j_index, 'KeepSearching']
                         and trx_data.at[j_index, 'PercentIdentity'] > pid):
                     continue
+                if merge_clusters:
+                    current_cluster = trx_data.at[j_index, 'Cluster']
+                    if current_cluster != 0:
+                        subexons.update_to_merge_list(clusters_to_merge,
+                                                      current_cluster, cluster)
                 trx_data.at[j_index, 'Cluster'] = cluster
                 trx_data.at[j_index, 'QueryExon'] = query_exon
                 trx_data.at[j_index, 'TargetCoverage'] = target_coverage
@@ -205,6 +235,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                     trx_data.at[j_index, 'KeepSearching'] = 1
                 else:
                     trx_data.at[j_index, 'KeepSearching'] = 0
+
+    if clusters_to_merge:
+        trx_data = _merge_clusters(trx_data, clusters_to_merge)
 
     trx_data.sort_values('InputOrder', inplace=True)
     trx_data.drop(
