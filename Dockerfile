@@ -25,9 +25,7 @@ COPY docker_banner.sh docker_banner.sh
 
 RUN cat /app/docker_banner.sh >> ~/.bashrc
 
-# install numpy before socket-bio (ThorAxe's dependency)
-RUN python3 -m pip install numpy && \
-    python3 -m pip install thoraxe
+RUN python3 -m pip install thoraxe
 
 WORKDIR /project
 

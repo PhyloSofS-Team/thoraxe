@@ -6,8 +6,8 @@ import warnings
 
 import numpy as np
 
-from skbio.alignment import StripedSmithWaterman
-from skbio.alignment._pairwise import blosum50
+from Bio import pairwise2
+from Bio.SubsMat.MatrixInfo import blosum50
 
 from thoraxe import subexons
 
@@ -60,37 +60,11 @@ def percent_identity(query, target):
 
 def _align(seq_a, seq_b, gap_open_penalty, gap_extend_penalty,
            substitution_matrix):
-    "Align the sequnces using StripedSmithWaterman from scikit-bio."
-    query = StripedSmithWaterman(seq_a,
-                                 gap_open_penalty=gap_open_penalty,
-                                 gap_extend_penalty=gap_extend_penalty,
-                                 substitution_matrix=substitution_matrix)
-
-    aln = query(seq_b)
-
-    return aln.aligned_query_sequence, aln.aligned_target_sequence
-
-
-def _align_and_order(  # pylint: disable=too-many-arguments
-        seq_i, len_i, seq_j, len_j, gap_open_penalty, gap_extend_penalty,
-        substitution_matrix):
-    """
-    Return the aligned sequences and the target sequence length.
-
-    This is because of issue: https://github.com/biocore/scikit-bio/issues/1654
-    """
-    seq_a, seq_b = (seq_i, seq_j) if len_i < len_j else (seq_j, seq_i)
-
-    aln_query, aln_target = _align(seq_a, seq_b, gap_open_penalty,
-                                   gap_extend_penalty, substitution_matrix)
-
-    if len(aln_query) != len(aln_target):
-        aln_query, aln_target = _align(  # noqa pylint: disable=bad-option-value,arguments-out-of-order
-            seq_b, seq_a, gap_open_penalty, gap_extend_penalty,
-            substitution_matrix)
-        return aln_query, aln_target
-
-    return aln_query, aln_target
+    "Align the sequnces using the BioPython pairwise2 aligner."
+    alignments = pairwise2.align.localds(seq_a, seq_b, substitution_matrix,
+                                         gap_open_penalty, gap_extend_penalty)
+    aln = alignments[0]
+    return aln[0], aln[1]
 
 
 def _merge_clusters(trx_data, clusters_to_merge):
@@ -118,10 +92,10 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
         minimum_len=4,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
-        gap_open_penalty=10,
-        gap_extend_penalty=1,
+        gap_open_penalty=-10,
+        gap_extend_penalty=-1,
         substitution_matrix=None,
-        merge_clusters=True):
+        merge_clusters=False):
     """
     Cluster exons based on their sequence identity after local alignment.
 
@@ -133,9 +107,9 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     and the name of the query sequence used to join that one into that
     cluster.
 
-    The alignment is performed using StripedSmithWaterman from scikit-bio.
+    The alignment is performed using Smith-Waterman from BioPython.
     The keyword arguments gap_open_penalty, gap_extend_penalty and
-    substitution_matrix are passed to StripedSmithWaterman.
+    substitution_matrix are passed to pairwise2.
 
     Exons with a length less than the minimum_len (default: 4) are not
     clustered. Non-clustered exons have Cluster number 0 and an empty
@@ -184,6 +158,7 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
     clusters_to_merge = []
 
     cluster_count = 0
+    aln_memo = dict()
     for i in range(nrows):
         len_i = row_list[i]['SeqLength']
         if len_i < minimum_len:
@@ -206,14 +181,20 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
                         and not trx_data.at[j_index, 'KeepSearching'])):
                 continue
 
-            aln_query, aln_target = _align_and_order(
-                row_list[i]['ProteinSequences'], len_i,
-                row_list[j]['ProteinSequences'], len_j, gap_open_penalty,
-                gap_extend_penalty, substitution_matrix)
-
-            target_coverage = coverage_shortest(aln_query, aln_target, len_j)
-
-            pid = percent_identity(aln_query, aln_target)
+            target_exon = row_list[j]['ExonID']
+            exon_pair_id = tuple(sorted([query_exon, target_exon]))
+            if exon_pair_id in aln_memo:
+                pid, target_coverage = aln_memo[exon_pair_id]
+            else:
+                aln_query, aln_target = _align(row_list[i]['ProteinSequences'],
+                                               row_list[j]['ProteinSequences'],
+                                               gap_open_penalty,
+                                               gap_extend_penalty,
+                                               substitution_matrix)
+                target_coverage = coverage_shortest(aln_query, aln_target,
+                                                    len_j)
+                pid = percent_identity(aln_query, aln_target)
+                aln_memo[exon_pair_id] = (pid, target_coverage)
 
             if (target_coverage >= coverage_cutoff
                     and pid >= percent_identity_cutoff):

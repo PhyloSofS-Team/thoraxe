@@ -477,7 +477,7 @@ def _percent_identity_without_gaps(query, target):
     return 100.0 * (identical / aln_len)
 
 
-def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=True):
+def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=False):
     """Return True if the subexon is aligned to a similar sequence."""
     n_seqs = msa_matrix.shape[0]
     if n_seqs == 1:

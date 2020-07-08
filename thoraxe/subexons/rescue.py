@@ -6,17 +6,18 @@ import collections
 
 import pandas as pd
 import numpy as np
-from skbio.alignment import StripedSmithWaterman
-from skbio.alignment._pairwise import blosum50
+from Bio import pairwise2
+from Bio.SubsMat.MatrixInfo import blosum50
 
 from thoraxe import transcript_info
 
 
 def _get_subexons_to_rescue(subexon_table):
     """Return a DataFrame with the subexons to rescue."""
-    return subexon_table.loc[subexon_table['Cluster'] < 0, [
-        'SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
-    ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
+    return subexon_table.loc[
+        subexon_table['Cluster'] < 0,
+        ['SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
+         ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
 
 
 def _get_sequence_list(sequences, minimum_len):
@@ -31,9 +32,9 @@ def _get_sequence_list(sequences, minimum_len):
 
 def _get_cluster2sequence(subexon_table, minimum_len=0):
     """Return a dict from cluster id to cluster unique sequences."""
-    clusterized = subexon_table.loc[subexon_table['Cluster'] > 0, [
-        'SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
-    ]]
+    clusterized = subexon_table.loc[
+        subexon_table['Cluster'] > 0,
+        ['SubexonIDCluster', 'Cluster', 'SubexonProteinSequence']]
     clusterized.drop_duplicates('SubexonIDCluster', inplace=True)
     clusterized.drop(columns='SubexonIDCluster', inplace=True)
     cluster2sequence = clusterized.groupby('Cluster').agg(
@@ -62,18 +63,21 @@ def _get_cluster_number(aln_stats):
 
 def _get_aln_stats(  # pylint: disable=too-many-arguments
         query, query_len, origin_cluster, cluster2sequence, coverage_cutoff,
-        percent_identity_cutoff):
+        percent_identity_cutoff, gap_open_penalty, gap_extend_penalty,
+        substitution_matrix):
     """Helper function to get a dict with the aln stats of the matches."""
     aln_stats = collections.defaultdict(list)
     for cluster, sequences in cluster2sequence.items():
         if cluster == origin_cluster:
             continue
         for sequence in sequences:
-            aln = query(sequence)
-            pid = transcript_info.percent_identity(aln.aligned_query_sequence,
-                                                   aln.aligned_target_sequence)
-            cov = transcript_info.coverage(aln.aligned_query_sequence,
-                                           query_len)
+            alignments = pairwise2.align.localds(query, sequence,
+                                                 substitution_matrix,
+                                                 gap_open_penalty,
+                                                 gap_extend_penalty)
+            aln = alignments[0]
+            pid = transcript_info.percent_identity(aln[0], aln[1])
+            cov = transcript_info.coverage(aln[0], query_len)
             if pid >= percent_identity_cutoff and cov >= coverage_cutoff:
                 aln_stats['percent identity'].append(pid)
                 aln_stats['coverage'].append(cov)
@@ -86,8 +90,8 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
         cluster2sequence,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
-        gap_open_penalty=10,
-        gap_extend_penalty=1,
+        gap_open_penalty=-10,
+        gap_extend_penalty=-1,
         substitution_matrix=None):
     """
     Return a dict from 'SubexonIDCluster' to cluster.
@@ -101,13 +105,15 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
     for row in to_rescue:
         origin_cluster = -1 * row['Cluster']
         seq = str(row['SubexonProteinSequence']).replace('*', '')
-        query = StripedSmithWaterman(seq,
-                                     gap_open_penalty=gap_open_penalty,
-                                     gap_extend_penalty=gap_extend_penalty,
-                                     substitution_matrix=substitution_matrix)
-        aln_stats = _get_aln_stats(query, len(seq), origin_cluster,
-                                   cluster2sequence, coverage_cutoff,
-                                   percent_identity_cutoff)
+        aln_stats = _get_aln_stats(seq,
+                                   len(seq),
+                                   origin_cluster,
+                                   cluster2sequence,
+                                   coverage_cutoff,
+                                   percent_identity_cutoff,
+                                   gap_open_penalty=gap_open_penalty,
+                                   gap_extend_penalty=gap_extend_penalty,
+                                   substitution_matrix=substitution_matrix)
         if aln_stats:
             subexon2cluster[row['SubexonIDCluster']] = _get_cluster_number(
                 aln_stats)
@@ -136,8 +142,8 @@ def subexon_rescue_phase(  # pylint: disable=too-many-arguments
         minimum_len=4,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
-        gap_open_penalty=10,
-        gap_extend_penalty=1,
+        gap_open_penalty=-10,
+        gap_extend_penalty=-1,
         substitution_matrix=None):
     """
     Execute the subexon rescue phase.

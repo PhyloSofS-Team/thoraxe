@@ -93,11 +93,11 @@ def parse_command_line():
     parser.add_argument('--gapopen',
                         help='Penalty for a gap opening.',
                         type=int,
-                        default=10)
+                        default=-10)
     parser.add_argument('--gapextend',
                         help='Penalty for gap extensions.',
                         type=int,
-                        default=1)
+                        default=-1)
     parser.add_argument(
         '--padding',
         help='Length of padding, Xs, in the chimeric alignment.',
