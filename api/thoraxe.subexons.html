@@ -376,7 +376,8 @@ to:   [1.0, 1.0, 1.0, nan, nan, nan, 2.0, 2.0, 2.0, 2.0]
 <dt id="thoraxe.subexons.alignment.msa2sequences">
 <code class="sig-prename descclassname">thoraxe.subexons.alignment.</code><code class="sig-name descname">msa2sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msa</span></em>, <em class="sig-param"><span class="n">gene_ids</span></em>, <em class="sig-param"><span class="n">padding</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.alignment.msa2sequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return str sequences from msa.</p>
-<p>It also checks gene_ids and replaces padding by gaps.</p>
+<p>It also checks gene_ids and replaces padding by gaps.
+Full gap columns are deleted.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -642,7 +643,7 @@ for getting the mapping between translation and gene ids of the used_genes.</p>
 
 <dl class="py function">
 <dt id="thoraxe.subexons.rescue.subexon_rescue_phase">
-<code class="sig-prename descclassname">thoraxe.subexons.rescue.</code><code class="sig-name descname">subexon_rescue_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subexon_table</span></em>, <em class="sig-param"><span class="n">minimum_len</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">coverage_cutoff</span><span class="o">=</span><span class="default_value">80.0</span></em>, <em class="sig-param"><span class="n">percent_identity_cutoff</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">gap_open_penalty</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">gap_extend_penalty</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">substitution_matrix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.rescue.subexon_rescue_phase" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.subexons.rescue.</code><code class="sig-name descname">subexon_rescue_phase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">subexon_table</span></em>, <em class="sig-param"><span class="n">minimum_len</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">coverage_cutoff</span><span class="o">=</span><span class="default_value">80.0</span></em>, <em class="sig-param"><span class="n">percent_identity_cutoff</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">gap_open_penalty</span><span class="o">=</span><span class="default_value">- 10</span></em>, <em class="sig-param"><span class="n">gap_extend_penalty</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">substitution_matrix</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.rescue.subexon_rescue_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute the subexon rescue phase.</p>
 <p>This function looks the subexons to rescues in the subexon_table by
 looking at the ‘Cluster’ numbers that are lower than 0, i.e. -1 means that
@@ -718,6 +719,20 @@ calling the function and the coordinates should be inclusive.</p>
 <span class="gt">Traceback (most recent call last):</span>
     <span class="o">...</span>
 <span class="gr">AssertionError</span>: <span class="n">starts, ends and ids should have the same length.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="thoraxe.subexons.subexons.update_to_merge_list">
+<code class="sig-prename descclassname">thoraxe.subexons.subexons.</code><code class="sig-name descname">update_to_merge_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_merge</span></em>, <em class="sig-param"><span class="n">subexon_1</span></em>, <em class="sig-param"><span class="n">subexon_2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.subexons.subexons.update_to_merge_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add subexon_1 and subexon_2 to the to_merge list.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">update_to_merge_list</span><span class="p">([],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">[{1, 2}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">update_to_merge_list</span><span class="p">([{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">}],</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">[{1, 2, 3}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">update_to_merge_list</span><span class="p">([{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">}],</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+<span class="go">[{1, 2}, {8, 9}]</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -28,18 +28,6 @@ path. If you are using **Windows 10**, you can use `ProGraphMSA` through
    sudo mv ProGraphMSA_64 /bin/ProGraphMSA
 
 
-NumPy
-~~~~~
-
-You can use the `pip`_ module of `Python 3`_ to install `NumPy`_ before
-*ThorAxe*. The order is important because `NumPy` should be installed before
-`scikit-bio`_, a *ThorAxe* dependency:
-
-::
-   python -m pip install numpy
-
-In *Ubuntu* you may need to use `python3` instead of `python`.
-
 ThorAxe
 -------
 
@@ -50,6 +38,7 @@ Finally, the easiest way to install *ThorAxe* is from PyPI_ using `pip`_ with
 
    python -m pip install thoraxe
 
+In *Ubuntu* you may need to use `python3` instead of `python`.
 
 Installation from source
 ------------------------
@@ -101,8 +90,6 @@ easier the use of the `thoraxe` *Python* module.
 .. _GitHub repo: https://github.com/PhyloSofS-Team/thoraxe
 .. _pip: https://pip.pypa.io/en/stable/installing/
 .. _Python 3: https://www.python.org/
-.. _NumPy: https://numpy.org/
-.. _scikit-bio: http://scikit-bio.org/
 .. _ProGraphMSA: https://github.com/acg-team/ProGraphMSA
 .. _Windows Subsystem for Linux: https://docs.microsoft.com/en-us/windows/wsl/install-win10
 .. _Docker image: https://hub.docker.com/r/diegozea/thoraxe

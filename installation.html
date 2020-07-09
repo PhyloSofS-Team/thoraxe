@@ -86,7 +86,6 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#prographmsa">ProGraphMSA</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#numpy">NumPy</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#thoraxe">ThorAxe</a></li>
@@ -187,17 +186,6 @@ sudo mv ProGraphMSA_64 /bin/ProGraphMSA</p>
 </dd>
 </dl>
 </div>
-<div class="section" id="numpy">
-<h3>NumPy<a class="headerlink" href="#numpy" title="Permalink to this headline">¶</a></h3>
-<p>You can use the <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a> module of <a class="reference external" href="https://www.python.org/">Python 3</a> to install <a class="reference external" href="https://numpy.org/">NumPy</a> before
-<em>ThorAxe</em>. The order is important because <cite>NumPy</cite> should be installed before
-<a class="reference external" href="http://scikit-bio.org/">scikit-bio</a>, a <em>ThorAxe</em> dependency:</p>
-<dl class="simple">
-<dt>::</dt><dd><p>python -m pip install numpy</p>
-</dd>
-</dl>
-<p>In <em>Ubuntu</em> you may need to use <cite>python3</cite> instead of <cite>python</cite>.</p>
-</div>
 </div>
 <div class="section" id="thoraxe">
 <h2>ThorAxe<a class="headerlink" href="#thoraxe" title="Permalink to this headline">¶</a></h2>
@@ -206,6 +194,7 @@ sudo mv ProGraphMSA_64 /bin/ProGraphMSA</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">thoraxe</span>
 </pre></div>
 </div>
+<p>In <em>Ubuntu</em> you may need to use <cite>python3</cite> instead of <cite>python</cite>.</p>
 </div>
 <div class="section" id="installation-from-source">
 <h2>Installation from source<a class="headerlink" href="#installation-from-source" title="Permalink to this headline">¶</a></h2>
@@ -236,9 +225,9 @@ in <em>Unix</em>. Please note that in <em>Ubuntu</em>, you may need <cite>sudo</
 <p>After this, we have access to the <cite>bash</cite> terminal of an <em>Ubuntu 18.04</em> image
 with <em>ThorAxe</em>, <cite>tree</cite> to help explore the results and <a class="reference external" href="https://ipython.readthedocs.io/en/stable/">ipython3</a> to make
 easier the use of the <cite>thoraxe</cite> <em>Python</em> module.</p>
-<div class="figure align-default" id="id4">
+<div class="figure align-default" id="id3">
 <img alt="_images/docker.gif" src="_images/docker.gif" />
-<p class="caption"><span class="caption-text">ThorAxe example using Docker in Windows 10.</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">ThorAxe example using Docker in Windows 10.</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 </div>
