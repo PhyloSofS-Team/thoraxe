@@ -61,7 +61,7 @@ def _get_cluster_number(aln_stats):
     return df_stats.index[0]
 
 
-def _get_aln_stats(  # pylint: disable=too-many-arguments
+def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
         query, query_len, origin_cluster, cluster2sequence, coverage_cutoff,
         percent_identity_cutoff, gap_open_penalty, gap_extend_penalty,
         substitution_matrix):
@@ -71,17 +71,20 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments
         if cluster == origin_cluster:
             continue
         for sequence in sequences:
-            alignments = pairwise2.align.localds(query, sequence,
+            alignments = pairwise2.align.localds(query,
+                                                 sequence,
                                                  substitution_matrix,
                                                  gap_open_penalty,
-                                                 gap_extend_penalty)
-            aln = alignments[0]
-            pid = transcript_info.percent_identity(aln[0], aln[1])
-            cov = transcript_info.coverage(aln[0], query_len)
-            if pid >= percent_identity_cutoff and cov >= coverage_cutoff:
-                aln_stats['percent identity'].append(pid)
-                aln_stats['coverage'].append(cov)
-                aln_stats['cluster'].append(cluster)
+                                                 gap_extend_penalty,
+                                                 one_alignment_only=True)
+            if alignments:
+                aln = alignments[0]
+                pid = transcript_info.percent_identity(aln[0], aln[1])
+                cov = transcript_info.coverage(aln[0], query_len)
+                if pid >= percent_identity_cutoff and cov >= coverage_cutoff:
+                    aln_stats['percent identity'].append(pid)
+                    aln_stats['coverage'].append(cov)
+                    aln_stats['cluster'].append(cluster)
     return aln_stats
 
 

@@ -107,7 +107,7 @@ def _merge_clusters(trx_data, clusters_to_merge):
     return trx_data
 
 
-def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
+def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
         trx_data,
         minimum_len=4,
         coverage_cutoff=80.0,
