@@ -757,6 +757,12 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
 def _full_gap_columns(sequences):
     """
     Return a boolean list, where True indicates a full gap column.
+
+    >>> _full_gap_columns(["Q-V-Q-"])
+    [False, True, False, True, False, True]
+    >>> seqs = ["Q-V-Q-", "--VH--"]
+    >>> _full_gap_columns(seqs)
+    [False, True, False, False, False, True]
     """
     gaps = [residue == '-' for residue in sequences[0]]
     n_seqs = len(sequences)
@@ -769,19 +775,19 @@ def _full_gap_columns(sequences):
     return gaps
 
 
-def _delete_full_gap_columns(sequences):
+def _delete_full_gap_columns(full_gaps, sequence, start, end):
     """
     Return the sequence without the full gap columns.
+
+    >>> full_gaps = [False, True, False, False, False, True]
+    >>> _delete_full_gap_columns(full_gaps, "Q-V-Q-", 1, 6)
+    'V-Q'
     """
-    full_gaps = _full_gap_columns(sequences)
-    cleaned_seqs = []
-    for sequence in sequences:
-        cleaned_seq = []
-        for (full_gap, residue) in zip(full_gaps, sequence):
-            if not full_gap:
-                cleaned_seq.append(residue)
-        cleaned_seqs.append(''.join(cleaned_seq))
-    return cleaned_seqs
+    cleaned_seq = []
+    for i in range(start, end):
+        if not full_gaps[i]:
+            cleaned_seq.append(sequence[i])
+    return ''.join(cleaned_seq)
 
 
 def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
@@ -799,7 +805,7 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
                                        S_exon_Lengths="",
                                        S_exon_Sequences="")
 
-        sequences = _delete_full_gap_columns(sequences)
+        full_gaps = _full_gap_columns(sequences)
 
         for (i, colcluster) in enumerate(colclusters):
             with open(
@@ -809,7 +815,9 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
                 for (j, subexon) in enumerate(colcluster.consensus):
                     if not np.isnan(subexon):
                         gene = gene_ids[j]
-                        seq = sequences[j][colcluster.start:colcluster.end + 1]
+                        seq = _delete_full_gap_columns(full_gaps, sequences[j],
+                                                       colcluster.start,
+                                                       colcluster.end + 1)
                         file.write('>{}\n{}\n'.format(gene, seq))
                         _store_s_exons(subexon_df, seq, subexon, gene,
                                        '{}_{}'.format(cluster, i))
