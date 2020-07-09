@@ -13,11 +13,15 @@ def clustered_trx_data(request):
         test_dir = os.path.dirname(filename)
         datadir = os.path.join(test_dir, 'data')
         folder_path = os.path.join(datadir, folder, 'Ensembl')
+        species_list = None
+        if folder == "MAPK8_all":
+            species_list = ['anser_brachyrhynchus']
         trx_data = transcript_info.read_transcript_info(
             os.path.join(folder_path, 'tsl.csv'),
             os.path.join(folder_path, 'exonstable.tsv'),
             os.path.join(folder_path, 'sequences.fasta'),
-            remove_na=False)
+            remove_na=False,
+            species_list=species_list)
         return transcript_info.exon_clustering(trx_data)
 
     return _get_clustered_trx_data
@@ -97,8 +101,8 @@ def test_subexon_table(clustered_trx_data):
     pig_se = subexon_table.SubexonID == "ENSSSCE00000122667_SE_0"
     human_se = subexon_table.SubexonID == "ENSE00001159289_SE_0"
 
-    assert str(_st(
-        subexon_table.loc[human_se, "SubexonProteinSequence"])) == human_seq
+    assert str(_st(subexon_table.loc[human_se,
+                                     "SubexonProteinSequence"])) == human_seq
     assert _st(subexon_table.loc[human_se, "Strand"]) == -1
     assert _st(subexon_table.loc[human_se, "StartPhase"]) == 0
     assert _st(subexon_table.loc[human_se, "EndPhase"]) == 0
@@ -106,8 +110,8 @@ def test_subexon_table(clustered_trx_data):
     assert _st(subexon_table.loc[human_se, "SubexonCodingStart"]) == 176599834
     assert _st(subexon_table.loc[human_se, "SubexonCodingEnd"]) == 176596808
 
-    assert str(_st(
-        subexon_table.loc[pig_se, "SubexonProteinSequence"])) == pig_seq
+    assert str(_st(subexon_table.loc[pig_se,
+                                     "SubexonProteinSequence"])) == pig_seq
     assert _st(subexon_table.loc[pig_se, "Strand"]) == 1
     assert _st(subexon_table.loc[pig_se, "StartPhase"]) == 0
     assert _st(subexon_table.loc[pig_se, "EndPhase"]) == 0

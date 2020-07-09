@@ -2,6 +2,7 @@
 Exon clustering: Functions to cluster exons using pairwise alignments.
 """
 
+import collections
 import warnings
 
 import numpy as np
@@ -61,10 +62,29 @@ def percent_identity(query, target):
 def _align(seq_a, seq_b, gap_open_penalty, gap_extend_penalty,
            substitution_matrix):
     "Align the sequnces using the BioPython pairwise2 aligner."
-    alignments = pairwise2.align.localds(seq_a, seq_b, substitution_matrix,
-                                         gap_open_penalty, gap_extend_penalty)
-    aln = alignments[0]
-    return aln[0], aln[1]
+    alignments = pairwise2.align.localds(seq_a,
+                                         seq_b,
+                                         substitution_matrix,
+                                         gap_open_penalty,
+                                         gap_extend_penalty,
+                                         one_alignment_only=True)
+    if alignments:
+        aln = alignments[0]
+        return aln[0], aln[1]
+    return "", ""
+
+
+def _max_percent_identity(residues_count_query, residues_count_target,
+                          len_target):
+    """
+    Return the maximum percent identity between the two sequences.
+    """
+    if residues_count_query.keys().isdisjoint(residues_count_target.keys()):
+        return 0
+    residues_count = residues_count_target.copy()
+    residues_count.subtract(residues_count_query)
+    return 100.0 * (len_target - sum(
+        val for val in residues_count.values() if val > 0)) / len_target
 
 
 def _merge_clusters(trx_data, clusters_to_merge):
@@ -159,6 +179,10 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
 
     cluster_count = 0
     aln_memo = dict()
+    residues_counts = [
+        collections.Counter(row_list[i]['ProteinSequences'])
+        for i in range(nrows)
+    ]
     for i in range(nrows):
         len_i = row_list[i]['SeqLength']
         if len_i < minimum_len:
@@ -186,6 +210,11 @@ def exon_clustering(  # pylint: disable=too-many-arguments,too-many-locals
             if exon_pair_id in aln_memo:
                 pid, target_coverage = aln_memo[exon_pair_id]
             else:
+                max_pid = _max_percent_identity(residues_counts[i],
+                                                residues_counts[j], len_j)
+                if max_pid < percent_identity_cutoff:
+                    aln_memo[exon_pair_id] = (0.0, 0.0)
+                    continue
                 aln_query, aln_target = _align(row_list[i]['ProteinSequences'],
                                                row_list[j]['ProteinSequences'],
                                                gap_open_penalty,
