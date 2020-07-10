@@ -224,6 +224,62 @@
 <span id="thoraxe-thoraxe-module"></span><h2>thoraxe.thoraxe module<a class="headerlink" href="#module-thoraxe.thoraxe" title="Permalink to this headline">¶</a></h2>
 <p>ThorAxe pipeline and script functions.</p>
 <dl class="py function">
+<dt id="thoraxe.thoraxe.add_s_exon_phases_and_coordinates">
+<code class="sig-prename descclassname">thoraxe.thoraxe.</code><code class="sig-name descname">add_s_exon_phases_and_coordinates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tbl</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.add_s_exon_phases_and_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add s-exon genomic coordinates and phases to the tidy s-exon table.</p>
+<p>For each s-exon, it add the <code class="docutils literal notranslate"><span class="pre">S_exon_Genomic_Sequence</span></code> and their genomic
+coordinates, starting at <code class="docutils literal notranslate"><span class="pre">1</span></code> and defining the closed interval:
+<code class="docutils literal notranslate"><span class="pre">[S_exon_CodingStart,</span> <span class="pre">S_exon_CodingEnd]</span></code>. Where <code class="docutils literal notranslate"><span class="pre">S_exon_CodingStart</span></code>
+is greater or equal to <code class="docutils literal notranslate"><span class="pre">S_exon_CodingEnd</span></code> for genes in the reverse
+<code class="docutils literal notranslate"><span class="pre">Strand</span></code>. It add also the <code class="docutils literal notranslate"><span class="pre">S_exon_StartPhase</span></code> and <code class="docutils literal notranslate"><span class="pre">S_exon_EndPhase</span></code>
+for those intervals.</p>
+<p>An s-exon, defined at the protein level, can be an entire sub-exon or a
+part of it. In cases where an s-exon is identical to a sub-exon, the
+genomic coordinates and the phases are the same. However, when a sub-exon
+is split into several s-exons, coordinates and phases need to be calculated:</p>
+<p><strong>Example 1: s-exons in the positive strand.</strong></p>
+<p>The following sub-exon shares codons with the previous and following
+sub-exon. In this example, <code class="docutils literal notranslate"><span class="pre">-</span></code> represents introns and lower case
+characters represent exon nucleotides. The start and end phases are <code class="docutils literal notranslate"><span class="pre">1</span></code>
+and <code class="docutils literal notranslate"><span class="pre">2</span></code> respectively:</p>
+<p><code class="docutils literal notranslate"><span class="pre">...v----vvwwwxxxyyyzz-----z...</span></code></p>
+<p>Because we are in the positive strand, the residue <code class="docutils literal notranslate"><span class="pre">V</span></code> coming from the
+<code class="docutils literal notranslate"><span class="pre">vvv</span></code> shared codon is assigned to this sub-exon protein sequence. In the
+same way, the <code class="docutils literal notranslate"><span class="pre">Z</span></code> residue coming from the <code class="docutils literal notranslate"><span class="pre">zzz</span></code> shared exon is assigned
+to the beginning of the next sub-exon:</p>
+<p><code class="docutils literal notranslate"><span class="pre">VWXY</span></code></p>
+<p>Let’s say that this sub-exon is composed of two s-exons: <code class="docutils literal notranslate"><span class="pre">VW</span></code> and <code class="docutils literal notranslate"><span class="pre">XY</span></code>.
+Then the corresponding genomic sequences are <code class="docutils literal notranslate"><span class="pre">vvwww</span></code> and <code class="docutils literal notranslate"><span class="pre">xxxyyyzz</span></code> and
+the <code class="docutils literal notranslate"><span class="pre">(start,</span> <span class="pre">end)</span></code> phases are <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">0)</span></code> and <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">2)</span></code>.</p>
+<p><em>Genomic coordinates.</em></p>
+<p>Let’s say that the first <code class="docutils literal notranslate"><span class="pre">v</span></code> has the genomic coordinate <code class="docutils literal notranslate"><span class="pre">1</span></code>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">----</span> <span class="pre">vvwww</span> <span class="pre">xxxyyyzz</span> <span class="pre">-----</span> <span class="pre">z</span></code>
+``           1 11111111 12222 2``
+<code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">2345</span> <span class="pre">67890</span> <span class="pre">12345678</span> <span class="pre">90123</span> <span class="pre">4</span></code></p>
+<p>In this way, the first s-exon has the genomic coordinates <code class="docutils literal notranslate"><span class="pre">[6,</span> <span class="pre">10]</span></code> and
+the second has the genomic coordinates <code class="docutils literal notranslate"><span class="pre">[11,</span> <span class="pre">18]</span></code>. The first s-exon has
+<code class="docutils literal notranslate"><span class="pre">2</span></code> amino-acid residues, but <code class="docutils literal notranslate"><span class="pre">5</span></code> instead of <code class="docutils literal notranslate"><span class="pre">6</span></code> bases because the
+first codon is shared between two s-exons. In particular, the
+amino-acid residue <code class="docutils literal notranslate"><span class="pre">V</span></code> needs two bases in this s-exon to complete the
+codon started in the previous s-exon.</p>
+<p><strong>Example 2: s-exons in the negative strand.</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">----</span> <span class="pre">vvwww</span> <span class="pre">xxxyyyzz</span> <span class="pre">-----</span> <span class="pre">z</span></code>
+<code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">2222</span> <span class="pre">11111</span> <span class="pre">11111</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">``</span>
+<span class="pre">``4</span> <span class="pre">3210</span> <span class="pre">98765</span> <span class="pre">43210987</span> <span class="pre">65432</span> <span class="pre">1</span></code></p>
+<p>If the same sequence belongs to the negative strand, the sub-exon protein
+sequence is going to contain <code class="docutils literal notranslate"><span class="pre">Z</span></code> but not <code class="docutils literal notranslate"><span class="pre">V</span></code>: <code class="docutils literal notranslate"><span class="pre">WXYZ</span></code>. Therefore,
+possible s-exons are <code class="docutils literal notranslate"><span class="pre">W</span></code> and <code class="docutils literal notranslate"><span class="pre">XYZ</span></code> and the corresponding genomic
+sequences will be <code class="docutils literal notranslate"><span class="pre">vvwww</span></code> and <code class="docutils literal notranslate"><span class="pre">xxxyyyzz</span></code> and the <code class="docutils literal notranslate"><span class="pre">(start,</span> <span class="pre">end)</span></code>
+phases will be <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">0)</span></code> and <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">2)</span></code>.</p>
+<p>In this way, the first s-exon has the genomic coordinates <code class="docutils literal notranslate"><span class="pre">[19,</span> <span class="pre">15]</span></code> and
+the second has the genomic coordinates <code class="docutils literal notranslate"><span class="pre">[14,</span> <span class="pre">7]</span></code>. The first s-exon has `
+<cite>1`</cite> amino-acid residue, but <code class="docutils literal notranslate"><span class="pre">5</span></code> instead of <code class="docutils literal notranslate"><span class="pre">3</span></code> bases because the first
+codon is shared between two s-exons. In particular, the amino-acid residue
+<code class="docutils literal notranslate"><span class="pre">V</span></code> needs two bases in this s-exon to complete the codon started in the
+previous s-exon.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="thoraxe.thoraxe.create_chimeric_msa">
 <code class="sig-prename descclassname">thoraxe.thoraxe.</code><code class="sig-name descname">create_chimeric_msa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output_folder</span></em>, <em class="sig-param"><span class="n">subexon_table</span></em>, <em class="sig-param"><span class="n">gene2speciesname</span></em>, <em class="sig-param"><span class="n">connected_subexons</span></em>, <em class="sig-param"><span class="n">clusters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cutoff</span><span class="o">=</span><span class="default_value">30.0</span></em>, <em class="sig-param"><span class="n">min_col_number</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">aligner</span><span class="o">=</span><span class="default_value">'ProGraphMSA'</span></em>, <em class="sig-param"><span class="n">padding</span><span class="o">=</span><span class="default_value">'XXXXXXXXXX'</span></em>, <em class="sig-param"><span class="n">species_list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.create_chimeric_msa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dict from cluster to cluster data.</p>
