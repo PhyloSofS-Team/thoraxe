@@ -494,9 +494,16 @@ def update_subexon_table(subexon_table, cluster2data):
     return subexon_table
 
 
-def _add_s_exon_phases_and_coordinates(tbl):
+def add_s_exon_phases_and_coordinates(tbl):
     """
-    Add s-exon genomic coordinates and phases to the tidy table.
+    Add s-exon genomic coordinates and phases to the tidy s-exon table.
+
+    For each s-exon, it add the ``S_exon_Genomic_Sequence`` and their genomic
+    coordinates, starting at ``1`` and defining the closed interval:
+    ``[S_exon_CodingStart, S_exon_CodingEnd]``. Where ``S_exon_CodingStart``
+    is greater or equal to ``S_exon_CodingEnd`` for genes in the reverse
+    ``Strand``. It add also the ``S_exon_StartPhase`` and ``S_exon_EndPhase``
+    for those intervals.
 
     An s-exon, defined at the protein level, can be an entire sub-exon or a
     part of it. In cases where an s-exon is identical to a sub-exon, the
@@ -523,13 +530,40 @@ def _add_s_exon_phases_and_coordinates(tbl):
     Then the corresponding genomic sequences are ``vvwww`` and ``xxxyyyzz`` and
     the ``(start, end)`` phases are ``(1, 0)`` and ``(0, 2)``.
 
+    *Genomic coordinates.*
+
+    Let's say that the first ``v`` has the genomic coordinate ``1``:
+
+    ``v ---- vvwww xxxyyyzz ----- z``
+    ``           1 11111111 12222 2``
+    ``1 2345 67890 12345678 90123 4``
+
+    In this way, the first s-exon has the genomic coordinates ``[6, 10]`` and
+    the second has the genomic coordinates ``[11, 18]``. The first s-exon has
+    ``2`` amino-acid residues, but ``5`` instead of ``6`` bases because the
+    first codon is shared between two s-exons. In particular, the
+    amino-acid residue ``V`` needs two bases in this s-exon to complete the
+    codon started in the previous s-exon.
+
     **Example 2: s-exons in the negative strand.**
+
+    ``v ---- vvwww xxxyyyzz ----- z``
+    ``2 2222 11111 11111           ``
+    ``4 3210 98765 43210987 65432 1``
 
     If the same sequence belongs to the negative strand, the sub-exon protein
     sequence is going to contain ``Z`` but not ``V``: ``WXYZ``. Therefore,
     possible s-exons are ``W`` and ``XYZ`` and the corresponding genomic
     sequences will be ``vvwww`` and ``xxxyyyzz`` and the ``(start, end)``
     phases will be ``(1, 0)`` and ``(0, 2)``.
+
+    In this way, the first s-exon has the genomic coordinates ``[19, 15]`` and
+    the second has the genomic coordinates ``[14, 7]``. The first s-exon has `
+    `1`` amino-acid residue, but ``5`` instead of ``3`` bases because the first
+    codon is shared between two s-exons. In particular, the amino-acid residue
+    ``V`` needs two bases in this s-exon to complete the codon started in the
+    previous s-exon.
+
     """
     tbl['S_exon_CodingStart'] = None
     tbl['S_exon_CodingEnd'] = None
@@ -607,23 +641,35 @@ def _get_first_s_exon(row):
     >>> row['Strand'] = 1
     >>> _get_first_s_exon(row)
     (48434883, 'CACAG', 'GTGCAGCAGTGA')
+    >>> # SNAP25 ENSE00000906745
+    >>> seq = 'AGTAAAGATGCTGGTATCAGGACTTTGGTTATGTTGGATGAACAAGGAG'
+    >>> row = {'SubexonSequence': seq}
+    >>> row['SubexonCodingStart'] = 10284724
+    >>> row['SubexonStartPhase'] = 0
+    >>> row['S_exon_Sequence'] = 'S'
+    >>> row['Strand'] = 1
+    >>> _get_first_s_exon(row)
+    (10284726, 'AGT', 'AAAGATGCTGGTATCAGGACTTTGGTTATGTTGGATGAACAAGGAG')
     """
     genomic_seq = row['SubexonSequence']
     start_coordinates = row['SubexonCodingStart']
     start_phase = row['SubexonStartPhase']
     s_exon_len = len(row['S_exon_Sequence'])
 
-    if row['Strand'] == 1:
-        needed_bases = (s_exon_len - 1) * 3
+    needed_bases = s_exon_len * 3
+
+    bases_to_complete_previous_codon = phases.bases_to_complete_previous_codon(
+        start_phase)
+    if bases_to_complete_previous_codon:
+        bases_in_previous_codon = 3 - bases_to_complete_previous_codon
     else:
-        needed_bases = s_exon_len * 3
-
-    skip_bases = phases.bases_to_complete_previous_codon(start_phase)
-    total_len = skip_bases + needed_bases
+        bases_in_previous_codon = 0
 
     if row['Strand'] == 1:
+        total_len = needed_bases - bases_in_previous_codon
         end_coordinates = start_coordinates + total_len - 1
     else:
+        total_len = needed_bases + bases_to_complete_previous_codon
         end_coordinates = start_coordinates - total_len + 1
 
     return end_coordinates, genomic_seq[:total_len], genomic_seq[total_len:]
@@ -708,7 +754,7 @@ def main():  # pylint: disable=too-many-locals
     subexon_table = subexons.alignment.impute_missing_s_exon(subexon_table)
 
     tidy_table = subexons.tidy.get_tidy_table(subexon_table, gene2speciesname)
-    _add_s_exon_phases_and_coordinates(tidy_table)
+    add_s_exon_phases_and_coordinates(tidy_table)
     tidy_table.to_csv(os.path.join(output_folder, "s_exon_table.csv"),
                       index=False)
 

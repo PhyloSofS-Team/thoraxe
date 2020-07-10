@@ -442,7 +442,12 @@ def _merge_subexon_columns(subexons_df):
     merged_id = ""
     merged_protein = ""
     merged_dna = ""
-    for index in range(1, subexons_df.shape[0]):
+    coding_start = -1
+    coding_end = -1
+    start_phase = -1
+    end_phase = -1
+    n_rows = subexons_df.shape[0]
+    for index in range(1, n_rows):
         rowi = subexons_df.iloc[index - 1, :]  # previous_row
         rowj = subexons_df.iloc[index, :]  # actual_row
         if not merged_id:
@@ -463,11 +468,19 @@ def _merge_subexon_columns(subexons_df):
         else:
             merged_dna = merged_dna + rowj['SubexonSequence']
 
-    return merged_id, merged_dna, merged_protein
+        if index == 1:
+            start_phase = rowi['StartPhase']
+            coding_start = rowi['SubexonCodingStart']
+        if index == (n_rows - 1):
+            end_phase = rowj['EndPhase']
+            coding_end = rowj['SubexonCodingEnd']
+
+    return merged_id, merged_dna, merged_protein, coding_start, coding_end, start_phase, end_phase
 
 
 def _fill_with_new_subexon_data(  # pylint: disable=too-many-arguments
-        old2new, rowi, rowj, merged_id, merged_dna, merged_protein):
+        old2new, rowi, rowj, merged_id, merged_dna, merged_protein,
+        coding_start, coding_end, start_phase, end_phase):
     """Fill a dict from old subexon ID to a dict with the new values."""
     keys = [
         'SubexonID', 'SubexonIDCluster', 'SubexonCodingStart',
@@ -478,14 +491,12 @@ def _fill_with_new_subexon_data(  # pylint: disable=too-many-arguments
     rowj_subexon = rowj['SubexonIDCluster']
     previous = old2new.setdefault(rowi_subexon, rowi[keys].to_dict())
     actual = old2new.setdefault(rowj_subexon, rowj[keys].to_dict())
-    if rowi['Strand'] == 1:
-        previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
-        actual['SubexonCodingStart'] = previous['SubexonCodingStart']
-    else:
-        actual['SubexonCodingStart'] = previous['SubexonCodingStart']
-        previous['SubexonCodingEnd'] = actual['SubexonCodingEnd']
-    previous['EndPhase'] = actual['EndPhase']
-    actual['StartPhase'] = previous['StartPhase']
+    actual['SubexonCodingStart'] = coding_start
+    actual['SubexonCodingEnd'] = coding_end
+    previous['SubexonCodingStart'] = coding_start
+    previous['SubexonCodingEnd'] = coding_end
+    previous['EndPhase'] = end_phase
+    actual['StartPhase'] = start_phase
     previous['SubexonProteinSequence'] = merged_protein
     actual['SubexonProteinSequence'] = merged_protein
     previous['SubexonSequence'] = merged_dna
@@ -514,8 +525,8 @@ def _merge_subexons(  # pylint: disable=too-many-locals
                                    ascending=True)
             assert len(transcript) == n_subexons
 
-            merged_id, merged_dna, merged_protein = _merge_subexon_columns(
-                transcript)
+            (merged_id, merged_dna, merged_protein, coding_start, coding_end,
+             start_phase, end_phase) = _merge_subexon_columns(transcript)
 
             old2new = {}
             for index in range(1, n_subexons):
@@ -523,7 +534,8 @@ def _merge_subexons(  # pylint: disable=too-many-locals
                 actual_row = transcript.iloc[index, :]
                 _fill_with_new_subexon_data(old2new, previous_row, actual_row,
                                             merged_id, merged_dna,
-                                            merged_protein)
+                                            merged_protein, coding_start,
+                                            coding_end, start_phase, end_phase)
 
             for index in group_index:
                 subexon_id = subexon_table.loc[index, 'SubexonIDCluster']
