@@ -667,14 +667,14 @@ def column_clusters(colpatterns):
     return _cluster_column_clusters(clusters)
 
 
-def _delete_padding(seq, padding):
+def delete_padding(seq, padding):
     """
     Replace padding by gaps.
 
-    >>> _delete_padding("MHGL--XXXX-XXX--XXXKLMHSXXXXXXX-X-X-X", "XXXXXXXXXX")
+    >>> delete_padding("MHGL--XXXX-XXX--XXXKLMHSXXXXXXX-X-X-X", "XXXXXXXXXX")
     'MHGL---------------KLMHS-------------'
 
-    >>> _delete_padding("MHGLXKLMHSX", "XXXXXXXXXX")
+    >>> delete_padding("MHGLXKLMHSX", "XXXXXXXXXX")
     'MHGLXKLMHSX'
     """
     regex = ''.join(c + '-*' for c in padding)
@@ -682,7 +682,7 @@ def _delete_padding(seq, padding):
     if match is not None:
         actual_padding = match.group()
         seq = seq.replace(actual_padding, '-' * len(actual_padding))
-        return _delete_padding(seq, padding)
+        return delete_padding(seq, padding)
 
     return seq
 
@@ -697,7 +697,7 @@ def msa2sequences(msa, gene_ids, padding):
     sequences = []
     for i, seq in enumerate(msa):
         assert seq.id == gene_ids[i]
-        sequences.append(_delete_padding(str(seq.seq), padding))
+        sequences.append(delete_padding(str(seq.seq), padding))
     return sequences
 
 

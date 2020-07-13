@@ -10,40 +10,15 @@ from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum50
 
 from thoraxe import transcript_info
+from thoraxe.subexons import alignment
 
 
 def _get_subexons_to_rescue(subexon_table):
     """Return a DataFrame with the subexons to rescue."""
     return subexon_table.loc[
         subexon_table['Cluster'] < 0,
-        ['SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
+        ['GeneID', 'SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
          ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
-
-
-def _get_sequence_list(sequences, minimum_len):
-    """Helper funtion to return a set of unique sequences."""
-    seq_list = set([])
-    for seq in sequences:
-        seq = str(seq).replace('*', '')
-        if len(seq) > minimum_len:
-            seq_list.add(seq)
-    return seq_list
-
-
-def _get_cluster2sequence(subexon_table, minimum_len=0):
-    """Return a dict from cluster id to cluster unique sequences."""
-    clusterized = subexon_table.loc[
-        subexon_table['Cluster'] > 0,
-        ['SubexonIDCluster', 'Cluster', 'SubexonProteinSequence']]
-    clusterized.drop_duplicates('SubexonIDCluster', inplace=True)
-    clusterized.drop(columns='SubexonIDCluster', inplace=True)
-    cluster2sequence = clusterized.groupby('Cluster').agg(
-        lambda col: _get_sequence_list(col, minimum_len)).to_dict('index')
-    return {
-        cluster: seqs['SubexonProteinSequence']
-        for cluster, seqs in cluster2sequence.items()
-        if seqs['SubexonProteinSequence']
-    }
 
 
 def _get_cluster_number(aln_stats):
@@ -61,17 +36,93 @@ def _get_cluster_number(aln_stats):
     return df_stats.index[0]
 
 
+def get_unaligned_regions(seq_i, seq_j, minimum_len=4):
+    """
+    Return the ungapped regions in `seq_j` that do not align with `seq_i`.
+
+    Returned regions should have at least `minimum_len`.
+
+    >>> seq_i = '------MHKCLVDE------YTEDQGGFRK------'
+    >>> seq_j = 'MLLHYHHHKC-------LMCYTRDLHG---IH-L-K'
+    >>> get_unaligned_regions(seq_i, seq_j)
+    ['MLLHYH', 'IHLK']
+    >>> seq_i = 'XXXXXXXXXXMHKCLVDE------YTEDQGGFRK'
+    >>> seq_j = '----MLLHYHHHKC-------LMCYTRDLHG---'
+    >>> get_unaligned_regions(seq_i, seq_j)
+    ['MLLHYH']
+    """
+    j_sequences = []
+    j_region = []
+    in_region = False
+    for (res_i, res_j) in zip(seq_i, seq_j):
+        if res_i == '-' or res_i == 'X':
+            in_region = True
+            if res_j != '-' and res_j != 'X':
+                j_region.append(res_j)
+        elif in_region:
+            seq = ''.join(j_region)
+            j_region.clear()
+            in_region = False
+            if len(seq) >= minimum_len:
+                j_sequences.append(seq)
+
+    seq = ''.join(j_region)
+    if len(seq) >= minimum_len:
+        j_sequences.append(seq)
+
+    return j_sequences
+
+
+def _get_gene_cluster_to_unaligned(gene_id, msa, minimum_len):
+    """
+    Dict from (gene, cluster) to the sequences that doesn't align to the gene.
+    """
+    unaligned_seqs = set()
+    n_seq = len(msa)
+    for i in range(0, n_seq):
+        seq_i = msa[i, :]
+        if seq_i.id == gene_id:
+            for j in range(0, n_seq):
+                if i != j:
+                    seq_j = msa[j, :]
+                    unaligned_seqs.update(
+                        get_unaligned_regions(seq_i,
+                                              seq_j,
+                                              minimum_len=minimum_len))
+    return list(unaligned_seqs)
+
+
 def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
-        query, query_len, origin_cluster, cluster2sequence, coverage_cutoff,
-        percent_identity_cutoff, gap_open_penalty, gap_extend_penalty,
-        substitution_matrix):
+        row, cluster2data, padding, coverage_cutoff, percent_identity_cutoff,
+        gap_open_penalty, gap_extend_penalty, substitution_matrix,
+        minimum_len):
     """Helper function to get a dict with the aln stats of the matches."""
+
+    query_seq = str(row['SubexonProteinSequence']).replace('*', '')
+    query_len = len(query_seq)
+
     aln_stats = collections.defaultdict(list)
-    for cluster, sequences in cluster2sequence.items():
+
+    cluster2sequences = collections.defaultdict(list)
+
+    origin_cluster = -1 * row['Cluster']
+    query_gene = row['GeneID']
+    for (cluster, (_, chimerics, msa)) in cluster2data.items():
+        if cluster != origin_cluster:
+            if query_gene not in chimerics:
+                cluster2sequences[cluster] = [
+                    alignment.delete_padding(seq, padding).replace('-', '')
+                    for (seq, _) in chimerics.values()
+                ]
+            elif len(chimerics) > 1:
+                cluster2sequences[cluster] = _get_gene_cluster_to_unaligned(
+                    query_gene, msa, minimum_len)
+
+    for cluster, sequences in cluster2sequences.items():
         if cluster == origin_cluster:
             continue
         for sequence in sequences:
-            alignments = pairwise2.align.localds(query,
+            alignments = pairwise2.align.localds(query_seq,
                                                  sequence,
                                                  substitution_matrix,
                                                  gap_open_penalty,
@@ -90,12 +141,14 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
 
 def _get_subexon2cluster(  # pylint: disable=too-many-arguments
         to_rescue,
-        cluster2sequence,
+        cluster2data,
+        padding,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
         gap_open_penalty=-10,
         gap_extend_penalty=-1,
-        substitution_matrix=None):
+        substitution_matrix=None,
+        minimum_len=4):
     """
     Return a dict from 'SubexonIDCluster' to cluster.
 
@@ -106,17 +159,15 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
 
     subexon2cluster = {}
     for row in to_rescue:
-        origin_cluster = -1 * row['Cluster']
-        seq = str(row['SubexonProteinSequence']).replace('*', '')
-        aln_stats = _get_aln_stats(seq,
-                                   len(seq),
-                                   origin_cluster,
-                                   cluster2sequence,
+        aln_stats = _get_aln_stats(row,
+                                   cluster2data,
+                                   padding,
                                    coverage_cutoff,
                                    percent_identity_cutoff,
                                    gap_open_penalty=gap_open_penalty,
                                    gap_extend_penalty=gap_extend_penalty,
-                                   substitution_matrix=substitution_matrix)
+                                   substitution_matrix=substitution_matrix,
+                                   minimum_len=minimum_len)
         if aln_stats:
             subexon2cluster[row['SubexonIDCluster']] = _get_cluster_number(
                 aln_stats)
@@ -141,7 +192,9 @@ def modify_subexon_cluster(subexon_table, subexon2cluster):
 
 
 def subexon_rescue_phase(  # pylint: disable=too-many-arguments
+        cluster2data,
         subexon_table,
+        padding,
         minimum_len=4,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
@@ -162,14 +215,15 @@ def subexon_rescue_phase(  # pylint: disable=too-many-arguments
     This function returns the list of 'Cluster's that have been modified.
     """
     to_rescue = _get_subexons_to_rescue(subexon_table)
-    cluster2sequence = _get_cluster2sequence(subexon_table, minimum_len)
     subexon2cluster = _get_subexon2cluster(
         to_rescue,
-        cluster2sequence,
+        cluster2data,
+        padding,
         coverage_cutoff=coverage_cutoff,
         percent_identity_cutoff=percent_identity_cutoff,
         gap_open_penalty=gap_open_penalty,
         gap_extend_penalty=gap_extend_penalty,
-        substitution_matrix=substitution_matrix)
+        substitution_matrix=substitution_matrix,
+        minimum_len=minimum_len)
     modify_subexon_cluster(subexon_table, subexon2cluster)
     return list(subexon2cluster.values())
