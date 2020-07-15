@@ -1095,8 +1095,8 @@ def _merge_block_clusters(clusters, columns):
                     clusters[previous_cluster].extend(clusters[actual_cluster])
                     columns[previous_cluster] = range(
                         max(0, min(min(cols), prev_cols.start)),
-                        max(max(cols), prev_cols.end))
-                    to_delete.update(actual_cluster)
+                        max(max(cols), prev_cols.stop))
+                    to_delete.update([actual_cluster])
                     break
     return [
         clus for (index, clus) in enumerate(clusters) if index not in to_delete
