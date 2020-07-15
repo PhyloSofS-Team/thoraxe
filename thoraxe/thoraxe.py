@@ -702,6 +702,22 @@ def _get_internal_s_exon(row, previous_end, seq):
     return start_coordinates, end_coordinates, seq[:total_len], seq[total_len:]
 
 
+def get_s_exon_msas(output_folder):
+    """
+    Return a dict of the s_exon MSAs.
+    """
+    s_exon_msas = dict()
+    msa_path = os.path.join(output_folder, 'msa')
+    msa_files = os.listdir(msa_path)
+    for msa_file in msa_files:
+        if 'msa_s_exon_' in msa_file and '.fasta' in msa_file:
+            fields = msa_file.split('_')
+            s_exon = '{}_{}'.format(fields[3], fields[4].split('.')[0])
+            s_exon_msas[s_exon] = subexons.alignment.read_msa_fasta(
+                os.path.join(msa_path, msa_file))
+    return s_exon_msas
+
+
 def main():  # pylint: disable=too-many-locals
     """Perform Pipeline."""
     args = parse_command_line().parse_args()
@@ -746,6 +762,8 @@ def main():  # pylint: disable=too-many-locals
                                disintegration=not args.no_disintegration,
                                species_list=species_list)
 
+    s_exon_msas = get_s_exon_msas(output_folder)
+
     subexon_table.to_csv(
         os.path.join(intermediate_output_path, "subexon_table.csv"))
 
@@ -771,19 +789,21 @@ def main():  # pylint: disable=too-many-locals
 
     splice_graph_filename = os.path.join(output_folder, "splice_graph.gml")
 
-    subexons.graph.splice_graph_gml(splice_graph_filename, node2genes,
-                                    edge2genes, node2transcripts,
+    subexons.graph.splice_graph_gml(splice_graph_filename, s_exon_msas,
+                                    node2genes, edge2genes, node2transcripts,
                                     edge2transcripts, edge2trx_cons,
                                     s_exon_2_char)
 
     path_table, ases_table = subexons.ases.conserved_ases(
         tidy_table,
         transcript_table,
+        s_exon_msas,
         splice_graph_filename,
         min_genes=args.mingenes,
         min_transcripts=args.mintranscripts,
         column_order=args.canonical_criteria.split(",")
         if args.canonical_criteria else None)
+
     path_table.to_csv(os.path.join(output_folder, "path_table.csv"),
                       index=False)
     ases_table.to_csv(os.path.join(output_folder, "ases_table.csv"),

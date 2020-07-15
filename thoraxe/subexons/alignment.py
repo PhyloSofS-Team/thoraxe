@@ -16,7 +16,12 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Align import MultipleSeqAlignment
 from Bio import AlignIO
+from Bio.Align import AlignInfo
+from Bio.Alphabet import IUPAC
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
@@ -667,6 +672,39 @@ def column_clusters(colpatterns):
     return _cluster_column_clusters(clusters)
 
 
+def get_consensus(msa, threshold=0.5):
+    """
+    Return the consensus sequence of the MSA.
+
+    It returns the amino-acid residue that appears in more than `threshold`
+    fraction of the sequences without counting sequences that has gaps in
+    that column. If any residue is present in more sequences than the
+    `threshold`, it introduces an `X` to indicate the ambiguity.
+    If there are more than 50% gaps in a column, it displays the residue
+    in lowercase.
+    
+    >>> from Bio.Alphabet import IUPAC
+    >>> from Bio.Seq import Seq
+    >>> from Bio.SeqRecord import SeqRecord
+    >>> from Bio.Align import MultipleSeqAlignment
+    >>> seq_1 = SeqRecord(Seq("SEEEEACCC", IUPAC.protein), id="I")
+    >>> seq_2 = SeqRecord(Seq("SSEEEGCC-", IUPAC.protein), id="II")
+    >>> seq_3 = SeqRecord(Seq("SSSEEKC--", IUPAC.protein), id="III")
+    >>> seq_4 = SeqRecord(Seq("SSSSEH---", IUPAC.protein), id="IIII")
+    >>> msa = MultipleSeqAlignment([seq_1, seq_2, seq_3, seq_4])
+    >>> get_consensus(msa)
+    'SSXEEXCCc'
+    """
+    alphabet = IUPAC.protein
+    summary_align = AlignInfo.SummaryInfo(msa)
+    ungapped = summary_align.dumb_consensus(consensus_alpha=alphabet,
+                                            threshold=threshold)
+    gapped = summary_align.gap_consensus(consensus_alpha=alphabet,
+                                         threshold=0.5)
+    return ''.join(res_a if res_b != '-' else res_a.lower()
+                   for (res_a, res_b) in zip(ungapped, gapped))
+
+
 def delete_padding(seq, padding):
     """
     Replace padding by gaps.
@@ -788,6 +826,19 @@ def _delete_full_gap_columns(full_gaps, sequence, start, end):
         if not full_gaps[i]:
             cleaned_seq.append(sequence[i])
     return ''.join(cleaned_seq)
+
+
+def get_submsa(msa, seq_ids):
+    """
+    Return the sub-MSA with `seq_ids`, deleting full gap columns.
+    """
+    sub_msa = MultipleSeqAlignment([seq for seq in msa if seq.id in seq_ids])
+    full_gaps = _full_gap_columns(sub_msa)
+    return MultipleSeqAlignment([
+        SeqRecord(Seq(_delete_full_gap_columns(full_gaps, seq, 0, len(seq)),
+                      IUPAC.protein),
+                  id=seq.id) for seq in sub_msa
+    ])
 
 
 def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):

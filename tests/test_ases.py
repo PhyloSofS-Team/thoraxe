@@ -3,6 +3,7 @@ import pytest
 import numpy as np
 import pandas as pd
 import networkx as nx
+import thoraxe
 from thoraxe import subexons
 
 
@@ -22,7 +23,9 @@ def mapk8(request):
         'path_table':
         os.path.join(mapk8_dir, 'path_table.csv'),
         'transcript_table':
-        os.path.join(mapk8_dir, '_intermediate', 'transcript_table.csv')
+        os.path.join(mapk8_dir, '_intermediate', 'transcript_table.csv'),
+        'output_path':
+        mapk8_dir
     }
 
 
@@ -32,8 +35,10 @@ def test_ases(mapk8):
     graph = nx.read_gml(mapk8['splice_graph'])
     trx_df = subexons.ases.get_transcript_scores(s_exon_df, transcript_table,
                                                  graph)
+    s_exon_msas = thoraxe.get_s_exon_msas(mapk8['output_path'])
     path_table, ases_df = subexons.ases.conserved_ases(s_exon_df,
                                                        transcript_table,
+                                                       s_exon_msas,
                                                        mapk8['splice_graph'],
                                                        min_genes=1,
                                                        min_transcripts=2)
@@ -45,8 +50,8 @@ def test_ases(mapk8):
     assert all(trx_df.MinimumTranscriptWeightedConservation[select] ==
                0.03333333333333333)
 
-    assert list(trx_df.MinimumConservation) == sorted(trx_df.MinimumConservation,
-                                                 reverse=True)
+    assert list(trx_df.MinimumConservation) == sorted(
+        trx_df.MinimumConservation, reverse=True)
 
     # mutually_exclusive because ENSXETT00000046905 from ENSXETG00000021691
     # is the only transcript with 15_0/15_1 at the  same time.

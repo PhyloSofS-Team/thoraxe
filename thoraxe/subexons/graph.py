@@ -6,14 +6,15 @@ import collections
 import logging
 
 from functools import reduce
+from thoraxe.subexons import alignment
 
 
 def _gene2n_transcripts(data):
     """
     Return a dictionary from gene id to number of transcripts in the gene.
     """
-    return data.groupby(
-        'GeneID').apply(lambda df: len(set(df.TranscriptIDCluster))).to_dict()
+    return data.groupby('GeneID').apply(
+        lambda df: len(set(df.TranscriptIDCluster))).to_dict()
 
 
 def _edge2stats(edge2gene_list):
@@ -109,8 +110,8 @@ def _get_elements(node2elements):
 
 
 def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
-        filename, node2genes, edge2genes, node2transcripts, edge2transcripts,
-        edge2trx_cons, s_exon_2_char):
+        filename, s_exons_msas, node2genes, edge2genes, node2transcripts,
+        edge2transcripts, edge2trx_cons, s_exon_2_char):
     """
     Store the splice graph in GML (Graph Modelling Language) format.
 
@@ -141,23 +142,28 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
             transcript_fraction = 100.0 * (len(transcripts) / n_transcripts)
             genes_str = ','.join(sorted(genes))
             transcripts_str = ','.join(sorted(transcripts))
-            gml.write('''
+            out_str = '''
                 node [
                     id {}
                     label "{}"
                     transcript_fraction {}
                     conservation {}
                     genes "{}"
-                    transcripts "{}"
-            '''.format(node_id, node, transcript_fraction, conservation,
-                       genes_str, transcripts_str))
+                    transcripts "{}"'''.format(node_id, node,
+                                               transcript_fraction,
+                                               conservation, genes_str,
+                                               transcripts_str)
             if s_exon_2_char and node not in ['start', 'stop']:
-                gml.write('''
-                    phylosofs "{}"
-            '''.format(s_exon_2_char[node]))
-            gml.write('''
+                out_str += '''
+                    phylosofs "{}"'''.format(s_exon_2_char[node])
+                if node[:1] != '0':
+                    out_str += '''
+                    consensus "{}"'''.format(
+                        alignment.get_consensus(s_exons_msas[node]))
+            out_str += '''
                 ]
-            ''')
+            '''
+            gml.write(out_str)
             node2id[node] = node_id
             node_id += 1
         for edge, genes in edge2genes.items():

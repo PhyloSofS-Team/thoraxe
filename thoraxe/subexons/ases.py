@@ -5,10 +5,13 @@ It finds the canonical path in the splice graph to detect conserved ASEs.
 """
 
 import collections
+import os
 
 import pandas as pd
 import networkx as nx
 import numpy as np
+
+from thoraxe.subexons import alignment
 
 PathData = collections.namedtuple('PathData', ['Genes', 'Transcripts'])
 
@@ -429,7 +432,51 @@ def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
     return events
 
 
-def create_ases_table(events, delim='/'):
+def _get_path_sequence(s_exon_df, path, path_genes, delim='/'):
+    """
+    Return the residue sequences for the path.
+    """
+    s_exons = path.split(delim)
+    sequences = []
+    for gene in path_genes:
+        gene_rows = s_exon_df.GeneID == gene
+        sequence = []
+        for s_exon in s_exons:
+            seqs = s_exon_df.loc[(s_exon_df.S_exonID == s_exon) & gene_rows,
+                                 'S_exon_Sequence'].drop_duplicates()
+            if seqs.size:
+                sequence.append(seqs.iloc[0])
+        sequences.append(''.join(sequence))
+    return sequences
+
+
+def _len_stats(sequences):
+    """
+    Return the minimum, mean and maximum sequence length.
+
+    >>> _len_stats(['A', 'AA', 'AAA'])
+    (1, 2.0, 3)
+    """
+    lengths = [len(seq) for seq in sequences]
+    return min(lengths), sum(lengths) / len(lengths), max(lengths)
+
+
+def _get_path_consensus(s_exon_msas, path, path_genes, delim='/'):
+    """
+    Return the consensus sequence for the given path in the given genes.
+    """
+    consensus = []
+    for s_exon in path.split(delim):
+        if s_exon in s_exon_msas:
+            msa = s_exon_msas[s_exon]
+            sub_msa = alignment.get_submsa(msa, path_genes)
+            consensus.append(alignment.get_consensus(sub_msa))
+        else:
+            consensus.append('')
+    return ''.join(consensus)
+
+
+def create_ases_table(s_exon_msas, s_exon_table, events, delim='/'):
     """
     Create an ASE data frame from the dictionary returned by `detect_ases`.
     """
@@ -446,6 +493,14 @@ def create_ases_table(events, delim='/'):
         'AlternativePathGenes': [],
         'CommonGenes': [],
         'NumberOfCommonGenes': [],
+        'CanonicalPathMinSeqLength': [],
+        'CanonicalPathMeanSeqLength': [],
+        'CanonicalPathMaxSeqLength': [],
+        'AlternativePathMinSeqLength': [],
+        'AlternativePathMeanSeqLength': [],
+        'AlternativePathMaxSeqLength': [],
+        'CanonicalPathConsensus': [],
+        'AlternativePathConsensus': [],
     }
     for (key, value) in events.items():
         paths['CanonicalPath'].append(key[0])
@@ -463,6 +518,20 @@ def create_ases_table(events, delim='/'):
         common_genes = can_genes.intersection(alt_genes)
         paths['CommonGenes'].append(delim.join(sorted(common_genes)))
         paths['NumberOfCommonGenes'].append(len(common_genes))
+        can_stats = _len_stats(
+            _get_path_sequence(s_exon_table, key[0], can_genes, delim=delim))
+        paths['CanonicalPathMinSeqLength'].append(can_stats[0])
+        paths['CanonicalPathMeanSeqLength'].append(can_stats[1])
+        paths['CanonicalPathMaxSeqLength'].append(can_stats[2])
+        alt_stats = _len_stats(
+            _get_path_sequence(s_exon_table, key[1], alt_genes, delim=delim))
+        paths['AlternativePathMinSeqLength'].append(alt_stats[0])
+        paths['AlternativePathMeanSeqLength'].append(alt_stats[1])
+        paths['AlternativePathMaxSeqLength'].append(alt_stats[2])
+        paths['CanonicalPathConsensus'].append(
+            _get_path_consensus(s_exon_msas, key[0], can_genes, delim=delim))
+        paths['AlternativePathConsensus'].append(
+            _get_path_consensus(s_exon_msas, key[1], alt_genes, delim=delim))
     data_frame = pd.DataFrame(paths)
     data_frame.sort_values(
         ['NumberOfCommonGenes', 'CanonicalPath', 'AlternativePath'],
@@ -475,6 +544,7 @@ def create_ases_table(events, delim='/'):
 def conserved_ases(  # pylint: disable=too-many-arguments
         s_exon_table,
         transcript_table,
+        s_exon_msas,
         graph_file_name,
         min_genes=1,
         min_transcripts=2,
@@ -495,5 +565,9 @@ def conserved_ases(  # pylint: disable=too-many-arguments
                          min_genes=min_genes,
                          min_transcripts=min_transcripts,
                          delim=delim)
-    ases_table = create_ases_table(events, delim=delim)
+    ases_table = create_ases_table(s_exon_msas,
+                                   s_exon_table,
+                                   events,
+                                   delim=delim)
+
     return path_table, ases_table

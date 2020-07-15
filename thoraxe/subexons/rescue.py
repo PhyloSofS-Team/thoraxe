@@ -3,6 +3,7 @@ Functions for the rescue phase.
 """
 
 import collections
+import logging
 
 import pandas as pd
 import numpy as np
@@ -169,6 +170,9 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
                                    substitution_matrix=substitution_matrix,
                                    minimum_len=minimum_len)
         if aln_stats:
+            logging.warning(
+                'Sub-exon %s from gene %s is being rescued (previous cluster: %s)',
+                row["SubexonIDCluster"], row["GeneID"], -1 * row["Cluster"])
             subexon2cluster[row['SubexonIDCluster']] = _get_cluster_number(
                 aln_stats)
 
