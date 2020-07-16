@@ -391,7 +391,6 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
     modified_clusters = subexons.rescue.subexon_rescue_phase(
         cluster2data,
         subexon_table,
-        padding,
         minimum_len=minimum_len,
         coverage_cutoff=coverage_cutoff,
         percent_identity_cutoff=percent_identity_cutoff,

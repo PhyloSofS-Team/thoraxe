@@ -51,6 +51,10 @@ def get_unaligned_regions(seq_i, seq_j, minimum_len=4):
     >>> seq_j = '----MLLHYHHHKC-------LMCYTRDLHG---'
     >>> get_unaligned_regions(seq_i, seq_j)
     ['MLLHYH']
+    >>> seq_i = 'XXXXXXXXXXMHKCLVDE------YTEDQGGFRK'
+    >>> seq_j = '----MLLHYHHHKC-----XXLMCYTRDLHG---'
+    >>> get_unaligned_regions(seq_i, seq_j)
+    ['MLLHYH', 'XXLMC']
     """
     j_sequences = []
     j_region = []
@@ -58,7 +62,7 @@ def get_unaligned_regions(seq_i, seq_j, minimum_len=4):
     for (res_i, res_j) in zip(seq_i, seq_j):
         if res_i == '-' or res_i == 'X':
             in_region = True
-            if res_j != '-' and res_j != 'X':
+            if res_j != '-':
                 j_region.append(res_j)
         elif in_region:
             seq = ''.join(j_region)
@@ -94,7 +98,7 @@ def _get_gene_cluster_to_unaligned(gene_id, msa, minimum_len):
 
 
 def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
-        row, cluster2data, padding, coverage_cutoff, percent_identity_cutoff,
+        row, cluster2data, coverage_cutoff, percent_identity_cutoff,
         gap_open_penalty, gap_extend_penalty, substitution_matrix,
         minimum_len):
     """Helper function to get a dict with the aln stats of the matches."""
@@ -112,7 +116,7 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
         if cluster != origin_cluster:
             if query_gene not in chimerics:
                 cluster2sequences[cluster] = [
-                    alignment.delete_padding(seq, padding).replace('-', '')
+                    seq.replace('-', '')
                     for (seq, _) in chimerics.values()
                 ]
             elif len(chimerics) > 1:
@@ -143,7 +147,6 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
 def _get_subexon2cluster(  # pylint: disable=too-many-arguments
         to_rescue,
         cluster2data,
-        padding,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
         gap_open_penalty=-10,
@@ -162,7 +165,6 @@ def _get_subexon2cluster(  # pylint: disable=too-many-arguments
     for row in to_rescue:
         aln_stats = _get_aln_stats(row,
                                    cluster2data,
-                                   padding,
                                    coverage_cutoff,
                                    percent_identity_cutoff,
                                    gap_open_penalty=gap_open_penalty,
@@ -198,7 +200,6 @@ def modify_subexon_cluster(subexon_table, subexon2cluster):
 def subexon_rescue_phase(  # pylint: disable=too-many-arguments
         cluster2data,
         subexon_table,
-        padding,
         minimum_len=4,
         coverage_cutoff=80.0,
         percent_identity_cutoff=30.0,
@@ -222,7 +223,6 @@ def subexon_rescue_phase(  # pylint: disable=too-many-arguments
     subexon2cluster = _get_subexon2cluster(
         to_rescue,
         cluster2data,
-        padding,
         coverage_cutoff=coverage_cutoff,
         percent_identity_cutoff=percent_identity_cutoff,
         gap_open_penalty=gap_open_penalty,
