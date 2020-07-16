@@ -434,19 +434,21 @@ def detect_ases(  # pylint: disable=too-many-locals,too-many-nested-blocks
 
 def _get_path_sequence(s_exon_df, path, path_genes, delim='/'):
     """
-    Return the residue sequences for the path.
+    Return the residue sequences for the path (internal nodes).
     """
-    s_exons = path.split(delim)
     sequences = []
-    for gene in path_genes:
-        gene_rows = s_exon_df.GeneID == gene
-        sequence = []
-        for s_exon in s_exons:
-            seqs = s_exon_df.loc[(s_exon_df.S_exonID == s_exon) & gene_rows,
-                                 'S_exon_Sequence'].drop_duplicates()
-            if seqs.size:
-                sequence.append(seqs.iloc[0])
-        sequences.append(''.join(sequence))
+    s_exons = path.split(delim)
+    if len(s_exons) > 2:
+        for gene in path_genes:
+            gene_rows = s_exon_df.GeneID == gene
+            sequence = []
+            for s_exon in s_exons[1:-1]:
+                seqs = s_exon_df.loc[(s_exon_df.S_exonID == s_exon)
+                                     & gene_rows,
+                                     'S_exon_Sequence'].drop_duplicates()
+                if seqs.size:
+                    sequence.append(seqs.iloc[0])
+            sequences.append(''.join(sequence))
     return sequences
 
 
@@ -456,23 +458,27 @@ def _len_stats(sequences):
 
     >>> _len_stats(['A', 'AA', 'AAA'])
     (1, 2.0, 3)
+    >>> _len_stats([])
+    (0, 0.0, 0)
     """
+    if not sequences:
+        return 0, 0.0, 0
     lengths = [len(seq) for seq in sequences]
     return min(lengths), sum(lengths) / len(lengths), max(lengths)
 
 
 def _get_path_consensus(s_exon_msas, path, path_genes, delim='/'):
     """
-    Return the consensus sequence for the given path in the given genes.
+    Return the consensus sequence for the internal nodes in the given genes.
     """
     consensus = []
-    for s_exon in path.split(delim):
-        if s_exon in s_exon_msas:
-            msa = s_exon_msas[s_exon]
-            sub_msa = alignment.get_submsa(msa, path_genes)
-            consensus.append(alignment.get_consensus(sub_msa))
-        else:
-            consensus.append('')
+    s_exons = path.split(delim)
+    if len(s_exons) > 2:
+        for s_exon in s_exons[1:-1]:
+            if s_exon in s_exon_msas:
+                msa = s_exon_msas[s_exon]
+                sub_msa = alignment.get_submsa(msa, path_genes)
+                consensus.append(alignment.get_consensus(sub_msa))
     return ''.join(consensus)
 
 
