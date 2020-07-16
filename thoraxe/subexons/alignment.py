@@ -757,16 +757,28 @@ def _is_s_exon(exon):
     return ORTHO_GROUP_PATTERN.match(str(exon)) is not None
 
 
-def impute_missing_s_exon(table, column='S_exons'):
+def impute_missing_s_exon(table, column='S_exons', key_columns=None):
     """
     Replace column values that do not conform to the naming by 0_number.
     """
+    if key_columns is None:
+        key_columns = [
+            "GeneID", "SubexonIDCluster", "S_exon_Sequence", "S_exon_Start",
+            "S_exon_End"
+        ]
+    s_exon_ids = dict()
     number = 1
     for i in table.index:
+        key = ';'.join(table.loc[i, key_columns])
         name = table.loc[i, column]
         if not _is_s_exon(name):
-            table.at[i, column] = '0_' + str(number)
-            number += 1
+            if key in s_exon_ids:
+                s_exon_id = s_exon_ids[key]
+            else:
+                s_exon_id = '0_' + str(number)
+                s_exon_ids[key] = s_exon_id
+                number += 1
+            table.at[i, column] = s_exon_id
     return table
 
 
