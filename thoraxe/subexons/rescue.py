@@ -11,7 +11,6 @@ from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum50
 
 from thoraxe import transcript_info
-from thoraxe.subexons import alignment
 
 
 def _get_subexons_to_rescue(subexon_table):
@@ -60,7 +59,7 @@ def get_unaligned_regions(seq_i, seq_j, minimum_len=4):
     j_region = []
     in_region = False
     for (res_i, res_j) in zip(seq_i, seq_j):
-        if res_i == '-' or res_i == 'X':
+        if res_i in {'-', 'X'}:
             in_region = True
             if res_j != '-':
                 j_region.append(res_j)
@@ -116,8 +115,7 @@ def _get_aln_stats(  # pylint: disable=too-many-arguments,too-many-locals
         if cluster != origin_cluster:
             if query_gene not in chimerics:
                 cluster2sequences[cluster] = [
-                    seq.replace('-', '')
-                    for (seq, _) in chimerics.values()
+                    seq.replace('-', '') for (seq, _) in chimerics.values()
                 ]
             elif len(chimerics) > 1:
                 cluster2sequences[cluster] = _get_gene_cluster_to_unaligned(

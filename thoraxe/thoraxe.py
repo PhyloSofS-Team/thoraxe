@@ -98,6 +98,14 @@ def parse_command_line():
                         help='Penalty for gap extensions.',
                         type=int,
                         default=-1)
+    parser.add_argument('-k',
+                        '--keep_single_subexons',
+                        help='Keep sub-exon that does not align against any '
+                        'other in their original cluster. If not set, this '
+                        'sub-exons are deleted from their cluster, and they '
+                        'could be reassigned during the '
+                        'sub-exon rescue phase.',
+                        action='store_true')
     parser.add_argument(
         '--padding',
         help='Length of padding, Xs, in the chimeric alignment.',
@@ -249,7 +257,7 @@ def _create_chimeric_msa(  # pylint: disable=too-many-arguments
     return subexon_df, chimerics, msa
 
 
-def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
+def _create_and_test_chimeric_msa(  # noqa pylint: disable=too-many-arguments,too-many-locals
         cluster2data,
         subexon_table,
         cluster_index,
@@ -261,7 +269,8 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
         min_col_number=4,
         aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
-        species_list=None):
+        species_list=None,
+        keep_single_subexons=False):
     """
     Update cluster2data and return a set of exons to delete.
 
@@ -281,11 +290,13 @@ def _create_and_test_chimeric_msa(  # pylint: disable=too-many-arguments
     cluster2data[cluster] = (subexon_df, chimerics, msa)
     if msa is None:
         return {}
-    return subexons.alignment.delete_subexons(subexon_df,
-                                              chimerics,
-                                              msa,
-                                              cutoff=cutoff,
-                                              min_col_number=min_col_number)
+    return subexons.alignment.delete_subexons(
+        subexon_df,
+        chimerics,
+        msa,
+        cutoff=cutoff,
+        min_col_number=min_col_number,
+        keep_single_subexons=keep_single_subexons)
 
 
 def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
@@ -298,7 +309,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
         min_col_number=4,
         aligner='ProGraphMSA',
         padding='XXXXXXXXXX',
-        species_list=None):
+        species_list=None,
+        keep_single_subexons=False):
     """
     Return a dict from cluster to cluster data.
 
@@ -331,7 +343,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
             min_col_number=min_col_number,
             aligner=aligner,
             padding=padding,
-            species_list=species_list)
+            species_list=species_list,
+            keep_single_subexons=keep_single_subexons)
         while to_delete:
             delete = [
                 subexon_table.loc[index, 'SubexonIDCluster'] in to_delete
@@ -353,7 +366,8 @@ def create_chimeric_msa(  # pylint: disable=too-many-arguments,too-many-locals
                 min_col_number=min_col_number,
                 aligner=aligner,
                 padding=padding,
-                species_list=species_list)
+                species_list=species_list,
+                keep_single_subexons=keep_single_subexons)
     return cluster2data
 
 
@@ -371,7 +385,8 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
         padding='XXXXXXXXXX',
         movements=True,
         disintegration=True,
-        species_list=None):
+        species_list=None,
+        keep_single_subexons=False):
     """Perform almost all the ThorAxe pipeline."""
 
     intermediate_output_path = utils.folders.create_subfolder(
@@ -379,15 +394,17 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
     msa_output_path = utils.folders.create_subfolder(output_folder, 'msa')
 
     cluster2updated_data = {}
-    cluster2data = create_chimeric_msa(intermediate_output_path,
-                                       subexon_table,
-                                       gene2speciesname,
-                                       connected_subexons,
-                                       cutoff=percent_identity_cutoff,
-                                       min_col_number=minimum_len,
-                                       aligner=aligner,
-                                       padding=padding,
-                                       species_list=species_list)
+    cluster2data = create_chimeric_msa(
+        intermediate_output_path,
+        subexon_table,
+        gene2speciesname,
+        connected_subexons,
+        cutoff=percent_identity_cutoff,
+        min_col_number=minimum_len,
+        aligner=aligner,
+        padding=padding,
+        species_list=species_list,
+        keep_single_subexons=keep_single_subexons)
     modified_clusters = subexons.rescue.subexon_rescue_phase(
         cluster2data,
         subexon_table,
@@ -407,7 +424,8 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
                             min_col_number=minimum_len,
                             aligner=aligner,
                             padding=padding,
-                            species_list=species_list))
+                            species_list=species_list,
+                            keep_single_subexons=keep_single_subexons))
 
     for (cluster, (subexon_df, chimerics, msa)) in cluster2data.items():
         if (msa is not None) and chimerics:
@@ -759,7 +777,8 @@ def main():  # pylint: disable=too-many-locals
                                padding='X' * args.padding,
                                movements=not args.no_movements,
                                disintegration=not args.no_disintegration,
-                               species_list=species_list)
+                               species_list=species_list,
+                               keep_single_subexons=args.keep_single_subexons)
 
     s_exon_msas = get_s_exon_msas(output_folder)
 

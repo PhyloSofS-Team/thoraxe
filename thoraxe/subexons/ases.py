@@ -5,7 +5,6 @@ It finds the canonical path in the splice graph to detect conserved ASEs.
 """
 
 import collections
-import os
 
 import pandas as pd
 import networkx as nx

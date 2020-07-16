@@ -506,22 +506,30 @@ def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=False):
     return False
 
 
-def _add_subexon_to_delete(result, subexon, subexon_msa, cutoff=30.0):
+def _add_subexon_to_delete(result,
+                           subexon,
+                           subexon_msa,
+                           cutoff=30.0,
+                           keep_single_subexons=False):
     """Update result keys with the subexon cluster id to keep."""
-    if not _should_keep_subexon(subexon_msa, cutoff=cutoff):
+    if not _should_keep_subexon(subexon_msa,
+                                cutoff=cutoff,
+                                keep_single_subexons=keep_single_subexons):
         result[subexon] = True
 
 
 def _subexons_to_delete(msa_matrix,
                         subexon_matrix,
                         cutoff=30.0,
-                        min_col_number=4):
+                        min_col_number=4,
+                        keep_single_subexons=False):
     """Return a dict from subexon cluster id to keep to percent identity."""
     return _compare_subexons(_add_subexon_to_delete,
                              msa_matrix,
                              subexon_matrix,
                              min_col_number,
-                             cutoff=cutoff)
+                             cutoff=cutoff,
+                             keep_single_subexons=keep_single_subexons)
 
 
 def _delete_subexons(subexons, msa_matrix, subexon_matrix):
@@ -533,14 +541,21 @@ def _delete_subexons(subexons, msa_matrix, subexon_matrix):
     return msa_matrix, subexon_matrix
 
 
-def delete_subexons(subexon_df, chimerics, msa, cutoff=30.0, min_col_number=4):
+def delete_subexons(  # pylint: disable=too-many-arguments
+        subexon_df,
+        chimerics,
+        msa,
+        cutoff=30.0,
+        min_col_number=4,
+        keep_single_subexons=False):
     """Return the list of 'SubexonIDCluster' to delete from 'Cluster'."""
     complete_set = set([])
     msa_matrix, subexon_matrix = msa_matrices(subexon_df, chimerics, msa)
     to_delete = _subexons_to_delete(msa_matrix,
                                     subexon_matrix,
                                     cutoff=cutoff,
-                                    min_col_number=min_col_number)
+                                    min_col_number=min_col_number,
+                                    keep_single_subexons=keep_single_subexons)
     while to_delete:
         subexon_ids = to_delete.keys()
         complete_set.update(subexon_ids)
@@ -682,7 +697,7 @@ def get_consensus(msa, threshold=0.5):
     `threshold`, it introduces an `X` to indicate the ambiguity.
     If there are more than 50% gaps in a column, it displays the residue
     in lowercase.
-    
+
     >>> from Bio.Alphabet import IUPAC
     >>> from Bio.Seq import Seq
     >>> from Bio.SeqRecord import SeqRecord
@@ -762,16 +777,15 @@ def impute_missing_s_exon(table, column='S_exons', key_columns=None):
     Replace column values that do not conform to the naming by 0_number.
     """
     if key_columns is None:
-        key_columns = [
-            "GeneID", "SubexonIDCluster", "S_exon_Sequence", "S_exon_Start",
-            "S_exon_End"
-        ]
+        key_columns = ["GeneID", "SubexonIDCluster", "S_exon_Sequences"]
     s_exon_ids = dict()
     number = 1
     for i in table.index:
-        key = ';'.join(table.loc[i, key_columns])
+        key = ';'.join(table.loc[i, col] for col in key_columns)
         name = table.loc[i, column]
         if not _is_s_exon(name):
+            #  print(table.loc[i, :])
+            #  print(key)
             if key in s_exon_ids:
                 s_exon_id = s_exon_ids[key]
             else:
