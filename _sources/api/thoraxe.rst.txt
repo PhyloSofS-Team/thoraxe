@@ -21,6 +21,12 @@ thoraxe.thoraxe module
 .. automodule:: thoraxe.thoraxe
    :members:
 
+thoraxe.version module
+----------------------
+
+.. automodule:: thoraxe.version
+   :members:
+
 
 Module contents
 ---------------
