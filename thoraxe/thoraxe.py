@@ -5,6 +5,7 @@ ThorAxe pipeline and script functions.
 import argparse
 import os
 from ast import literal_eval
+from .version import __version__
 from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -142,6 +143,9 @@ def parse_command_line():
         'used: MinimumConservation,MinimumTranscriptWeightedConservation,'
         'MeanTranscriptWeightedConservation,TranscriptLength,TSL',
         default='')
+    parser.add_argument('--version',
+                        action='version',
+                        version='ThorAxe version {}'.format(__version__))
     return parser
 
 

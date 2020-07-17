@@ -22,6 +22,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from thoraxe import utils
+from ..version import __version__
 
 # REST parameters
 SERVER = "https://rest.ensembl.org"
@@ -178,6 +179,9 @@ def parse_command_line():
                         '--verbose',
                         help='Print detailed progress.',
                         action='store_true')
+    parser.add_argument('--version',
+                        action='version',
+                        version='ThorAxe version {}'.format(__version__))
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 

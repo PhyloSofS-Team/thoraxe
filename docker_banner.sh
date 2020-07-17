@@ -7,5 +7,5 @@ echo "              \ \ \ \ \ \ \ \/\ \L\ \ \ \/ \ \ \/\ \  /   //\  __/        
 echo "               \ \_\ \ \_\ \_\ \____/\ \_\  \ \_\ \_\/\_/\_\ \____\          "
 echo "                \/_/  \/_/\/_/\/___/  \/_/   \/_/\/_/\//\/_/\/____/          "
 echo "                                                                             "
-echo "      Use Thor's Axe to cut exons into their smaller evolutionary units.     "
+echo "     Use Thor's Axe to cut exons into their evolutionary building blocks     "
 echo "                                                                             "

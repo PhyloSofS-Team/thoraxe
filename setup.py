@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+from thoraxe.version import __version__
 
 setup(
     name='thoraxe',
@@ -9,7 +10,7 @@ setup(
     author="Diego Javier Zea, Hugues Richard & Elodie Laine",
     author_email='diegozea@gmail.com',
     url='https://github.com/PhyloSofS-Team/thoraxe',
-    version='0.5.2',
+    version=__version__,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
