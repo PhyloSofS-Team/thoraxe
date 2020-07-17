@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import setup, find_packages
-from thoraxe.version import __version__
+
+with open(os.path.join("thoraxe", "version.py")) as file:
+    exec(file.read(), version)
 
 setup(
     name='thoraxe',
