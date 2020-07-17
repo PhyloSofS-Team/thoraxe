@@ -5,7 +5,6 @@ ThorAxe pipeline and script functions.
 import argparse
 import os
 from ast import literal_eval
-from .version import __version__
 from Bio.Alphabet import generic_protein
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -16,6 +15,7 @@ from thoraxe import subexons
 from thoraxe import utils
 from thoraxe import transcript_info
 from thoraxe.transcript_info import phases
+from .version import __version__
 
 
 def parse_command_line():
