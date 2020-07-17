@@ -486,6 +486,8 @@ def _should_keep_subexon(msa_matrix, cutoff=30.0, keep_single_subexons=False):
     """Return True if the subexon is aligned to a similar sequence."""
     n_seqs = msa_matrix.shape[0]
     if n_seqs == 1:
+        # it is just in case because _compare_subexons ensures that this
+        # branch is never reached
         return keep_single_subexons
     tries = 0
     for i in range(0, n_seqs - 1):
@@ -776,16 +778,17 @@ def impute_missing_s_exon(table, column='S_exons', key_columns=None):
     """
     Replace column values that do not conform to the naming by 0_number.
     """
+
+    # Ensure the same s-exon ID for the same sub-exon:
     if key_columns is None:
         key_columns = ["GeneID", "SubexonIDCluster", "S_exon_Sequences"]
     s_exon_ids = dict()
+
     number = 1
     for i in table.index:
         key = ';'.join(table.loc[i, col] for col in key_columns)
         name = table.loc[i, column]
         if not _is_s_exon(name):
-            #  print(table.loc[i, :])
-            #  print(key)
             if key in s_exon_ids:
                 s_exon_id = s_exon_ids[key]
             else:
@@ -793,6 +796,7 @@ def impute_missing_s_exon(table, column='S_exons', key_columns=None):
                 s_exon_ids[key] = s_exon_id
                 number += 1
             table.at[i, column] = s_exon_id
+
     return table
 
 

@@ -98,13 +98,13 @@ def parse_command_line():
                         help='Penalty for gap extensions.',
                         type=int,
                         default=-1)
-    parser.add_argument('-k',
-                        '--keep_single_subexons',
-                        help='Keep sub-exon that does not align against any '
-                        'other in their original cluster. If not set, this '
-                        'sub-exons are deleted from their cluster, and they '
-                        'could be reassigned during the '
-                        'sub-exon rescue phase.',
+    parser.add_argument('-r',
+                        '--rescue_unaligned_subexons',
+                        help='The sub-exons that do not align against any '
+                        'other are deleted from their cluster, and they '
+                        'could be reassigned during the sub-exon rescue '
+                        'phase. By default, they are kept into their '
+                        'original exon cluster.',
                         action='store_true')
     parser.add_argument(
         '--padding',
@@ -764,21 +764,22 @@ def main():  # pylint: disable=too-many-locals
     gene2speciesname = subexons.alignment.gene2species(transcript_table)
     connected_subexons = subexons.alignment.subexon_connectivity(subexon_table)
 
-    cluster2data = get_s_exons(output_folder,
-                               subexon_table,
-                               gene2speciesname,
-                               connected_subexons,
-                               minimum_len=args.minlen,
-                               coverage_cutoff=args.coverage,
-                               percent_identity_cutoff=args.identity,
-                               gap_open_penalty=args.gapopen,
-                               gap_extend_penalty=args.gapextend,
-                               aligner=args.aligner,
-                               padding='X' * args.padding,
-                               movements=not args.no_movements,
-                               disintegration=not args.no_disintegration,
-                               species_list=species_list,
-                               keep_single_subexons=args.keep_single_subexons)
+    cluster2data = get_s_exons(
+        output_folder,
+        subexon_table,
+        gene2speciesname,
+        connected_subexons,
+        minimum_len=args.minlen,
+        coverage_cutoff=args.coverage,
+        percent_identity_cutoff=args.identity,
+        gap_open_penalty=args.gapopen,
+        gap_extend_penalty=args.gapextend,
+        aligner=args.aligner,
+        padding='X' * args.padding,
+        movements=not args.no_movements,
+        disintegration=not args.no_disintegration,
+        species_list=species_list,
+        keep_single_subexons=not args.rescue_unaligned_subexons)
 
     s_exon_msas = get_s_exon_msas(output_folder)
 
