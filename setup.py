@@ -4,7 +4,7 @@ import os
 from setuptools import setup, find_packages
 
 with open(os.path.join("thoraxe", "version.py")) as file:
-    exec(file.read(), version)
+    exec(file.read())
 
 setup(
     name='thoraxe',
