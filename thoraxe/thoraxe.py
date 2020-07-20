@@ -498,10 +498,11 @@ def update_subexon_table(subexon_table, cluster2data):
     for (_, data) in cluster2data.items():
         cluster_df = data[0]
         if cluster_df.shape[0] > 0:
+            # noqa https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike
             subexon2data.update(
-                cluster_df.loc[:, [key_col] +
-                               columns_to_add].drop_duplicates().set_index(
-                                   key_col).to_dict('index'))
+                cluster_df.reindex([key_col] +
+                               columns_to_add).drop_duplicates().set_index(
+                                       key_col).to_dict('index'))
 
     columns = {colname: [] for colname in columns_to_add}
     for subexon in subexon_table[key_col]:
