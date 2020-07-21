@@ -686,7 +686,16 @@ def column_clusters(colpatterns):
                 cluster.end = colpattern.end
             else:
                 clusters.append(_colcluster(colpattern))
-    return _cluster_column_clusters(clusters)
+
+    n_clusters = len(clusters)
+    while True:
+        clusters = _cluster_column_clusters(clusters)
+        if n_clusters == len(clusters):
+            break
+        else:
+            n_clusters = len(clusters)
+
+    return clusters
 
 
 def get_consensus(msa, threshold=0.5):
