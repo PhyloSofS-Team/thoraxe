@@ -271,8 +271,9 @@ def _is_first_or_last_exon(row_list, row_index):
     end_exon = False
 
     n_rows = len(row_list)
-
-    if row_index == 0:
+    if n_rows == 1:
+        start_exon, end_exon = True, True
+    elif row_index == 0:
         start_exon = True
     elif row_index == (n_rows - 1):
         end_exon = True
@@ -330,7 +331,7 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     If the last exon of the transcript has an incomplete codon at the end, it is
     deleted on the returned sequence.
 
-    NOTE: _check_phases_by_position should be used beipt_infore this function
+    NOTE: _check_phases_by_position should be used before this function
     to ensure that there are not errors in the input data.
     """
     end_phase = row_list[row_index]['EndPhase']
@@ -640,18 +641,18 @@ def delete_incomplete_sequences(data_frame):
         agg(lambda df: "".join([str(s) for s in df])[-1] != "*")
     # Incomplete sequences do not end with '*'
 
-    incomplete_transcripts = set(
-        incomplete_seqs.index[incomplete_seqs['ExonProteinSequence']]).union(
-            incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
-
-    if incomplete_transcripts:
-        clusters.inform_about_deletions(incomplete_transcripts,
-                                        "Incomplete transcripts were found:")
-        data_frame.drop([
-            i for i in data_frame.index
-            if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
-        ],
-                        inplace=True)
+    if not incomplete_seqs.empty:
+        incomplete_transcripts = set(
+            incomplete_seqs.index[incomplete_seqs['ExonProteinSequence']]).union(
+                incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
+        if incomplete_transcripts:
+            clusters.inform_about_deletions(incomplete_transcripts,
+                                            "Incomplete transcripts were found:")
+            data_frame.drop([
+                i for i in data_frame.index
+                if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
+            ],
+                            inplace=True)
 
 
 def delete_badquality_sequences(data_frame):
@@ -664,18 +665,17 @@ def delete_badquality_sequences(data_frame):
         groupby('TranscriptID'). \
         agg(lambda df: any('X' in str(s) for s in df))
 
-    badquality_transcripts = set(
-        badquality_seqs.index[badquality_seqs['ExonProteinSequence']])
-
-    if badquality_transcripts:
-        clusters.inform_about_deletions(
-            badquality_transcripts,
-            "Transcripts with bad quality sequences were found:")
-        data_frame.drop([
-            i for i in data_frame.index
-            if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
-        ],
-                        inplace=True)
+    if not badquality_seqs.empty:
+        badquality_transcripts = set(
+            badquality_seqs.index[badquality_seqs['ExonProteinSequence']])
+        if badquality_transcripts:
+            clusters.inform_about_deletions(
+                badquality_transcripts,
+                "Transcripts with bad quality sequences were found:")
+            data_frame.drop([
+                i for i in data_frame.index
+                if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
+                ], inplace=True)
 
 
 def find_identical_sequences(data_frame):
@@ -868,6 +868,10 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     delete_incomplete_sequences(transcript_info)
     if remove_badquality:
         delete_badquality_sequences(transcript_info)
+
+    if transcript_info.empty:
+        raise ValueError("There are no transcripts left!")
+
     # Ensure exon order and check the downloaded exon phase information:
     phases.check_order_and_phases(transcript_info)
     # NOTE: delete_incomplete_sequences deletes sequences with incomplete CDSs.
