@@ -243,7 +243,6 @@ def check_order_and_phases(data_frame):
     row_number = 1  # to skip the first row
     exon_pos = 1  # to store exon rank without counting non coding exons
     # as 'ExonRank' does.
-
     while row_number < n_rows:
 
         # data_frame.loc[index, column] uses the index of the row (i)

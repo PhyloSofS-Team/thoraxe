@@ -454,7 +454,7 @@ def add_protein_seq(data_frame,
     """
     _check_column_presence(
         data_frame, 'ExonSequence', 'You need to run '
-        'add_exonpercent_identity_cutoff_sequences first.')
+        'add_exon_sequences first.')
     _check_column_absence(data_frame, seq_column,
                           'Values are going to change.')
     _check_column_absence(data_frame, 'IncompleteCDS',
@@ -510,14 +510,18 @@ def add_protein_seq(data_frame,
                 cds_seq = _manage_start_phase_positive_strand(
                     row_list, row_index, cds_seq, start_exon)
 
-        # Add the translated CDS :
-        if isinstance(cds_seq, str):
-            sequences.append(Seq(cds_seq, IUPAC.extended_dna).translate())
-        else:
-            sequences.append(cds_seq.translate())
-
         # Look for signals of incomplete CDS :
-        incomplete_cds.append(_is_incomplete_cds(row, start_exon, end_exon))
+        incomplete = _is_incomplete_cds(row, start_exon, end_exon)
+        if (len(cds_seq) % 3) == 0:
+            # Add the translated CDS :
+            if isinstance(cds_seq, str):
+                sequences.append(Seq(cds_seq, IUPAC.extended_dna).translate())
+            else:
+                sequences.append(cds_seq.translate())
+        else:
+            sequences.append("")
+            incomplete = True
+        incomplete_cds.append(incomplete)
 
         row_index += 1
 
@@ -855,11 +859,13 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     exon_table = read_exon_file(exon_table_file)
     # Merge both tables to have all the transcript information in one
     # DataFrame and to filter the exon table based on tsl evidence:
-    tsl_table.rename(columns={'TranscriptID': 'TranscriptID'}, inplace=True)
     transcript_info = pd.merge(tsl_table,
                                exon_table,
                                how='inner',
                                on='TranscriptID')
+    # Just in case, ensure the correct order after merge: 
+    transcript_info.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
+                          inplace=True)
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
