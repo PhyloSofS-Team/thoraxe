@@ -452,9 +452,8 @@ def add_protein_seq(data_frame,
     the output of add_exon_sequences when it is applied to the output
     of read_exon_file.
     """
-    _check_column_presence(
-        data_frame, 'ExonSequence', 'You need to run '
-        'add_exon_sequences first.')
+    _check_column_presence(data_frame, 'ExonSequence', 'You need to run '
+                           'add_exon_sequences first.')
     _check_column_absence(data_frame, seq_column,
                           'Values are going to change.')
     _check_column_absence(data_frame, 'IncompleteCDS',
@@ -646,12 +645,12 @@ def delete_incomplete_sequences(data_frame):
     # Incomplete sequences do not end with '*'
 
     if not incomplete_seqs.empty:
-        incomplete_transcripts = set(
-            incomplete_seqs.index[incomplete_seqs['ExonProteinSequence']]).union(
+        incomplete_transcripts = set(incomplete_seqs.index[
+            incomplete_seqs['ExonProteinSequence']]).union(
                 incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
         if incomplete_transcripts:
-            clusters.inform_about_deletions(incomplete_transcripts,
-                                            "Incomplete transcripts were found:")
+            clusters.inform_about_deletions(
+                incomplete_transcripts, "Incomplete transcripts were found:")
             data_frame.drop([
                 i for i in data_frame.index
                 if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
@@ -679,7 +678,8 @@ def delete_badquality_sequences(data_frame):
             data_frame.drop([
                 i for i in data_frame.index
                 if data_frame.loc[i, 'TranscriptID'] in badquality_transcripts
-                ], inplace=True)
+            ],
+                            inplace=True)
 
 
 def find_identical_sequences(data_frame):
@@ -863,11 +863,12 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
                                exon_table,
                                how='inner',
                                on='TranscriptID')
-    # Just in case, ensure the correct order after merge: 
+    # Just in case, ensure the correct order after merge:
     transcript_info.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
-                          inplace=True)
+                                inplace=True)
     # Delete repeated exons:
-    transcript_info.drop_duplicates(subset=['GeneID', 'TranscriptID', 'ExonID'], inplace=True)
+    transcript_info.drop_duplicates(
+        subset=['GeneID', 'TranscriptID', 'ExonID'], inplace=True)
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
@@ -885,6 +886,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # NOTE: delete_incomplete_sequences deletes sequences with incomplete CDSs.
     # check_order_and_phases should run after it, because it throws errors with
     # some incomplete CDSs.
+    # Delete incomplete CDS identified by check_order_and_phases:
+    delete_incomplete_sequences(transcript_info)
     # More clean up:
     delete_identical_sequences(transcript_info)
     merge_identical_exons(transcript_info)

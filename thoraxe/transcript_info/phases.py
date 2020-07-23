@@ -46,6 +46,8 @@ Static function call graph:
 
 """
 
+import logging
+
 
 def bases_to_complete_previous_codon(phase):  # pylint: disable=invalid-name
     """
@@ -172,7 +174,12 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
 
     It takes into account that -1 phases cannot be calculated, and therefore
     they are not compared (thanks to _equal_phases).
+
+    Return True if everything is OK.
     """
+    exon_id = data_frame.loc[row_index, 'ExonID']
+    transcript_id = data_frame.loc[row_index, 'TranscriptID']
+
     previous_end_phase = end_phase_previous_exon(data_frame, exon_pos,
                                                  prev_row_index)
 
@@ -184,38 +191,49 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
     df_start_phase = data_frame.loc[row_index, 'StartPhase']
     df_end_phase = data_frame.loc[row_index, 'EndPhase']
 
-    assert _equal_phases(df_start_phase, start_phase),\
-        ("%d start phase is observed but %d start phase is expected " %
-         (df_start_phase, start_phase)) + \
-        ("for row number %d, index %d." % (row_number, row_index))
+    if not _equal_phases(df_start_phase, start_phase):
+        logging.warning(
+            "%d start phase is observed but %d is expected (%s, %s).",
+            df_start_phase, start_phase, transcript_id, exon_id)
+        return False
 
-    if df_start_phase == -1:
-        assert exon_pos == 0, "start phase -1 is not in the first exon " + \
-            "for row number %d, index %d" % (row_number, row_index)
+    if (df_start_phase == -1) and (exon_pos != 0):
+        logging.warning("start phase -1 is not in the first exon (%s, %s).",
+                        transcript_id, exon_id)
+        return False
 
-    assert _equal_phases(df_end_phase, end_phase), \
-        ("%d start phase is observed but %d start phase is expected " %
-         (df_end_phase, end_phase)) + \
-        ("for row number %d, index %d." % (row_number, row_index))
+    if not _equal_phases(df_end_phase, end_phase):
+        logging.warning(
+            "%d start phase is observed but %d is expected (%s, %s).",
+            df_end_phase, end_phase, transcript_id, exon_id)
+        return False
 
     n_rows = data_frame.shape[0]
     if df_end_phase == -1 and row_number != n_rows - 1:
         # next row index.
         next_row_index = data_frame.index[row_number + 1]
-        assert data_frame.loc[row_index, 'TranscriptID'] != \
-            data_frame.loc[next_row_index, 'TranscriptID'], \
-            "end phase -1 is not in the last exon " + \
-            "for row number %d, index %d." % (row_number, row_index)
+        if transcript_id == data_frame.loc[next_row_index, 'TranscriptID']:
+            logging.warning("end phase -1 is not in the last exon (%s, %s).",
+                            transcript_id, exon_id)
+            return False
+
+    return True
 
 
-def _check_exon_order(data_frame, row_number, row_index, prev_row_index,
-                      exon_pos):
-    """Check that exons are ordered by rank in the transcript."""
-    if exon_pos != 0:
-        assert data_frame.loc[row_index, 'ExonRank'] > \
-            data_frame.loc[prev_row_index, 'ExonRank'], \
-            "Exons aren't sorted by rank, error with row number " + \
-            str(row_number) + ", index " + str(row_index) + "."
+def _check_exon_order(data_frame, row_index, prev_row_index, exon_pos):
+    """
+    Check that exons are ordered by rank in the transcript.
+    
+    Return True if everything is OK.
+    """
+    exon_id = data_frame.loc[row_index, 'ExonID']
+    transcript_id = data_frame.loc[row_index, 'TranscriptID']
+    if (exon_pos != 0) and (data_frame.loc[row_index, 'ExonRank'] <=
+                            data_frame.loc[prev_row_index, 'ExonRank']):
+        logging.warning("Exons aren't sorted by rank (%s, %s).", transcript_id,
+                        exon_id)
+        return False
+    return True
 
 
 def check_order_and_phases(data_frame):
@@ -263,10 +281,10 @@ def check_order_and_phases(data_frame):
                 "Data isn't sorted by 'TranscriptID'"
             exon_pos += 1
 
-        _check_exon_order(data_frame, row_number, row_index, prev_row_index,
-                          exon_pos)
-
-        _check_phases(data_frame, row_number, row_index, prev_row_index,
-                      exon_pos)
+        if (not _check_exon_order(data_frame, row_index, prev_row_index,
+                                  exon_pos)) or (not _check_phases(
+                                      data_frame, row_number, row_index,
+                                      prev_row_index, exon_pos)):
+            data_frame.at[row_index, 'IncompleteCDS'] = True
 
         row_number += 1
