@@ -866,6 +866,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # Just in case, ensure the correct order after merge: 
     transcript_info.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
                           inplace=True)
+    # Delete repeated exons:
+    transcript_info.drop_duplicates(subset=['GeneID', 'TranscriptID', 'ExonID'], inplace=True)
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
