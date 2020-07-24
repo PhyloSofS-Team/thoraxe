@@ -334,6 +334,8 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     NOTE: _check_phases_by_position should be used before this function
     to ensure that there are not errors in the input data.
     """
+    if cds_seq is None:
+        return None
     end_phase = row_list[row_index]['EndPhase']
     if end_phase in {1, 2}:
         if end_exon:
@@ -369,6 +371,8 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
     >>> _manage_start_phase_positive_strand(row_list, 1, seq_two, False)
     'TGTCAAAAGACACATTCTGTAGTGTTGTAA'
     """
+    if cds_seq is None:
+        return None
     start_phase = row_list[row_index]['StartPhase']
     if start_phase in {1, 2}:
         if start_exon:
@@ -376,6 +380,8 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
             cds_seq = cds_seq[n_bases:]  # delete incomplete codon
         else:
             n_bases = phases.bases_to_complete_next_codon(start_phase)
+            if n_bases is None:
+                return None
             previous_exon_sequence = row_list[row_index - 1]['ExonSequence']
             cds_seq = previous_exon_sequence[-n_bases:] + cds_seq
 
@@ -399,8 +405,13 @@ def _manage_end_phase_positive_strand(cds_seq, end_phase):
     >>> _manage_end_phase_positive_strand('XXXYYY', 0)
     'XXXYYY'
     """
+    if cds_seq is None:
+        return None
     if end_phase in {1, 2}:
-        return cds_seq[:-phases.bases_to_complete_next_codon(end_phase)]
+        n_bases = phases.bases_to_complete_next_codon(end_phase)
+        if n_bases is None:
+            return None
+        return cds_seq[:-n_bases]
 
     return cds_seq  # do not change CDS sequence if exon start phase is 0 or -1
 
@@ -511,7 +522,7 @@ def add_protein_seq(data_frame,
 
         # Look for signals of incomplete CDS :
         incomplete = _is_incomplete_cds(row, start_exon, end_exon)
-        if (len(cds_seq) % 3) == 0:
+        if (cds_seq is not None) and ((len(cds_seq) % 3) == 0):
             # Add the translated CDS :
             if isinstance(cds_seq, str):
                 sequences.append(Seq(cds_seq, IUPAC.extended_dna).translate())

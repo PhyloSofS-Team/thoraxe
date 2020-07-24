@@ -67,7 +67,10 @@ def bases_to_complete_previous_codon(phase):  # pylint: disable=invalid-name
     if phase == 2:
         return 1
 
-    raise ValueError("Only phases 0, 1 and 2 are allowed.")
+    logging.warning(
+        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)" %
+        phase)
+    return None
 
 
 def bases_to_complete_next_codon(phase):  # pylint: disable=invalid-name
@@ -84,7 +87,10 @@ def bases_to_complete_next_codon(phase):  # pylint: disable=invalid-name
     if phase in {0, 1, 2}:
         return phase
 
-    raise ValueError("Only phases 0, 1 and 2 are allowed.")
+    logging.warning(
+        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)" %
+        phase)
+    return None
 
 
 def calculate_phase(cdna_len, previous_end_phase):
@@ -126,8 +132,11 @@ def calculate_phase(cdna_len, previous_end_phase):
     >>> calculate_phase(6, 1) # e.g. X-----XXyyyz----zz
     (1, 1)
     """
+    n_bases = bases_to_complete_previous_codon(previous_end_phase)
+    if n_bases is None:
+        return None, None
     next_start_phase = (
-        cdna_len - bases_to_complete_previous_codon(previous_end_phase)) % 3
+        cdna_len - n_bases) % 3
 
     return previous_end_phase, next_start_phase
 
@@ -187,6 +196,8 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
         data_frame.loc[row_index, 'cDNA_CodingStart'] + 1
 
     start_phase, end_phase = calculate_phase(cdna_len, previous_end_phase)
+    if (start_phase is None) or (end_phase is None):
+        return False
 
     df_start_phase = data_frame.loc[row_index, 'StartPhase']
     df_end_phase = data_frame.loc[row_index, 'EndPhase']
