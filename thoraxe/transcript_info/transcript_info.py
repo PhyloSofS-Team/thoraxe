@@ -272,23 +272,22 @@ def _is_first_or_last_exon(row_list, row_index):
 
     n_rows = len(row_list)
     if n_rows == 1:
-        start_exon, end_exon = True, True
+        return True, True
     elif row_index == 0:
         start_exon = True
     elif row_index == (n_rows - 1):
         end_exon = True
-    else:
-        row = row_list[row_index]
 
+    row = row_list[row_index]
+    if row_index > 0:
         identical_to_previous = row_list[
             row_index - 1]['TranscriptID'] == row['TranscriptID']
+        if (not identical_to_previous):  # or (row['StartPhase'] == -1):
+            start_exon = True
+    if row_index < (n_rows - 1):
         identical_to_next = row_list[row_index +
                                      1]['TranscriptID'] == row['TranscriptID']
-
-        if (not identical_to_previous) or (row['StartPhase'] == -1):
-            start_exon = True
-
-        if (not identical_to_next) or (row['EndPhase'] == -1):
+        if (not identical_to_next):  # or (row['EndPhase'] == -1):
             end_exon = True
 
     return start_exon, end_exon
