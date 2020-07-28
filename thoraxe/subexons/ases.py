@@ -56,10 +56,9 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         'Path': []
     }
 
-    transcript2tsl = transcript_table.loc[:,
-                                          ["TranscriptIDCluster", "TSL"
-                                           ]].set_index("TranscriptIDCluster"
-                                                        ).to_dict()['TSL']
+    transcript2tsl = transcript_table.loc[:, [
+        "TranscriptIDCluster", "TSL"
+    ]].set_index("TranscriptIDCluster").to_dict()['TSL']
 
     for (trx, subdf) in s_exon_table.groupby('TranscriptIDCluster'):
         n_rows = len(subdf)
@@ -442,9 +441,9 @@ def _get_path_sequence(s_exon_df, path, path_genes, delim='/'):
             gene_rows = s_exon_df.GeneID == gene
             sequence = []
             for s_exon in s_exons[1:-1]:
-                seqs = s_exon_df.loc[(s_exon_df.S_exonID == s_exon)
-                                     & gene_rows,
-                                     'S_exon_Sequence'].drop_duplicates()
+                seqs = s_exon_df.loc[
+                    (s_exon_df.S_exonID == s_exon)
+                    & gene_rows, 'S_exon_Sequence'].drop_duplicates()
                 if seqs.size:
                     sequence.append(seqs.iloc[0])
             sequences.append(''.join(sequence))

@@ -68,7 +68,7 @@ def bases_to_complete_previous_codon(phase):  # pylint: disable=invalid-name
         return 1
 
     logging.warning(
-        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)" %
+        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)",
         phase)
     return None
 
@@ -88,7 +88,7 @@ def bases_to_complete_next_codon(phase):  # pylint: disable=invalid-name
         return phase
 
     logging.warning(
-        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)" %
+        "Only phases 0, 1 and 2 are allowed for internal exons (phase: %s)",
         phase)
     return None
 
@@ -135,8 +135,7 @@ def calculate_phase(cdna_len, previous_end_phase):
     n_bases = bases_to_complete_previous_codon(previous_end_phase)
     if n_bases is None:
         return None, None
-    next_start_phase = (
-        cdna_len - n_bases) % 3
+    next_start_phase = (cdna_len - n_bases) % 3
 
     return previous_end_phase, next_start_phase
 
@@ -234,7 +233,7 @@ def _check_phases(data_frame, row_number, row_index, prev_row_index, exon_pos):
 def _check_exon_order(data_frame, row_index, prev_row_index, exon_pos):
     """
     Check that exons are ordered by rank in the transcript.
-    
+
     Return True if everything is OK.
     """
     exon_id = data_frame.loc[row_index, 'ExonID']

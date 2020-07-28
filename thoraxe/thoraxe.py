@@ -205,8 +205,8 @@ def merge_clusters(subexon_table):
     """Merge 'Cluster's that share subexons."""
     clusters_df = subexon_table.groupby('SubexonIDCluster').agg(
         {'Cluster': lambda col: set(val for val in col if val != 0)})
-    cluster_lists = clusters_df.loc[
-        map(lambda x: len(x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
+    cluster_lists = clusters_df.loc[map(lambda x: len(
+        x) > 1, clusters_df['Cluster']), 'Cluster'].apply(
             repr).drop_duplicates().apply(lambda x: sorted(literal_eval(x)))
     cluster_sets = _merge_clusters_in_list(cluster_lists)
     for cluster_set in cluster_sets:
@@ -498,10 +498,11 @@ def update_subexon_table(subexon_table, cluster2data):
     for (_, data) in cluster2data.items():
         cluster_df = data[0]
         if cluster_df.shape[0] > 0:
-            # noqa https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike
+            # https://pandas.pydata.org/pandas-docs/stable/user_guide/
+            # indexing.html#deprecate-loc-reindex-listlike
             subexon2data.update(
                 cluster_df.reindex([key_col] +
-                               columns_to_add).drop_duplicates().set_index(
+                                   columns_to_add).drop_duplicates().set_index(
                                        key_col).to_dict('index'))
 
     columns = {colname: [] for colname in columns_to_add}
@@ -603,9 +604,8 @@ def add_s_exon_phases_and_coordinates(tbl):
             remaining_seq = ''
             for row_number, i in enumerate(group_indices):
                 if row_number == 0:  # first s-exon
-                    tbl.at[i,
-                           'S_exon_StartPhase'] = tbl.loc[i,
-                                                          'SubexonStartPhase']
+                    tbl.at[i, 'S_exon_StartPhase'] = tbl.loc[
+                        i, 'SubexonStartPhase']
                     tbl.at[i, 'S_exon_EndPhase'] = 0
                     (end_coord, s_exon_seq,
                      remaining_seq) = _get_first_s_exon(tbl.loc[i, :])

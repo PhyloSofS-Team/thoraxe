@@ -297,12 +297,10 @@ def _add_transcript_fraction(subexon_df):
         ['GeneID',
          'SubexonID']).size().to_frame('TranscriptsWithSubexon').reset_index()
 
-    transcript_counts = subexon_df.loc[:,
-                                       ['GeneID', 'TranscriptID'
-                                        ]].drop_duplicates().groupby([
-                                            'GeneID'
-                                        ]).size().to_frame(
-                                            'TranscriptsInGene').reset_index()
+    transcript_counts = subexon_df.loc[:, [
+        'GeneID', 'TranscriptID'
+    ]].drop_duplicates().groupby(
+        ['GeneID']).size().to_frame('TranscriptsInGene').reset_index()
 
     counts = pd.merge(subexon_counts,
                       transcript_counts,
@@ -322,8 +320,8 @@ def _add_transcript_fraction(subexon_df):
 def _find_exon(subexon_table, subexon_id_cluster):
     """Return a list with the 'ExonID's of a particular subexon."""
     return subexon_table.loc[subexon_table['SubexonIDCluster'] ==
-                             subexon_id_cluster,
-                             'ExonIDCluster'].unique().tolist()
+                             subexon_id_cluster, 'ExonIDCluster'].unique(
+                             ).tolist()
 
 
 def update_to_merge_list(to_merge, subexon_1, subexon_2):
@@ -364,9 +362,9 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
         previous_row = row_list[row_index - 1]
         actual_row = row_list[row_index]
         if (previous_row['SubexonIDCluster'] in subexons) and (
-                actual_row['SubexonIDCluster']
-                in subexons) and (previous_row['TranscriptFraction']
-                                  == actual_row['TranscriptFraction']):
+                actual_row['SubexonIDCluster'] in subexons) and (
+                    previous_row['TranscriptFraction'] ==
+                    actual_row['TranscriptFraction']):
             to_merge = update_to_merge_list(to_merge,
                                             previous_row['SubexonIDCluster'],
                                             actual_row['SubexonIDCluster'])

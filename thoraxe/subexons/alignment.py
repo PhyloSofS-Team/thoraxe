@@ -49,9 +49,8 @@ def subexon_connectivity(subexon_table, id_column='SubexonIDCluster'):
         if nrows > 1:
             for row_index in range(1, nrows):
                 connected_pairs.append(
-                    (transcript.iloc[row_index - 1,
-                                     col_index], transcript.iloc[row_index,
-                                                                 col_index]))
+                    (transcript.iloc[row_index - 1, col_index],
+                     transcript.iloc[row_index, col_index]))
     return set(connected_pairs)
 
 
@@ -692,8 +691,7 @@ def column_clusters(colpatterns):
         clusters = _cluster_column_clusters(clusters)
         if n_clusters == len(clusters):
             break
-        else:
-            n_clusters = len(clusters)
+        n_clusters = len(clusters)
 
     return clusters
 
@@ -818,8 +816,8 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
     """
     seq = seq.replace('-', '')
     length = len(seq)
-    query = (subexon_df['SubexonIndex'] == subexon) & (subexon_df['GeneID']
-                                                       == gene)
+    query = (subexon_df['SubexonIndex'] == subexon) & (
+        subexon_df['GeneID'] == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
         subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)

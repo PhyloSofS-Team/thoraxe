@@ -222,11 +222,9 @@ def _transcript_pir(s_exon_data, output_file, s_exon2char,
 def _save_transcripts(s_exon_data, output_file, transcript2phylosofs):
     """Save transcripts in PhyloSofS' format."""
     with open(output_file, 'w', encoding='utf-8') as file:
-        gene_transcripts = s_exon_data.loc[:,
-                                           ['GeneID', 'TranscriptIDCluster'
-                                            ]].sort_values(by=[
-                                                'GeneID', 'TranscriptIDCluster'
-                                            ]).drop_duplicates()
+        gene_transcripts = s_exon_data.loc[:, [
+            'GeneID', 'TranscriptIDCluster'
+        ]].sort_values(by=['GeneID', 'TranscriptIDCluster']).drop_duplicates()
         for gene, group in gene_transcripts.groupby('GeneID'):
             file.write("{} ".format(gene))
             transcripts = group['TranscriptIDCluster']

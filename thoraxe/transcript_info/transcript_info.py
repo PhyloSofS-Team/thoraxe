@@ -271,23 +271,21 @@ def _is_first_or_last_exon(row_list, row_index):
     end_exon = False
 
     n_rows = len(row_list)
-    if n_rows == 1:
-        return True, True
-    elif row_index == 0:
+    if row_index == 0:
         start_exon = True
-    elif row_index == (n_rows - 1):
+    if row_index == (n_rows - 1):
         end_exon = True
 
     row = row_list[row_index]
     if row_index > 0:
         identical_to_previous = row_list[
             row_index - 1]['TranscriptID'] == row['TranscriptID']
-        if (not identical_to_previous):  # or (row['StartPhase'] == -1):
+        if not identical_to_previous:  # or (row['StartPhase'] == -1):
             start_exon = True
     if row_index < (n_rows - 1):
         identical_to_next = row_list[row_index +
                                      1]['TranscriptID'] == row['TranscriptID']
-        if (not identical_to_next):  # or (row['EndPhase'] == -1):
+        if not identical_to_next:  # or (row['EndPhase'] == -1):
             end_exon = True
 
     return start_exon, end_exon
@@ -381,8 +379,9 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
             n_bases = phases.bases_to_complete_next_codon(start_phase)
             if n_bases is None:
                 return None
-            previous_exon_sequence = row_list[row_index - 1]['ExonSequence']
-            cds_seq = previous_exon_sequence[-n_bases:] + cds_seq
+            seq = row_list[row_index - 1]['ExonSequence']
+            seq = seq[-n_bases:]  # pylint: disable=invalid-unary-operand-type
+            cds_seq = seq + cds_seq
 
     return cds_seq
 
@@ -410,7 +409,7 @@ def _manage_end_phase_positive_strand(cds_seq, end_phase):
         n_bases = phases.bases_to_complete_next_codon(end_phase)
         if n_bases is None:
             return None
-        return cds_seq[:-n_bases]
+        return cds_seq[:-n_bases]  # pylint: disable=invalid-unary-operand-type
 
     return cds_seq  # do not change CDS sequence if exon start phase is 0 or -1
 

@@ -15,10 +15,9 @@ from thoraxe import transcript_info
 
 def _get_subexons_to_rescue(subexon_table):
     """Return a DataFrame with the subexons to rescue."""
-    return subexon_table.loc[
-        subexon_table['Cluster'] < 0,
-        ['GeneID', 'SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
-         ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
+    return subexon_table.loc[subexon_table['Cluster'] < 0, [
+        'GeneID', 'SubexonIDCluster', 'Cluster', 'SubexonProteinSequence'
+    ]].drop_duplicates(subset='SubexonIDCluster').to_dict('records')
 
 
 def _get_cluster_number(aln_stats):
