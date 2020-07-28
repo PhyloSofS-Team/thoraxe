@@ -4,3 +4,6 @@ jobs=0
 
 [MESSAGES CONTROL]
 disable=W0511
+
+[TYPECHECK]
+ignored-classes=DataFrameGroupBy
