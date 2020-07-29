@@ -501,7 +501,7 @@ def update_subexon_table(subexon_table, cluster2data):
             # https://pandas.pydata.org/pandas-docs/stable/user_guide/
             # indexing.html#deprecate-loc-reindex-listlike
             subexon2data.update(
-                cluster_df.reindex([key_col] +
+                cluster_df.reindex(columns=[key_col] +
                                    columns_to_add).drop_duplicates().set_index(
                                        key_col).to_dict('index'))
 
