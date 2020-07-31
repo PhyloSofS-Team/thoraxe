@@ -22,8 +22,8 @@ def _check_column_presence(data_frame, column, message=""):
 def _check_column_absence(data_frame, column, message=""):
     """Give a warning if the column is already present in the data_frame."""
     if column in data_frame.columns:
-        logging.warn("Input DataFrame already has column: %s. %s", column,
-                     message)
+        logging.warning("Input DataFrame already has column: %s. %s", column,
+                        message)
 
 
 def _get_flag(flag):
@@ -432,13 +432,13 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
     exon_id = row['ExonID']
 
     if end_exon and (not allow_incomplete_cds) and end_phase in {1, 2}:
-        logging.warn('Exon end phase is 1 or 2 in last exon (%s, %s).',
-                     transcript_id, exon_id)
+        logging.warning('Exon end phase is 1 or 2 in last exon (%s, %s).',
+                        transcript_id, exon_id)
         return False
 
     if (not end_exon) and end_phase == -1:
-        logging.warn('Exon end phase -1 is not in the last exon (%s, %s).',
-                     transcript_id, exon_id)
+        logging.warning('Exon end phase -1 is not in the last exon (%s, %s).',
+                        transcript_id, exon_id)
         return False
 
     return True
@@ -457,9 +457,10 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
-def add_protein_seq(data_frame,
-                    allow_incomplete_cds=True,
-                    seq_column="ExonProteinSequence"):
+def add_protein_seq(  # pylint: disable=too-many-branches
+        data_frame,
+        allow_incomplete_cds=True,
+        seq_column="ExonProteinSequence"):
     """
     Add a column with the protein sequence of the exon.
 
