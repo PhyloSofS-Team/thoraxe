@@ -308,6 +308,9 @@ def _manage_start_phase_negative_strand(cds_seq, start_phase):
     >>> _manage_start_phase_negative_strand('XYYY', 2)
     'YYY'
     """
+    if cds_seq is None:
+        return None
+
     if start_phase == 1:
         return cds_seq[2:]
     if start_phase == 2:
@@ -425,17 +428,20 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
     The pandas' DataFrame row is printed in the error message.
     """
     end_phase = row['EndPhase']
-    if end_exon:
-        if not allow_incomplete_cds and end_phase in {1, 2}:
-            raise ValueError('Exon end phase is 1 or 2 in last exon, '
-                             'row:  %s' % row)
-    else:
-        if end_phase == -1:
-            if row['StartPhase'] != -1:
-                raise ValueError('Exon end phase -1 is not in the last exon, '
-                                 'row: {}'.format(row))
-            warnings.warn('Exon start and end phases are -1, possible '
-                          'unique exon in row: {}'.format(row))
+    transcript_id = row['TranscriptID']
+    exon_id = row['ExonID']
+
+    if end_exon and not allow_incomplete_cds and end_phase in {1, 2}:
+        warnings.warn('Exon end phase is 1 or 2 in last exon (%s, %s).',
+                      transcript_id, exon_id)
+        return False
+
+    if not end_exon and end_phase == -1:
+        warnings.warn('Exon end phase -1 is not in the last exon (%s, %s).',
+                      transcript_id, exon_id)
+        return False
+
+    return True
 
 
 def _is_incomplete_cds(row, start_exon, end_exon):
@@ -505,7 +511,9 @@ def add_protein_seq(data_frame,
             # the exon at the right for the positive strand (i.e. to the
             # exon that changes because of the phase change):
 
-            _check_phases_by_position(row, end_exon, allow_incomplete_cds)
+            if not _check_phases_by_position(row, end_exon,
+                                             allow_incomplete_cds):
+                cds_seq = None
 
             if row['Strand'] == -1:
                 cds_seq = _manage_start_phase_negative_strand(
@@ -519,16 +527,23 @@ def add_protein_seq(data_frame,
                     row_list, row_index, cds_seq, start_exon)
 
         # Look for signals of incomplete CDS :
-        incomplete = _is_incomplete_cds(row, start_exon, end_exon)
-        if (cds_seq is not None) and ((len(cds_seq) % 3) == 0):
-            # Add the translated CDS :
-            if isinstance(cds_seq, str):
-                sequences.append(Seq(cds_seq, IUPAC.extended_dna).translate())
+        incomplete = True if cds_seq is None else _is_incomplete_cds(
+            row, start_exon, end_exon)
+
+        if not incomplete:
+            if (len(cds_seq) % 3) == 0:
+                # Add the translated CDS :
+                if isinstance(cds_seq, str):
+                    sequences.append(
+                        Seq(cds_seq, IUPAC.extended_dna).translate())
+                else:
+                    sequences.append(cds_seq.translate())
             else:
-                sequences.append(cds_seq.translate())
-        else:
+                incomplete = True
+
+        if incomplete:
             sequences.append("")
-            incomplete = True
+
         incomplete_cds.append(incomplete)
 
         row_index += 1
@@ -631,6 +646,16 @@ def find_identical_exons(data_frame,
     return exon_clusters
 
 
+def _without_stopcodon(sequences):
+    """
+    Return True for the sequences that doesn't end with '*'.
+    """
+    sequence = "".join([str(seq) for seq in sequences])
+    if sequence:
+        return sequence[-1] != "*"
+    return True
+
+
 def delete_incomplete_sequences(data_frame):
     """
     Delete incomplete sequences in place.
@@ -650,8 +675,7 @@ def delete_incomplete_sequences(data_frame):
     incomplete_seqs = data_frame.loc[:, ['TranscriptID',
                                          'ExonProteinSequence']]. \
         groupby('TranscriptID'). \
-        agg(lambda df: "".join([str(s) for s in df])[-1] != "*")
-    # Incomplete sequences do not end with '*'
+        agg(_without_stopcodon)  # Incomplete sequences do not end with '*'
 
     if not incomplete_seqs.empty:
         incomplete_transcripts = set(incomplete_seqs.index[
