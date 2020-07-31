@@ -1,6 +1,6 @@
 """Functions that use pandas to read transcript information."""
 
-import warnings
+import logging
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -22,8 +22,8 @@ def _check_column_presence(data_frame, column, message=""):
 def _check_column_absence(data_frame, column, message=""):
     """Give a warning if the column is already present in the data_frame."""
     if column in data_frame.columns:
-        warnings.warn("Input DataFrame already has column: %s. %s" %
-                      (column, message))
+        logging.warn("Input DataFrame already has column: %s. %s", column,
+                     message)
 
 
 def _get_flag(flag):
@@ -431,14 +431,14 @@ def _check_phases_by_position(row, end_exon, allow_incomplete_cds):
     transcript_id = row['TranscriptID']
     exon_id = row['ExonID']
 
-    if end_exon and not allow_incomplete_cds and end_phase in {1, 2}:
-        warnings.warn('Exon end phase is 1 or 2 in last exon (%s, %s).',
-                      transcript_id, exon_id)
+    if end_exon and (not allow_incomplete_cds) and end_phase in {1, 2}:
+        logging.warn('Exon end phase is 1 or 2 in last exon (%s, %s).',
+                     transcript_id, exon_id)
         return False
 
-    if not end_exon and end_phase == -1:
-        warnings.warn('Exon end phase -1 is not in the last exon (%s, %s).',
-                      transcript_id, exon_id)
+    if (not end_exon) and end_phase == -1:
+        logging.warn('Exon end phase -1 is not in the last exon (%s, %s).',
+                     transcript_id, exon_id)
         return False
 
     return True
