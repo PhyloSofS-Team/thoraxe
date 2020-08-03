@@ -793,7 +793,7 @@ def impute_missing_s_exon(table, column='S_exons', key_columns=None):
 
     number = 1
     for i in table.index:
-        key = ';'.join(table.loc[i, col] for col in key_columns)
+        key = ';'.join(str(table.loc[i, col]) for col in key_columns)
         name = table.loc[i, column]
         if not _is_s_exon(name):
             if key in s_exon_ids:
