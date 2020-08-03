@@ -335,17 +335,27 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     to ensure that there are not errors in the input data.
     """
     if cds_seq is None:
-        return None
+        return None, False
     end_phase = row_list[row_index]['EndPhase']
+    skip_next = False
     if end_phase in {1, 2}:
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
         else:
             next_exon_sequence = row_list[row_index + 1]['ExonSequence']
             n_bases = phases.bases_to_complete_previous_codon(end_phase)
-            cds_seq = cds_seq + next_exon_sequence[0:n_bases]
+            len_next = len(next_exon_sequence)
+            if len_next >= n_bases:
+                cds_seq = cds_seq + next_exon_sequence[0:n_bases]
+            else:
+                take = n_bases - len_next
+                next_next_exon_sequence = row_list[row_index + 2]['ExonSequence']
+                if row_list[row_index +1]['TranscriptID'] != row_list[row_index + 2]['TranscriptID']:
+                    return None
+                cds_seq = cds_seq + next_exon_sequence + next_next_exon_sequence[0:take]
+                skip_next = True
 
-    return cds_seq
+    return cds_seq, skip_next
 
 
 def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
@@ -372,8 +382,9 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
     'TGTCAAAAGACACATTCTGTAGTGTTGTAA'
     """
     if cds_seq is None:
-        return None
+        return None, False
     start_phase = row_list[row_index]['StartPhase']
+    skip_prev = False
     if start_phase in {1, 2}:
         if start_exon:
             n_bases = phases.bases_to_complete_previous_codon(start_phase)
@@ -383,10 +394,20 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
             if n_bases is None:
                 return None
             seq = row_list[row_index - 1]['ExonSequence']
-            seq = seq[-n_bases:]  # pylint: disable=invalid-unary-operand-type
-            cds_seq = seq + cds_seq
+            seq_len = len(seq)
+            if seq_len >= n_bases:
+                seq = seq[-n_bases:]  # pylint: disable=invalid-unary-operand-type
+                cds_seq = seq + cds_seq
+            else:
+                take = n_bases - seq_len
+                prev_seq = row_list[row_index - 2]['ExonSequence']
+                if row_list[row_index - 2]['TranscriptID'] != row_list[row_index - 1]['TranscriptID']:
+                    return None
+                prev_seq = prev_seq[take:]  # noqa pylint: disable=invalid-unary-operand-type
+                cds_seq = prev_seq + seq + cds_seq
+                skip_prev = True
 
-    return cds_seq
+    return cds_seq, skip_prev 
 
 
 def _manage_end_phase_positive_strand(cds_seq, end_phase):
@@ -481,7 +502,12 @@ def add_protein_seq(  # pylint: disable=too-many-branches
     row_list = data_frame.to_dict('records')
     n_rows = len(row_list)
     row_index = 0
+    skip_prev = False
+    skip_next = False
     while row_index < n_rows:
+        if skip_next:
+            skip_next = False
+            continue
         start_exon, end_exon = _is_first_or_last_exon(row_list, row_index)
 
         # Copy of the actual row to have easier access :
@@ -519,13 +545,17 @@ def add_protein_seq(  # pylint: disable=too-many-branches
             if row['Strand'] == -1:
                 cds_seq = _manage_start_phase_negative_strand(
                     cds_seq, row['StartPhase'])
-                cds_seq = _manage_end_phase_negative_strand(
+                cds_seq, skip_next = _manage_end_phase_negative_strand(
                     row_list, row_index, cds_seq, end_exon)
             else:
                 cds_seq = _manage_end_phase_positive_strand(
                     cds_seq, row['EndPhase'])
-                cds_seq = _manage_start_phase_positive_strand(
+                cds_seq, skip_prev = _manage_start_phase_positive_strand(
                     row_list, row_index, cds_seq, start_exon)
+
+        if skip_prev:
+            skip_prev = False
+            sequences[-1] = ""
 
         # Look for signals of incomplete CDS :
         incomplete = True if cds_seq is None else _is_incomplete_cds(

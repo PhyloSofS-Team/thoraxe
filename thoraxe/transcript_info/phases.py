@@ -7,43 +7,6 @@ for the downloaded and parsed data. Also, this module have functions used to
 calculate the subexon phases.
 
 This could be useful to help in the understanding of exon start and end phases.
-
-Static function call graph:
----------------------------
-::
-
-    +----------------------------------+
-    |      check_order_and_phases      |
-    +-+--------+-----------------------+
-      |        |
-      |        |
-      |        v
-      |      +-+-----------------------+
-      |      |    _check_exon_order    |
-      |      +-------------------------+
-      v
-    +-+--------------------------------+
-    |          _check_phases           |
-    +-+--------+---------+-------------+
-      |        |         |
-      |        |         |
-      |        |         v
-      |        |       +-+-------------+
-      |        |       | _equal_phases |
-      |        v       +---------------+
-      |      +-+-----------------------+
-      |      | end_phase_previous_exon |
-      ^      +-------------------------+
-    +-+--------------------------------+
-    |         calculate_phase          |
-    +-+--------------------------------+
-      |
-      |
-      v
-    +-+--------------------------------+
-    | bases_to_complete_previous_codon |
-    +----------------------------------+
-
 """
 
 import logging
