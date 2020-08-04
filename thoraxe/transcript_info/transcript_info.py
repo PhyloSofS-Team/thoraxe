@@ -337,25 +337,58 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
     if cds_seq is None:
         return None, False
     end_phase = row_list[row_index]['EndPhase']
-    skip_next = False
+    skip = 0
     if end_phase in {1, 2}:
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
         else:
             next_exon_sequence = row_list[row_index + 1]['ExonSequence']
             n_bases = phases.bases_to_complete_previous_codon(end_phase)
-            len_next = len(next_exon_sequence)
-            if len_next >= n_bases:
-                cds_seq = cds_seq + next_exon_sequence[0:n_bases]
-            else:
-                take = n_bases - len_next
-                next_next_exon_sequence = row_list[row_index + 2]['ExonSequence']
-                if row_list[row_index +1]['TranscriptID'] != row_list[row_index + 2]['TranscriptID']:
-                    return None
-                cds_seq = cds_seq + next_exon_sequence + next_next_exon_sequence[0:take]
-                skip_next = True
+            cds_seq, skip = _take_n_bases(cds_seq, n_bases, 'next', row_list,
+                                          row_index)
 
-    return cds_seq, skip_next
+    return cds_seq, skip
+
+
+def _take_n_bases(cds_seq, nbases, direction, row_list, row_index):
+    """
+    Helper function to deal with shared codons in (sub-)exon boundaries.
+    """
+    rows = []
+    while 0 <= row_index < len(row_list):
+        rows.append(row_list[row_index])
+        if direction == "next":
+            row_index += 1
+        else:
+            row_index -= 1
+    seqs = [row['ExonSequence'] for row in rows]
+    lengths = [len(seq) for seq in seqs]
+    trxs = [row['TranscriptID'] for row in rows]
+    cds = [cds_seq]
+    idx = 1
+    skip = 0
+    while nbases and idx < len(rows):
+
+        if trxs[idx] != trxs[idx - 1]:
+            return None, 0
+
+        if lengths[idx] > nbases:
+            if direction == "next":
+                cds.append(seqs[idx][0:nbases])
+            else:
+                seq = seqs[idx]
+                cds.insert(0, seq[len(seq) - nbases:])
+            nbases = 0
+        else:
+            nbases -= lengths[idx]
+            if direction == "next":
+                cds.append(seqs[idx])
+            else:
+                cds.insert(0, seqs[idx])
+            idx += 1
+            skip += 1
+
+    return ''.join(str(seq) for seq in cds), skip
 
 
 def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
@@ -384,7 +417,7 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
     if cds_seq is None:
         return None, False
     start_phase = row_list[row_index]['StartPhase']
-    skip_prev = False
+    skip = 0
     if start_phase in {1, 2}:
         if start_exon:
             n_bases = phases.bases_to_complete_previous_codon(start_phase)
@@ -393,21 +426,10 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
             n_bases = phases.bases_to_complete_next_codon(start_phase)
             if n_bases is None:
                 return None
-            seq = row_list[row_index - 1]['ExonSequence']
-            seq_len = len(seq)
-            if seq_len >= n_bases:
-                seq = seq[-n_bases:]  # pylint: disable=invalid-unary-operand-type
-                cds_seq = seq + cds_seq
-            else:
-                take = n_bases - seq_len
-                prev_seq = row_list[row_index - 2]['ExonSequence']
-                if row_list[row_index - 2]['TranscriptID'] != row_list[row_index - 1]['TranscriptID']:
-                    return None
-                prev_seq = prev_seq[take:]  # noqa pylint: disable=invalid-unary-operand-type
-                cds_seq = prev_seq + seq + cds_seq
-                skip_prev = True
+            cds_seq, skip = _take_n_bases(cds_seq, n_bases, 'previous',
+                                          row_list, row_index)
 
-    return cds_seq, skip_prev 
+    return cds_seq, skip
 
 
 def _manage_end_phase_positive_strand(cds_seq, end_phase):
@@ -506,7 +528,7 @@ def add_protein_seq(  # pylint: disable=too-many-branches
     skip_next = False
     while row_index < n_rows:
         if skip_next:
-            skip_next = False
+            skip_next -= 1
             continue
         start_exon, end_exon = _is_first_or_last_exon(row_list, row_index)
 
@@ -554,8 +576,9 @@ def add_protein_seq(  # pylint: disable=too-many-branches
                     row_list, row_index, cds_seq, start_exon)
 
         if skip_prev:
-            skip_prev = False
-            sequences[-1] = ""
+            for skip in range(1, skip_prev + 1):
+                sequences[len(sequences) - skip] = ""
+            skip_prev = 0
 
         # Look for signals of incomplete CDS :
         incomplete = True if cds_seq is None else _is_incomplete_cds(
@@ -582,7 +605,8 @@ def add_protein_seq(  # pylint: disable=too-many-branches
     # Add new column to store the sequences :
     data_frame[seq_column] = sequences
     # New column to store signals of incomplete CDS :
-    data_frame['IncompleteCDS'] = incomplete_cds
+    if seq_column != "SubexonProteinSequence":  # do not add it for sub-exons
+        data_frame['IncompleteCDS'] = incomplete_cds
 
 
 def _different_phases(row_i, row_j):
@@ -687,7 +711,9 @@ def _without_stopcodon(sequences):
     return True
 
 
-def delete_incomplete_sequences(data_frame):
+def delete_incomplete_sequences(data_frame,
+                                seq_column="ExonProteinSequence",
+                                trx_column="TranscriptID"):
     """
     Delete incomplete sequences in place.
 
@@ -696,28 +722,27 @@ def delete_incomplete_sequences(data_frame):
     It also deletes sequences that probably has an incomplete CDS because
     starts or ends with phases differente fron 0 or -1.
     """
-    _check_column_presence(data_frame, 'ExonProteinSequence',
+    _check_column_presence(data_frame, seq_column,
                            'You need to run add_protein_seq first.')
 
-    incomplete_cdss = data_frame.loc[:, ['TranscriptID', 'IncompleteCDS'
-                                         ]].groupby('TranscriptID').agg(
-                                             lambda df: sum(df) > 0)
+    incomplete_cdss = data_frame.loc[:, [trx_column, 'IncompleteCDS']].groupby(
+        trx_column).agg(lambda df: sum(df) > 0)
 
-    incomplete_seqs = data_frame.loc[:, ['TranscriptID',
-                                         'ExonProteinSequence']]. \
-        groupby('TranscriptID'). \
+    incomplete_seqs = data_frame.loc[:, [trx_column,
+                                         seq_column]]. \
+        groupby(trx_column). \
         agg(_without_stopcodon)  # Incomplete sequences do not end with '*'
 
     if not incomplete_seqs.empty:
-        incomplete_transcripts = set(incomplete_seqs.index[
-            incomplete_seqs['ExonProteinSequence']]).union(
+        incomplete_transcripts = set(
+            incomplete_seqs.index[incomplete_seqs[seq_column]]).union(
                 incomplete_cdss.index[incomplete_cdss['IncompleteCDS']])
         if incomplete_transcripts:
             clusters.inform_about_deletions(
                 incomplete_transcripts, "Incomplete transcripts were found:")
             data_frame.drop([
                 i for i in data_frame.index
-                if data_frame.loc[i, 'TranscriptID'] in incomplete_transcripts
+                if data_frame.loc[i, trx_column] in incomplete_transcripts
             ],
                             inplace=True)
 
