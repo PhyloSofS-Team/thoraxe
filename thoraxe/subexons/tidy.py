@@ -31,13 +31,16 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
         if previous_transcript != row.TranscriptIDCluster:
             previous_transcript = row.TranscriptIDCluster
             s_exon_rank = 0
-
         sube_seq = str(row.SubexonProteinSequence).replace('*', '')
         hexons = split.split_exons(row.S_exons)
-        he_lens = split.split_lengths(row.S_exon_Lengths, sube_seq)
-        he_seqs = split.split_seqs(row.S_exon_Sequences, sube_seq)
-        assert len(hexons) == len(he_lens)
-        assert len(hexons) == len(he_seqs)
+        if sube_seq:
+            he_lens = split.split_lengths(row.S_exon_Lengths, sube_seq)
+            he_seqs = split.split_seqs(row.S_exon_Sequences, sube_seq)
+            assert len(hexons) == len(he_lens)
+            assert len(hexons) == len(he_seqs)
+        else:
+            he_lens = [0]
+            he_seqs = ['']
 
         tidy_row = dict()
         for column in list(tidy_table.columns):

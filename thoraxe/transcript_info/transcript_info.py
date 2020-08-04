@@ -518,17 +518,18 @@ def add_protein_seq(  # pylint: disable=too-many-branches
     _check_column_absence(data_frame, 'IncompleteCDS',
                           'Values are going to change.')
 
-    sequences = []
     incomplete_cds = []
 
     row_list = data_frame.to_dict('records')
     n_rows = len(row_list)
+    sequences = ['' for _ in range(0, n_rows)]
     row_index = 0
-    skip_prev = False
-    skip_next = False
+    skip_prev = 0
+    skip_next = 0
     while row_index < n_rows:
         if skip_next:
             skip_next -= 1
+            row_index += 1
             continue
         start_exon, end_exon = _is_first_or_last_exon(row_list, row_index)
 
@@ -577,7 +578,7 @@ def add_protein_seq(  # pylint: disable=too-many-branches
 
         if skip_prev:
             for skip in range(1, skip_prev + 1):
-                sequences[len(sequences) - skip] = ""
+                sequences[row_index - skip] = ""
             skip_prev = 0
 
         # Look for signals of incomplete CDS :
@@ -588,17 +589,15 @@ def add_protein_seq(  # pylint: disable=too-many-branches
             if (len(cds_seq) % 3) == 0:
                 # Add the translated CDS :
                 if isinstance(cds_seq, str):
-                    sequences.append(
-                        Seq(cds_seq, IUPAC.extended_dna).translate())
+                    sequences[row_index] = Seq(cds_seq,
+                                               IUPAC.extended_dna).translate()
                 else:
-                    sequences.append(cds_seq.translate())
+                    sequences[row_index] = cds_seq.translate()
             else:
                 incomplete = True
 
-        if incomplete:
-            sequences.append("")
-
-        incomplete_cds.append(incomplete)
+        if seq_column != "SubexonProteinSequence":
+            incomplete_cds.append(incomplete)
 
         row_index += 1
 
