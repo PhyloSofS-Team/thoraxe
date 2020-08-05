@@ -304,41 +304,6 @@ downloading that data from ENSEMBL. The code was changed to be use as a checker
 for the downloaded and parsed data. Also, this module have functions used to
 calculate the subexon phases.</p>
 <p>This could be useful to help in the understanding of exon start and end phases.</p>
-<div class="section" id="static-function-call-graph">
-<h3>Static function call graph:<a class="headerlink" href="#static-function-call-graph" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+----------------------------------+</span>
-<span class="o">|</span>      <span class="n">check_order_and_phases</span>      <span class="o">|</span>
-<span class="o">+-+--------+-----------------------+</span>
-  <span class="o">|</span>        <span class="o">|</span>
-  <span class="o">|</span>        <span class="o">|</span>
-  <span class="o">|</span>        <span class="n">v</span>
-  <span class="o">|</span>      <span class="o">+-+-----------------------+</span>
-  <span class="o">|</span>      <span class="o">|</span>    <span class="n">_check_exon_order</span>    <span class="o">|</span>
-  <span class="o">|</span>      <span class="o">+-------------------------+</span>
-  <span class="n">v</span>
-<span class="o">+-+--------------------------------+</span>
-<span class="o">|</span>          <span class="n">_check_phases</span>           <span class="o">|</span>
-<span class="o">+-+--------+---------+-------------+</span>
-  <span class="o">|</span>        <span class="o">|</span>         <span class="o">|</span>
-  <span class="o">|</span>        <span class="o">|</span>         <span class="o">|</span>
-  <span class="o">|</span>        <span class="o">|</span>         <span class="n">v</span>
-  <span class="o">|</span>        <span class="o">|</span>       <span class="o">+-+-------------+</span>
-  <span class="o">|</span>        <span class="o">|</span>       <span class="o">|</span> <span class="n">_equal_phases</span> <span class="o">|</span>
-  <span class="o">|</span>        <span class="n">v</span>       <span class="o">+---------------+</span>
-  <span class="o">|</span>      <span class="o">+-+-----------------------+</span>
-  <span class="o">|</span>      <span class="o">|</span> <span class="n">end_phase_previous_exon</span> <span class="o">|</span>
-  <span class="o">^</span>      <span class="o">+-------------------------+</span>
-<span class="o">+-+--------------------------------+</span>
-<span class="o">|</span>         <span class="n">calculate_phase</span>          <span class="o">|</span>
-<span class="o">+-+--------------------------------+</span>
-  <span class="o">|</span>
-  <span class="o">|</span>
-  <span class="n">v</span>
-<span class="o">+-+--------------------------------+</span>
-<span class="o">|</span> <span class="n">bases_to_complete_previous_codon</span> <span class="o">|</span>
-<span class="o">+----------------------------------+</span>
-</pre></div>
-</div>
 <dl class="py function">
 <dt id="thoraxe.transcript_info.phases.bases_to_complete_next_codon">
 <code class="sig-prename descclassname">thoraxe.transcript_info.phases.</code><code class="sig-name descname">bases_to_complete_next_codon</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">phase</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_next_codon" title="Permalink to this definition">¶</a></dt>
@@ -425,7 +390,6 @@ information. It throws an informative error if something is wrong.</p>
 </dd></dl>
 
 </div>
-</div>
 <div class="section" id="module-thoraxe.transcript_info.transcript_info">
 <span id="thoraxe-transcript-info-transcript-info-module"></span><h2>thoraxe.transcript_info.transcript_info module<a class="headerlink" href="#module-thoraxe.transcript_info.transcript_info" title="Permalink to this headline">¶</a></h2>
 <p>Functions that use pandas to read transcript information.</p>
@@ -466,7 +430,7 @@ of read_exon_file.</p>
 
 <dl class="py function">
 <dt id="thoraxe.transcript_info.transcript_info.delete_incomplete_sequences">
-<code class="sig-prename descclassname">thoraxe.transcript_info.transcript_info.</code><code class="sig-name descname">delete_incomplete_sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_frame</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.delete_incomplete_sequences" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">thoraxe.transcript_info.transcript_info.</code><code class="sig-name descname">delete_incomplete_sequences</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data_frame</span></em>, <em class="sig-param"><span class="n">seq_column</span><span class="o">=</span><span class="default_value">'ExonProteinSequence'</span></em>, <em class="sig-param"><span class="n">trx_column</span><span class="o">=</span><span class="default_value">'TranscriptID'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.delete_incomplete_sequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete incomplete sequences in place.</p>
 <p>Incomplete sequences are the ones that do not have their protein
 sequence finishing with ‘*’.
