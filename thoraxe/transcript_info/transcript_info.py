@@ -342,7 +342,6 @@ def _manage_end_phase_negative_strand(row_list, row_index, cds_seq, end_exon):
         if end_exon:
             cds_seq = cds_seq[:-end_phase]  # delete incomplete codon
         else:
-            next_exon_sequence = row_list[row_index + 1]['ExonSequence']
             n_bases = phases.bases_to_complete_previous_codon(end_phase)
             cds_seq, skip = _take_n_bases(cds_seq, n_bases, 'next', row_list,
                                           row_index)
@@ -500,7 +499,7 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
-def add_protein_seq(  # pylint: disable=too-many-branches
+def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         data_frame,
         allow_incomplete_cds=True,
         seq_column="ExonProteinSequence"):
