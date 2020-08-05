@@ -407,11 +407,13 @@ def _manage_start_phase_positive_strand(row_list, row_index, cds_seq,
     >>> seq_one = 'AATTGATATATAAGGAAGTTATGGACTTGGAAGAGAGAACCAAGAATGGAGTCATACGG'
     >>> seq_one = seq_one + 'GGGCAGCCTTCTCCTTTAGGTTG'
     >>> seq_two = 'TCAAAAGACACATTCTGTAGTGTTGTAA'
-    >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': seq_one}
-    >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': seq_two}
+    >>> row_one = {'StartPhase': 1, 'EndPhase': 2, 'ExonSequence': seq_one, \
+            'TranscriptID': ''}
+    >>> row_two = {'StartPhase': 2, 'EndPhase': 0, 'ExonSequence': seq_two, \
+            'TranscriptID': ''}
     >>> row_list = [row_one, row_two]
     >>> _manage_start_phase_positive_strand(row_list, 1, seq_two, False)
-    'TGTCAAAAGACACATTCTGTAGTGTTGTAA'
+    ('TGTCAAAAGACACATTCTGTAGTGTTGTAA', 0)
     """
     if cds_seq is None:
         return None, False
