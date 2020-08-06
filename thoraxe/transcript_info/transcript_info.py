@@ -519,11 +519,10 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
     _check_column_absence(data_frame, 'IncompleteCDS',
                           'Values are going to change.')
 
-    incomplete_cds = []
-
     row_list = data_frame.to_dict('records')
     n_rows = len(row_list)
     sequences = ['' for _ in range(0, n_rows)]
+    incomplete_cds = [False for _ in range(0, n_rows)]
     row_index = 0
     skip_prev = 0
     skip_next = 0
@@ -598,7 +597,7 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
                 incomplete = True
 
         if seq_column != "SubexonProteinSequence":
-            incomplete_cds.append(incomplete)
+            incomplete_cds[row_index] = incomplete
 
         row_index += 1
 
