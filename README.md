@@ -1,5 +1,5 @@
 # ThorAxe
-*Disentangle homology relationships between exons*
+*Assessing Conservation of Alternative Splicing with Evolutionary Splicing Graphs*
 
 Status                     |Linux                     |Windows                    
 :-------------------------:|:-------------------------|:-------------------------
