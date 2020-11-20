@@ -10,7 +10,6 @@ thoraxe.transcript\_query.transcript\_query module
 .. automodule:: thoraxe.transcript_query.transcript_query
    :members:
 
-
 Module contents
 ---------------
 

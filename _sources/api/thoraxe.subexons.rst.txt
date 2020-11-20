@@ -52,7 +52,6 @@ thoraxe.subexons.tidy module
 .. automodule:: thoraxe.subexons.tidy
    :members:
 
-
 Module contents
 ---------------
 

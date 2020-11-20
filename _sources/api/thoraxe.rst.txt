@@ -27,7 +27,6 @@ thoraxe.version module
 .. automodule:: thoraxe.version
    :members:
 
-
 Module contents
 ---------------
 

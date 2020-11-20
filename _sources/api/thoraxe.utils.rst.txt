@@ -22,7 +22,6 @@ thoraxe.utils.split module
 .. automodule:: thoraxe.utils.split
    :members:
 
-
 Module contents
 ---------------
 

@@ -28,7 +28,6 @@ thoraxe.transcript\_info.transcript\_info module
 .. automodule:: thoraxe.transcript_info.transcript_info
    :members:
 
-
 Module contents
 ---------------
 
