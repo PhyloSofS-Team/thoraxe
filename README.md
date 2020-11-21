@@ -8,4 +8,4 @@ Status                     |Linux                     |Windows
 Please refer to the [**documentation**](https://phylosofs-team.github.io/thoraxe/)
 for [**installation**](https://phylosofs-team.github.io/thoraxe/installation.html)
 instructions and more information.  
-Check out our [**tutorial**](https://www.youtube.com/watch?v=Z96985kX-uY)!
+Check out our [**tutorial**](https://www.youtube.com/watch?v=Z96985kX-uY) to see how you can easily use ThorAxe and visualise the results!
