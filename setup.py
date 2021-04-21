@@ -38,7 +38,7 @@ setup(
     test_suite='tests',
     tests_require=[
         'pytest', 'pytest-cov', 'coveralls', 'codecov', 'pytest-pylint',
-        'pylint'
+        'pylint','numpy<1.20'
     ],
     include_package_data=True,
     zip_safe=False,

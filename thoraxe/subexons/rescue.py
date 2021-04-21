@@ -7,7 +7,6 @@ import logging
 
 import pandas as pd
 import numpy as np
-from Bio import pairwise2
 from Bio.SubsMat.MatrixInfo import blosum50
 
 from thoraxe import transcript_info
@@ -191,12 +190,12 @@ def modify_subexon_cluster(subexon_table, subexon2cluster):
     return subexon_table
 
 
-def subexon_rescue_phase(  # pylint: disable=too-many-arguments
+def subexon_rescue_phase(  # pylint: disable=too-many-arguments,duplicate-code
         cluster2data,
         subexon_table,
         minimum_len=4,
         coverage_cutoff=80.0,
-        percent_identity_cutoff=30.0,  # pylint: disable=duplicate-code
+        percent_identity_cutoff=30.0,
         gap_open_penalty=-10,
         gap_extend_penalty=-1,
         substitution_matrix=None):
