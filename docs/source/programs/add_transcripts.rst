@@ -17,7 +17,7 @@ For example, let's see you want to add a *MAPK8* transcript described in
     :ref: thoraxe.add_transcripts.add_transcripts.parse_command_line
     :prog: transcript_query
 
-.. note::
+.. tip::
     While this program is called `add_transcripts` you can use it to add genes 
     by adding their transcripts. Use a single input table to add multiple 
     genes and transcripts or run this script multiple times to add a different 
