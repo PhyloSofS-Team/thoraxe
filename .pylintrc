@@ -7,3 +7,9 @@ disable=W0511
 
 [TYPECHECK]
 ignored-classes=DataFrameGroupBy
+
+[SIMILARITIES]
+min-similarity-lines=6
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=no

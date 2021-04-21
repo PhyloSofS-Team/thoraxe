@@ -59,8 +59,8 @@ def percent_identity(query, target):
     return 100.0 * (identical / aln_len)
 
 
-def _align(seq_a, seq_b, gap_open_penalty, gap_extend_penalty,
-           substitution_matrix):
+def align(seq_a, seq_b, gap_open_penalty, gap_extend_penalty,
+          substitution_matrix):
     "Align the sequnces using the BioPython pairwise2 aligner."
     alignments = pairwise2.align.localds(seq_a,
                                          seq_b,
@@ -215,11 +215,11 @@ def exon_clustering(  # noqa pylint: disable=too-many-arguments,too-many-locals,
                 if max_pid < percent_identity_cutoff:
                     aln_memo[exon_pair_id] = (0.0, 0.0)
                     continue
-                aln_query, aln_target = _align(row_list[i]['ProteinSequences'],
-                                               row_list[j]['ProteinSequences'],
-                                               gap_open_penalty,
-                                               gap_extend_penalty,
-                                               substitution_matrix)
+                aln_query, aln_target = align(row_list[i]['ProteinSequences'],
+                                              row_list[j]['ProteinSequences'],
+                                              gap_open_penalty,
+                                              gap_extend_penalty,
+                                              substitution_matrix)
                 target_coverage = coverage_shortest(aln_query, aln_target,
                                                     len_j)
                 pid = percent_identity(aln_query, aln_target)
