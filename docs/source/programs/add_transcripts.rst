@@ -78,9 +78,9 @@ NucleotideSequence   Nucleotide sequence for the exons. They can contain
                      complement of the genomic sequence.
 ==================== ===========================================================
 
-You can find an example of the required table in the `test/data` folder of 
-the `thoraxe` repository at `GitHub`_. There is also this `Google spreadsheet`_ 
-that you can modify and download later as a CSV file.
+You can find `user_transcript.csv`, an example of the required table in the 
+`test/data` folder of the `thoraxe` repository at `GitHub`_. There is also 
+this `Google spreadsheet`_ that you can modify and download later as a CSV file.
 
 
 .. _GitHub: https://github.com/PhyloSofS-Team/thoraxe
