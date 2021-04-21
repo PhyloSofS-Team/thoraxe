@@ -1,0 +1,17 @@
+thoraxe.add\_transcripts package
+================================
+
+Submodules
+----------
+
+thoraxe.add\_transcripts.add\_transcripts module
+------------------------------------------------
+
+.. automodule:: thoraxe.add_transcripts.add_transcripts
+   :members:
+
+Module contents
+---------------
+
+.. automodule:: thoraxe.add_transcripts
+   :members:

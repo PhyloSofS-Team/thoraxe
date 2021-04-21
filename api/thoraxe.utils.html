@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>thoraxe.utils package &mdash; ThorAxe 0.1.0 documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -50,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ThorAxe
+            <a href="../index.html" class="icon icon-home"> ThorAxe
           
 
           
@@ -88,6 +90,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="thoraxe.html">thoraxe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="thoraxe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.add_transcripts.html">thoraxe.add_transcripts package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_info.html">thoraxe.transcript_info package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_query.html">thoraxe.transcript_query package</a></li>
@@ -142,6 +145,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -157,7 +162,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/api/thoraxe.utils.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -181,7 +186,7 @@
 <p>folders: Util functions to create output folder structure.</p>
 <dl class="py function">
 <dt id="thoraxe.utils.folders.create_subfolder">
-<code class="sig-prename descclassname">thoraxe.utils.folders.</code><code class="sig-name descname">create_subfolder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span></em>, <em class="sig-param"><span class="n">subfolder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.folders.create_subfolder" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.folders.</span></code><code class="sig-name descname"><span class="pre">create_subfolder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subfolder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.folders.create_subfolder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return path to the subfolder. It creates the folder if it doesn’t exist.</p>
 </dd></dl>
 
@@ -191,7 +196,7 @@
 <p>species: Util functions to get the species list.</p>
 <dl class="py function">
 <dt id="thoraxe.utils.species.check_species_name">
-<code class="sig-prename descclassname">thoraxe.utils.species.</code><code class="sig-name descname">check_species_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">species_name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.species.check_species_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.species.</span></code><code class="sig-name descname"><span class="pre">check_species_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.species.check_species_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return True if the species_name has the correct format.</p>
 <p>The expected name is binomial. Trinomial names aren’t used but they don’t
 raise an error. If the species_name doesn’t conform the expected format an
@@ -208,7 +213,7 @@ error is raised.</p>
 
 <dl class="py function">
 <dt id="thoraxe.utils.species.get_species_list">
-<code class="sig-prename descclassname">thoraxe.utils.species.</code><code class="sig-name descname">get_species_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">specieslist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.species.get_species_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.species.</span></code><code class="sig-name descname"><span class="pre">get_species_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specieslist</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.species.get_species_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of species names (str).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_species_list</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_species_list</span><span class="p">(</span><span class="s1">&#39;homo_sapiens,mus_musculus&#39;</span><span class="p">)</span>
@@ -223,7 +228,7 @@ error is raised.</p>
 <p>split: Util functions to split s-exons.</p>
 <dl class="py function">
 <dt id="thoraxe.utils.split.split_exons">
-<code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_exons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">exons</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_exons" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.split.</span></code><code class="sig-name descname"><span class="pre">split_exons</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exons</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_exons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of the s-exons in the string.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_exons</span><span class="p">(</span><span class="s1">&#39;3_0/3_1&#39;</span><span class="p">)</span>
 <span class="go">[&#39;3_0&#39;, &#39;3_1&#39;]</span>
@@ -235,7 +240,7 @@ error is raised.</p>
 
 <dl class="py function">
 <dt id="thoraxe.utils.split.split_lengths">
-<code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_lengths</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lengths</span></em>, <em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_lengths" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.split.</span></code><code class="sig-name descname"><span class="pre">split_lengths</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lengths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_lengths" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of the s-exon lengths, len(seq) if there is not data.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">split_lengths</span><span class="p">(</span><span class="s1">&#39;4/2&#39;</span><span class="p">,</span> <span class="s1">&#39;MLGHAC&#39;</span><span class="p">)</span>
@@ -252,7 +257,7 @@ error is raised.</p>
 
 <dl class="py function">
 <dt id="thoraxe.utils.split.split_seqs">
-<code class="sig-prename descclassname">thoraxe.utils.split.</code><code class="sig-name descname">split_seqs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequences</span></em>, <em class="sig-param"><span class="n">seq</span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_seqs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">thoraxe.utils.split.</span></code><code class="sig-name descname"><span class="pre">split_seqs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.utils.split.split_seqs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list with the s-exon sequences.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_seqs</span><span class="p">(</span><span class="s1">&#39;MLGH/AC&#39;</span><span class="p">,</span> <span class="s1">&#39;MLGHAC&#39;</span><span class="p">)</span>
 <span class="go">[&#39;MLGH&#39;, &#39;AC&#39;]</span>
@@ -276,35 +281,28 @@ error is raised.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="thoraxe.transcript_query.html" class="btn btn-neutral float-left" title="thoraxe.transcript_query package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="thoraxe.transcript_query.html" class="btn btn-neutral float-left" title="thoraxe.transcript_query package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine
+        &#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

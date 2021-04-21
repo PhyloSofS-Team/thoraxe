@@ -6,3 +6,4 @@ thoraxe
 
    thoraxe
    transcript_query
+   add_transcripts
