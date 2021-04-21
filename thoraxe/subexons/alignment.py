@@ -326,7 +326,7 @@ def run_aligner(chimerics,
                 raise OSError(
                     '{} not found. '.format(aligner) +
                     'Please indicate the path to ProGraphMSA or install it ' +
-                    'from https://github.com/acg-team/ProGraphMSA')
+                    'from https://github.com/acg-team/ProGraphMSA') from err
             raise err
 
     return output_path

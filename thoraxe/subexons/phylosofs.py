@@ -168,7 +168,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
         except ValueError as err:
             raise Exception(
                 'Error with protein {} while prunning the tree {} : {}'.format(
-                    clade, tree, err))
+                    clade, tree, err)) from err
 
     # Use gene id instead of protein/peptide/translation id in the tree
     for clade in tree.get_terminals():

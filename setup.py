@@ -24,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
             'transcript_query=thoraxe.transcript_query:main',
-            'thoraxe=thoraxe:main'
+            'thoraxe=thoraxe:main',
+            'add_transcripts=thoraxe.add_transcripts:main'
         ],
     },
     packages=find_packages(),
@@ -32,7 +33,7 @@ setup(
     setup_requires=['pytest-runner'],
     install_requires=[
         'pandas>0.21.0', 'biopython>1.44,<1.78', 'requests', 'numpy<1.20', 'recordclass',
-        'urllib3', 'networkx'
+        'urllib3', 'networkx', 'tabulate'
     ],
     test_suite='tests',
     tests_require=[

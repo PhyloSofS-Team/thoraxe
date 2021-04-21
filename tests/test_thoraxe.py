@@ -2,9 +2,8 @@ import os
 import shutil
 import sys
 import platform
-import pytest
 import subprocess
-import warnings
+import pytest
 
 import thoraxe
 
