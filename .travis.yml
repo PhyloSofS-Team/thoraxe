@@ -12,6 +12,8 @@ install:
   - chmod a+x ./prographmsa/bin/ProGraphMSA_64
   - sudo cp ./prographmsa/bin/ProGraphMSA_64 /bin/ProGraphMSA
   - rm -fr prographmsa # clean up
+  - python -m pip uninstall numpy
+  - python -m pip install 'numpy==1.19.5'
   - python -m pip install .
   - python -m pip install coveralls codecov
   - python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
