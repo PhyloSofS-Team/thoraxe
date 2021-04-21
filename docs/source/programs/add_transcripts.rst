@@ -82,7 +82,7 @@ You can find an example of the required table in
 `test/data/user_transcript.csv` of the `thoraxe` repository at `GitHub`_ or in 
 this `Google spreadsheet`_. 
 
-.. hint:
+.. hint::
     You can copy this `Google spreadsheet`_ to modify it with your data and 
     download it as a CSV file.
 
