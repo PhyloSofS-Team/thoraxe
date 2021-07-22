@@ -12,6 +12,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 import time
 import warnings
@@ -158,7 +159,8 @@ def parse_command_line():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('genename',
                         type=str,
-                        help='gene name in Ensembl (e.g. MAPK8)')
+                        help='gene name in Ensembl (e.g. MAPK8) or the '
+                        'Ensembl stable ID (e.g ENSG00000107643)')
     parser.add_argument('-s',
                         '--species',
                         help='species to look for the gene name',
@@ -584,6 +586,15 @@ def save_ensembl_version(output_folder):
                                           res['version']))
 
 
+def is_esemble_id(name):
+    """
+    It returns True if name is an stable Ensembl ID.
+
+    Stable IDs are created in the form 
+    ENS[species prefix][feature type prefix][a unique eleven digit number].
+    """
+    return re.match("ENS.*G[0-9]{11}", name) is not None
+
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
 def main():  # pylint: disable=too-many-locals,too-many-statements
@@ -603,20 +614,24 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # 2-
     orthokeep = utils.species.get_species_list(args.specieslist)
 
-    print("Searching ID for gene with name %s in species %s ..." %
-          (args.genename, args.species))
-    geneids = get_geneids_from_symbol(args.species, args.genename)
-    _print_if(args.verbose,
-              "Found the following list of ids: %s" % (json.dumps(geneids)))
-    if not geneids:
-        raise Exception("No results for {}".format(args.genename))
-    curgene = geneids[0]
-    gene_name = args.genename
-    cdirectory = gene_name
-    query_result_subdir = os.path.join(cdirectory, "Ensembl")
-    print("... using gene id %s from now on." % (curgene))
+    cdirectory = args.genename
+
+    if is_esemble_id(args.genename):
+        curgene = args.genename
+    else:
+        print("Searching ID for gene with name %s in species %s ..." %  
+            (args.genename, args.species))
+        geneids = get_geneids_from_symbol(args.species, args.genename)
+        _print_if(args.verbose,
+                "Found the following list of ids: %s" % (json.dumps(geneids)))
+        if not geneids:
+            raise Exception("No results for {}".format(args.genename))
+        curgene = geneids[0]
+        print("... using gene id %s from now on." % (curgene))
+
     _print_if(args.verbose,
               "Results will be saved in directory %s" % (cdirectory))
+    query_result_subdir = os.path.join(cdirectory, "Ensembl")
     if not os.path.exists(cdirectory):
         os.makedirs(query_result_subdir)
 
