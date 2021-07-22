@@ -74,7 +74,7 @@ def plot_msa_subexons(cluster2data, output_folder):
         file.write('var clusterData = ')
 
     json.dump(structured_data,
-              codecs.open(js_file, 'a', encoding='utf-8'),
+              codecs.open(js_file, 'a', encoding='utf-8'),  # noqa pylint: disable=consider-using-with
               separators=(',', ':'),
               sort_keys=True,
               indent=4)

@@ -161,7 +161,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
     data = _get_protein2gene(exontable_file)
 
     # Delete unused proteins
-    used_proteins = set(data.index[data['GeneID'].isin(used_genes)])
+    used_proteins = set(data.index[data['GeneID'].isin(used_genes)])  # noqa pylint: disable=unsubscriptable-object
     for clade in _get_terminals_to_delete(tree, used_proteins):
         try:
             tree.prune(clade)
@@ -172,7 +172,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
 
     # Use gene id instead of protein/peptide/translation id in the tree
     for clade in tree.get_terminals():
-        clade.name = data.loc[clade.name, 'GeneID']
+        clade.name = data.loc[clade.name, 'GeneID']  # pylint: disable=no-member
 
     Phylo.write(tree, output_tree, 'newick')
 
