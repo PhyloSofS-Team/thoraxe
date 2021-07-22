@@ -592,10 +592,11 @@ def is_esemble_id(name):
     """
     It returns True if name is an stable Ensembl ID.
 
-    Stable IDs are created in the form 
+    Stable IDs are created in the form
     ENS[species prefix][feature type prefix][a unique eleven digit number].
     """
     return re.match("ENS.*G[0-9]{11}", name) is not None
+
 
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
@@ -621,11 +622,12 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if is_esemble_id(args.genename):
         curgene = args.genename
     else:
-        print("Searching ID for gene with name %s in species %s ..." %  
-            (args.genename, args.species))
+        print("Searching ID for gene with name %s in species %s ..." %
+              (args.genename, args.species))
         geneids = get_geneids_from_symbol(args.species, args.genename)
-        _print_if(args.verbose,
-                "Found the following list of ids: %s" % (json.dumps(geneids)))
+        _print_if(
+            args.verbose,
+            "Found the following list of ids: %s" % (json.dumps(geneids)))
         if not geneids:
             raise Exception("No results for {}".format(args.genename))
         curgene = geneids[0]
@@ -689,10 +691,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     ffasta = os.path.join(query_result_subdir, "sequences.fasta")
     fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")
     with open(ffasta, "w") as fastaout:
-        with  open(fexonstable, "w") as exonstableout:
+        with open(fexonstable, "w") as exonstableout:
             dex = get_listofexons(curgene)
             lexid = list({x['exon_id'] for x in dex})
-            _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
+            _print_if(args.verbose,
+                      "Getting the sequences files for %s" % (curgene))
             exfasta = get_exons_sequences(lexid)
             extable = get_biomart_exons_annot(args.species, curgene)
             if extable is None:
@@ -709,15 +712,16 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
                 # orthotaxon = ortholog['target']['taxon_id']
                 ortho_name = "%s:%s" % (orthospecies, orthoid)
                 _print_if(args.verbose,
-                        "Getting exons information for %s" % (ortho_name))
+                          "Getting exons information for %s" % (ortho_name))
                 dexortho = get_listofexons(orthoid)
                 lexidortho = list({x['exon_id'] for x in dexortho})
                 _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
                 exorthofasta = get_exons_sequences(lexidortho)
-                _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
+                _print_if(args.verbose,
+                          "  - %d fasta sequences" % (len(exorthofasta)))
                 ortho_exontable = get_biomart_exons_annot(orthospecies,
-                                                        orthoid,
-                                                        header=False)
+                                                          orthoid,
+                                                          header=False)
                 if ortho_exontable is None:
                     warnings.warn('Download failed for {} in {}! '.format(
                         orthoid, orthospecies))
