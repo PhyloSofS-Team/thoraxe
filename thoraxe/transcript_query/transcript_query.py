@@ -160,7 +160,9 @@ def parse_command_line():
     parser.add_argument('genename',
                         type=str,
                         help='gene name in Ensembl (e.g. MAPK8) or the '
-                        'Ensembl stable ID (e.g ENSG00000107643)')
+                        'Ensembl Stable ID (e.g ENSG00000107643). '
+                        'Note that the Stable ID can not include a version '
+                        'number at the end.')
     parser.add_argument('-s',
                         '--species',
                         help='species to look for the gene name',
@@ -686,50 +688,48 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # TO DO revert to multiple files if it is easier
     ffasta = os.path.join(query_result_subdir, "sequences.fasta")
     fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")
-    fastaout = open(ffasta, "w")
-    exonstableout = open(fexonstable, "w")
-    dex = get_listofexons(curgene)
-    lexid = list({x['exon_id'] for x in dex})
-    _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
-    exfasta = get_exons_sequences(lexid)
-    extable = get_biomart_exons_annot(args.species, curgene)
-    if extable is None:
-        _store_errors(query_result_subdir, args.species, curgene)
-        sys.exit(1)
-    extable = _rename(extable)
-    exonstableout.write(extable)
-    exons_name = "%s:%s" % (args.species, args.genename)
-    for dseq in exfasta:
-        dictseq2fasta(dseq, exons_name, fastaout)
-    for ortholog in orthologs_filtered:
-        orthoid = ortholog['target']['id']
-        orthospecies = ortholog['target']['species']
-        # orthotaxon = ortholog['target']['taxon_id']
-        ortho_name = "%s:%s" % (orthospecies, orthoid)
-        _print_if(args.verbose,
-                  "Getting exons information for %s" % (ortho_name))
-        dexortho = get_listofexons(orthoid)
-        lexidortho = list({x['exon_id'] for x in dexortho})
-        _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
-        exorthofasta = get_exons_sequences(lexidortho)
-        _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
-        ortho_exontable = get_biomart_exons_annot(orthospecies,
-                                                  orthoid,
-                                                  header=False)
-        if ortho_exontable is None:
-            warnings.warn('Download failed for {} in {}! '.format(
-                orthoid, orthospecies))
-            _store_errors(query_result_subdir, orthospecies, orthoid)
-            continue
+    with open(ffasta, "w") as fastaout:
+        with  open(fexonstable, "w") as exonstableout:
+            dex = get_listofexons(curgene)
+            lexid = list({x['exon_id'] for x in dex})
+            _print_if(args.verbose, "Getting the sequences files for %s" % (curgene))
+            exfasta = get_exons_sequences(lexid)
+            extable = get_biomart_exons_annot(args.species, curgene)
+            if extable is None:
+                _store_errors(query_result_subdir, args.species, curgene)
+                sys.exit(1)
+            extable = _rename(extable)
+            exonstableout.write(extable)
+            exons_name = "%s:%s" % (args.species, args.genename)
+            for dseq in exfasta:
+                dictseq2fasta(dseq, exons_name, fastaout)
+            for ortholog in orthologs_filtered:
+                orthoid = ortholog['target']['id']
+                orthospecies = ortholog['target']['species']
+                # orthotaxon = ortholog['target']['taxon_id']
+                ortho_name = "%s:%s" % (orthospecies, orthoid)
+                _print_if(args.verbose,
+                        "Getting exons information for %s" % (ortho_name))
+                dexortho = get_listofexons(orthoid)
+                lexidortho = list({x['exon_id'] for x in dexortho})
+                _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
+                exorthofasta = get_exons_sequences(lexidortho)
+                _print_if(args.verbose, "  - %d fasta sequences" % (len(exorthofasta)))
+                ortho_exontable = get_biomart_exons_annot(orthospecies,
+                                                        orthoid,
+                                                        header=False)
+                if ortho_exontable is None:
+                    warnings.warn('Download failed for {} in {}! '.format(
+                        orthoid, orthospecies))
+                    _store_errors(query_result_subdir, orthospecies, orthoid)
+                    continue
 
-        _print_if(
-            args.verbose, "  - %d lines in the exon table" %
-            (ortho_exontable.count("\n") + 1))
-        exonstableout.write(ortho_exontable)
-        for dseq in exorthofasta:
-            dictseq2fasta(dseq, ortho_name, fastaout)
-    fastaout.close()
-    exonstableout.close()
+                _print_if(
+                    args.verbose, "  - %d lines in the exon table" %
+                    (ortho_exontable.count("\n") + 1))
+                exonstableout.write(ortho_exontable)
+                for dseq in exorthofasta:
+                    dictseq2fasta(dseq, ortho_name, fastaout)
     print("------------------- transcript_query finished -------------------")
 
 
