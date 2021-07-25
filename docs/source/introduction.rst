@@ -28,7 +28,7 @@ For example, let's say you want to analyse *MAPK8* between human and mouse:
 .. tip::
    As gene names can have synonyms and clashes, it is safer to use the **Ensembl
    stable ID** instead. For example: 
-   `transcript_query ENSG00000107643 --specieslist homo_sapiens,mus_musculus`
+   ``transcript_query ENSG00000107643 --specieslist homo_sapiens,mus_musculus``
 
 
 [OPTIONAL] Add transcripts to the previously download data
