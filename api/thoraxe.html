@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>thoraxe package &mdash; ThorAxe 0.1.0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +32,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -176,9 +180,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="thoraxe-package">
+  <section id="thoraxe-package">
 <h1>thoraxe package<a class="headerlink" href="#thoraxe-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<section id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -226,16 +230,16 @@
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
+</section>
+<section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-thoraxe.thoraxe">
+</section>
+<section id="module-thoraxe.thoraxe">
 <span id="thoraxe-thoraxe-module"></span><h2>thoraxe.thoraxe module<a class="headerlink" href="#module-thoraxe.thoraxe" title="Permalink to this headline">¶</a></h2>
 <p>ThorAxe pipeline and script functions.</p>
 <dl class="py function">
-<dt id="thoraxe.thoraxe.add_s_exon_phases_and_coordinates">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">add_s_exon_phases_and_coordinates</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tbl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.add_s_exon_phases_and_coordinates" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.add_s_exon_phases_and_coordinates">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">add_s_exon_phases_and_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tbl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.add_s_exon_phases_and_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add s-exon genomic coordinates and phases to the tidy s-exon table.</p>
 <p>For each s-exon, it add the <code class="docutils literal notranslate"><span class="pre">S_exon_Genomic_Sequence</span></code> and their genomic
 coordinates, starting at <code class="docutils literal notranslate"><span class="pre">1</span></code> and defining the closed interval:
@@ -290,8 +294,8 @@ previous s-exon.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.create_chimeric_msa">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">create_chimeric_msa</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene2speciesname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected_subexons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_col_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ProGraphMSA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XXXXXXXXXX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_single_subexons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.create_chimeric_msa" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.create_chimeric_msa">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">create_chimeric_msa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene2speciesname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected_subexons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_col_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ProGraphMSA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XXXXXXXXXX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_single_subexons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.create_chimeric_msa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dict from cluster to cluster data.</p>
 <p>For each cluster, there is a tuple with the subexon dataframe, the
 chimeric sequences and the msa.</p>
@@ -301,20 +305,20 @@ identifiers from subexon_table are used.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.get_s_exon_msas">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">get_s_exon_msas</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_s_exon_msas" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.get_s_exon_msas">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">get_s_exon_msas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_s_exon_msas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dict of the s_exon MSAs.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.get_s_exons">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">get_s_exons</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene2speciesname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected_subexons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_identity_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ProGraphMSA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XXXXXXXXXX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disintegration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_single_subexons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_s_exons" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.get_s_exons">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">get_s_exons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene2speciesname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connected_subexons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_identity_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aligner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ProGraphMSA'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XXXXXXXXXX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">movements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disintegration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_single_subexons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_s_exons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform almost all the ThorAxe pipeline.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.get_subexons">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">get_subexons</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transcript_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_identity_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_subexons" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.get_subexons">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">get_subexons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transcript_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_identity_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_subexons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a DataFrame with subexon information and clustered exons.</p>
 <p>Exons are clustered according to their protein sequence using the blosum50
 matrix and the following arguments: minimum_len, coverage_cutoff,
@@ -322,46 +326,46 @@ percent_identity_cutoff, gap_open_penalty and gap_extend_penalty.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.get_transcripts">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">get_transcripts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tsl_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_transcripts" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.get_transcripts">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">get_transcripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tsl_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.get_transcripts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a DataFrame with the transcript information.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.main">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">main</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.main" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.main">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform Pipeline.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.merge_clusters">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">merge_clusters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.merge_clusters" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.merge_clusters">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">merge_clusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.merge_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge ‘Cluster’s that share subexons.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.parse_command_line">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">parse_command_line</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.parse_command_line" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.parse_command_line">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">parse_command_line</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.parse_command_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse command line.</p>
 <p>It uses argparse to parse thoraxe’ command line arguments and returns
 the argparse parser.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="thoraxe.thoraxe.update_subexon_table">
-<code class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></code><code class="sig-name descname"><span class="pre">update_subexon_table</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster2data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.update_subexon_table" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="thoraxe.thoraxe.update_subexon_table">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.thoraxe.</span></span><span class="sig-name descname"><span class="pre">update_subexon_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subexon_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster2data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.thoraxe.update_subexon_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the subexon table by adding the s-exon information.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-thoraxe.version">
+</section>
+<section id="module-thoraxe.version">
 <span id="thoraxe-version-module"></span><h2>thoraxe.version module<a class="headerlink" href="#module-thoraxe.version" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-thoraxe">
+</section>
+<section id="module-thoraxe">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-thoraxe" title="Permalink to this headline">¶</a></h2>
 <p>thoraxe: Pipeline to disentangle homology relationships between exons.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

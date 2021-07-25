@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Quick Introduction &mdash; ThorAxe 0.1.0 documentation</title>
@@ -13,6 +14,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +32,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -162,7 +166,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="quick-introduction">
+  <section id="quick-introduction">
 <h1>Quick Introduction<a class="headerlink" href="#quick-introduction" title="Permalink to this headline">¶</a></h1>
 <p><em>ThorAxe</em>  finds <em>s-exons</em>, i.e. potential orthologous exonic regions, and
 allows the creation of <em>Evolutionary Splicing Graphs (ESG)</em>. There are more
@@ -174,22 +178,29 @@ meant to be run in that order, being <cite>add_transcripts</cite> optional:</p>
 <p>You can check our <a class="reference external" href="https://www.youtube.com/watch?v=Z96985kX-uY">YouTube tutorial</a> to see how you can use <em>ThorAxe</em> and
 visualise the results.</p>
 </div>
-<div class="section" id="i-download-transcript-information-from-ensembl">
+<section id="i-download-transcript-information-from-ensembl">
 <h2>I. Download transcript information from Ensembl<a class="headerlink" href="#i-download-transcript-information-from-ensembl" title="Permalink to this headline">¶</a></h2>
 <p><cite>transcript_query</cite> downloads the information that <em>ThorAxe</em> needs from Ensembl;
-it only requires a gene name. You can find more information on our
+it only requires a gene name (as it appears on Ensembl) or an Ensembl stable ID
+(<cite>ENS…</cite>). You can find more information on our
 documentation for <a class="reference external" href="https://phylosofs-team.github.io/thoraxe/programs/transcript_query.html">transcript_query</a> or by running <cite>transcript_query -h</cite>.
 For example, let’s say you want to analyse <em>MAPK8</em> between human and mouse:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transcript_query</span> <span class="n">MAPK8</span> <span class="o">--</span><span class="n">specieslist</span> <span class="n">homo_sapiens</span><span class="p">,</span><span class="n">mus_musculus</span>
 </pre></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>As gene names can have synonyms and clashes, it is safer to use the <strong>Ensembl
+stable ID</strong> instead. For example:
+<cite>transcript_query ENSG00000107643 –specieslist homo_sapiens,mus_musculus</cite></p>
 </div>
-<div class="section" id="optional-add-transcripts-to-the-previously-download-data">
+</section>
+<section id="optional-add-transcripts-to-the-previously-download-data">
 <h2>[OPTIONAL] Add transcripts to the previously download data<a class="headerlink" href="#optional-add-transcripts-to-the-previously-download-data" title="Permalink to this headline">¶</a></h2>
 <p>If you have transcripts that are not available at Ensembl, e.g. data coming
 from your experiments, you can manually add them using <a class="reference external" href="https://phylosofs-team.github.io/thoraxe/programs/add_transcripts.html">add_transcripts</a>.</p>
-</div>
-<div class="section" id="ii-run-thoraxe">
+</section>
+<section id="ii-run-thoraxe">
 <h2>II. Run ThorAxe<a class="headerlink" href="#ii-run-thoraxe" title="Permalink to this headline">¶</a></h2>
 <p>Finally, you need to run <cite>thoraxe</cite> on that data. There are multiple
 configuration options that you can check in the <a class="reference external" href="https://phylosofs-team.github.io/thoraxe/programs/thoraxe.html">thoraxe</a> documentation or by
@@ -197,8 +208,8 @@ running <cite>thoraxe -h</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">thoraxe</span> <span class="o">-</span><span class="n">i</span> <span class="n">MAPK8</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

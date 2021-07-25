@@ -15,13 +15,21 @@ I. Download transcript information from Ensembl
 -----------------------------------------------
 
 `transcript_query` downloads the information that *ThorAxe* needs from Ensembl; 
-it only requires a gene name. You can find more information on our 
+it only requires a gene name (as it appears on Ensembl) or an Ensembl stable ID 
+(`ENS...`). You can find more information on our 
 documentation for `transcript_query`_ or by running `transcript_query -h`. 
 For example, let's say you want to analyse *MAPK8* between human and mouse:
 
 ::
 
     transcript_query MAPK8 --specieslist homo_sapiens,mus_musculus
+
+
+.. tip::
+   As gene names can have synonyms and clashes, it is safer to use the **Ensembl
+   stable ID** instead. For example: 
+   `transcript_query ENSG00000107643 --specieslist homo_sapiens,mus_musculus`
+
 
 [OPTIONAL] Add transcripts to the previously download data
 -----------------------------------------------------------
