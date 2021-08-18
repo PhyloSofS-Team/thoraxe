@@ -269,6 +269,21 @@ def _genes_and_transcripts(paths, path_dict):
     return PathData(genes, transcripts)
 
 
+def _clean_subpath(subpath, delim="/"):
+    """
+    Add / to the subpath if needed to avoid partial s-exon matching.
+    """
+    first = subpath[0]
+    last = subpath[len(subpath)-1]
+    cleaned_subpath = ""
+    if first != "s":  # start
+        cleaned_subpath += delim
+    cleaned_subpath += subpath
+    if last != "p":  # stop 
+        cleaned_subpath += delim
+    return cleaned_subpath
+
+
 def _subpath_data(subpath, path_dict, subpath_dict):
     """
     Return the `PathData` for the given subpath.
@@ -278,7 +293,7 @@ def _subpath_data(subpath, path_dict, subpath_dict):
     if subpath not in subpath_dict:
         subpath_dict[subpath] = PathData(set(), set())
         for (path, path_data) in path_dict.items():
-            if subpath in path:
+            if _clean_subpath(subpath) in path:
                 subpath_dict[subpath].Genes.update(path_data.Genes)
                 subpath_dict[subpath].Transcripts.update(path_data.Transcripts)
     return subpath_dict[subpath]
