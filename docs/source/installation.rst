@@ -44,7 +44,7 @@ In *Ubuntu*, you may need to use `python3` instead of `python`.
 
 ::
 
-   python3 -m pip install thorax
+   python3 -m pip install thoraxe
 
 Installation from source
 ------------------------
