@@ -423,12 +423,15 @@ def get_genetree(ensgeneid, **params):
     Get the gene tree around the gene geneid as of now, the whole tree
     is returned.
     """
-    params.setdefault('object_type', 'gene')
-    params.setdefault('nh_format', 'full')  # 'species'
-    params.setdefault('aligned', '1')
-    ext_genetree = '/genetree/member/id/{0}?'.format(ensgeneid)
-    request = generic_ensembl_rest_request(ext_genetree, params, NHTREE)
-    return request.text
+    url = "https://rest.ensembl.org/genetree/member/id/{0}?object_type=gene&nh_format=full&aligned=1".format(ensgeneid)
+    response = requests.get(url, headers=NHTREE)
+    if response.status_code == 400 and "No GeneTree found" in response.text:
+        warnings.warn("No gene tree found for gene id {}".format(ensgeneid))
+        return None
+    if not (response.status_code == 200 and response.text and response.text[0] == "("):
+        response = _request_ensembl_redirect(url, headers=NHTREE)
+    
+    return response.text
 
 
 def get_orthologs(ensgeneid, **params):
@@ -446,6 +449,9 @@ def get_orthologs(ensgeneid, **params):
     request = generic_ensembl_rest_request(ext_orthologs, params, HJSON)
     res = request.json()
     dortho = res['data'][0]['homologies']
+    if not dortho:
+        raise Exception(
+            "Ensembl does not have annotated orthologs for {}".format(ensgeneid))
     # keep only binomial species names:
     dortho = [d for d in dortho if len(d['target']['species'].split('_')) == 2]
     return dortho
@@ -644,8 +650,9 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
     print("Writing the gene tree")
     tree_text = get_genetree(curgene)
-    with open(os.path.join(query_result_subdir, "tree.nh"), "w") as treeout:
-        treeout.write(tree_text)
+    if tree_text is not None:
+        with open(os.path.join(query_result_subdir, "tree.nh"), "w") as treeout:
+            treeout.write(tree_text)
 
     print("Looking for orthologs")
     orthologs = get_orthologs(curgene)
