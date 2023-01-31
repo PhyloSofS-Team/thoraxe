@@ -34,9 +34,10 @@ jobs:
           export PYTEST_ADDOPTS="--pylint"
           python setup.py test
       - name: Coverage
-        run: coveralls
+        run: |
+          coveralls
       - name: Documentation
-        - run: |
+        run: |
             export SPHINX_APIDOC_OPTIONS=members
             sphinx-apidoc -o docs/source/api thoraxe
             sphinx-build docs/source docs/build/html
