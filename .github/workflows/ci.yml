@@ -36,7 +36,7 @@ jobs:
           python setup.py test
           coveralls
         env:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Documentation
         run: |
             export SPHINX_APIDOC_OPTIONS=members
