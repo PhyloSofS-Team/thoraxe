@@ -17,6 +17,7 @@ Args = collections.namedtuple('Args', ['input', 'ensembl'])
 
 def _is_windows():
     """Return True in Windows."""
+    print(f"platform.system() -> {platform.system()}")
     return platform.system() == 'Windows'
 
 
