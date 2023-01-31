@@ -35,7 +35,7 @@ jobs:
           export PYTEST_ADDOPTS="--pylint"
           python setup.py test
           coveralls
-        with:
+        env:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Documentation
         run: |
