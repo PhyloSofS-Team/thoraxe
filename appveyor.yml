@@ -27,5 +27,5 @@ install:
 build: false
 
 test_script:
-  - "python -m pytest"
+  - "python setup.py test"
   - "codecov.exe"
