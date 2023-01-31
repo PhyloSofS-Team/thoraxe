@@ -30,16 +30,13 @@ jobs:
           pip install -r requirements.txt
           python -m pip install .
           python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
-      - name: Test and Lint
+      - name: Test, Lint and Coverage
         run: |
           export PYTEST_ADDOPTS="--pylint"
           python setup.py test
           coveralls
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./coveralls/lcov.info
       - name: Documentation
         run: |
             export SPHINX_APIDOC_OPTIONS=members
