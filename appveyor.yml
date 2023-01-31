@@ -1,27 +1,21 @@
 # https://github.com/coala/coala-quickstart/blob/master/.ci/appveyor.yml
 environment:
   matrix:
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: "3.6"
-      PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: "3.7"
-      PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python38-x64"
+    - PYTHON: "C:\\Python38-x64" # security : end-of-life 2024-10
       PYTHON_VERSION: "3.8"
       PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Python311-x64" # bugfix : end-of-life 2027-10
+      PYTHON_VERSION: "3.11"
+      PYTHON_ARCH: "64"
+    # https://devguide.python.org/versions/#versions
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "python -m pip install --upgrade setuptools pip wheel"
-  - "python -m pip install coveralls codecov"
-  - "pip install -r requirements.txt"
-  - "pip install typing-extensions==4.1.1"
-  - "pip install pytest"
-  - "python setup.py bdist_wheel"
-  - "pip install dist/thoraxe-0.7.2-py3-none-any.whl"
+  - "python -m pip install --upgrade pytest coveralls codecov"
+  - "python setup.py install"
   - ps: (new-object net.webclient).DownloadFile('https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86win32.exe', 'C:\\projects\\thoraxe\\muscle.exe')
 
 build: false
