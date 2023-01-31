@@ -22,6 +22,7 @@ jobs:
           chmod a+x ./prographmsa/bin/ProGraphMSA_64
           sudo cp ./prographmsa/bin/ProGraphMSA_64 /bin/ProGraphMSA
           rm -fr prographmsa # clean up
+          sudo apt-get install -y lcov
           python -m pip install --upgrade pip
           python -m pip install 'numpy==1.19.5'
           pip install pytest pylint
