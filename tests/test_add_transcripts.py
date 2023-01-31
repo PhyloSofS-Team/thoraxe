@@ -71,6 +71,7 @@ def test_add_transcripts(monkeypatch, request, set_out_dir, copy_mapk8_dir):
     # Set aligner to run ThorAxe
     aligner = 'ProGraphMSA'
     if utils.windows.is_windows():
+        print(f"WSL: {shutil.which('wsl')}")
         if shutil.which('wsl') is not None:  # ProGraphSA in the WSL
             status, _ = subprocess.getstatusoutput(
                 ['wsl', 'ProGraphMSA', '-h'])
