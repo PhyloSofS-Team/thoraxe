@@ -2,23 +2,17 @@ import collections
 import os
 import shutil
 import sys
-import platform
 import subprocess
 import warnings
 import pytest
 
 import pandas as pd
 import thoraxe
+from thoraxe import utils
 from thoraxe import add_transcripts
 from thoraxe.transcript_info import read_exon_file
 
 Args = collections.namedtuple('Args', ['input', 'ensembl'])
-
-
-def _is_windows():
-    """Return True in Windows."""
-    name = platform.system().lower()
-    return name[0:3] == 'win'
 
 
 # https://stackoverflow.com/a/12514470/1846377
@@ -76,7 +70,7 @@ def test_add_transcripts(monkeypatch, request, set_out_dir, copy_mapk8_dir):
 
     # Set aligner to run ThorAxe
     aligner = 'ProGraphMSA'
-    if _is_windows():
+    if utils.windows.is_windows():
         if shutil.which('wsl') is not None:  # ProGraphSA in the WSL
             status, _ = subprocess.getstatusoutput(
                 ['wsl', 'ProGraphMSA', '-h'])

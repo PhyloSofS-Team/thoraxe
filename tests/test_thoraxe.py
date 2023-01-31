@@ -6,11 +6,7 @@ import subprocess
 import pytest
 
 import thoraxe
-
-
-def _is_windows():
-    """Return True in Windows."""
-    return platform.system() == 'Windows'
+from thoraxe import utils
 
 
 @pytest.fixture(scope='module')
@@ -22,7 +18,7 @@ def set_out_dir():
 
 def test_thoraxe(monkeypatch, request, set_out_dir):
     aligner = 'ProGraphMSA'
-    if _is_windows():
+    if utils.windows.is_windows():
         if shutil.which('wsl') is not None:  # ProGraphSA in the WSL
             status, _ = subprocess.getstatusoutput(
                 ['wsl', 'ProGraphMSA', '-h'])

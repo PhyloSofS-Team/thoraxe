@@ -25,6 +25,8 @@ from Bio.Alphabet import IUPAC
 from Bio import BiopythonWarning
 from recordclass import recordclass
 
+from thoraxe import utils
+
 ORTHO_GROUP_PATTERN = re.compile("^[0-9]+_[0-9]+")
 
 ColPattern = collections.namedtuple('ColPattern', ['pattern', 'start', 'end'])
@@ -297,7 +299,7 @@ def run_aligner(chimerics,
     command = aligner.split()
 
     wsl = _get_wsl_name(command[0])
-    is_wsl = platform.system() == 'Windows' and wsl is not None
+    is_wsl = utils.windows.is_windows() and wsl is not None
 
     if '--input_order' not in command:
         command.append('--input_order')
