@@ -15,15 +15,16 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
-  - "python -m pip install --upgrade setuptools pip"
+  - "python -m pip install --upgrade setuptools pip wheel"
   - "python -m pip install coveralls codecov"
   - "pip install -r requirements.txt"
   - "pip install typing-extensions==4.1.1"
-  - "python -m pip install . --use-pep517"
+  - "python setup.py bdist_wheel"
+  - "pip install dist/*.whl"
   - ps: (new-object net.webclient).DownloadFile('https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86win32.exe', 'C:\\projects\\thoraxe\\muscle.exe')
 
 build: false
 
 test_script:
-  - "python setup.py test"
+  - "python -m pytest"
   - "codecov.exe"
