@@ -19,6 +19,7 @@ install:
   - "python -m pip install coveralls codecov"
   - "pip install -r requirements.txt"
   - "pip install typing-extensions==4.1.1"
+  - "pip install pytest"
   - "python setup.py bdist_wheel"
   - "pip install dist/thoraxe-0.7.2-py3-none-any.whl"
   - ps: (new-object net.webclient).DownloadFile('https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86win32.exe', 'C:\\projects\\thoraxe\\muscle.exe')
