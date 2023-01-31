@@ -36,8 +36,7 @@ jobs:
       - name: Coverage
         run: |
           coveralls
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Documentation
         run: |
             export SPHINX_APIDOC_OPTIONS=members
