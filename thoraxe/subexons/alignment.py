@@ -323,10 +323,8 @@ def run_aligner(chimerics,
             subprocess.call(command)
         except (OSError, FileNotFoundError) as err:
             if shutil.which(command[0]) is None:
-                raise OSError(
-                    '{} not found. '.format(aligner) +
-                    'Please indicate the path to ProGraphMSA or install it ' +
-                    'from https://github.com/acg-team/ProGraphMSA') from err
+                message = '{} not found. Please indicate the path to ProGraphMSA or install it from https://github.com/acg-team/ProGraphMSA'.format(aligner)
+                raise OSError(message) from err
             raise err
 
     return output_path
