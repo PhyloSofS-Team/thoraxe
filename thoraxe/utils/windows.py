@@ -6,5 +6,7 @@ import platform
 
 def is_windows():
     """Return True in Windows."""
-    name = platform.system().lower()
+    current_platform = platform.system()
+    print(f"Current platform: {current_platform}")
+    name = current_platform.lower()
     return name[0:3] == 'win'
