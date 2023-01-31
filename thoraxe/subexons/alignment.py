@@ -1215,7 +1215,7 @@ def get_subexon_boundaries(col_clusters):
     """
     Returns a dict from (sequence number, subexon id) to start and end columns.
     """
-    boundaries = dict()
+    boundaries = {}
     for cluster in col_clusters:
         for (seq, subexon) in enumerate(cluster.consensus):
             if not np.isnan(subexon):
