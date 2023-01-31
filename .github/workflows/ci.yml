@@ -36,6 +36,8 @@ jobs:
       - name: Coverage
         run: |
           coveralls
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Documentation
         run: |
             export SPHINX_APIDOC_OPTIONS=members
@@ -45,5 +47,5 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.DOCS }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/build/html/*
