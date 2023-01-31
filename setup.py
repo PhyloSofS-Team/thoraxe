@@ -20,7 +20,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English', 'Programming Language :: Python :: 3'
     ],
-    python_requires=">=3.6.1,<3.10",  # pandas & numpy
+    python_requires=">=3.6.1,<3.9",  # pandas & numpy <3.10, network <3.9
     entry_points={
         'console_scripts': [
             'transcript_query=thoraxe.transcript_query:main',
