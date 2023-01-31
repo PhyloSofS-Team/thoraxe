@@ -624,7 +624,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if is_esemble_id(args.genename):
         curgene = args.genename
     else:
-        print(f"Searching ID for gene with name {args.genename} in species {args.specie} ...")
+        print(f"Searching ID for gene with name {args.genename} in species {args.species} ...")
         geneids = get_geneids_from_symbol(args.species, args.genename)
         _print_if(
             args.verbose,

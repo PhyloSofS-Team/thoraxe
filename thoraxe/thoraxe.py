@@ -5,7 +5,7 @@ ThorAxe pipeline and script functions.
 import argparse
 import os
 from ast import literal_eval
-from Bio.Alphabet import generic_protein
+from Bio.Alphabet import generic_protein # pylint: disable=no-name-in-module
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Align import MultipleSeqAlignment
@@ -449,7 +449,7 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
 
             if movements or disintegration:
                 msa = MultipleSeqAlignment([
-                    SeqRecord(Seq(row.tostring().decode('utf-8'),
+                    SeqRecord(Seq(row.tostring().decode('utf-8'), # pylint: disable=too-many-function-args,line-too-long
                                   generic_protein),
                               id=gene_id)
                     for (gene_id, row) in zip(gene_ids, msa_numpy)
@@ -457,9 +457,9 @@ def get_s_exons(  # noqa pylint: disable=too-many-arguments,too-many-locals
                 # cluster2data[cluster] = (subexon_df, chimerics, msa)
             with open(
                     _outfile(intermediate_output_path, "gene_ids_", cluster,
-                             ".txt"), 'w') as outfile:
+                             ".txt"), 'w', encoding="utf-8") as outfile:
                 for item in gene_ids:
-                    outfile.write("%s\n" % item)
+                    outfile.write(f"{item}\n")
 
             np.savetxt(_outfile(intermediate_output_path, "msa_matrix_",
                                 cluster, ".txt"),
@@ -734,7 +734,7 @@ def get_s_exon_msas(output_folder):
     for msa_file in msa_files:
         if 'msa_s_exon_' in msa_file and '.fasta' in msa_file:
             fields = msa_file.split('_')
-            s_exon = f'{fields[3]}_{fields[4].split('.')[0]}'
+            s_exon = f'{fields[3]}_{fields[4].split(".")[0]}'
             s_exon_msas[s_exon] = subexons.alignment.read_msa_fasta(
                 os.path.join(msa_path, msa_file))
     return s_exon_msas
