@@ -55,7 +55,7 @@ def parse_command_line():
                         action='store_true')
     parser.add_argument('--version',
                         action='version',
-                        version='ThorAxe version {}'.format(__version__))
+                        version=f'ThorAxe version {__version__}')
 
     return parser
 
@@ -116,7 +116,7 @@ def _check_col_names(input_df):
     for col in COLUMN_NAMES:
         if col not in input_df.columns:
             raise Exception(
-                'The {} column is missing in the input table.'.format(col))
+                f'The {col} column is missing in the input table.')
     for col in input_df.columns:
         if col not in COLUMN_NAMES:
             logging.warning('The %s column is not going to be used', col)
@@ -126,8 +126,7 @@ def _check_transcript(input_df, exontable):
     for transcript in input_df['TranscriptID'].unique():
         if _in(transcript, exontable['TranscriptID']):
             raise Exception(
-                'TranscriptID {} is already in the Ensembl data!'.format(
-                    transcript))
+                f'TranscriptID {transcript} is already in the Ensembl data!')
 
 
 def _format_df(data):
@@ -153,14 +152,14 @@ def _check_exon(input_df, exontable):
             new_exon = input_df[input_df.ExonID ==
                                 exon][exon_columns].drop_duplicates()
             if not (previous_exon.values == new_exon.values).all():
-                raise Exception('''
-Exon {} is already in the Ensembl data with different values!
+                raise Exception(f'''
+Exon {exon} is already in the Ensembl data with different values!
                     
 Exon data at Ensembl: 
-{}
+{_format_df(previous_exon)}
 
 New exon data:
-{}'''.format(exon, _format_df(previous_exon), _format_df(new_exon)))
+{_format_df(new_exon)}''')
 
 
 def _check_species_name(input_df):
@@ -169,13 +168,12 @@ def _check_species_name(input_df):
         name = row.Species
         if not name.islower():
             raise Exception(
-                'Error with {}: Species name should be lowercase, {}'.format(
-                    name, example))
+                f'Error with {name}: Species name should be lowercase, {example}')
         if len(name.split('_')) != 2:
             raise Exception(
-                'Error with {}:'.format(name) +
+                f'Error with {name}:' +
                 'Species name should be binomial, and the terms should be '
-                'separated by underscore, {}'.format(example))
+                f'separated by underscore, {example}')
 
 
 def _check_pair_order(input_df):
@@ -226,7 +224,7 @@ def add_to_exontable(input_df, exontable):
             {
                 'GeneID': row.GeneID,
                 'TranscriptID': row.TranscriptID,
-                'ProteinID': "{}_PROTEIN".format(row.TranscriptID),
+                'ProteinID': f"{row.TranscriptID}_PROTEIN",
                 'Strand': row.Strand,
                 'ExonID': row.ExonID,
                 'ExonRegionStart': row.ExonRegionStart,
@@ -269,14 +267,12 @@ def add_sequences(input_df, seqrecords):
     It modifies seqrecords by appending the new sequences.
     """
     for row in input_df.itertuples():
-        name = '{}:{}'.format(row.Species, row.GeneID)
+        name = f'{row.Species}:{row.GeneID}'
         seqrecords.append(
             SeqRecord(Seq(row.NucleotideSequence, SingleLetterAlphabet()),
                       id=name,
                       name=name,
-                      description='{}:{} {} na:na:na:{}:{}:{}'.format(
-                          row.Species, row.GeneID, row.ExonID,
-                          row.ExonRegionStart, row.ExonRegionEnd, row.Strand)))
+                      description=f'{row.Species}:{row.GeneID} {row.ExonID} na:na:na:{row.ExonRegionStart}:{row.ExonRegionEnd}:{row.Strand}'))
 
 
 def main():

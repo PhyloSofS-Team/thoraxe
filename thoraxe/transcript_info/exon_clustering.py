@@ -45,7 +45,7 @@ def percent_identity(query, target):
     """
     aln_len = len(query)
     if aln_len != len(target):
-        warnings.warn('{} and {} have different lengths'.format(query, target))
+        warnings.warn(f'{query} and {target} have different lengths')
         return np.nan
 
     identical = 0

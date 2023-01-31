@@ -145,7 +145,7 @@ def parse_command_line():
         default='')
     parser.add_argument('--version',
                         action='version',
-                        version='ThorAxe version {}'.format(__version__))
+                        version=f'ThorAxe version {__version__}')
     return parser
 
 
@@ -734,7 +734,7 @@ def get_s_exon_msas(output_folder):
     for msa_file in msa_files:
         if 'msa_s_exon_' in msa_file and '.fasta' in msa_file:
             fields = msa_file.split('_')
-            s_exon = '{}_{}'.format(fields[3], fields[4].split('.')[0])
+            s_exon = f'{fields[3]}_{fields[4].split('.')[0]}'
             s_exon_msas[s_exon] = subexons.alignment.read_msa_fasta(
                 os.path.join(msa_path, msa_file))
     return s_exon_msas

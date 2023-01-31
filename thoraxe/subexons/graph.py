@@ -142,24 +142,20 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
             transcript_fraction = 100.0 * (len(transcripts) / n_transcripts)
             genes_str = ','.join(sorted(genes))
             transcripts_str = ','.join(sorted(transcripts))
-            out_str = '''
+            out_str = f'''
                 node [
-                    id {}
-                    label "{}"
-                    transcript_fraction {}
-                    conservation {}
-                    genes "{}"
-                    transcripts "{}"'''.format(node_id, node,
-                                               transcript_fraction,
-                                               conservation, genes_str,
-                                               transcripts_str)
+                    id {node_id}
+                    label "{node}"
+                    transcript_fraction {transcript_fraction}
+                    conservation {conservation}
+                    genes "{genes_str}"
+                    transcripts "{transcripts_str}"'''
             if s_exon_2_char and node not in ['start', 'stop']:
-                out_str += '''
-                    phylosofs "{}"'''.format(s_exon_2_char[node])
+                out_str += f'''
+                    phylosofs "{s_exon_2_char[node]}"'''
                 if node[:1] != '0':
-                    out_str += '''
-                    consensus "{}"'''.format(
-                        alignment.get_consensus(s_exons_msas[node]))
+                    out_str += f'''
+                    consensus "{alignment.get_consensus(s_exons_msas[node])}"'''
             out_str += '''
                 ]
             '''
@@ -173,19 +169,17 @@ def splice_graph_gml(  # pylint: disable=too-many-locals, too-many-arguments
             transcript_weighted_conservation = edge2trx_cons[edge]
             genes_str = ','.join(sorted(genes))
             transcripts_str = ','.join(sorted(transcripts))
-            gml.write('''
+            gml.write(f'''
                 edge [
-                    source {}
-                    target {}
-                    transcript_fraction {}
-                    conservation {}
-                    transcript_weighted_conservation {}
-                    genes "{}"
-                    transcripts "{}"
+                    source {node2id[edge[0]]}
+                    target {node2id[edge[1]]}
+                    transcript_fraction {transcript_fraction}
+                    conservation {conservation}
+                    transcript_weighted_conservation {transcript_weighted_conservation}
+                    genes "{genes_str}"
+                    transcripts "{transcripts_str}"
                 ]
-            '''.format(node2id[edge[0]], node2id[edge[1]], transcript_fraction,
-                       conservation, transcript_weighted_conservation,
-                       genes_str, transcripts_str))
+            ''')
         gml.write('''
         ]
         ''')

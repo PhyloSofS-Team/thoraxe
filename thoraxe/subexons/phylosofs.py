@@ -96,8 +96,7 @@ def get_s_exon2char(s_exons):
                 i += 1
             else:
                 raise Exception(
-                    'PhyloSofS can not parse more than {} s-exons.'.format(
-                        MAX_EXONS))
+                    f'PhyloSofS can not parse more than {MAX_EXONS} s-exons.')
     return s_exons_chars
 
 
@@ -167,8 +166,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
             tree.prune(clade)
         except ValueError as err:
             raise Exception(
-                'Error with protein {} while prunning the tree {} : {}'.format(
-                    clade, tree, err)) # from err
+                f'Error with protein {clade} while prunning the tree {tree} : {err}') # from err
 
     # Use gene id instead of protein/peptide/translation id in the tree
     for clade in tree.get_terminals():
@@ -212,8 +210,7 @@ def _transcript_pir(s_exon_data, output_file, s_exon2char,
                     ['GeneID', 'TranscriptIDCluster'])
         for (gene, transcript), group in groups:
             seq, annot = _fill_sequence_and_annotation(group, s_exon2char)
-            file.write(">P1;{} {} {}\n".format(
-                gene, transcript, transcript2phylosofs[transcript]))
+            file.write(f">P1;{gene} {transcript} {transcript2phylosofs[transcript]}\n")
             file.write(annot + "\n")
             file.write(seq + "*\n")
     return output_file
@@ -226,7 +223,7 @@ def _save_transcripts(s_exon_data, output_file, transcript2phylosofs):
             'GeneID', 'TranscriptIDCluster'
         ]].sort_values(by=['GeneID', 'TranscriptIDCluster']).drop_duplicates()
         for gene, group in gene_transcripts.groupby('GeneID'):
-            file.write("{} ".format(gene))
+            file.write(f"{gene} ")
             transcripts = group['TranscriptIDCluster']
             n_transcripts = len(transcripts)
             for i in range(n_transcripts):
@@ -255,7 +252,7 @@ def phylosofs_inputs(s_exon_data, ensembl_folder, output_folder):
     with open(os.path.join(output_path, 's_exons.tsv'), 'w',
               encoding='utf-8') as file:
         for exon, char in s_exon2char.items():
-            file.write("{}\t{}\n".format(exon, char))
+            file.write(f"{exon}\t{char}\n")
 
     _save_transcripts(s_exon_data, os.path.join(output_path,
                                                 'transcripts.txt'),

@@ -54,7 +54,7 @@ def create_python_structure(cluster2data):
             for subexon in row
         ] for row in msa_matrix]
 
-        structured_data['cluster_{}'.format(cluster)] = {
+        structured_data[f'cluster_{cluster}'] = {
             'x': list(range(0, msa.get_alignment_length())),
             'y': gene_ids,
             'z_cluster': msa_matrix.tolist(),

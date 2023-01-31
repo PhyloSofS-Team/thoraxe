@@ -199,7 +199,7 @@ def _print_fasta(chimerics, stream):
     for (key, value) in chimerics.items():
         chimeric = value[0]
         if chimeric:
-            stream.write('>{}\n{}\n'.format(key, chimeric))
+            stream.write(f'>{key}\n{chimeric}\n')
 
 
 def _print_temporal_fasta(chimerics):
@@ -261,7 +261,7 @@ def _win2wsl(path):
         return '/mnt/' + drive + path[2:].replace('\\', '/')
 
     raise ValueError(
-        '{} is not an absolute Windows path to a file.'.format(path))
+        f'{path} is not an absolute Windows path to a file.')
 
 
 def run_aligner(chimerics,
@@ -313,8 +313,7 @@ def run_aligner(chimerics,
             subprocess.call(command)
         else:
             assert command[1] == '-c'
-            subprocess.call("{} -c '{}'".format(command[0],
-                                                ' '.join(command[2:])))
+            subprocess.call(f"{command[0]} -c '{' '.join(command[2:])}'")
     else:
         try:
             command.append('--output')
@@ -324,7 +323,7 @@ def run_aligner(chimerics,
         except (OSError, FileNotFoundError) as err:
             if shutil.which(command[0]) is None:
                 raise OSError(
-                    '{} not found. '.format(aligner) +
+                    f'{aligner} not found. ' +
                     'Please indicate the path to ProGraphMSA or install it ' +
                     'from https://github.com/acg-team/ProGraphMSA') # from err
             raise err
@@ -820,9 +819,9 @@ def _store_s_exons(subexon_df, seq, subexon, gene, s_exon_id):
         subexon_df['GeneID'] == gene)
     value = subexon_df.loc[query, 'S_exons'].unique()[0]
     if '_' in value:
-        subexon_df.loc[query, 'S_exons'] += '/{}'.format(s_exon_id)
-        subexon_df.loc[query, 'S_exon_Lengths'] += '/{}'.format(length)
-        subexon_df.loc[query, 'S_exon_Sequences'] += '/{}'.format(seq)
+        subexon_df.loc[query, 'S_exons'] += f'/{s_exon_id}'
+        subexon_df.loc[query, 'S_exon_Lengths'] += f'/{length}'
+        subexon_df.loc[query, 'S_exon_Sequences'] += f'/{seq}'
     else:
         subexon_df.loc[query, 'S_exons'] = s_exon_id
         subexon_df.loc[query, 'S_exon_Lengths'] = str(length)
@@ -898,7 +897,7 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
         for (i, colcluster) in enumerate(colclusters):
             with open(
                     os.path.join(output_folder,
-                                 'msa_s_exon_{}_{}.fasta'.format(cluster, i)),
+                                 f'msa_s_exon_{cluster}_{i}.fasta'),
                     'w') as file:
                 for (j, subexon) in enumerate(colcluster.consensus):
                     if not np.isnan(subexon):
@@ -906,9 +905,9 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
                         seq = _delete_full_gap_columns(full_gaps, sequences[j],
                                                        colcluster.start,
                                                        colcluster.end + 1)
-                        file.write('>{}\n{}\n'.format(gene, seq))
+                        file.write(f'>{gene}\n{seq}\n')
                         _store_s_exons(subexon_df, seq, subexon, gene,
-                                       '{}_{}'.format(cluster, i))
+                                       f'{cluster}_{i}')
 
     return subexon_df
 

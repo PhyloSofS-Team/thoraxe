@@ -128,8 +128,7 @@ def read_tsl_file(tsl_file, max_tsl_level, remove_na=False, species_list=None):
     if to_delete:
         clusters.inform_about_deletions(
             to_delete,
-            "There are transcripts with TSL greater than {}{}:".format(
-                max_tsl_level, " or no TSL information" if remove_na else ""))
+            f"There are transcripts with TSL greater than {max_tsl_level}{' or no TSL information' if remove_na else ''}:")
 
     return tsl_data
 
@@ -261,8 +260,7 @@ def _get_exon_cds(exon_cdna_seq, cdna_coding_start, cdna_coding_end,
     if last_exon:
         return exon_cdna_seq[:cds_len]
 
-    raise ValueError('exon has {} bases instead of {}'.format(
-        cdna_len, cds_len))
+    raise ValueError(f'exon has {cdna_len} bases instead of {cds_len}')
 
 
 def _is_first_or_last_exon(row_list, row_index):

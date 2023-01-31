@@ -78,7 +78,7 @@ def _request_ensembl_retry(session, session_method, *args, **kargs):
     wait = response.headers.get('Retry-After')
     if wait:
         warnings.warn(
-            'Ensembl rate limit reached, waiting for {} seconds.'.format(wait))
+            f'Ensembl rate limit reached, waiting for {wait} seconds.')
         time.sleep(float(wait) + 1.0)
         response = getattr(session, session_method)(*args, **kargs)
 
@@ -122,8 +122,8 @@ def _request_ensembl_redirect(*args, **kargs):
     if response.ok:
         return response
 
-    warnings.warn('Failed request for args: {} kargs: {}'.format(args, kargs))
-    warnings.warn('Failed request output: {}'.format(response))
+    warnings.warn(f'Failed request for args: {args} kargs: {kargs}')
+    warnings.warn(f'Failed request output: {response}')
 
     return None
 
@@ -185,7 +185,7 @@ def parse_command_line():
                         action='store_true')
     parser.add_argument('--version',
                         action='version',
-                        version='ThorAxe version {}'.format(__version__))
+                        version=f'ThorAxe version {__version__}')
     # TO DO: take care of aliases for species names,symbol always use the
     # binomial names when running the code
 
@@ -218,7 +218,7 @@ def lodict2csv(listofdicts, out, fnames=None, header=True):
 def dictseq2fasta(dseq, geneid, out):
     """Write fasta sequences from the exons."""
     colw = 80
-    out.write(">%s %s %s\n" % (geneid, dseq['id'], dseq['desc']))
+    out.write(f">{geneid} {dseq['id']} {dseq['desc']}\n")
     exseq = dseq['seq']
     exseq = "\n".join([exseq[i:i + colw] for i in range(0, len(exseq), colw)])
     out.write(exseq + "\n")
@@ -282,8 +282,7 @@ def _biomart_exons_annot_request(dataset, geneid, header=True):
     try:
         req = _request_ensembl_redirect(biomart_request_url)
         if req.status_code >= 300:
-            warnings.warn('BioMart request status for {} in {}: {}.'.format(
-                geneid, dataset, req.status_code))
+            warnings.warn(f'BioMart request status for {geneid} in {dataset}: {req.status_code}.')
         response = req.text
     except Exception as err:  # pylint: disable=broad-except
         print(err)
@@ -302,9 +301,7 @@ def get_biomart_exons_annot(species_name, geneid, header=True):
         if _check_biomart_response(response):
             return response
 
-    warnings.warn(
-        'It can not found {} in biomart (tried: {}).\nLast response:\n{}'.
-        format(species_name, dataset_names, response))
+    warnings.warn(f'It can not found {species_name} in biomart (tried: {dataset_names}).\nLast response:\n{response}') # pylint: disable=line-too-long
 
     return None
 
@@ -323,7 +320,7 @@ def get_geneids_from_symbol(species, symbol, **params):
     example: get_geneids_from_symbol("human", "MAPK8")
     """
     params.setdefault('object_type', 'gene')
-    ext_geneid = '/xrefs/symbol/{0}/{1}?'.format(species, symbol)
+    ext_geneid = f'/xrefs/symbol/{species}/{symbol}?'
     request = generic_ensembl_rest_request(ext_geneid, params, HJSON)
     dnames = request.json()
     res = [dictionary["id"] for dictionary in dnames]
@@ -339,7 +336,7 @@ def get_listoftranscripts(ensgeneid, species, **params):
     """
     # TO DO filter on protein coding
     params.setdefault('feature', 'transcript')
-    ext_listtr = '/overlap/id/{0}?'.format(ensgeneid)
+    ext_listtr = f'/overlap/id/{ensgeneid}?'
     request = generic_ensembl_rest_request(ext_listtr, params, HJSON)
     dnames = request.json()
     for dictionary in dnames:
@@ -349,7 +346,7 @@ def get_listoftranscripts(ensgeneid, species, **params):
 
 def write_tsl_file(path, l_of_sptr):
     """Write a TSL file from a list of transcripts."""
-    with open(os.path.join(path, "tsl.csv"), "w") as csvout:
+    with open(os.path.join(path, "tsl.csv"), "w", encoding="utf-8") as csvout:
         # One trick to get the good names in the header
         other_names = [
             "Species", "Name", "TranscriptID", "Source", "ExperimentSource",
@@ -376,7 +373,7 @@ def get_listofexons(ensgeneid, **params):
     """
     params.setdefault('feature', 'exon')
     # could think about biotype = protein_coding here
-    ext_listex = '/overlap/id/{0}?'.format(ensgeneid)
+    ext_listex = f'/overlap/id/{ensgeneid}?'
     request = generic_ensembl_rest_request(ext_listex, params, HJSON)
     dexons = request.json()
     return dexons
@@ -416,18 +413,17 @@ def get_exons_sequences(listensexons):  # , **params):
     return list_res
 
 
-def get_genetree(ensgeneid, **params):
+def get_genetree(ensgeneid):
     """
     Return the gene tree.
 
     Get the gene tree around the gene geneid as of now, the whole tree
     is returned.
     """
-    url = "https://rest.ensembl.org/genetree/member/id/{0}?object_type=gene&nh_format=full&aligned=1".format(
-        ensgeneid)
-    response = requests.get(url, headers=NHTREE)
+    url = f"https://rest.ensembl.org/genetree/member/id/{ensgeneid}?object_type=gene&nh_format=full&aligned=1" # pylint: disable=line-too-long
+    response = requests.get(url, headers=NHTREE, timeout=1800) # 30 min timeout
     if response.status_code == 400 and "No GeneTree found" in response.text:
-        warnings.warn("No gene tree found for gene id {}".format(ensgeneid))
+        warnings.warn(f"No gene tree found for gene id {ensgeneid}")
         return None
     if not (response.status_code == 200 and response.text
             and response.text[0] == "("):
@@ -447,14 +443,13 @@ def get_orthologs(ensgeneid, **params):
     # Aussi avoir une option pour filtrer les espèces qui vont être regardées
     # On a besoin de stocker aussi l'info général sur les orthologues
     # pour plus tard
-    ext_orthologs = '/homology/id/{0}'.format(ensgeneid)
+    ext_orthologs = f'/homology/id/{ensgeneid}'
     request = generic_ensembl_rest_request(ext_orthologs, params, HJSON)
     res = request.json()
     dortho = res['data'][0]['homologies']
     if not dortho:
         raise Exception(
-            "Ensembl does not have annotated orthologs for {}".format(
-                ensgeneid))
+            f"Ensembl does not have annotated orthologs for {ensgeneid}")
     # keep only binomial species names:
     dortho = [d for d in dortho if len(d['target']['species'].split('_')) == 2]
     return dortho
@@ -480,7 +475,7 @@ def filter_ortho(dortho, species=None, relationship='1:n'):
     ]
     if dortho and not orthologs:
         raise Exception(
-            "There are not {} in the requested species.".format(relationships))
+            f"There are not {relationships} in the requested species.")
     return orthologs
 
 
@@ -577,11 +572,11 @@ def _store_errors(output_dir, species_name, geneid):
     """Save a CSV file with the species & gene pairs that has failed."""
     filename = os.path.join(output_dir, "errors.csv")
     if not os.path.isfile(filename):
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             file.write('Species,GeneID\n')
 
-    with open(filename, "a") as file:
-        file.write('{},{}\n'.format(species_name, geneid))
+    with open(filename, "a", encoding="utf-8") as file:
+        file.write(f'{species_name},{geneid}\n')
 
 
 def save_ensembl_version(output_folder):
@@ -589,12 +584,10 @@ def save_ensembl_version(output_folder):
     request = generic_ensembl_rest_request('/info/eg_version', {}, HJSON)
     res = request.json()
     with open(os.path.join(output_folder, 'ensembl_version.csv'),
-              'w') as outfile:
+              'w', encoding="utf-8") as outfile:
         outfile.write('Download_date,Download_time,Ensembl_version\n')
         now = datetime.now()
-        outfile.write('{},{},{}\n'.format(now.strftime('%d-%m-%Y'),
-                                          now.strftime('%H:%M'),
-                                          res['version']))
+        outfile.write(f'{now.strftime("%d-%m-%Y")},{now.strftime("%H:%M")},{res["version"]}\n')
 
 
 def is_esemble_id(name):
@@ -631,19 +624,18 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     if is_esemble_id(args.genename):
         curgene = args.genename
     else:
-        print("Searching ID for gene with name %s in species %s ..." %
-              (args.genename, args.species))
+        print(f"Searching ID for gene with name {args.genename} in species {args.specie} ...")
         geneids = get_geneids_from_symbol(args.species, args.genename)
         _print_if(
             args.verbose,
-            "Found the following list of ids: %s" % (json.dumps(geneids)))
+            f"Found the following list of ids: {json.dumps(geneids)}")
         if not geneids:
-            raise Exception("No results for {}".format(args.genename))
+            raise Exception(f"No results for {args.genename}")
         curgene = geneids[0]
-        print("... using gene id %s from now on." % (curgene))
+        print(f"... using gene id {curgene} from now on.")
 
     _print_if(args.verbose,
-              "Results will be saved in directory %s" % (cdirectory))
+              f"Results will be saved in directory {cdirectory}")
     query_result_subdir = os.path.join(cdirectory, "Ensembl")
     if not os.path.exists(cdirectory):
         os.makedirs(query_result_subdir)
@@ -655,7 +647,7 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     tree_text = get_genetree(curgene)
     if tree_text is not None:
         with open(os.path.join(query_result_subdir, "tree.nh"),
-                  "w") as treeout:
+                  "w", encoding="utf-8") as treeout:
             treeout.write(tree_text)
 
     print("Looking for orthologs")
@@ -663,15 +655,14 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
     _print_if(
-        args.verbose, "Found a total of %d orthologs, of which %d paralogs" %
-        (len(orthologs), nparalogs))
+        args.verbose, f"Found a total of {len(orthologs)} orthologs, of which {nparalogs} paralogs")
     # ['taxonomy_level']
     _print_if(args.verbose, "Orthologous species:")
     number = 0
     corthologs = Counter(
         [ortholog['target']['species'] for ortholog in orthologs])
     for i, j in corthologs.most_common():
-        _print_if(args.verbose, "  %-23s: %4d" % (i, j))
+        _print_if(args.verbose, "  %-23s: %4d" % (i, j)) # pylint: disable=consider-using-f-string,line-too-long
         # if nt > 5: break
         number += 1
     ##
@@ -687,26 +678,26 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
     tsl_cur, tsl_ortho = get_transcripts_orthologs(curgene, orthologs_filtered)
     write_tsl_file(query_result_subdir, [tsl_cur] + tsl_ortho)
 
-    _print_if(args.verbose, "**** Query species : %s" % (args.species))
+    _print_if(args.verbose, f"**** Query species : {args.species}")
     _print_if(args.verbose,
-              "Got a total of %d transcripts with biotypes" % (len(tsl_cur)))
+              f"Got a total of {len(tsl_cur)} transcripts with biotypes")
     for i, j in Counter([dic['biotype'] for dic in tsl_cur]).most_common():
-        _print_if(args.verbose, "  %-23s: %4d" % (i, j))
+        _print_if(args.verbose, "  %-23s: %4d" % (i, j)) # pylint: disable=consider-using-f-string,line-too-long
     _print_if(args.verbose, "**** Orthologues")
     for tr_o in tsl_ortho:
         _print_if(args.verbose,
-                  "%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o)))
+                  "%-22s: %4d transcripts " % (tr_o[0]['species'], len(tr_o))) # pylint: disable=consider-using-f-string,line-too-long
 
     print("Getting exons sequences")
     # TO DO revert to multiple files if it is easier
     ffasta = os.path.join(query_result_subdir, "sequences.fasta")
     fexonstable = os.path.join(query_result_subdir, "exonstable.tsv")
-    with open(ffasta, "w") as fastaout:
-        with open(fexonstable, "w") as exonstableout:
+    with open(ffasta, "w", encoding="utf-8") as fastaout:
+        with open(fexonstable, "w", encoding="utf-8") as exonstableout:
             dex = get_listofexons(curgene)
             lexid = list({x['exon_id'] for x in dex})
             _print_if(args.verbose,
-                      "Getting the sequences files for %s" % (curgene))
+                      f"Getting the sequences files for {curgene}")
             exfasta = get_exons_sequences(lexid)
             extable = get_biomart_exons_annot(args.species, curgene)
             if extable is None:
@@ -714,28 +705,27 @@ def main():  # pylint: disable=too-many-locals,too-many-statements
                 sys.exit(1)
             extable = _rename(extable)
             exonstableout.write(extable)
-            exons_name = "%s:%s" % (args.species, args.genename)
+            exons_name = r"{args.species}:{args.genename}"
             for dseq in exfasta:
                 dictseq2fasta(dseq, exons_name, fastaout)
             for ortholog in orthologs_filtered:
                 orthoid = ortholog['target']['id']
                 orthospecies = ortholog['target']['species']
                 # orthotaxon = ortholog['target']['taxon_id']
-                ortho_name = "%s:%s" % (orthospecies, orthoid)
+                ortho_name = f"{orthospecies}:{orthoid}"
                 _print_if(args.verbose,
-                          "Getting exons information for %s" % (ortho_name))
+                          f"Getting exons information for {ortho_name}")
                 dexortho = get_listofexons(orthoid)
                 lexidortho = list({x['exon_id'] for x in dexortho})
-                _print_if(args.verbose, "  - %d exons" % (len(lexidortho)))
+                _print_if(args.verbose, f"  - {len(lexidortho)} exons")
                 exorthofasta = get_exons_sequences(lexidortho)
                 _print_if(args.verbose,
-                          "  - %d fasta sequences" % (len(exorthofasta)))
+                          f"  - {len(exorthofasta)} fasta sequences")
                 ortho_exontable = get_biomart_exons_annot(orthospecies,
                                                           orthoid,
                                                           header=False)
                 if ortho_exontable is None:
-                    warnings.warn('Download failed for {} in {}! '.format(
-                        orthoid, orthospecies))
+                    warnings.warn(f'Download failed for {orthoid} in {orthospecies}! ')
                     _store_errors(query_result_subdir, orthospecies, orthoid)
                     continue
 
