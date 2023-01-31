@@ -1,0 +1,48 @@
+name: thoraxe
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.10"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          git clone https://github.com/PhyloSofS-Team/ProGraphMSA.git prographmsa          
+          chmod a+x ./prographmsa/bin/ProGraphMSA_64
+          sudo cp ./prographmsa/bin/ProGraphMSA_64 /bin/ProGraphMSA
+          rm -fr prographmsa # clean up
+          python -m pip install --upgrade pip
+          python -m pip install 'numpy==1.19.5'
+          pip install pytest pylint
+          python -m pip install coveralls codecov
+          pip install -r requirements.txt
+          python -m pip install .
+          python -m pip install sphinx sphinx_rtd_theme sphinx-argparse
+      - name: Test and Lint
+        run: |
+          export PYTEST_ADDOPTS="--pylint"
+          python setup.py test
+      - name: Coverage
+        run: coveralls
+      - name: Documentation
+        - run: |
+            export SPHINX_APIDOC_OPTIONS=members
+            sphinx-apidoc -o docs/source/api thoraxe
+            sphinx-build docs/source docs/build/html
+            ./push_docs.sh
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html/*

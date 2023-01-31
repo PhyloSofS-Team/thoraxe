@@ -1,11 +1,8 @@
 # https://github.com/coala/coala-quickstart/blob/master/.ci/appveyor.yml
 environment:
   matrix:
-    - PYTHON: "C:\\Python38-x64" # security : end-of-life 2024-10
+    - PYTHON: "C:\\Python38-x64" # end-of-life 2024-10
       PYTHON_VERSION: "3.8"
-      PYTHON_ARCH: "64"
-    - PYTHON: "C:\\Python310-x64" # bugfix : end-of-life 2026-10
-      PYTHON_VERSION: "3.10"
       PYTHON_ARCH: "64"
     # https://devguide.python.org/versions/#versions
 
