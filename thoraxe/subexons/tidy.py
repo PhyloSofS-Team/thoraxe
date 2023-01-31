@@ -42,7 +42,7 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
             he_lens = [0]
             he_seqs = ['']
 
-        tidy_row = dict()
+        tidy_row = {}
         for column in list(tidy_table.columns):
             if column in list(table.columns):
                 tidy_row[column] = getattr(row, column)

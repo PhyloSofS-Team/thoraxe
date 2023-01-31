@@ -166,7 +166,7 @@ def prune_tree(input_tree, output_tree, exontable_file, used_genes):
             tree.prune(clade)
         except ValueError as err:
             raise Exception(
-                f'Error with protein {clade} while prunning the tree {tree} : {err}') # from err
+                f'Error with protein {clade} while prunning the tree {tree} : {err}') from err # noqa pylint: disable=line-too-long
 
     # Use gene id instead of protein/peptide/translation id in the tree
     for clade in tree.get_terminals():

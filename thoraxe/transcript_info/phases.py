@@ -228,7 +228,7 @@ def check_order_and_phases(data_frame):
     finished_transcripts = set()
 
     assert data_frame.loc[data_frame.index[0], 'StartPhase'] in {-1, 0},\
-        'First exon has start phase of 1 or 2, row: %s' % data_frame.iloc[0, :]
+        f'First exon has start phase of 1 or 2, row: {data_frame.iloc[0, :]}'
 
     n_rows = data_frame.shape[0]
     row_number = 1  # to skip the first row

@@ -115,8 +115,7 @@ def _in(value, column):
 def _check_col_names(input_df):
     for col in COLUMN_NAMES:
         if col not in input_df.columns:
-            raise Exception(
-                f'The {col} column is missing in the input table.')
+            raise Exception(f'The {col} column is missing in the input table.')
     for col in input_df.columns:
         if col not in COLUMN_NAMES:
             logging.warning('The %s column is not going to be used', col)
@@ -168,7 +167,8 @@ def _check_species_name(input_df):
         name = row.Species
         if not name.islower():
             raise Exception(
-                f'Error with {name}: Species name should be lowercase, {example}')
+                f'Error with {name}: Species name should be lowercase, {example}'
+            )
         if len(name.split('_')) != 2:
             raise Exception(
                 f'Error with {name}:' +
@@ -249,14 +249,22 @@ def add_to_tsl(input_df, tsl_df):
     for row in subset.itertuples():
         tsl_df = tsl_df.append(
             {
-                'Species': row.Species,
-                'Name': row.TranscriptID,
-                'TranscriptID': row.TranscriptID,
-                'Source': 'user',
-                'ExperimentSource': 'user',
-                'Biotype': 'protein_coding',
-                'Flags': np.nan,
-                'Version': str(datetime.datetime.now().isoformat(timespec='hours')),
+                'Species':
+                row.Species,
+                'Name':
+                row.TranscriptID,
+                'TranscriptID':
+                row.TranscriptID,
+                'Source':
+                'user',
+                'ExperimentSource':
+                'user',
+                'Biotype':
+                'protein_coding',
+                'Flags':
+                np.nan,
+                'Version':
+                str(datetime.datetime.now().isoformat(timespec='hours')),
             },
             ignore_index=True)
     return tsl_df
@@ -269,10 +277,13 @@ def add_sequences(input_df, seqrecords):
     for row in input_df.itertuples():
         name = f'{row.Species}:{row.GeneID}'
         seqrecords.append(
-            SeqRecord(Seq(row.NucleotideSequence, SingleLetterAlphabet()),
-                      id=name,
-                      name=name,
-                      description=f'{row.Species}:{row.GeneID} {row.ExonID} na:na:na:{row.ExonRegionStart}:{row.ExonRegionEnd}:{row.Strand}'))
+            SeqRecord(
+                Seq(row.NucleotideSequence, SingleLetterAlphabet()),
+                id=name,
+                name=name,
+                description=
+                f'{row.Species}:{row.GeneID} {row.ExonID} na:na:na:{row.ExonRegionStart}:{row.ExonRegionEnd}:{row.Strand}' # pylint: disable=line-too-long
+            ))
 
 
 def main():

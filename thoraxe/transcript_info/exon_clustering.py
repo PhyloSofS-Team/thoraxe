@@ -91,7 +91,7 @@ def _merge_clusters(trx_data, clusters_to_merge):
     """
     Merge the clusters in the transcript table.
     """
-    old2new = dict()
+    old2new = {}
     for group in clusters_to_merge:
         clusters = sorted(group)
         n_clusters = len(clusters)
@@ -178,7 +178,7 @@ def exon_clustering(  # noqa pylint: disable=too-many-arguments,too-many-locals,
     clusters_to_merge = []
 
     cluster_count = 0
-    aln_memo = dict()
+    aln_memo = {}
     residues_counts = [
         collections.Counter(row_list[i]['ProteinSequences'])
         for i in range(nrows)

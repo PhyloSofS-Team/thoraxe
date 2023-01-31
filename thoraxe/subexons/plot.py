@@ -70,7 +70,7 @@ def plot_msa_subexons(cluster2data, output_folder):
     structured_data = create_python_structure(cluster2data)
 
     js_file = os.path.join(output_folder, 'cluster_data.js')
-    with open(js_file, 'w') as file:
+    with open(js_file, 'w', encoding="utf-8") as file:
         file.write('var clusterData = ')
 
     json.dump(structured_data,
@@ -79,7 +79,7 @@ def plot_msa_subexons(cluster2data, output_folder):
               sort_keys=True,
               indent=4)
 
-    with open(js_file, 'a') as file:
+    with open(js_file, 'a', encoding="utf-8") as file:
         file.write(';')
 
     copyfile(_HTML_FILE, os.path.join(output_folder, 'cluster_plots.html'))

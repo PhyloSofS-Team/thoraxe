@@ -728,7 +728,7 @@ def get_s_exon_msas(output_folder):
     """
     Return a dict of the s_exon MSAs.
     """
-    s_exon_msas = dict()
+    s_exon_msas = {}
     msa_path = os.path.join(output_folder, 'msa')
     msa_files = os.listdir(msa_path)
     for msa_file in msa_files:

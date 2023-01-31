@@ -288,7 +288,7 @@ def run_aligner(chimerics,
         aligner='wsl.exe ProGraphMSA'
     """
     if len(chimerics) == 1:
-        with open(output_path, 'w') as outfile:
+        with open(output_path, 'w', encoding="utf-8") as outfile:
             _print_fasta(chimerics, outfile)
         return output_path
 
@@ -325,7 +325,7 @@ def run_aligner(chimerics,
                 raise OSError(
                     f'{aligner} not found. ' +
                     'Please indicate the path to ProGraphMSA or install it ' +
-                    'from https://github.com/acg-team/ProGraphMSA') # from err
+                    'from https://github.com/acg-team/ProGraphMSA') from err
             raise err
 
     return output_path
@@ -788,7 +788,7 @@ def impute_missing_s_exon(table, column='S_exons', key_columns=None):
     # Ensure the same s-exon ID for the same sub-exon:
     if key_columns is None:
         key_columns = ["GeneID", "SubexonIDCluster", "S_exon_Sequences"]
-    s_exon_ids = dict()
+    s_exon_ids = {}
 
     number = 1
     for i in table.index:
@@ -898,7 +898,7 @@ def save_s_exons(subexon_df, sequences, gene_ids, colclusters, output_folder):
             with open(
                     os.path.join(output_folder,
                                  f'msa_s_exon_{cluster}_{i}.fasta'),
-                    'w') as file:
+                    'w', encoding="utf-8") as file:
                 for (j, subexon) in enumerate(colcluster.consensus):
                     if not np.isnan(subexon):
                         gene = gene_ids[j]
@@ -1032,7 +1032,7 @@ def _choose_one(blocks):
             pos: block.subexon_block_end - block.subexon_block_start
             for (pos, block) in enumerate(blocks) if block.subexon == subexon
         }
-        pos_to_delete = max(pos2len, key=lambda key: pos2len[key])
+        pos_to_delete = max(pos2len, key=lambda key: pos2len[key]) # pylint: disable=cell-var-from-loop
         del blocks[pos_to_delete]
     return blocks
 

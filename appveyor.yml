@@ -1,4 +1,8 @@
-# https://github.com/coala/coala-quickstart/blob/master/.ci/appveyor.yml
+# appveyor.yml - https://www.appveyor.com/docs/lang/python
+---
+image:
+  - Visual Studio 2019
+  
 environment:
   matrix:
     - PYTHON: "C:\\Python38-x64" # end-of-life 2024-10

@@ -28,11 +28,11 @@ def check_species_name(species_name):
         raise ValueError(
             'The species name should be the binomial/trinomial name lowercased'
             ' with spaces replaced by underscores e.g. Homo sapiens should be '
-            'homo_sapiens. {} do not conform the format.'.format(species_name))
+            f'homo_sapiens. {species_name} do not conform the format.')
 
     if len(species_name.split('_')) != 2:
         warnings.warn(
-            'Only binomial names are used. Skipping {}.'.format(species_name))
+            f'Only binomial names are used. Skipping {species_name}.')
         return False
 
     return True
@@ -41,7 +41,7 @@ def check_species_name(species_name):
 def _read_species_list(file):
     """Return the species list from the file."""
     species = []
-    with open(file, 'r') as stream:
+    with open(file, 'r', encoding="utf-8") as stream:
         for line in stream:
             species_name = line.strip()
             if check_species_name(species_name):
@@ -66,7 +66,7 @@ def get_species_list(specieslist):
         filename = fields[0]
         if os.path.isfile(filename):
             return _read_species_list(filename)
-        raise ValueError('{} is not a file.'.format(filename))
+        raise ValueError(f'{filename} is not a file.')
 
     for species_name in fields:
         check_species_name(species_name)

@@ -15,8 +15,7 @@ from thoraxe.transcript_info import phases
 def _check_column_presence(data_frame, column, message=""):
     """Raise an error if column is not in data_frame."""
     if column not in data_frame.columns:
-        raise ValueError("Input DataFrame hasn't column: %s. %s" %
-                         (column, message))
+        raise ValueError(f"Input DataFrame hasn't column: {column}. {message}")
 
 
 def _check_column_absence(data_frame, column, message=""):
@@ -128,7 +127,8 @@ def read_tsl_file(tsl_file, max_tsl_level, remove_na=False, species_list=None):
     if to_delete:
         clusters.inform_about_deletions(
             to_delete,
-            f"There are transcripts with TSL greater than {max_tsl_level}{' or no TSL information' if remove_na else ''}:")
+            f"There are transcripts with TSL greater than {max_tsl_level}{' or no TSL information' if remove_na else ''}:" # pylint: disable=line-too-long
+        )
 
     return tsl_data
 
@@ -178,8 +178,7 @@ def _complete_transcripts(data):
         data.drop(index_to_delete, inplace=True)
         clusters.inform_about_deletions(
             to_delete,
-            "Exons without sequences: {}... Deleting incomplete transcripts:".
-            format(exons_to_delete))
+            f"Exons without sequences: {exons_to_delete}... Deleting incomplete transcripts:") # pylint: disable=line-too-long
 
 
 def add_exon_sequences(data_frame, sequence_file):

@@ -489,7 +489,7 @@ def get_transcripts_orthologs(ensgeneid, lorthologs):
     ::
 
         {dn_ds : float, method_link_type : str,rop in
-            source : dict(),  target : dict(), taxonomy_level : str,
+            source : {},  target : {}, taxonomy_level : str,
             type: Enum(ortholog_one2one,
                        ortholog_one2many,
                        within_species_paralog)}
@@ -602,7 +602,7 @@ def is_esemble_id(name):
 
 # TO DO : Refactor main to avoid pylint statements if possible:
 # Too many local variables (42/15) and Too many statements (75/50).
-def main():  # pylint: disable=too-many-locals,too-many-statements
+def main():  # pylint: disable=too-many-locals,too-many-statements,too-many-branches,line-too-long
     """Main script function to download transcript data from ENSEMBL."""
     # 1- Get gene name and species
     # 2- Match with ensembl gene ID

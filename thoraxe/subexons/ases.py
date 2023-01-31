@@ -244,7 +244,7 @@ def _get_path_dict(path_table):
     genes and `TranscriptIDCluster`s.
     """
     path_list = []
-    path_dict = dict()
+    path_dict = {}
     for row in path_table.itertuples():
         if row.Path not in path_dict:
             path_list.append(row.Path)
@@ -279,7 +279,7 @@ def _clean_subpath(subpath, delim="/"):
     if first != "s":  # start
         cleaned_subpath += delim
     cleaned_subpath += subpath
-    if last != "p":  # stop 
+    if last != "p":  # stop
         cleaned_subpath += delim
     return cleaned_subpath
 
