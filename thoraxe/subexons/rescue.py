@@ -1,4 +1,3 @@
-# pylint: disable=cyclic-import
 """
 Functions for the rescue phase.
 """

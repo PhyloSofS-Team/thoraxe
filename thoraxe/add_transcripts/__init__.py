@@ -1,4 +1,3 @@
-# pylint: disable=cyclic-import
 """
 add_transcripts: Add user-defined transcript data.
 
