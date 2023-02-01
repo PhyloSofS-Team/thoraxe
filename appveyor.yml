@@ -22,7 +22,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "python -m pip install --upgrade setuptools pip wheel"
   - "python -m pip install --upgrade pytest coveralls codecov"
-  - "python -m pip install pylint=2.13.9"
+  - "python -m pip install pylint==2.13.9"
   - "python -m pip install numpy==1.19.5"
   - "python -m pip install pandas==1.0.5"
   - "python setup.py install"
