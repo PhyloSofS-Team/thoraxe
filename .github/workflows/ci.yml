@@ -42,7 +42,6 @@ jobs:
             export SPHINX_APIDOC_OPTIONS=members
             sphinx-apidoc -o docs/source/api thoraxe
             sphinx-build docs/source docs/build/html
-            ./push_docs.sh
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
