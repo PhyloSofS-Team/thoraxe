@@ -1,4 +1,3 @@
-# pylint: disable=cyclic-import
 """
 tidy:  Utils for having a tidy CSV table output (denormalized table).
 """
