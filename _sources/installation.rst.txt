@@ -5,7 +5,7 @@ Installation
 Dependencies
 ------------
 
-*ThorAxe* needs **Python 3.6.1 or higher** and:
+*ThorAxe* needs **Python version 3.6.1 or higher, but less than 3.9** and:
 
 ProGraphMSA
 ~~~~~~~~~~~
