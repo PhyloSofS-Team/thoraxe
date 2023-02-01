@@ -5,6 +5,12 @@ image:
 
 environment:
   matrix:
+    - PYTHON: "C:\\Python36-x64" # end-of-life 2021-12-23
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Python37-x64" # end-of-life 2023-06-27
+      PYTHON_VERSION: "3.7"
+      PYTHON_ARCH: "64"
     - PYTHON: "C:\\Python38-x64" # end-of-life 2024-10
       PYTHON_VERSION: "3.8"
       PYTHON_ARCH: "64"
