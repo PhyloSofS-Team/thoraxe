@@ -1,4 +1,5 @@
-""" # pylint: disable=cyclic-import
+# pylint: disable=cyclic-import
+"""
 add_transcripts: Add user-defined transcript data.
 
 It adds the new transcripts to the data previously downloaded from Ensembl.
