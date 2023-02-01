@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>thoraxe.transcript_info package &mdash; ThorAxe 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="thoraxe.transcript_query package" href="thoraxe.transcript_query.html" />
+    <link rel="prev" title="thoraxe.subexons package" href="thoraxe.subexons.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ThorAxe
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">Command line programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output.html">Output description</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="thoraxe.html">thoraxe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="thoraxe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.add_transcripts.html">thoraxe.add_transcripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">thoraxe.transcript_info package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_query.html">thoraxe.transcript_query package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.utils.html">thoraxe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe.thoraxe">thoraxe.thoraxe module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe.version">thoraxe.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ThorAxe</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">thoraxe</a> &raquo;</li>
+        
+          <li><a href="thoraxe.html">thoraxe package</a> &raquo;</li>
+        
+      <li>thoraxe.transcript_info package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/api/thoraxe.transcript_info.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="thoraxe-transcript-info-package">
+<h1>thoraxe.transcript_info package<a class="headerlink" href="#thoraxe-transcript-info-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-thoraxe.transcript_info.clusters">
+<span id="thoraxe-transcript-info-clusters-module"></span><h2>thoraxe.transcript_info.clusters module<a class="headerlink" href="#module-thoraxe.transcript_info.clusters" title="Permalink to this heading">¶</a></h2>
+<p>clusters: Helper module for work with sets as clusters.</p>
+<p>A cluster is a set of elements and we can have list of clusters.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.clusters.cluster2str">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.clusters.</span></span><span class="sig-name descname"><span class="pre">cluster2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim='/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item2str=&lt;class</span> <span class="pre">'str'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.cluster2str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a cluster (set) and return a string representation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">})</span>
+<span class="go">&#39;1/10/100&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">},</span> <span class="n">delim</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+<span class="go">&#39;1;10;100&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span> <span class="p">:</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">10</span> <span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster2str</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">},</span> <span class="n">item2str</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+<span class="go">&#39;a/b/100&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.clusters.fill_clusters">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.clusters.</span></span><span class="sig-name descname"><span class="pre">fill_clusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clusters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_j</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.fill_clusters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill the list of clusters (sets) with two elements from the same cluster.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fill_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">[{1, 10}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fill_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="go">[{1, 10, 100}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fill_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="go">[{1, 10, 100}, {20, 30}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.clusters.inform_about_deletions">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.clusters.</span></span><span class="sig-name descname"><span class="pre">inform_about_deletions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">todelete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.inform_about_deletions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Warning about elements that are going to be deleted.</p>
+<p><cite>inform_about_deletions({1, 2, 3}, “Identical sequences were found:”)</cite> will inform:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Identical</span> <span class="n">sequences</span> <span class="n">were</span> <span class="n">found</span><span class="p">:</span>
+<span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">deleting</span> <span class="mi">1</span>
+<span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">deleting</span> <span class="mi">2</span>
+<span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">deleting</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.clusters.set_to_delete">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.clusters.</span></span><span class="sig-name descname"><span class="pre">set_to_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.clusters.set_to_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the set to delete given a list of sets.</p>
+<p>It keeps the first element of the set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">set_to_delete</span><span class="p">([{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">}])</span> <span class="c1"># it keeps 1 and 4</span>
+<span class="go">{2, 3, 5}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.transcript_info.exon_clustering">
+<span id="thoraxe-transcript-info-exon-clustering-module"></span><h2>thoraxe.transcript_info.exon_clustering module<a class="headerlink" href="#module-thoraxe.transcript_info.exon_clustering" title="Permalink to this heading">¶</a></h2>
+<p>Exon clustering: Functions to cluster exons using pairwise alignments.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.exon_clustering.align">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.exon_clustering.</span></span><span class="sig-name descname"><span class="pre">align</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substitution_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Align the sequnces using the BioPython pairwise2 aligner.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.exon_clustering.coverage">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.exon_clustering.</span></span><span class="sig-name descname"><span class="pre">coverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.coverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return coverage of the sequence in the alignment.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coverage</span><span class="p">(</span><span class="s2">&quot;AAAA----&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="go">50.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.exon_clustering.coverage_shortest">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.exon_clustering.</span></span><span class="sig-name descname"><span class="pre">coverage_shortest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.coverage_shortest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return coverage of the shortest sequence in the alignment.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coverage_shortest</span><span class="p">(</span><span class="s2">&quot;AAAA----&quot;</span><span class="p">,</span> <span class="s2">&quot;AAAAAAAA&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="go">50.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.exon_clustering.exon_clustering">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.exon_clustering.</span></span><span class="sig-name descname"><span class="pre">exon_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trx_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percent_identity_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_open_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_extend_penalty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substitution_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_clusters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.exon_clustering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster exons based on their sequence identity after local alignment.</p>
+<p>It uses a Hobohm I sequence clustering algorithm to perform a fast
+clustering of the exons. Exons are sorted from the longest to the
+shortest before start the clustering, but at the end the returned
+table as the same order as the input. The returned data frame as two
+extra columns, Cluster and QueryExon that contains the cluster number
+and the name of the query sequence used to join that one into that
+cluster.</p>
+<p>The alignment is performed using Smith-Waterman from BioPython.
+The keyword arguments gap_open_penalty, gap_extend_penalty and
+substitution_matrix are passed to pairwise2.</p>
+<p>Exons with a length less than the minimum_len (default: 4) are not
+clustered. Non-clustered exons have Cluster number 0 and an empty
+string as ExonQuery.</p>
+<p>The coverage and percent identity cutoff to decide if an exon sequence
+belongs to one cluster can be modified with the keyword arguments
+coverage_cutoff and percent_identity_cutoff (default to 80.0 and
+30.0, respectively).</p>
+<p>Exons are aligned against others until they reach a percent identity
+higher than percent_identity_cutoff plus 30, to allow low identity matches
+to be replaced by better ones.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.exon_clustering.percent_identity">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.exon_clustering.</span></span><span class="sig-name descname"><span class="pre">percent_identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.exon_clustering.percent_identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return percent identity of the aligned sequences.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">percent_identity</span><span class="p">(</span><span class="s2">&quot;AA---&quot;</span><span class="p">,</span> <span class="s2">&quot;AAAA-&quot;</span><span class="p">)</span>
+<span class="go">50.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.transcript_info.phases">
+<span id="thoraxe-transcript-info-phases-module"></span><h2>thoraxe.transcript_info.phases module<a class="headerlink" href="#module-thoraxe.transcript_info.phases" title="Permalink to this heading">¶</a></h2>
+<p>phases: Calculate exon phases and chack exon order and phases.</p>
+<p>This is the code for calculating exon start and end phases that we used before
+downloading that data from ENSEMBL. The code was changed to be use as a checker
+for the downloaded and parsed data. Also, this module have functions used to
+calculate the subexon phases.</p>
+<p>This could be useful to help in the understanding of exon start and end phases.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.phases.bases_to_complete_next_codon">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.phases.</span></span><span class="sig-name descname"><span class="pre">bases_to_complete_next_codon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_next_codon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bases at the exon end that completes the next codon.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----X</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_next_codon</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># e.g. X-----XX</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.phases.bases_to_complete_previous_codon">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.phases.</span></span><span class="sig-name descname"><span class="pre">bases_to_complete_previous_codon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.bases_to_complete_previous_codon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the bases at exon start that completes the previous codon.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXX</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----X</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bases_to_complete_previous_codon</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># e.g. X-----XX</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.phases.calculate_phase">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.phases.</span></span><span class="sig-name descname"><span class="pre">calculate_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cdna_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_end_phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.calculate_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate exon start and end phases using the intron phase.</p>
+<p>It calculates phases as explained in the ENSEMBL glossary:
+<a class="reference external" href="http://www.ensembl.org/Multi/Help/Glossary">http://www.ensembl.org/Multi/Help/Glossary</a></p>
+<p>“In protein-coding exons, the end phase is the place where the intron
+lands inside the codon : 0 between codons, 1 between the 1st and second
+base, 2 between the second and 3rd base. Exons therefore have a start
+phase and an end phase, but introns have just one phase. An exon which
+is non coding (or non-coding at the end) has an end phase of -1”</p>
+<p>Under this definition, start phase of the actual exon is the end phase
+of the previous one, and the end phase of the actual is the start phase
+of the next one.</p>
+<p>Let X, y and z denote codon bases that belong to exons X, y and z.
+Let - denote intron bases.</p>
+<dl class="simple">
+<dt>0 - No interruption.</dt><dd><p>XXX——yyyzzz</p>
+</dd>
+<dt>1 - first codon’s first base is in the previous exon.</dt><dd><p>X——XXyyyzzz</p>
+</dd>
+<dt>2 - first codon’s first two bases are in the</dt><dd><p>previous exon.
+XX——Xyyyzzz</p>
+</dd>
+</dl>
+<p>NOTE: This function can not calculate a phase of -1.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># e.g. -----XXXyyy----zzz</span>
+<span class="go">(0, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># e.g. XX-----Xyyyzz----z</span>
+<span class="go">(2, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_phase</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># e.g. X-----XXyyyz----zz</span>
+<span class="go">(1, 1)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.phases.check_order_and_phases">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.phases.</span></span><span class="sig-name descname"><span class="pre">check_order_and_phases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.check_order_and_phases" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check DataFrame order and exon start/end phases.</p>
+<p>It takes a data frame with the exon data, including the sequences as
+the output of add_exon_sequences when it is applied to the output
+of read_exon_file.</p>
+<p>The columns of the input dataframe must be ordered by ‘Transcript
+stable ID’ and ‘ExonRank’. The function read_exon_file
+ensures that order.</p>
+<p>It checks that order and it also checks exon start and end phase
+information. It throws an informative error if something is wrong.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.phases.end_phase_previous_exon">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.phases.</span></span><span class="sig-name descname"><span class="pre">end_phase_previous_exon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exon_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prev_row_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_phase_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'EndPhase'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.phases.end_phase_previous_exon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the end phase of the previous exon.</p>
+<p>It returns 0 if the actual exon is the first in the transcript.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.transcript_info.transcript_info">
+<span id="thoraxe-transcript-info-transcript-info-module"></span><h2>thoraxe.transcript_info.transcript_info module<a class="headerlink" href="#module-thoraxe.transcript_info.transcript_info" title="Permalink to this heading">¶</a></h2>
+<p>Functions that use pandas to read transcript information.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.add_exon_sequences">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">add_exon_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.add_exon_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add exon sequences to the DataFrame.</p>
+<p>This function adds an ‘ExonSequence’ column at the end of ‘data_frame’.
+For each row, this column has the BioPython’s SeqRecord for the exon
+sequence of the row. The sequence description in the sequence_file
+(in fasta format) should have the ‘ExonID’ as the second element
+if the description is split by ‘ ‘.ipt_in
+The data_frame should have an ‘ExonID’ column and should not have
+an ‘ExonSequence’ column.
+‘ExonID’ is going to be used to match the SeqRecord to the row.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.add_protein_seq">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">add_protein_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_incomplete_cds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonProteinSequence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.add_protein_seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a column with the protein sequence of the exon.</p>
+<p>It takes a data frame with the exon data, including the sequences as
+the output of add_exon_sequences when it is applied to the output
+of read_exon_file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.delete_badquality_sequences">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">delete_badquality_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.delete_badquality_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete protein sequences with X’s in their sequence in place.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.delete_identical_sequences">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">delete_identical_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonProteinSequence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.delete_identical_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete identical sequences in place keeping only one.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.delete_incomplete_sequences">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">delete_incomplete_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonProteinSequence'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trx_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TranscriptID'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.delete_incomplete_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete incomplete sequences in place.</p>
+<p>Incomplete sequences are the ones that do not have their protein
+sequence finishing with ‘*’.
+It also deletes sequences that probably has an incomplete CDS because
+starts or ends with phases differente fron 0 or -1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.find_identical_exons">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">find_identical_exons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exon_id_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonID'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonProteinSequence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.find_identical_exons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find exons that have similar coordinates and identical sequences.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.find_identical_sequences">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">find_identical_sequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.find_identical_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find different transcripts with identical sequences.</p>
+<p>Input should have the exon sequences as the output of add_exon_sequences.
+It returns a list with the identical sequence clusters (sets).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.merge_identical_exons">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">merge_identical_exons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exon_id_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonID'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ExonProteinSequence'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.merge_identical_exons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unify the ‘ExonID’ of identical exons.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.read_exon_file">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">read_exon_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exon_table_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.read_exon_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the exon_table_file and returns a pandas’ DataFrame.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.read_transcript_info">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">read_transcript_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tsl_table_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exon_table_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exon_sequence_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tsl_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_na</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_badquality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.read_transcript_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read and integrate the transcript information.</p>
+<p>Due to the data structure downloaded from ENSEMBL, we combine 3 types of
+primary information:</p>
+<ol class="arabic simple">
+<li><p>tsl_table_file has the evidence for the gene transcripts. For each
+transcript, it gives information on its type and its evidence level.
+We use this information to filter out transcripts which are not
+interesting for our analysis (e.g. ncRNA, partial transcripts, etc.)
+At this moment, we keep transcripts with ‘Protein coding’ biotype and
+with a TSL evidence level of 1, 2 or 3 by default (max_tsl_level).
+If remove_na is True (default) rows with missing TSL data are
+eliminated.</p></li>
+<li><p>Each row of the exon_table_file summarizes t :whe information for a
+transcript exon, as provided by Biomart. The sorting of the exons
+is important and it is done using the rank information provided by
+ENSEMBL (not coordinates).</p></li>
+<li><p>The genomic sequence information from the coding sequence of all
+the exons in fasta format is in exon_sequence_file.</p></li>
+</ol>
+<p>This function also processes the information within transcript to get the
+peptidic sequences of each exon taking into account the exon phases.
+The codons overlapping the exon boundary are always added to the end of
+the first exon. This is different from the older implementation, where it
+is added to the beginning of the next exon.</p>
+<p>This protein sequence information is used by this function to delete
+incomplete and identical sequences and to merge identical exons.</p>
+<p>If remove_badquality is True (default), protein sequences with X’s are
+deleted.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.read_tsl_file">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">read_tsl_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tsl_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tsl_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_na</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.read_tsl_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a csv file with the Transcript Support Level (TSL) data.</p>
+<p><cite>max_tsl_level</cite> determines the maximum Transcript Support Level (TSL)
+level to keep. The options are:</p>
+<ul class="simple">
+<li><p>1.0 : All splice junctions of the transcript are supported by at
+least one non-suspect mRNA.</p></li>
+<li><p>2.0 : The best supporting mRNA is flagged as suspect or the support is
+from multiple ESTs (Expressed Sequence Tags).</p></li>
+<li><p>3.0 : The only support is from a single EST.</p></li>
+<li><p>4.0 : The best supporting EST is flagged as suspect.</p></li>
+<li><p>5.0 : No single transcript supports the model structure.</p></li>
+</ul>
+<p>If <cite>remove_na</cite> is True, columns with missing TSL are not included
+(default: False).</p>
+<p>It returns a pandas DataFrame with MultiIndex: (‘Species’, ‘TranscriptID’).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.transcript_info.transcript_info.store_cluster">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.transcript_info.transcript_info.</span></span><span class="sig-name descname"><span class="pre">store_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item2str=&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_item=&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim='/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.transcript_info.transcript_info.store_cluster" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the string representation of clusters in the data_frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_frame</strong> – DataFrame that’s going to store the cluster column.</p></li>
+<li><p><strong>cluster_list</strong> – List of sets.</p></li>
+<li><p><strong>default_values</strong> – Name of existing DataFrame column that containts the default
+(string) values for the new column.</p></li>
+<li><p><strong>column_name</strong> – Name of the new column to add with the cluster information.</p></li>
+<li><p><strong>item2str</strong> – Function to map from cluster item to its representation in the
+DataFrame (default: str)</p></li>
+<li><p><strong>getitem</strong> – Function to get the cluster item from the DataFrame row and the index
+of the default_values column (default: default value).</p></li>
+<li><p><strong>delim</strong> – Character delimiting cluster items (default: ‘/’).</p></li>
+</ul>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cluster_list</span> <span class="o">=</span> <span class="p">[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store_cluster</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_list</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span>
+<span class="go">   id  value cluster</span>
+<span class="go">0   1      1       1</span>
+<span class="go">1   2      2     2/3</span>
+<span class="go">2   3      2     2/3</span>
+<span class="go">3   4      3       4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.transcript_info">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-thoraxe.transcript_info" title="Permalink to this heading">¶</a></h2>
+<p>transcript_info: Module to read and manage transcript information.</p>
+<p>It performs the first exon clustering of the pipeline.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="thoraxe.transcript_query.html" class="btn btn-neutral float-right" title="thoraxe.transcript_query package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="thoraxe.subexons.html" class="btn btn-neutral float-left" title="thoraxe.subexons package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
