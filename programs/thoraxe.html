@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>thoraxe &mdash; ThorAxe 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="transcript_query" href="transcript_query.html" />
+    <link rel="prev" title="thoraxe" href="programs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> ThorAxe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">Command line programs</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">thoraxe</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="transcript_query.html">transcript_query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="add_transcripts.html">add_transcripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../output.html">Output description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">Module API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ThorAxe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="programs.html">thoraxe</a></li>
+      <li class="breadcrumb-item active">thoraxe</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/programs/thoraxe.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thoraxe">
+<h1>thoraxe<a class="headerlink" href="#thoraxe" title="Permalink to this heading"></a></h1>
+<p><blockquote>
+<div><p>thoraxe is a tool to identify orthologous exonic regions (s-exons) in a
+set of transcripts from orthologous genes in a set of species.</p>
+</div></blockquote>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">thoraxe</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="n">INPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUTPUTDIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span> <span class="n">ALIGNER</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">MAXTSL</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MINLEN</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">MINGENES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">MINTRANSCRIPTS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">COVERAGE</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">IDENTITY</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapopen</span> <span class="n">GAPOPEN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">gapextend</span> <span class="n">GAPEXTEND</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">padding</span> <span class="n">PADDING</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no_movements</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no_disintegration</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">plot_chimerics</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">canonical_criteria</span> <span class="n">CANONICAL_CRITERIA</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>-i, --inputdir</kbd></dt>
+<dd><p>Input directory. The input folder should have an Ensembl subfolder as the generated by transcript_query.</p>
+<p>Default: “.”</p>
+</dd>
+<dt><kbd>-o, --outputdir</kbd></dt>
+<dd><p>Output directory, the indicated input directory is used by default.</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>-a, --aligner</kbd></dt>
+<dd><p>Path to ProGraphMSA.</p>
+<p>Default: “ProGraphMSA”</p>
+</dd>
+<dt><kbd>-s, --maxtsl</kbd></dt>
+<dd><p>Maximum Transcript Support Level (TSL) to use when TSL is available for a transcript.</p>
+<p>Default: 3</p>
+</dd>
+<dt><kbd>-m, --minlen</kbd></dt>
+<dd><p>Minimum exon length.</p>
+<p>Default: 4</p>
+</dd>
+<dt><kbd>-g, --mingenes</kbd></dt>
+<dd><p>Minimum number of genes to consider a path in the splice graph.</p>
+<p>Default: 1</p>
+</dd>
+<dt><kbd>-t, --mintranscripts</kbd></dt>
+<dd><p>Minimum number of transcripts to consider a path in the splice graph.</p>
+<p>Default: 2</p>
+</dd>
+<dt><kbd>-c, --coverage</kbd></dt>
+<dd><p>Minimum alignment coverage of the shorter exon to include both exons in the same cluster.</p>
+<p>Default: 80.0</p>
+</dd>
+<dt><kbd>-p, --identity</kbd></dt>
+<dd><p>Minimum percent identity to include exons in the same cluster.</p>
+<p>Default: 30.0</p>
+</dd>
+<dt><kbd>--gapopen</kbd></dt>
+<dd><p>Penalty for a gap opening.</p>
+<p>Default: -10</p>
+</dd>
+<dt><kbd>--gapextend</kbd></dt>
+<dd><p>Penalty for gap extensions.</p>
+<p>Default: -1</p>
+</dd>
+<dt><kbd>-r, --rescue_unaligned_subexons</kbd></dt>
+<dd><p>The sub-exons that do not align against any other are deleted from their cluster, and they could be reassigned during the sub-exon rescue phase. By default, they are kept into their original exon cluster.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--padding</kbd></dt>
+<dd><p>Length of padding, Xs, in the chimeric alignment.</p>
+<p>Default: 10</p>
+</dd>
+<dt><kbd>-y, --phylosofs</kbd></dt>
+<dd><p>Save inputs to run PhyloSofS in the phylosofs folder.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--no_movements</kbd></dt>
+<dd><p>Do not move one/two residue sub-exon blocks.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--no_disintegration</kbd></dt>
+<dd><p>Do not disintegrate one-residue-length s-exons.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--plot_chimerics</kbd></dt>
+<dd><p>Save plotly/html plot for the chimeric alignments in the _intermediate folder.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>-l, --specieslist</kbd></dt>
+<dd><p>It could be a list of more than one species separated by commas and without spaces, e.g. homo_sapiens,mus_musculus, or a single file with the species list (one species per line). If nothing is indicated, all the available species are used.</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>--canonical_criteria</kbd></dt>
+<dd><p>List of column names of the <cite>path_table</cite> separated by commas used to sort the row. If nothing is indicated, the following list is used: MinimumConservation,MinimumTranscriptWeightedConservation,MeanTranscriptWeightedConservation,TranscriptLength,TSL</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+</dl>
+</section>
+<p><blockquote>
+<div><p>It has been developed at LCQB (Laboratory of Computational and
+Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.</p>
+</div></blockquote>
+</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>It is possible to avoid filtering by <em>Transcript Support Level</em> (<em>TSL</em>) by
+setting <cite>–maxtsl</cite> to <cite>5</cite>.</p>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="programs.html" class="btn btn-neutral float-left" title="thoraxe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="transcript_query.html" class="btn btn-neutral float-right" title="transcript_query" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

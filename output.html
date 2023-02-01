@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Output description &mdash; ThorAxe 0.1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="thoraxe" href="api/modules.html" />
+    <link rel="prev" title="add_transcripts" href="programs/add_transcripts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> ThorAxe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programs/programs.html">Command line programs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Output description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#transcript-query">transcript_query</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#thoraxe">thoraxe</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tables">Tables</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#s-exon-table">S-exon table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#path-table">Path table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#table-of-alternative-splicing-events">Table of Alternative Splicing Events</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#splice-graph">Splice graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phylosofs">phylosofs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-outputs">Intermediate outputs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">Module API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ThorAxe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Output description</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/output.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="output-description">
+<h1>Output description<a class="headerlink" href="#output-description" title="Permalink to this heading"></a></h1>
+<p><em>ThorAxe</em> has two command-line programs, <cite>transcript_query</cite> and <cite>thoraxe</cite>. The
+first downloads from <a class="reference external" href="https://www.ensembl.org/index.html">Ensembl</a> the inputs for the second.</p>
+<section id="transcript-query">
+<h2>transcript_query<a class="headerlink" href="#transcript-query" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transcript_query</span> <span class="n">PAX6</span> <span class="o">-</span><span class="n">l</span> <span class="n">homo_sapiens</span><span class="p">,</span><span class="n">mus_musculus</span><span class="p">,</span><span class="n">xenopus_tropicalis</span><span class="p">,</span><span class="n">danio_rerio</span>
+</pre></div>
+</div>
+<p>Running the previous line is going to create a <cite>PAX6</cite> folder with an <cite>Ensembl</cite>
+subfolder. That last folder contains four files with information downloaded
+from <em>Ensembl</em>. In this case, the information corresponds to the transcripts
+and exons from the human <em>PAX6</em> gene and all their one-to-one orthologs in the
+indicated species:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PAX6
+└── Ensembl
+    ├── ensembl_version.csv
+    ├── exonstable.tsv
+    ├── sequences.fasta
+    ├── tree.nh
+    └── tsl.csv
+</pre></div>
+</div>
+<p>The <cite>ensembl_version.csv</cite> file contains a table with information about the
+download date and hour together with the <em>Ensembl Genomes</em> version.</p>
+<p><cite>sequences.fasta</cite> contains the CDS sequence of each downloaded exon. You can
+find the used genome assembly in the sequence name/description. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="n">homo_sapiens</span><span class="p">:</span><span class="n">MAPK8</span> <span class="n">ENSE00003837028</span> <span class="n">chromosome</span><span class="p">:</span><span class="n">GRCh38</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">48306753</span><span class="p">:</span><span class="mi">48306821</span><span class="p">:</span><span class="mi">1</span>
+<span class="n">CGGCGACCACCCCGGACGGCCCCTGTCCCCGCTGGCGGGCTTCCCTGTCGCCGTTCGCTGCGCTGCCGG</span>
+</pre></div>
+</div>
+<p>It’s the entry for <strong>MAPK8</strong> exon <cite>ENSE00003837028</cite> from chromosome <strong>10</strong> in
+the assembly <strong>GRCh38</strong>.</p>
+</section>
+<section id="thoraxe">
+<h2>thoraxe<a class="headerlink" href="#thoraxe" title="Permalink to this heading"></a></h2>
+<p>We can run <cite>thoraxe</cite> in the <cite>PAX6</cite> folder that <cite>transcript_query</cite> created with
+the <em>Ensembl</em> data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">thoraxe</span> <span class="o">-</span><span class="n">i</span> <span class="n">PAX6</span> <span class="o">--</span><span class="n">phylosofs</span> <span class="o">--</span><span class="n">plot_chimerics</span>
+</pre></div>
+</div>
+<p><em>ThorAxe</em> is going to look for the <cite>Ensembl</cite> folder with the input data and is
+going to create a <cite>thoraxe</cite> folder containing the final and intermediate
+results of the study. The <cite>–phylosofs</cite> and <cite>–plot_chimerics</cite> arguments are
+optionals.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PAX6
+├── Ensembl
+│   ├── ensembl_version.csv
+│   ├── exonstable.tsv
+│   ├── sequences.fasta
+│   ├── tree.nh
+│   └── tsl.csv
+└── thoraxe
+    ├── _intermediate
+    │   ├── chimeric_alignment_1.fasta
+    │   ⋮
+    │   ├── cluster_data.js
+    │   ├── cluster_plots.html
+    │   ├── gene_ids_1.txt
+    │   ⋮
+    │   ├── msa_matrix_1.txt
+    │   ⋮
+    │   ├── subexon_table.csv
+    │   ├── subexon_table_1.csv
+    │   ⋮
+    │   └── transcript_table.csv
+    ├── ases_table.csv
+    ├── msa
+    │   ├── msa_s_exon_10_0.fasta
+    │   ⋮
+    │   └── msa_s_exon_9_0.fasta
+    ├── path_table.csv
+    ├── phylosofs
+    │   ├── s_exons.tsv
+    │   ├── transcripts.pir
+    │   ├── transcripts.txt
+    │   └── tree.nh
+    ├── s_exon_table.csv
+    └── splice_graph.gml
+</pre></div>
+</div>
+<p>The <cite>msa</cite> folder has a multiple sequence alignment for each s-exon, e.g.
+<cite>msa_s_exon_10_0.fasta</cite>. This MSAs can be easily used as a seed to
+look for homologous sequences in different databases by using <a class="reference external" href="//www.ebi.ac.uk/Tools/hmmer/search/hmmsearch">hmmsearch</a>.</p>
+<section id="tables">
+<h3>Tables<a class="headerlink" href="#tables" title="Permalink to this heading"></a></h3>
+<p><em>ThorAxe</em> outputs three tidy (denormalized) tables rather than a normalized
+database: <cite>s_exon_table.csv</cite>, <cite>path_table.csv</cite> and <cite>ases_table.csv</cite>.  These
+tables are comma-separated files easily read by <a class="reference external" href="https://www.r-project.org/">R</a>, <a class="reference external" href="https://www.python.org/">Python</a> (using <a class="reference external" href="https://pandas.pydata.org/">pandas</a>) or
+<a class="reference external" href="https://julialang.org/">Julia</a> (using <a class="reference external" href="https://github.com/JuliaData/CSV.jl">CSV</a> and <a class="reference external" href="https://github.com/JuliaData/DataFrames.jl">DataFrames</a>) among other software tools. When a cell
+should include a list of elements, <em>ThorAxe</em> uses by default the character <cite>/</cite>
+as the delimiter between the list elements. The stored list can easily
+re-create by using <cite>strsplit</cite> in <em>R</em>, the <cite>split</cite> string method in <em>Python</em> or
+the <cite>split</cite> function in <em>Julia</em>.</p>
+<section id="s-exon-table">
+<h4>S-exon table<a class="headerlink" href="#s-exon-table" title="Permalink to this heading"></a></h4>
+<p>The <cite>s_exon_table.csv</cite> file has the tidy (denormalized) output data for
+the <strong>orthologous exonic regions (s-exons)</strong>. Each row is an observation of an
+s-exon in a particular transcript. Rows are in order, following the s-exon rank.
+That means that the concatenation of the s-exon sequences for each
+transcript gives the protein isoform sequence.</p>
+</section>
+<section id="path-table">
+<h4>Path table<a class="headerlink" href="#path-table" title="Permalink to this heading"></a></h4>
+<p>The <cite>path_table.csv</cite> contains information about each transcript as a path in
+the splice graph. The first row indicates the <em>canonical path</em>. The canonical
+path is used to detect alternative splicing events automatically, and it is
+the one present in the largest number of genes/species with the highest
+minimal value of <cite>transcript_weighted_conservation</cite>, and it is the longest. The
+alternative splicing events are stored in the <cite>ases_table.csv</cite> file where the
+canonical path and the alternative are indicated, together with conservation
+(number of genes showing the path) information.</p>
+</section>
+<section id="table-of-alternative-splicing-events">
+<h4>Table of Alternative Splicing Events<a class="headerlink" href="#table-of-alternative-splicing-events" title="Permalink to this heading"></a></h4>
+<p>ThorAxe automatically detects alternative splicing events by comparing each
+transcript/path to the canonical path in the splice graph. The <cite>ases_table.csv</cite>
+file stores these detected events. The table identifies each event using the
+first two columns: <cite>CanonicalPath</cite> and <cite>AlternativePath</cite>. These columns store
+the list of nodes that forms the alternative subpaths in the canonical and
+<em>alternative</em> (non-canonical) path. First, <em>ThorAxe</em> classifies each event,
+respect to the canonical path, as <cite>insertion</cite>, <cite>deletion</cite> ,
+<cite>fully_alternative</cite>, <cite>alternative_start</cite>, <cite>alternative_end</cite> or simply
+<cite>alternative</cite>.  The <cite>ASE</cite> column stores this classification. The events,
+excepting insertions and deletions, are further classified according to their
+number of mutually exclusive s-exons pairs into: <cite>mutually_exclusive</cite>,
+<cite>partially_mutually_exclusive</cite> and not mutually exclusive (empty cell). The
+<cite>MutualExclusivity</cite> column stores this classification. The
+<cite>MutualExclusiveCanonical</cite> and <cite>MutualExclusiveAlternative</cite> columns stores two
+paired list indicating the mutually exclusive s-exon pairs. For example, an
+event having <cite>15_0/15_1</cite> in <cite>MutualExclusiveCanonical</cite> and <cite>7_5/7_5</cite> in
+<cite>MutualExclusiveAlternative</cite>, means that s-exon <cite>15_0</cite> is mutually exclusive
+with s-exon <cite>7_5</cite> and that <cite>15_1</cite> is also mutually exclusive with <cite>7_5</cite>. Here,
+mutually exclusive means that there is no transcript in the path table showing
+both s-exons.</p>
+</section>
+</section>
+<section id="splice-graph">
+<h3>Splice graph<a class="headerlink" href="#splice-graph" title="Permalink to this heading"></a></h3>
+<p><em>ThorAxe</em> splice graph as <em>s-exons</em>, rather than exon, as nodes. Using <em>s-exon</em>
+allows us to represent transcripts from different species in the same splice
+graph. As a consequence, the edges indicate the connectivity between these
+exonic regions and not necessarily junctions between genomic exons. <em>ThorAxe</em>
+splice graph has conservation information, where conservation means the
+fraction or transcript weighted fraction of species showing a particular node
+(s-exon) or connection. The <cite>splice_graph.gml</cite> file stores this splice graph
+of s-exons using the human-readable <em>Graph Modelling Language</em> (GML) format.
+<em>GML</em> is a rich format, and we used it to store useful metadata for nodes and
+edges:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 41%" />
+<col style="width: 59%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Metadata</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>label</p></td>
+<td><p>The s-exon ID (only for nodes).</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcript_fraction</p></td>
+<td><p>It is the number of transcripts showing that
+node/edge over the total number of transcripts,
+taking into account all the genes.</p></td>
+</tr>
+<tr class="row-even"><td><p>conservation</p></td>
+<td><p>Fraction of genes showing that node/edge.</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcript_weighted_conservation</p></td>
+<td><p>As <cite>conservation</cite> but each gene is weighted
+using the fraction of transcripts in that
+gene showing that edge (only for edges).</p></td>
+</tr>
+<tr class="row-even"><td><p>genes</p></td>
+<td><p>List of genes, separated by commas,
+showing that node/edge.</p></td>
+</tr>
+<tr class="row-odd"><td><p>transcripts</p></td>
+<td><p>List of transcripts, separated by commas,
+showing that node/edge.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <em>ThorAxe’s</em> <cite>transcript_query</cite> is run with <cite>–orthology 1:1</cite> (default),
+the number of genes is identical to the number of species in the dataset.</p>
+</div>
+</section>
+<section id="phylosofs">
+<h3>phylosofs<a class="headerlink" href="#phylosofs" title="Permalink to this heading"></a></h3>
+<p>The <cite>phylosofs</cite> folder has the needed inputs for the structural and molecular
+modelling pipelines of <a class="reference external" href="https://github.com/PhyloSofS-Team/PhyloSofS">PhyloSofS</a>. It is only generated when the <cite>–phylosofs</cite>
+optional argument is used.
+These PhyloSofS’s files use a single unicode character to represent each s-exon.
+The mapping between the id for <em>PhyloSofS</em> and the one of <em>ThorAxe</em>
+(<em>ExonCluster_ChimericBlock</em>) is in the <cite>s_exons.tsv</cite> file.</p>
+<p>The <cite>transcripts.pir</cite> has the annotated sequence using the PIR format.</p>
+<p>The list of transcripts for each gene is in <cite>transcripts.txt</cite></p>
+</section>
+<section id="intermediate-outputs">
+<h3>Intermediate outputs<a class="headerlink" href="#intermediate-outputs" title="Permalink to this heading"></a></h3>
+<p>The <cite>_intermediate</cite> folder has intermediate files and states from the <em>ThorAxe</em>
+pipeline. In particular, <cite>cluster_plots.html</cite> has the interactive plots of the
+chimeric alignments, with the possibility to show the <cite>constitutive</cite> value
+calculated for each subexon. This plot is only generated when the
+<cite>–plot_chimerics</cite> optional argument is indicated.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><cite>cluster_plots.html</cite> loads the <cite>cluster_data.js</cite> file that includes
+all the information needed to plot all the generated multiple sequence alignments
+using <em>Plotly</em>. It can freeze the tab when a lot of sequences/species are used or
+if the computer hasn’t enough resources available.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="programs/add_transcripts.html" class="btn btn-neutral float-left" title="add_transcripts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/modules.html" class="btn btn-neutral float-right" title="thoraxe" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

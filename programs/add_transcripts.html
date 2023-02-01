@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>add_transcripts &mdash; ThorAxe 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Output description" href="../output.html" />
+    <link rel="prev" title="transcript_query" href="transcript_query.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> ThorAxe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">Command line programs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.html">thoraxe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transcript_query.html">transcript_query</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">add_transcripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#input-preparation">Input preparation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../output.html">Output description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">Module API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ThorAxe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="programs.html">thoraxe</a></li>
+      <li class="breadcrumb-item active">add_transcripts</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/programs/add_transcripts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="add-transcripts">
+<h1>add_transcripts<a class="headerlink" href="#add-transcripts" title="Permalink to this heading"></a></h1>
+<p>This script should run after <cite>transcript_query</cite> and before <cite>thoraxe</cite>.
+For example, let’s see you want to add a <em>MAPK8</em> transcript described in
+<cite>user_transcript.csv</cite> to the data download from <em>Ensembl</em> for that gene to run
+<cite>thoraxe</cite>; you can do something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transcript_query</span> <span class="n">MAPK8</span>
+<span class="n">add_transcripts</span> <span class="n">user_transcript</span><span class="o">.</span><span class="n">csv</span> <span class="n">MAPK8</span><span class="o">/</span><span class="n">Ensembl</span>
+<span class="n">thoraxe</span> <span class="o">-</span><span class="n">i</span> <span class="n">MAPK8</span>
+</pre></div>
+</div>
+<p><blockquote>
+<div><p>add_transcripts downloads add user-defined transcripts to
+the data previously download from Ensembl.</p>
+</div></blockquote>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">transcript_query</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="nb">input</span> <span class="n">ensembl</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>input</kbd></dt>
+<dd><p>Input CSV containing the transcript data.</p>
+</dd>
+<dt><kbd>ensembl</kbd></dt>
+<dd><p>Path to the previously download Ensembl data for a gene, i.e. the path to the Ensembl directory created by transcript_query</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>-v, --verbose</kbd></dt>
+<dd><p>Print detailed progress.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+</dl>
+</section>
+<p><blockquote>
+<div><p>It has been developed at LCQB (Laboratory of Computational and
+Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.</p>
+</div></blockquote>
+</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>While this program is called <cite>add_transcripts</cite> you can use it to add genes
+by adding their transcripts. Use a single input table to add multiple
+genes and transcripts or run this script multiple times to add a different
+transcript each time.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You can not use this program to add single exons unless they contain the
+complete <em>CDS</em>. Otherwise, <cite>thoraxe</cite> would delete the exon and its
+incomplete transcript.</p>
+</div>
+<section id="input-preparation">
+<h2>Input preparation<a class="headerlink" href="#input-preparation" title="Permalink to this heading"></a></h2>
+<p>The input table should be a CSV file with the following columns:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Column Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Species</p></td>
+<td><p>It should be the binomial species name in lowercase and
+using underscore instead of space.</p></td>
+</tr>
+<tr class="row-odd"><td><p>GeneID</p></td>
+<td><p>It should be the Ensembl gene ID, e.g. ENSG00000107643,
+rather than the gene name, e.g. MAPK8.</p></td>
+</tr>
+<tr class="row-even"><td><p>TranscriptID</p></td>
+<td><p>A string to identify the transcript.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Strand</p></td>
+<td><p>The Strand should be 1 for a gene in the forward strand
+and -1 for one in the reverse strand.</p></td>
+</tr>
+<tr class="row-even"><td><p>ExonID</p></td>
+<td><p>A string to identify the exon.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ExonRank</p></td>
+<td><p>The Exon Rank should be consecutive integer numbers
+indicating the order of the exons in the transcript.</p></td>
+</tr>
+<tr class="row-even"><td><p>ExonRegionStart</p></td>
+<td><p>ExonRegionStart should be the genomic coordinate of the
+first, last if the gene is in the reverse strand,
+nucleotide of the NucleotideSequence of the exon. Note
+that ExonRegionStart should always be less than
+ExonRegionEnd.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ExonRegionEnd</p></td>
+<td><p>ExonRegionEnd should be the genomic coordinate of the
+last, first if the gene is in the reverse strand,
+nucleotide of the NucleotideSequence of the exon.</p></td>
+</tr>
+<tr class="row-even"><td><p>GenomicCodingStart</p></td>
+<td><p>If the gene is in the forward strand, GenomicCodingStart
+should be the first coding nucleotide’s genomic
+coordinate. Otherwise, it should be the genomic
+coordinate of the last coding nucleotide. Note that
+GenomicCodingStart should always be less than
+GenomicCodingEnd.</p></td>
+</tr>
+<tr class="row-odd"><td><p>GenomicCodingEnd</p></td>
+<td><p>If the gene is in the forward strand, GenomicCodingEnd
+should be the last coding nucleotide’s genomic coordinate
+on the exon. Otherwise, it should be the genomic
+coordinate of the first coding nucleotide.</p></td>
+</tr>
+<tr class="row-even"><td><p>StartPhase</p></td>
+<td><p>Start phase of the exon. The position of an exon/intron
+boundary within a codon. A phase of zero means the
+boundary falls between codons, one means between the first
+and second base and two means between the second and third
+base. Exons have a start and end phase, whereas introns
+have just one phase. A boundary in a non-coding region has
+a phase of -1.</p></td>
+</tr>
+<tr class="row-odd"><td><p>EndPhase</p></td>
+<td><p>End phase of the exon.</p></td>
+</tr>
+<tr class="row-even"><td><p>NucleotideSequence</p></td>
+<td><p>Nucleotide sequence for the exons. They can contain
+non-coding regions, e.g. UTRs. If the gene is in the
+reverse strand, the exon sequence should be the reverse
+complement of the genomic sequence.</p></td>
+</tr>
+</tbody>
+</table>
+<p>You can find an example of the required table in
+<cite>test/data/user_transcript.csv</cite> of the <cite>thoraxe</cite> repository at <a class="reference external" href="https://github.com/PhyloSofS-Team/thoraxe">GitHub</a> or in
+this <a class="reference external" href="https://docs.google.com/spreadsheets/d/1EEz1rsDCJdJeCl8jPoikTtskAKpEQiE3V8FGcCG55mk/edit?usp=sharing">Google spreadsheet</a>.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>You can copy this <a class="reference external" href="https://docs.google.com/spreadsheets/d/1EEz1rsDCJdJeCl8jPoikTtskAKpEQiE3V8FGcCG55mk/edit?usp=sharing">Google spreadsheet</a> to modify it with your data and
+download it as a CSV file.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transcript_query.html" class="btn btn-neutral float-left" title="transcript_query" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../output.html" class="btn btn-neutral float-right" title="Output description" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
