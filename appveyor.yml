@@ -22,6 +22,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "python -m pip install --upgrade setuptools pip wheel"
   - "python -m pip install --upgrade pytest coveralls codecov"
+  - "pip install -r requirements.txt"
   - "python setup.py install"
   - ps: (new-object net.webclient).DownloadFile('https://www.drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86win32.exe', 'C:\\projects\\thoraxe\\muscle.exe')
   - wsl git clone https://github.com/PhyloSofS-Team/ProGraphMSA.git prographmsa
