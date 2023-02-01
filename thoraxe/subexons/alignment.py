@@ -1132,8 +1132,8 @@ def _merge_block_clusters(clusters, columns):
                 if cols.intersection(prev_cols):
                     clusters[previous_cluster].extend(clusters[actual_cluster])
                     columns[previous_cluster] = range(
-                        max(0, min(min(cols), prev_cols.start)),
-                        max(max(cols), prev_cols.stop))
+                        max(0, min(cols, prev_cols.start)),
+                        max(cols, prev_cols.stop))
                     to_delete.update([actual_cluster])
                     break
     return [

@@ -3,7 +3,7 @@ ignore=tests,setup.py,conf.py
 jobs=0
 
 [MESSAGES CONTROL]
-disable=W0511,R0801,R0401
+disable=W0511,R0801,R0401,W0719
 
 [TYPECHECK]
 ignored-classes=DataFrameGroupBy

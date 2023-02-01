@@ -213,8 +213,8 @@ def add_to_exontable(input_df, exontable):
     for row in input_df.itertuples():
         if transcript_id != row.TranscriptID or cdna_end == 0:
             transcript_id = row.TranscriptID
-            coding_len = (row.GenomicCodingEnd - row.GenomicCodingStart)
-            exon_len = (row.ExonRegionEnd - row.ExonRegionStart)
+            coding_len = row.GenomicCodingEnd - row.GenomicCodingStart
+            exon_len = row.ExonRegionEnd - row.ExonRegionStart
             cdna_start = exon_len - coding_len + 1
             cdna_end = cdna_start + coding_len
         else:
