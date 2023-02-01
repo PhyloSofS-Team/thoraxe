@@ -1,0 +1,57 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Zea"
+  given-names: "Diego Javier"
+  orcid: "https://orcid.org/0000-0002-4254-9320"
+- family-names: "Laskina"
+  given-names: "Sofya"
+- family-names: "Baudin"
+  given-names: "Alexis"
+- family-names: "Richard"
+  given-names: "Hugues"
+  orcid: "http://orcid.org/0000-0001-7776-1340"
+- family-names: "Laine"
+  given-names: "Elodie"
+  orcid: "http://orcid.org/0000-0003-4870-6304"
+title: "Assessing conservation of alternative splicing with evolutionary splicing graphs"
+license: "MIT"
+doi: "10.1101/gr.274696.120"
+preferred-citation:
+  type: article
+  title: "Assessing conservation of alternative splicing with evolutionary splicing graphs"
+  authors:
+  - family-names: "Zea"
+    given-names: "Diego Javier"
+    orcid: "https://orcid.org/0000-0002-4254-9320"
+  - family-names: "Laskina"
+    given-names: "Sofya"
+  - family-names: "Baudin"
+    given-names: "Alexis"
+  - family-names: "Richard"
+    given-names: "Hugues"
+    orcid: "http://orcid.org/0000-0001-7776-1340"
+  - family-names: "Laine"
+    given-names: "Elodie"
+    orcid: "http://orcid.org/0000-0003-4870-6304"
+  journal: "Genome Research"
+  volume: 31
+  issue: 8
+  year: 2021
+  publisher: "Cold Spring Harbor Lab"
+  abstract: "Understanding how protein function has evolved and diversified is
+    of great importance for human genetics and medicine. Here, we tackle the 
+    problem of describing the whole transcript variability observed in several 
+    species by generalizing the definition of splicing graph. We provide a 
+    practical solution to construct parsimonious evolutionary splicing graphs 
+    where each node is a minimal transcript building block defined across 
+    species. We show a clear link between the functional relevance, tissue 
+    regulation, and conservation of alternative transcripts on a set of 50 
+    genes. By scaling up to the whole human protein-coding genome, we identify 
+    a few thousand genes where alternative splicing modulates the number and 
+    composition of pseudorepeats. We have implemented our approach in ThorAxe, 
+    an efficient, versatile, robust, and freely available computational tool."
+  doi: "10.1101/gr.274696.120"
+  url: "https://genome.cshlp.org/content/31/8/1462"
+  start: 1462
+  end: 1473
