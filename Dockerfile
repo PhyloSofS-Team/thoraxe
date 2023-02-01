@@ -22,6 +22,9 @@ COPY docker_banner.sh docker_banner.sh
 
 RUN cat /app/docker_banner.sh >> ~/.bashrc
 
+# to allow testing thoraxe inside the container
+RUN python3 -m pip install setuptools pytest coverage pylint
+
 RUN git clone https://github.com/PhyloSofS-Team/ProGraphMSA.git prographmsa && \
     chmod a+x ./prographmsa/bin/ProGraphMSA_64 && \
     cp ./prographmsa/bin/ProGraphMSA_64 /bin/ProGraphMSA && \
