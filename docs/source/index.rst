@@ -15,7 +15,7 @@ If you find *ThorAxe* useful on your research, **please cite us!**
 
 
 .. note::
-   *ThorAxe* can be run on the **`Ases`_ web server**, allowing for a convenient 
+   *ThorAxe* can be run on the **Ases web server_**, allowing for a convenient 
    display of its output. *Ases* makes it easy to run *ThorAxe* and explore and 
    share its results with others.
 
@@ -39,4 +39,4 @@ Indices and tables
 
 .. _YouTube tutorial: https://www.youtube.com/watch?v=Z96985kX-uY
 .. _Genome Research: https://genome.cshlp.org/content/31/8/1462
-.. _Ases: http://www.lcqb.upmc.fr/Ases
+.. _Ases web server: http://www.lcqb.upmc.fr/Ases
