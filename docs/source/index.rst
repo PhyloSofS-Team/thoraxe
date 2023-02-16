@@ -3,7 +3,7 @@ ThorAxe's documentation!
 
 *Assessing Conservation of Alternative Splicing with Evolutionary Splicing Graphs*
 
-Check out our **`YouTube tutorial`_** to see how you can easily use *ThorAxe* and 
+Check out our `YouTube tutorial`_ to see how you can easily use *ThorAxe* and 
 visualise the results! If you want to know more, you can read our 
 `Genome Research`_ publication. 
 
@@ -15,7 +15,7 @@ If you find *ThorAxe* useful on your research, **please cite us!**
 
 
 .. note::
-   *ThorAxe* can be run on the **Ases web server_**, allowing for a convenient 
+   *ThorAxe* can be run on the `Ases web server`_, allowing for a convenient 
    display of its output. *Ases* makes it easy to run *ThorAxe* and explore and 
    share its results with others.
 
