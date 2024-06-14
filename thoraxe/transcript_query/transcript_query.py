@@ -413,14 +413,14 @@ def get_exons_sequences(listensexons):  # , **params):
     return list_res
 
 
-def get_genetree(ensgeneid):
+def get_genetree(species, ensgeneid):
     """
     Return the gene tree.
 
     Get the gene tree around the gene geneid as of now, the whole tree
     is returned.
     """
-    url = f"https://rest.ensembl.org/genetree/member/id/{ensgeneid}?object_type=gene&nh_format=full&aligned=1" # pylint: disable=line-too-long
+    url = f"https://rest.ensembl.org/genetree/member/id/{species}/{ensgeneid}?object_type=gene&nh_format=full&aligned=1" # pylint: disable=line-too-long
     response = requests.get(url, headers=NHTREE, timeout=1800) # 30 min timeout
     if response.status_code == 400 and "No GeneTree found" in response.text:
         warnings.warn(f"No gene tree found for gene id {ensgeneid}")
@@ -432,7 +432,7 @@ def get_genetree(ensgeneid):
     return response.text
 
 
-def get_orthologs(ensgeneid, **params):
+def get_orthologs(species, ensgeneid, **params):
     """Get the orthologs from the gene with id ensgeneid."""
     params.setdefault('object_type', 'gene')
     # TO DO: rajouter des parametres pour séparer les différentes relations
@@ -443,7 +443,7 @@ def get_orthologs(ensgeneid, **params):
     # Aussi avoir une option pour filtrer les espèces qui vont être regardées
     # On a besoin de stocker aussi l'info général sur les orthologues
     # pour plus tard
-    ext_orthologs = f'/homology/id/{ensgeneid}'
+    ext_orthologs = f'/homology/id/{species}/{ensgeneid}'
     request = generic_ensembl_rest_request(ext_orthologs, params, HJSON)
     res = request.json()
     dortho = res['data'][0]['homologies']
@@ -644,14 +644,14 @@ def main():  # pylint: disable=too-many-locals,too-many-statements,too-many-bran
     # 3-
     # print "Searching for orthologous sequences (ignoring paralogues for now)"
     print("Writing the gene tree")
-    tree_text = get_genetree(curgene)
+    tree_text = get_genetree(args.species, curgene)
     if tree_text is not None:
         with open(os.path.join(query_result_subdir, "tree.nh"),
                   "w", encoding="utf-8") as treeout:
             treeout.write(tree_text)
 
     print("Looking for orthologs")
-    orthologs = get_orthologs(curgene)
+    orthologs = get_orthologs(args.species, curgene)
     nparalogs = len(
         [x for x in orthologs if x['type'] == "within_species_paralog"])
     _print_if(
