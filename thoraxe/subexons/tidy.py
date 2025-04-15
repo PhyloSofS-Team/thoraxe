@@ -64,7 +64,9 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
                 stop = stop + he_len
             tidy_row['S_exon_Start'] = start
             tidy_row['S_exon_End'] = stop
-            tidy_table = tidy_table.append(tidy_row, ignore_index=True)
+            # FIX for warning in future versions (03/2024)
+            #tidy_table = tidy_table.append(tidy_row, ignore_index=True)
+            tidy_table = pd.concat([tidy_table,pd.DataFrame([tidy_row])], ignore_index=True)
 
     tidy_table.rename(columns={
         "StartPhase": "SubexonStartPhase",

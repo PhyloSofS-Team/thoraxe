@@ -562,16 +562,16 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
                                              allow_incomplete_cds):
                 cds_seq = None
 
-            if row['Strand'] == -1:
-                cds_seq = _manage_start_phase_negative_strand(
-                    cds_seq, row['StartPhase'])
-                cds_seq, skip_next = _manage_end_phase_negative_strand(
-                    row_list, row_index, cds_seq, end_exon)
-            else:
-                cds_seq = _manage_end_phase_positive_strand(
-                    cds_seq, row['EndPhase'])
-                cds_seq, skip_prev = _manage_start_phase_positive_strand(
-                    row_list, row_index, cds_seq, start_exon)
+            # if row['Strand'] == -1:
+            #     cds_seq = _manage_start_phase_negative_strand(
+            #         cds_seq, row['StartPhase'])
+            #     cds_seq, skip_next = _manage_end_phase_negative_strand(
+            #         row_list, row_index, cds_seq, end_exon)
+            # else:
+            cds_seq = _manage_end_phase_positive_strand(
+                cds_seq, row['EndPhase'])
+            cds_seq, skip_prev = _manage_start_phase_positive_strand(
+                row_list, row_index, cds_seq, start_exon)
 
         if skip_prev:
             for skip in range(1, skip_prev + 1):

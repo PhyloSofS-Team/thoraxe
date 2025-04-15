@@ -64,9 +64,14 @@ def _create_subexon_index(subexon_table):
     subset_columns = ['SubexonID', 'GeneID']
     unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
+    # FIX the ordering of the subexons
+    # using the start for some (positive strand) and the end for others (negative strand)
+    # may result in discrepancies between genes
+    # the fix takes the start in both cases while still acounting fo the direction of the strand
     unique_subexons = unique_subexons.assign(Order=[
         row.SubexonCodingStart if row.Strand == 1 else (-1 *
-                                                        row.SubexonCodingEnd)
+        #                                                row.SubexonCodingEnd)
+                                                        row.SubexonCodingStart)
         for row in unique_subexons.itertuples()
     ])
 
