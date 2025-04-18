@@ -18,8 +18,8 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import SingleLetterAlphabet
 
 from tabulate import tabulate
-from thoraxe.transcript_info import read_exon_file
-from ..version import __version__
+#from thoraxe.transcript_info import read_exon_file
+from thoraxe.version import __version__
 
 
 def parse_command_line():
@@ -174,6 +174,9 @@ def _check_species_name(input_df):
                 f'Error with {name}:' +
                 'Species name should be binomial, and the terms should be '
                 f'separated by underscore, {example}')
+        
+
+
 
 
 def _check_pair_order(input_df):
@@ -203,42 +206,151 @@ def check_input(input_df, exontable):
     _check_exon(input_df, exontable)
 
 
-def add_to_exontable(input_df, exontable):
-    """
-    It adds the new exons and transcripts to the Ensembl's exontable.
-    """
-    transcript_id = ""
-    cdna_start = 0
-    cdna_end = 0
-    for row in input_df.itertuples():
-        if transcript_id != row.TranscriptID or cdna_end == 0:
-            transcript_id = row.TranscriptID
-            coding_len = row.GenomicCodingEnd - row.GenomicCodingStart
-            exon_len = row.ExonRegionEnd - row.ExonRegionStart
-            cdna_start = exon_len - coding_len + 1
-            cdna_end = cdna_start + coding_len
+def calculate_cDNA_start_end(df):
+    # Sort the dataframe by TranscriptID and ExonRank
+    df = df.sort_values(by=['TranscriptID', 'ExonRank']).copy()
+    
+    # Convert necessary columns to numeric type
+    numeric_columns = ['ExonRank', 'ExonRegionStart', 'ExonRegionEnd', 'GenomicCodingStart', 'GenomicCodingEnd', 'Strand']
+    for col in numeric_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    
+    # Initialize cDNA coding start and end columns
+    df['cDNA_CodingStart'] = np.nan
+    df['cDNA_CodingEnd'] = np.nan
+
+    # Process each transcript separately
+    for transcript_id, transcript_group in df.groupby('TranscriptID'):
+        transcript_group = transcript_group.sort_values(by='ExonRank')
+
+        # Compute exon lengths
+        exon_lengths = (transcript_group['ExonRegionEnd'] - transcript_group['ExonRegionStart'] + 1).values
+        
+        # Identify coding exons
+        is_coding_exon = transcript_group['GenomicCodingStart'].notna().values
+        
+        # Compute coding exon lengths
+        coding_lengths = np.zeros_like(exon_lengths)
+        coding_lengths[is_coding_exon] = (
+            transcript_group.loc[is_coding_exon, 'GenomicCodingEnd'] - 
+            transcript_group.loc[is_coding_exon, 'GenomicCodingStart'] + 1
+        ).values
+        
+        # Compute 3' non-coding region
+        nc_3_p = np.zeros_like(exon_lengths)
+        strand = transcript_group['Strand'].iloc[0]  # All exons share the same strand
+        
+        if strand == -1:
+            nc_3_p[is_coding_exon] = (
+                transcript_group.loc[is_coding_exon, 'ExonRegionStart'] - 
+                transcript_group.loc[is_coding_exon, 'GenomicCodingStart']
+            ).values
         else:
-            cdna_start = cdna_end + 1
-            cdna_end += (row.GenomicCodingEnd - row.GenomicCodingStart + 1)
-        exontable = exontable.append(
-            {
-                'GeneID': row.GeneID,
-                'TranscriptID': row.TranscriptID,
-                'ProteinID': f"{row.TranscriptID}_PROTEIN",
-                'Strand': row.Strand,
-                'ExonID': row.ExonID,
-                'ExonRegionStart': row.ExonRegionStart,
-                'ExonRegionEnd': row.ExonRegionEnd,
-                'ExonRank': row.ExonRank,
-                'cDNA_CodingStart': cdna_start,
-                'cDNA_CodingEnd': cdna_end,
-                'GenomicCodingStart': row.GenomicCodingStart,
-                'GenomicCodingEnd': row.GenomicCodingEnd,
-                'StartPhase': row.StartPhase,
-                'EndPhase': row.EndPhase,
-            },
-            ignore_index=True)
+            nc_3_p[is_coding_exon] = (
+                transcript_group.loc[is_coding_exon, 'ExonRegionEnd'] - 
+                transcript_group.loc[is_coding_exon, 'GenomicCodingEnd']
+            ).values
+        
+        # Compute cumulative exon length
+        cum_exon_len = np.cumsum(exon_lengths)
+
+        # Compute cDNA coding start and end positions
+        cDNA_coding_start = np.full_like(exon_lengths, np.nan, dtype=float)
+        cDNA_coding_end = np.full_like(exon_lengths, np.nan, dtype=float)
+
+        cDNA_coding_start[is_coding_exon] = (cum_exon_len - coding_lengths - nc_3_p + 1)[is_coding_exon]
+        cDNA_coding_end[is_coding_exon] = (cum_exon_len - nc_3_p)[is_coding_exon]
+
+        # Assign values back to the dataframe
+        df.loc[transcript_group.index, 'cDNA_CodingStart'] = cDNA_coding_start
+        df.loc[transcript_group.index, 'cDNA_CodingEnd'] = cDNA_coding_end
+
+    return df
+
+def clean_dataframe(input_df):
+    """
+    Cleans and prepares input DataFrame:
+    - Calculates cDNA start and end values
+    - Removes NaN values
+    - Converts numeric columns to Int64
+    - Sorts by TranscriptID and ExonRank
+    """
+    # First, calculate cDNA start and end values
+    input_df = calculate_cDNA_start_end(input_df)
+    
+    # Remove NaN values and convert numeric columns
+    #input_df = input_df.dropna().copy()
+    numeric_columns = [
+        'ExonRegionStart', 'ExonRegionEnd', 'GenomicCodingStart', 
+        'GenomicCodingEnd', 'StartPhase', 'EndPhase', 'cDNA_CodingStart', 'cDNA_CodingEnd'
+    ]
+    
+    for col in numeric_columns:
+        if col in input_df.columns:
+            input_df[col] = pd.to_numeric(input_df[col], errors='coerce').astype('Int64')
+    
+    # Sort data
+    input_df = input_df.sort_values(by=['TranscriptID', 'ExonRank']).reset_index(drop=True)
+    
+    return input_df
+
+def merge_with_exontable(input_df, exontable):
+    """
+    Merges cleaned input_df with exontable.
+    """
+    input_df = input_df.sort_values(by=['TranscriptID', 'ExonRank']).reset_index(drop=True)
+
+    for row in input_df.itertuples(index=False):  # Dodato index=False
+        exontable = pd.concat([
+            exontable,
+            pd.DataFrame({
+                'GeneID': [row.GeneID],
+                'TranscriptID': [row.TranscriptID],
+                'ProteinID': [f"{row.TranscriptID}_PROTEIN"],
+                'Strand': [row.Strand],
+                'ExonID': [row.ExonID],
+                'ExonRegionStart': [row.ExonRegionStart],
+                'ExonRegionEnd': [row.ExonRegionEnd],
+                'ExonRank': [row.ExonRank],
+                'cDNA_CodingStart': [getattr(row, 'cDNA_CodingStart', None)],  # Korišćenje getattr()
+                'cDNA_CodingEnd': [getattr(row, 'cDNA_CodingEnd', None)],
+                'GenomicCodingStart': [getattr(row, 'GenomicCodingStart', None)],
+                'GenomicCodingEnd': [getattr(row, 'GenomicCodingEnd', None)],
+                'StartPhase': [getattr(row, 'StartPhase', None)],
+                'EndPhase': [getattr(row, 'EndPhase', None)],
+            })
+        ], ignore_index=True)
+
     return exontable
+
+
+def read_exon_file(exon_table_file):
+    """Read the exon_table_file and return a cleaned pandas DataFrame."""
+    
+    int_cols_with_nas = [
+        'cDNA_CodingStart', 'cDNA_CodingEnd', 'GenomicCodingStart',
+        'GenomicCodingEnd'
+    ]
+    
+    # Read CSV with dtype=str to avoid unwanted float conversion
+    exon_data = pd.read_csv(exon_table_file, sep='\t', dtype='string')
+
+    # Convert numeric columns to proper integer format, handling NaNs
+    for col in int_cols_with_nas:
+        if col in exon_data.columns:
+            exon_data[col] = pd.to_numeric(exon_data[col], errors='coerce').astype('Int64')
+
+    # Sort exon by rank in transcript
+    exon_data = exon_data.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank']).reset_index(drop=True)
+    
+    return exon_data
+
+def read_transcript_file(transcript_file):
+    """
+    Read the transcript CSV file and return a pandas DataFrame without modifications.
+    """
+    # Read data from CSV
+    return pd.read_csv(transcript_file)
 
 
 def add_to_tsl(input_df, tsl_df):
@@ -246,27 +358,22 @@ def add_to_tsl(input_df, tsl_df):
     It adds the new transcripts to the TSL table downloaded from Ensembl.
     """
     subset = input_df[['Species', 'TranscriptID']].drop_duplicates()
-    for row in subset.itertuples():
-        tsl_df = tsl_df.append(
-            {
-                'Species':
-                row.Species,
-                'Name':
-                row.TranscriptID,
-                'TranscriptID':
-                row.TranscriptID,
-                'Source':
-                'user',
-                'ExperimentSource':
-                'user',
-                'Biotype':
-                'protein_coding',
-                'Flags':
-                np.nan,
-                'Version':
-                str(datetime.datetime.now().isoformat(timespec='hours')),
-            },
-            ignore_index=True)
+
+    # Create a new DataFrame to store the new transcript entries
+    new_entries = pd.DataFrame({
+        'Species': subset['Species'],
+        'Name': subset['TranscriptID'],
+        'TranscriptID': subset['TranscriptID'],
+        'Source': 'user',
+        'ExperimentSource': 'user',
+        'Biotype': 'protein_coding',
+        'Flags': np.nan,
+        'Version': datetime.datetime.now().isoformat(timespec='hours')
+    })
+
+    # Use pd.concat() correctly
+    tsl_df = pd.concat([tsl_df, new_entries], ignore_index=True)
+
     return tsl_df
 
 
@@ -285,27 +392,37 @@ def add_sequences(input_df, seqrecords):
                 f'{row.Species}:{row.GeneID} {row.ExonID} na:na:na:{row.ExonRegionStart}:{row.ExonRegionEnd}:{row.Strand}' # pylint: disable=line-too-long
             ))
 
-
 def main():
     """Main script function to add user transcript data."""
     args = parse_command_line().parse_args()
     paths = get_output_paths(args)
+
     print("Reading user input...")
-    input_df = pd.read_csv(paths.input)
+    input_df = read_transcript_file(paths.input)  
+
     exontable = read_exon_file(paths.exontable)
     tsl_df = pd.read_csv(paths.tsl)
+
     print("Checking input...")
     check_input(input_df, exontable)
+
+    input_df = clean_dataframe(input_df)
+
     print("Adding new transcripts...")
-    new_exontable = add_to_exontable(input_df, exontable)
+    new_exontable = merge_with_exontable(input_df, exontable)
+
     new_tsl = add_to_tsl(input_df, tsl_df)
+
     seqrecords = read_fasta(paths.sequences)
     add_sequences(input_df, seqrecords)
+
     print("Saving...")
     _write_fasta(paths.sequences, seqrecords)
     new_tsl.to_csv(paths.tsl, index=False)
     new_exontable.to_csv(paths.exontable, sep='\t', index=False)
+
     print("Finished!")
+
 
 
 if __name__ == '__main__':
