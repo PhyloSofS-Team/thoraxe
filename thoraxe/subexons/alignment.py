@@ -1124,26 +1124,31 @@ def cluster_subexon_blocks(blocks, margin=2):
 
 
 def _merge_block_clusters(clusters, columns):
-    """
-    Merge cluster sharing columns, return the list of clusters.
-    """
-    n_clusters = len(clusters)
-    to_delete = set([])
-    for actual_cluster in range(1, n_clusters):
-        cols = set(columns[actual_cluster])
-        for previous_cluster in range(actual_cluster):
-            prev_cols = columns[previous_cluster]
-            if previous_cluster not in to_delete:
-                if cols.intersection(prev_cols):
-                    clusters[previous_cluster].extend(clusters[actual_cluster])
-                    columns[previous_cluster] = range(
-                        max(0, min(cols, prev_cols.start)),
-                        max(cols, prev_cols.stop))
-                    to_delete.update([actual_cluster])
-                    break
-    return [
-        clus for (index, clus) in enumerate(clusters) if index not in to_delete
-    ]
+  """
+  Merge cluster sharing columns, return the list of clusters.
+  """
+  n_clusters = len(clusters)
+  to_delete = set([])
+  for actual_cluster in range(1, n_clusters):
+    cols = set(columns[actual_cluster])
+    for previous_cluster in range(actual_cluster):
+      prev_cols = columns[previous_cluster]
+      prev_start = min(prev_cols.start) if isinstance(prev_cols.start, set) else prev_cols.start
+      prev_stop = max(prev_cols.stop) if isinstance(prev_cols.stop, set) else prev_cols.stop
+      if previous_cluster not in to_delete:
+        if cols.intersection(prev_cols):
+          clusters[previous_cluster].extend(clusters[actual_cluster])
+          min_col = min(cols)
+          max_col = max(cols)
+          columns[previous_cluster] = range(
+            max(0, min(min_col, prev_start)),
+            max(max_col, prev_stop)
+          )
+          to_delete.update([actual_cluster])
+          break
+  return [
+    clus for (index, clus) in enumerate(clusters) if index not in to_delete
+  ]
 
 
 def problematic_block_clusters(
