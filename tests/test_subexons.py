@@ -145,7 +145,7 @@ def test_subexon_clusters(clustered_trx_data):
     not_merged = subexons.create_subexon_table(data, merge_non_redundant=False)
     assert not_merged.shape[0] > subexon_table.shape[0]
 
-    # QVQQ
+    # AQVQQ
     assert len(
         not_merged[not_merged['SubexonID'] == 'ENSMUSE00000689835_SE_2']) > 0
     assert len(
@@ -161,7 +161,7 @@ def test_subexon_clusters(clustered_trx_data):
         qvqq['TranscriptID']) == ['ENSMUST00000111943', 'ENSMUST00000111945']
     for index in [0, 1]:
         assert qvqq['Strand'].iloc[index] == -1
-        assert str(qvqq['SubexonProteinSequence'].iloc[index]) == 'QVQQ*'
+        assert str(qvqq['SubexonProteinSequence'].iloc[index]) == 'AQVQQ*'
         assert str(qvqq['SubexonSequence'].iloc[index]) == 'CACAGGTGCAGCAATGA'
         assert qvqq['ExonIDCluster'].iloc[
             index] == 'ENSMUSE00000689835/ENSMUSE00000689841'
@@ -169,7 +169,7 @@ def test_subexon_clusters(clustered_trx_data):
     # ENSMUSE00000689835 unmerged coordinates:
     #
     # G|CACAG GTGCAGCAATGA
-    #      Q   V  Q  Q  *
+    #  A   Q   V  Q  Q  *
     #
     # phases:
     #  1     0           0
@@ -280,8 +280,8 @@ def test_subexon_phases_and_coordinates(clustered_trx_data):
 
     # ENSABRE00000111150 has two sub-exons: se_a and se_b
 
-    # se_a : AVMSR
-    # se_b : SKRDNNFYSVEIGDSTFTVLKRYQNLKPIGSGAQGIVC
+    # se_a : FAVMS
+    # se_b : RSKRDNNFYSVEIGDSTFTVLKRYQNLKPIGSGAQGIV
 
     # se_a :
     # \/ 2379656 (start phase: 1)
@@ -331,5 +331,5 @@ def test_subexon_phases_and_coordinates(clustered_trx_data):
     assert str(se_a['SubexonSequence']) == "TTGCCGTCATGAGCAG"
 
     assert str(se_b['SubexonProteinSequence']
-               ) == "SKRDNNFYSVEIGDSTFTVLKRYQNLKPIGSGAQGIVC"
-    assert str(se_a['SubexonProteinSequence']) == "AVMSR"
+               ) == "RSKRDNNFYSVEIGDSTFTVLKRYQNLKPIGSGAQGIV"
+    assert str(se_a['SubexonProteinSequence']) == "FAVMS"
