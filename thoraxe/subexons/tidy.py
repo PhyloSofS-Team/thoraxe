@@ -14,8 +14,19 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
     Takes the final exon table and a dict from gene to species name to save a
     csv file with the output table in the outputdir.
     """
+    # Add a signed start column to sort by start position taking into account
+    # the strand
+    table = table.assign(
+        _SignedStart=table["SubexonCodingStart"] * table["Strand"]
+    )
+    # Sort by GeneID, TranscriptIDCluster, SubexonRank and signed start
+    # (to have a consistent order of s-exons when they have the same rank)
     table = table.sort_values(
-        by=["GeneID", "TranscriptIDCluster", "SubexonRank"])
+        by=["GeneID", "TranscriptIDCluster", "SubexonRank", "_SignedStart"],
+        kind="stable"
+    )
+    # Remove the signed start column
+    table = table.drop(columns=["_SignedStart"])
 
     tidy_table = pd.DataFrame(columns=[
         "Species", "GeneID", "TranscriptIDCluster", "ExonIDCluster",

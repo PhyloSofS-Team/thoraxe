@@ -60,7 +60,8 @@ def get_transcript_scores(  # pylint: disable=too-many-locals
         "TranscriptIDCluster", "TSL"
     ]].set_index("TranscriptIDCluster").to_dict()['TSL']
 
-    for (trx, subdf) in s_exon_table.groupby('TranscriptIDCluster'):
+    for (trx, unsorted_subdf) in s_exon_table.groupby('TranscriptIDCluster'):
+        subdf = unsorted_subdf.sort_values('S_exon_Rank', kind='stable')
         n_rows = len(subdf)
         s_exon_len = [len(_get_seq(subdf.S_exon_Sequence.iloc[0]))]
         path = ["start", subdf.S_exonID.iloc[0]]
