@@ -18,9 +18,9 @@ def check_species_name(species_name):
     >>> check_species_name('homo_sapiens')
     True
     >>> check_species_name('colobus_angolensis_palliatus')
-    False
+    True
     >>> check_species_name('cricetulus_griseus_chok1gshd')
-    False
+    True
     """
     result = re.match('^[a-z]+_[a-z]+(_[0-9a-z]+)?$', species_name)
 
@@ -30,10 +30,22 @@ def check_species_name(species_name):
             ' with spaces replaced by underscores e.g. Homo sapiens should be '
             f'homo_sapiens. {species_name} do not conform the format.')
 
-    if len(species_name.split('_')) != 2:
-        warnings.warn(
-            f'Only binomial names are used. Skipping {species_name}.')
-        return False
+    # DEPRECATED: trinomial names were previously skipped
+    # if len(species_name.split('_')) != 2:
+    #     warnings.warn(
+    #         f'Only binomial names are used. Skipping {species_name}.')
+    #     return False
+
+    # 3-TERM-SPECIES FIX: accept trinomial names (e.g. anas_platyrhynchos_platyrhynchos)
+    n_parts = len(species_name.split('_'))
+    if n_parts < 2:
+        raise ValueError(
+            f'Species name must have at least 2 parts (genus_species). '
+            f'Got: {species_name}')
+    # if n_parts > 2:
+    #     warnings.warn(
+    #         f'Trinomial species name detected: {species_name}. '
+    #         f'Attempting to use it.')
 
     return True
 

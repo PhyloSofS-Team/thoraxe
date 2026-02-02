@@ -230,10 +230,20 @@ def _species2ensembldataset(species_name):
 
     >>> _species2ensembldataset('homo_sapiens')
     ['hsapiens_gene_ensembl', 'hsapiens_eg_gene']
+    >>> _species2ensembldataset('anas_platyrhynchos_platyrhynchos')
+    ['applatyrhynchos_gene_ensembl', 'applatyrhynchos_eg_gene']
     """
     utils.species.check_species_name(species_name)
     names = species_name.split("_")
-    species = names[0][0] + names[1]
+    # DEPRECATED: only handled binomial names
+    # species = names[0][0] + names[1]
+    # 3-TERM-SPECIES FIX: handle both binomial and trinomial names
+    # Binomial:  homo_sapiens           -> hsapiens
+    # Trinomial: canis_lupus_familiaris -> clfamiliaris
+    if len(names) == 2:
+        species = names[0][0] + names[1]
+    else:
+        species = names[0][0] + names[1][0] + "".join(names[2:])
     return [species + "_gene_ensembl", species + "_eg_gene"]
 
 
@@ -450,8 +460,10 @@ def get_orthologs(species, ensgeneid, **params):
     if not dortho:
         raise Exception(
             f"Ensembl does not have annotated orthologs for {ensgeneid}")
-    # keep only binomial species names:
-    dortho = [d for d in dortho if len(d['target']['species'].split('_')) == 2]
+    # DEPRECATED: used to keep only binomial species names
+    # dortho = [d for d in dortho if len(d['target']['species'].split('_')) == 2]
+    # 3-TERM-SPECIES FIX: keep binomial and trinomial species names (>= 2 parts)
+    dortho = [d for d in dortho if len(d['target']['species'].split('_')) >= 2]
     return dortho
 
 
