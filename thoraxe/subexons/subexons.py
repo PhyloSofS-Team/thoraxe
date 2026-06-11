@@ -247,6 +247,8 @@ def _subexon_info(  # pylint: disable=too-many-locals
     subexon_df.drop(columns=column_to_delete, inplace=True)
     subexon_df.rename(columns=columns_to_rename, inplace=True)
 
+ #   subexon_df.to_csv("subexon_df_firstpass.csv")
+
     return subexon_df
 
 
@@ -516,6 +518,9 @@ def _merge_subexons(  # pylint: disable=too-many-locals
             group_index = subexon_table.index[
                 subexon_table['SubexonIDCluster'].isin(subexon_group)]
             group_mask = subexon_table.index.isin(group_index)
+            # this was originally keeping only one single line for each subexon in the group to be merged
+            # the proposed fix updates common values for the first transcript only
+            # and specific values (subexon ranks and intervals) for each transcript
             transcript = subexon_table[group_mask].drop_duplicates(
                 'SubexonIDCluster')  # keep the first transcript
             transcript.sort_values(by='SubexonRank',
@@ -526,19 +531,26 @@ def _merge_subexons(  # pylint: disable=too-many-locals
             (merged_id, merged_dna, merged_protein, coding_start, coding_end,
              start_phase, end_phase) = _merge_subexon_columns(transcript)
 
-            old2new = {}
-            for index in range(1, n_subexons):
-                previous_row = transcript.iloc[index - 1, :]
-                actual_row = transcript.iloc[index, :]
-                _fill_with_new_subexon_data(old2new, previous_row, actual_row,
-                                            merged_id, merged_dna,
-                                            merged_protein, coding_start,
-                                            coding_end, start_phase, end_phase)
+            # Pour chaque transcrit, recalculer old2new avec les rangs corrects
+            for transcript_id, transcript_rows in subexon_table[group_mask].groupby('TranscriptID'):
+                transcript = transcript_rows.sort_values(by='SubexonRank', ascending=True)
+                
+                old2new = {}
+                for index in range(1, n_subexons):
+                    previous_row = transcript.iloc[index - 1, :]
+                    actual_row = transcript.iloc[index, :]
+                    _fill_with_new_subexon_data(old2new, previous_row, actual_row,
+                                                merged_id, merged_dna,
+                                                merged_protein, coding_start,
+                                                coding_end, start_phase, end_phase)
 
-            for index in group_index:
-                subexon_id = subexon_table.loc[index, 'SubexonIDCluster']
-                for key, value in old2new[subexon_id].items():
-                    subexon_table.loc[index, key] = value
+                #for index in group_index:
+                # Appliquer old2new uniquement aux lignes de ce transcrit
+                for index in transcript.index:
+                    subexon_id = subexon_table.loc[index, 'SubexonIDCluster']
+                    if subexon_id in old2new:
+                        for key, value in old2new[subexon_id].items():
+                            subexon_table.loc[index, key] = value
 
             subexon_table.drop_duplicates(subset=[
                 'GeneID', 'TranscriptID', 'TranscriptIDCluster', 'ExonID',
@@ -583,9 +595,12 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
 
     subexon_table = pd.concat(subexon_data_frames)
     subexon_table = _add_transcript_fraction(subexon_table)
+   # subexon_table.to_csv("subexon_table_before_merge.csv")
 
     if merge_non_redundant:
         subexons_to_merge = _find_subexons_to_merge(subexon_table)
+        print(subexons_to_merge)
         _merge_subexons(subexon_table, subexons_to_merge)
+  #  subexon_table.to_csv("subexon_table_after_merge.csv")
 
     return subexon_table
