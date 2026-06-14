@@ -595,12 +595,9 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
 
     subexon_table = pd.concat(subexon_data_frames)
     subexon_table = _add_transcript_fraction(subexon_table)
-   # subexon_table.to_csv("subexon_table_before_merge.csv")
 
     if merge_non_redundant:
         subexons_to_merge = _find_subexons_to_merge(subexon_table)
-        print(subexons_to_merge)
         _merge_subexons(subexon_table, subexons_to_merge)
-  #  subexon_table.to_csv("subexon_table_after_merge.csv")
 
     return subexon_table
