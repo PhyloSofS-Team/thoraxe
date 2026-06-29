@@ -155,6 +155,9 @@ def read_exon_file(exon_table_file):
     for col in int_cols_with_nas:
         exon_data[col] = pd.to_numeric(exon_data[col])
 
+    for col in ["StartPhase", "EndPhase"]:
+        exon_data[col] = pd.to_numeric(exon_data[col]).astype(int)
+
     # Sort exon by rank in transcript :
     # ---------------------------------
     exon_data.sort_values(by=['GeneID', 'TranscriptID', 'ExonRank'],
