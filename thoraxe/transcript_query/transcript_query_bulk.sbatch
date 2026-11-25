@@ -54,10 +54,15 @@ mkdir -p "$OUT/transcript_query_logs" || exit 1
 OUT=$(readlink -f "$OUT")
 LOGS=$OUT/transcript_query_logs
 
+TASK=$(( ${SLURM_ARRAY_TASK_ID:-0} - ${SLURM_ARRAY_TASK_MIN:-0} ))
+COUNT=${SLURM_ARRAY_TASK_COUNT:-1}
+
 if [ -z "$GENE_LIST" ]; then
-  # every protein-coding gene of the query species, in a stable order (same list in every task)
+  # every protein-coding gene of the query species, in a stable order (same list in every task).
+  # Each task keeps the list it computed: reading back a shared file can fail while a task on
+  # another node replaces it. The first task saves it in OUT_DIR/gene_list.txt for reference.
   GENE_LIST=$OUT/gene_list.txt
-  "$PYTHON" - "$BULK" > "$GENE_LIST.$$" <<'EOF' || { echo "cannot list the genes of $BULK"; exit 1; }
+  GENES_TEXT=$("$PYTHON" - "$BULK" <<'EOF'
 import sqlite3
 import sys
 from thoraxe.bulk_ensembl.layout import BulkDir
@@ -67,12 +72,21 @@ for (gene,) in con.execute(
         "SELECT gene_id FROM gene WHERE biotype = 'protein_coding' ORDER BY gene_id"):
     print(gene)
 EOF
-  mv "$GENE_LIST.$$" "$GENE_LIST"
+  ) || { echo "cannot list the genes of $BULK"; exit 1; }
+  mapfile -t GENES <<< "$GENES_TEXT"
+  if [ "$TASK" = 0 ]; then
+    tmp=$GENE_LIST.$(hostname).$$
+    printf '%s\n' "${GENES[@]}" > "$tmp" && mv "$tmp" "$GENE_LIST"
+  fi
+else
+  mapfile -t GENES < <(grep -v '^[[:space:]]*$' "$GENE_LIST")
 fi
-mapfile -t GENES < <(grep -v '^[[:space:]]*$' "$GENE_LIST")
+# an empty list is an error, not a task with nothing to do
+if [ ${#GENES[@]} = 0 ] || [ -z "${GENES[0]}" ]; then
+  echo "no genes in $GENE_LIST"
+  exit 1
+fi
 
-TASK=$(( ${SLURM_ARRAY_TASK_ID:-0} - ${SLURM_ARRAY_TASK_MIN:-0} ))
-COUNT=${SLURM_ARRAY_TASK_COUNT:-1}
 echo "task $TASK of $COUNT: genes $TASK, $((TASK + COUNT)), ... of ${#GENES[@]} from $GENE_LIST;" \
      "bulk=$BULK host=$(hostname) start=$(date -Is)"
 
