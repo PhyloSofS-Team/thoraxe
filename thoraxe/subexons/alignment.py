@@ -62,7 +62,21 @@ def _create_subexon_index(subexon_table):
     # taking phases into account. Being more specific with the subset
     # columns may cause duplicated subexons in the chimeric sequence.
     subset_columns = ['SubexonID', 'GeneID']
-    unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
+    # The representative row of each sub-exon (its protein goes into the
+    # chimeric sequence and the s-exon node) is chosen by the same rank as
+    # the cluster representative (Ensembl before user-added, TSL, ID), not by
+    # the row order, where user-added CHS.* IDs come first.
+    if {'Source', 'TSL', 'TranscriptID'}.issubset(subexon_table.columns):
+        ranked = subexon_table.assign(
+            _UserAdded=subexon_table['Source'].astype(str) == 'user',
+            _TSL=pd.to_numeric(subexon_table['TSL'],
+                               errors='coerce').fillna(99.0)).sort_values(
+                                   by=['_UserAdded', '_TSL', 'TranscriptID'],
+                                   kind='stable')
+        unique_subexons = ranked.drop_duplicates(
+            subset=subset_columns).drop(columns=['_UserAdded', '_TSL'])
+    else:
+        unique_subexons = subexon_table.drop_duplicates(subset=subset_columns)
 
     # FIX the ordering of the subexons
     # using the start for some (positive strand) and the end for others (negative strand)

@@ -35,16 +35,24 @@ def fill_clusters(clusters, element_i, element_j):
     return clusters
 
 
-def set_to_delete(set_list):
+def set_to_delete(set_list, key=None):
     """
     Return the set to delete given a list of sets.
 
-    It keeps the first element of the set.
+    It keeps the smallest element of each set according to `key` (default:
+    the element itself), so the choice does not depend on the set iteration
+    order, which Python randomizes for strings in each process.
 
-    >>> set_to_delete([{1, 2, 3}, {4, 5}]) # it keeps 1 and 4
-    {2, 3, 5}
+    >>> sorted(set_to_delete([{1, 2, 3}, {4, 5}])) # it keeps 1 and 4
+    [2, 3, 5]
+    >>> sorted(set_to_delete([{'b', 'a'}], key=lambda x: x != 'b'))
+    ['a']
     """
-    return {element for group in set_list for element in list(group)[1:]}
+    to_delete = set()
+    for group in set_list:
+        keep = min(group, key=key) if key is not None else min(group)
+        to_delete.update(element for element in group if element != keep)
+    return to_delete
 
 
 def inform_about_deletions(todelete, message):

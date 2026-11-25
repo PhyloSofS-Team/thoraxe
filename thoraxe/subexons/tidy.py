@@ -7,6 +7,33 @@ import pandas as pd
 from thoraxe.utils import split
 
 
+def _own_s_exon_sequences(lengths, own):
+    """
+    Cut the row's own sub-exon protein at the s-exon lengths.
+
+    The s-exon sequences stored per sub-exon come from one representative
+    row, so a codon split at a sub-exon boundary can carry another
+    transcript's residue, or one residue more or less. Each row gets its own
+    residues instead; a length difference goes to the first s-exon (the
+    sub-exon start), or to the last one if the first is too short.
+
+    >>> _own_s_exon_sequences([2, 3], 'MKLAV')
+    ([2, 3], ['MK', 'LAV'])
+    >>> _own_s_exon_sequences([2, 3], 'MKLA')
+    ([1, 3], ['M', 'KLA'])
+    """
+    lengths = [int(length) for length in lengths]
+    diff = len(own) - sum(lengths)
+    if diff:
+        index = 0 if lengths[0] + diff >= 0 else len(lengths) - 1
+        lengths[index] = max(0, lengths[index] + diff)
+    seqs, pos = [], 0
+    for length in lengths:
+        seqs.append(own[pos:pos + length])
+        pos += length
+    return lengths, seqs
+
+
 def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
     """
     Save a tidy and denormalized output table.
@@ -49,6 +76,7 @@ def get_tidy_table(table, gene2species):  # pylint: disable=too-many-locals
             he_seqs = split.split_seqs(row.S_exon_Sequences, sube_seq)
             assert len(hexons) == len(he_lens)
             assert len(hexons) == len(he_seqs)
+            he_lens, he_seqs = _own_s_exon_sequences(he_lens, sube_seq)
         else:
             he_lens = [0]
             he_seqs = ['']

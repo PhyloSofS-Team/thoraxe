@@ -2,6 +2,7 @@
 
 import collections
 
+import numpy as np
 import pandas as pd
 
 from thoraxe import transcript_info
@@ -145,14 +146,15 @@ def _add_subexon_rank(subexon_df):
     return subexon_df
 
 
-def _get_info_from_row(row, columns):
-    """Return a dict with from column to value."""
-    return {col: getattr(row, col) for col in columns}
+def _subexon_info(gene_df, intervals):  # pylint: disable=too-many-locals
+    """
+    Return a pandas' DataFrame for subexons.
 
-
-def _subexon_info(  # pylint: disable=too-many-locals
-        gene_df, exon_df, intervals):
-    """Return a pandas' DataFrame for subexons."""
+    `intervals` come from disjoint_intervals over the coding bounds of every
+    row of `gene_df` (one row per transcript exon), with the row number as
+    component: each sub-exon is given only to the rows whose own coding
+    region covers it.
+    """
     # We are going to use transcript_info functions to transcribe and
     # merge subexons. Therefore, we are going to use the exon table column
     # names at the beginning, and then we are going to change these column
@@ -181,7 +183,11 @@ def _subexon_info(  # pylint: disable=too-many-locals
         'TargetCoverage',
         'PercentIdentity',
         'AlignedQuery',
-        'AlignedTarget'
+        'AlignedTarget',
+        # Used to choose a representative row deterministically (see
+        # alignment._create_subexon_index)
+        'Source',
+        'TSL'
     ]
 
     # cDNA_CodingStart and end are only needed for _get_exon_cds
@@ -193,9 +199,11 @@ def _subexon_info(  # pylint: disable=too-many-locals
         column_to_delete
     }
 
+    exon_rows = gene_df.to_dict('records')
     for interval_number, interval in enumerate(intervals):
-        for exon_id in interval.components:
-            exon_row = exon_df.loc[exon_id]
+        for row_number in sorted(interval.components):
+            exon_row = exon_rows[row_number]
+            exon_id = exon_row['ExonID']
             seq = _get_subexon_seq(exon_row, interval)
             subexon_info = {
                 'SubexonID': exon_id + '_SE_' + str(interval_number),
@@ -222,11 +230,12 @@ def _subexon_info(  # pylint: disable=too-many-locals
                     'GenomicCodingStart': interval.end,
                     'GenomicCodingEnd': interval.start
                 })
-            for row in gene_df[gene_df['ExonID'] == exon_id].itertuples():
-                transcript_row_info = _get_info_from_row(row, columns_to_keep)
-                transcript_row_info.update(subexon_info)
-                for key, value in transcript_row_info.items():
-                    subexon_dict[key].append(value)
+            transcript_row_info = {
+                key: exon_row.get(key, np.nan) for key in columns_to_keep
+            }
+            transcript_row_info.update(subexon_info)
+            for key, value in transcript_row_info.items():
+                subexon_dict[key].append(value)
 
     subexon_df = pd.DataFrame.from_dict(subexon_dict)
     subexon_df = _add_subexon_rank(subexon_df)
@@ -348,7 +357,8 @@ def update_to_merge_list(to_merge, subexon_1, subexon_2):
     return to_merge
 
 
-def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
+def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table,
+                            transcripts=None):
     """
     Take the exon information to find subexons to merge.
 
@@ -366,7 +376,10 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
         if (previous_row['SubexonIDCluster'] in subexons) and (
                 actual_row['SubexonIDCluster'] in subexons) and (
                     previous_row['TranscriptFraction'] ==
-                    actual_row['TranscriptFraction']):
+                    actual_row['TranscriptFraction']) and (
+                        transcripts is None or
+                        transcripts[previous_row['SubexonIDCluster']] ==
+                        transcripts[actual_row['SubexonIDCluster']]):
             to_merge = update_to_merge_list(to_merge,
                                             previous_row['SubexonIDCluster'],
                                             actual_row['SubexonIDCluster'])
@@ -383,6 +396,10 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
 def _find_subexons_to_merge(subexon_table, delim='/'):
     """Find non redundant and contiguous subexons."""
     subexons_to_merge = []
+    # Sub-exons are merged only when the same transcripts use them, so every
+    # transcript has all the pieces of a merged sub-exon.
+    transcripts = subexon_table.groupby('SubexonIDCluster')['TranscriptID'].agg(
+        frozenset).to_dict()
     subexons = [
         subexon for subexon in subexon_table['SubexonIDCluster'].unique()
         if delim not in subexon  # non-redundant subexons
@@ -400,7 +417,7 @@ def _find_subexons_to_merge(subexon_table, delim='/'):
             for exon_table in exon_tables:
                 if exon_table.shape[0] > 1:
                     subexon_index += _fill_subexons_to_merge(
-                        subexons_to_merge, subexons, exon_table)
+                        subexons_to_merge, subexons, exon_table, transcripts)
                     continue
         else:
             raise Exception(
@@ -528,21 +545,28 @@ def _merge_subexons(  # pylint: disable=too-many-locals
                                    ascending=True)
             assert len(transcript) == n_subexons
 
-            (merged_id, merged_dna, merged_protein, coding_start, coding_end,
-             start_phase, end_phase) = _merge_subexon_columns(transcript)
+            (merged_id, merged_dna, _, coding_start, coding_end, _,
+             _) = _merge_subexon_columns(transcript)
 
             # Pour chaque transcrit, recalculer old2new avec les rangs corrects
             for transcript_id, transcript_rows in subexon_table[group_mask].groupby('TranscriptID'):
                 transcript = transcript_rows.sort_values(by='SubexonRank', ascending=True)
-                
+                assert len(transcript) == n_subexons, transcript_id
+                # The ID, DNA and coordinates are shared; the protein and the
+                # phases are the transcript's own: a codon split at a sub-exon
+                # boundary can give a different residue in each transcript.
+                (_, _, own_protein, _, _, own_start_phase,
+                 own_end_phase) = _merge_subexon_columns(transcript)
+
                 old2new = {}
                 for index in range(1, n_subexons):
                     previous_row = transcript.iloc[index - 1, :]
                     actual_row = transcript.iloc[index, :]
                     _fill_with_new_subexon_data(old2new, previous_row, actual_row,
                                                 merged_id, merged_dna,
-                                                merged_protein, coding_start,
-                                                coding_end, start_phase, end_phase)
+                                                own_protein, coding_start,
+                                                coding_end, own_start_phase,
+                                                own_end_phase)
 
                 #for index in group_index:
                 # Appliquer old2new uniquement aux lignes de ce transcrit
@@ -574,15 +598,14 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
     subexon_data_frames = []
     for _, gene_df in transcript_data.groupby('GeneID'):
 
-        # We need the genomic coding coordinates and the sequence of each exon
-        exon_df = gene_df.drop_duplicates(subset='ExonID')
-        exon_df.set_index('ExonID', inplace=True)
-        exon_df = exon_df.sort_values(
-            by=['GenomicCodingStart', 'GenomicCodingEnd'])
-
-        intervals = disjoint_intervals(list(exon_df['GenomicCodingStart']),
-                                       list(exon_df['GenomicCodingEnd']),
-                                       list(exon_df.index))
+        # Every transcript exon keeps its own coding bounds: an exon shared by
+        # transcripts with different CDS starts/ends is cut at each of them,
+        # instead of taking the bounds of its first row.
+        gene_df = gene_df.sort_values(
+            by=['GenomicCodingStart', 'GenomicCodingEnd'], kind='stable')
+        intervals = disjoint_intervals(gene_df['GenomicCodingStart'].tolist(),
+                                       gene_df['GenomicCodingEnd'].tolist(),
+                                       list(range(len(gene_df))))
 
         intervals = [
             interval for interval in intervals if len(interval.components) > 0
@@ -590,7 +613,7 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
 
         intervals = sorted(intervals, key=lambda interval: interval.start)
 
-        subexon_df = _subexon_info(gene_df, exon_df, intervals)
+        subexon_df = _subexon_info(gene_df, intervals)
         subexon_data_frames.append(subexon_df)
 
     subexon_table = pd.concat(subexon_data_frames)

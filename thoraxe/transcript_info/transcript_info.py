@@ -1,5 +1,7 @@
 """Functions that use pandas to read transcript information."""
 
+# pylint: disable=too-many-lines
+
 import logging
 
 from Bio import SeqIO
@@ -501,6 +503,58 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
+def _genomic_cds(row):
+    """
+    Return the CDS of the exon cut at its genomic coding coordinates.
+
+    ExonSequence is the cDNA of the exon (reverse complement in strand -1),
+    so both UTR sides are removed whatever the exon phases.
+    """
+    if row['Strand'] == -1:
+        i = row['ExonRegionEnd'] - row['GenomicCodingEnd']
+        j = row['ExonRegionEnd'] - row['GenomicCodingStart'] + 1
+    else:
+        i = row['GenomicCodingStart'] - row['ExonRegionStart']
+        j = row['GenomicCodingEnd'] - row['ExonRegionStart'] + 1
+    return row['ExonSequence'][int(i):int(j)]
+
+
+def _has_utr(row):
+    """Return True if the exon cDNA is longer than its coding part."""
+    cds_len = row['cDNA_CodingEnd'] - row['cDNA_CodingStart'] + 1
+    return cds_len != len(row['ExonSequence'])
+
+
+def normalize_user_phases(data_frame):
+    """
+    Write the phases of user-added transcripts in the Ensembl convention.
+
+    Ensembl gives StartPhase -1 to the first coding exon when it starts with
+    5'UTR, and EndPhase -1 to the last coding exon when it ends with 3'UTR.
+    Transcripts added with add_transcripts (Source 'user', e.g. CHESS) have 0
+    in both places. The other phases agree. The DataFrame (coding exons
+    only, as read by read_exon_file, with the TSL table merged) is modified
+    in place; rows of other sources are not changed.
+    """
+    if 'Source' not in data_frame.columns or data_frame.empty:
+        return
+    user = data_frame['Source'].astype(str) == 'user'
+    if not user.any():
+        return
+    plus = data_frame['Strand'] == 1
+    coding_start = data_frame['GenomicCodingStart']
+    coding_end = data_frame['GenomicCodingEnd']
+    utr5 = np.where(plus, coding_start > data_frame['ExonRegionStart'],
+                    coding_end < data_frame['ExonRegionEnd'])
+    utr3 = np.where(plus, coding_end < data_frame['ExonRegionEnd'],
+                    coding_start > data_frame['ExonRegionStart'])
+    rank = data_frame.groupby('TranscriptID')['ExonRank']
+    first = data_frame['ExonRank'] == rank.transform('min')
+    last = data_frame['ExonRank'] == rank.transform('max')
+    data_frame.loc[user & first & utr5, 'StartPhase'] = -1
+    data_frame.loc[user & last & utr3, 'EndPhase'] = -1
+
+
 def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         data_frame,
         allow_incomplete_cds=True,
@@ -537,23 +591,21 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
         row = row_list[row_index]
 
         if (row['StartPhase'] == -1) and (row['EndPhase'] == -1):
-            if row['Strand'] == -1:
-                i = row['ExonRegionEnd'] - row['GenomicCodingEnd']
-                j = row['ExonRegionEnd'] - row['GenomicCodingStart']
-                j += 1
-            else:
-                # TO DO: TEST IT!
-                i = row['GenomicCodingStart'] - row['ExonRegionStart']
-                j = row['GenomicCodingEnd'] - row['ExonRegionStart']
-                j += 1
-
-            cds_seq = row['ExonSequence'][i:j]
+            cds_seq = _genomic_cds(row)
 
         else:
-            cds_seq = _get_exon_cds(row['ExonSequence'],
-                                    row['cDNA_CodingStart'],
-                                    row['cDNA_CodingEnd'], start_exon,
-                                    end_exon)
+            if start_exon and end_exon and _has_utr(row):
+                # The only coding exon of the transcript, with UTR: cut both
+                # sides. _get_exon_cds would keep the last CDS-length bases
+                # (first exon), which is wrong when the exon has 3'UTR
+                # (e.g. phases 0/-1, or 0/0 in user-added transcripts).
+                # Sub-exon rows never get here: their cDNA is their CDS.
+                cds_seq = _genomic_cds(row)
+            else:
+                cds_seq = _get_exon_cds(row['ExonSequence'],
+                                        row['cDNA_CodingStart'],
+                                        row['cDNA_CodingEnd'], start_exon,
+                                        end_exon)
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
@@ -584,6 +636,11 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
         # Look for signals of incomplete CDS :
         incomplete = True if cds_seq is None else _is_incomplete_cds(
             row, start_exon, end_exon)
+        # _is_incomplete_cds only looks at the end of an exon that is both
+        # first and last; check its start too, as for any first exon:
+        if (not incomplete and seq_column != "SubexonProteinSequence"
+                and start_exon and end_exon and row['StartPhase'] in {1, 2}):
+            incomplete = True
 
         if not incomplete:
             if (len(cds_seq) % 3) == 0:
@@ -861,6 +918,24 @@ def store_cluster(  # pylint: disable=too-many-arguments
     return data_frame.insert(2, column_name, cluster_column)
 
 
+def _representative_rank(data_frame):
+    """
+    Return a key ranking the transcripts of an identical-protein cluster.
+
+    Ensembl transcripts come before user-added ones (add_transcripts writes
+    Source 'user', e.g. CHESS), then lower TSL (missing TSL last), then
+    TranscriptID. The representative is the smallest.
+    """
+    info = data_frame.drop_duplicates('TranscriptID').set_index('TranscriptID')
+    rank = {}
+    for tid in info.index:
+        source = info.at[tid, 'Source'] if 'Source' in info.columns else ''
+        tsl = info.at[tid, 'TSL'] if 'TSL' in info.columns else np.nan
+        tsl = 99.0 if pd.isna(tsl) else float(tsl)
+        rank[tid] = (str(source) == 'user', tsl, str(tid))
+    return lambda tid: rank.get(tid, (True, 99.0, str(tid)))
+
+
 def delete_identical_sequences(data_frame, seq_column='ExonProteinSequence'):
     """Delete identical sequences in place keeping only one."""
     _check_column_presence(data_frame, seq_column,
@@ -869,7 +944,8 @@ def delete_identical_sequences(data_frame, seq_column='ExonProteinSequence'):
     identical_sequences = find_identical_sequences(data_frame)
     store_cluster(data_frame, identical_sequences, 'TranscriptID',
                   'TranscriptIDCluster')
-    to_delete = clusters.set_to_delete(identical_sequences)
+    to_delete = clusters.set_to_delete(identical_sequences,
+                                       key=_representative_rank(data_frame))
     clusters.inform_about_deletions(
         to_delete,
         "Identical isoform sequences were found, keeping only one transcript:")
@@ -957,6 +1033,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # Delete repeated exons:
     transcript_info.drop_duplicates(
         subset=['GeneID', 'TranscriptID', 'ExonID'], inplace=True)
+    # User-added transcripts (e.g. CHESS) mark UTR boundaries with phase 0:
+    normalize_user_phases(transcript_info)
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:

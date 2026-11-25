@@ -1,0 +1,2 @@
+Species,Name,TranscriptID,Source,ExperimentSource,Biotype,Flags,Version
+homo_sapiens,OR5B21-201,ENST00000360374,ensembl_havana,ensembl_havana_transcript_homo_sapiens,protein_coding,NA (assigned to previous version 2),3
