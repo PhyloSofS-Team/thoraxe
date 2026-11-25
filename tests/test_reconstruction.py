@@ -121,3 +121,22 @@ def test_path_protein_is_own_protein(monkeypatch, tmp_path):
             paths[transcript] = protein
     own = _own_proteins(_read('LBX2'))
     assert {transcript: paths[transcript] for transcript in own} == own
+
+
+def test_normalize_user_phases():
+    """User-added transcripts get phase -1 at their UTR boundaries."""
+    data = pd.DataFrame({
+        'TranscriptID': ['CHS.1.1'] * 3 + ['CHS.2.1'] + ['ENST1'] * 2,
+        'Source': ['user'] * 4 + ['ensembl'] * 2,
+        'Strand': [1, 1, 1, -1, 1, 1],
+        'ExonRank': [1, 2, 3, 1, 1, 2],
+        'ExonRegionStart': [100, 300, 500, 900, 100, 300],
+        'ExonRegionEnd': [200, 400, 600, 1000, 200, 400],
+        'GenomicCodingStart': [150, 300, 500, 920, 150, 300],
+        'GenomicCodingEnd': [200, 400, 550, 950, 200, 350],
+        'StartPhase': [0, 0, 2, 0, 0, 0],
+        'EndPhase': [0, 2, 0, 0, 0, 0]
+    })
+    transcript_info.normalize_user_phases(data)
+    assert data['StartPhase'].tolist() == [-1, 0, 2, -1, 0, 0]
+    assert data['EndPhase'].tolist() == [0, 2, -1, -1, 0, 0]

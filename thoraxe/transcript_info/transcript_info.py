@@ -503,6 +503,36 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
+def normalize_user_phases(data_frame):
+    """
+    Write the phases of user-added transcripts in the Ensembl convention.
+
+    Ensembl gives StartPhase -1 to the first coding exon when it starts with
+    5'UTR, and EndPhase -1 to the last coding exon when it ends with 3'UTR.
+    Transcripts added with add_transcripts (Source 'user', e.g. CHESS) have 0
+    in both places. The other phases agree. The DataFrame (coding exons
+    only, as read by read_exon_file, with the TSL table merged) is modified
+    in place; rows of other sources are not changed.
+    """
+    if 'Source' not in data_frame.columns or data_frame.empty:
+        return
+    user = data_frame['Source'].astype(str) == 'user'
+    if not user.any():
+        return
+    plus = data_frame['Strand'] == 1
+    coding_start = data_frame['GenomicCodingStart']
+    coding_end = data_frame['GenomicCodingEnd']
+    utr5 = np.where(plus, coding_start > data_frame['ExonRegionStart'],
+                    coding_end < data_frame['ExonRegionEnd'])
+    utr3 = np.where(plus, coding_end < data_frame['ExonRegionEnd'],
+                    coding_start > data_frame['ExonRegionStart'])
+    rank = data_frame.groupby('TranscriptID')['ExonRank']
+    first = data_frame['ExonRank'] == rank.transform('min')
+    last = data_frame['ExonRank'] == rank.transform('max')
+    data_frame.loc[user & first & utr5, 'StartPhase'] = -1
+    data_frame.loc[user & last & utr3, 'EndPhase'] = -1
+
+
 def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-many-statements
         data_frame,
         allow_incomplete_cds=True,
@@ -978,6 +1008,8 @@ def read_transcript_info(  # pylint: disable=too-many-arguments
     # Delete repeated exons:
     transcript_info.drop_duplicates(
         subset=['GeneID', 'TranscriptID', 'ExonID'], inplace=True)
+    # User-added transcripts (e.g. CHESS) mark UTR boundaries with phase 0:
+    normalize_user_phases(transcript_info)
     # 3. Read sequences using BioPython and add them to the exon DataFrame:
     add_exon_sequences(transcript_info, exon_sequence_file)
     # Add protein sequence to the table:
