@@ -183,6 +183,13 @@ def parse_command_line():
                         '--verbose',
                         help='Print detailed progress.',
                         action='store_true')
+    parser.add_argument(
+        '--bulk-dir',
+        help='Read Ensembl from this folder of bulk files, prepared with '
+        '"ensembl_bulk download" and "ensembl_bulk index", instead of the '
+        'Ensembl REST API and BioMart. Without --specieslist, the species of '
+        'the bulk folder are used.',
+        default='')
     parser.add_argument('--version',
                         action='version',
                         version=f'ThorAxe version {__version__}')
@@ -627,6 +634,11 @@ def main():  # pylint: disable=too-many-locals,too-many-statements,too-many-bran
 
     # 1-
     args = parse_command_line().parse_args()
+
+    if args.bulk_dir:
+        from thoraxe.bulk_ensembl import query  # pylint: disable=import-outside-toplevel
+        query.run(args)
+        return
 
     # 2-
     orthokeep = utils.species.get_species_list(args.specieslist)

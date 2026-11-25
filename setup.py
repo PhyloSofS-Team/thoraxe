@@ -25,7 +25,8 @@ setup(
         'console_scripts': [
             'transcript_query=thoraxe.transcript_query:main',
             'thoraxe=thoraxe:main',
-            'add_transcripts=thoraxe.add_transcripts:main'
+            'add_transcripts=thoraxe.add_transcripts:main',
+            'ensembl_bulk=thoraxe.bulk_ensembl.cli:main'
         ],
     },
     packages=find_packages(),

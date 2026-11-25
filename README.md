@@ -9,6 +9,11 @@ Please refer to the [**documentation**](https://phylosofs-team.github.io/thoraxe
 for [**installation**](https://phylosofs-team.github.io/thoraxe/installation.html)
 instructions and more information.  
 
+To prepare many genes from one Ensembl release, `ensembl_bulk` downloads its
+bulk files once and `transcript_query --bulk-dir` reads them instead of querying
+the Ensembl REST API and BioMart gene by gene (see
+[**ensembl_bulk**](https://phylosofs-team.github.io/thoraxe/programs/ensembl_bulk.html)).
+
 Check out our 
 [**video tutorial**](https://www.youtube.com/watch?v=Z96985kX-uY) to see
 how you can easily use *ThorAxe* and visualise the results! If you want to 
