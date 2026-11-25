@@ -128,10 +128,16 @@ def run(args):  # pylint: disable=too-many-locals,too-many-statements
     tq.write_tsl_file(query_result_subdir, [tsl_cur] + tsl_ortho)
 
     print("Getting exons sequences")
+    # One species open at a time: the genome indexes of all species do not fit in
+    # memory (millions of sequence regions for fragmented assemblies). The orthologs
+    # come grouped by species, so each genome is still opened once per gene.
     species_sequences = {}
 
     def exon_records(species, gene_id, label):
         if species not in species_sequences:
+            for opened in species_sequences.values():
+                opened.close()
+            species_sequences.clear()
             species_sequences[species] = sequences.SpeciesSequences(
                 bulk.genome_fa(species), bulk.gtf_db(species))
         return species_sequences[species].exon_records(gene_id, label)

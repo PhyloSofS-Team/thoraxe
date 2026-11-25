@@ -10,8 +10,10 @@
 # every protein-coding gene of the query species of BULK_DIR, listed in OUT_DIR/gene_list.txt.
 # BULK_DIR is a folder prepared with ensembl_bulk (thoraxe/bulk_ensembl/ensembl_bulk.sbatch).
 #
-# The genes are spread over the array tasks (100 by default, change it with --array; 20 to
-# 40 minutes per task for the 20,000 human protein-coding genes). Each gene is logged in
+# The genes are spread over the array tasks (100 by default, change it with --array). A gene
+# takes about 10 s with 19 species and about 1 minute with all ~200 species (peak memory
+# 1.5 GB), so with 100 tasks the 20,000 human protein-coding genes take about 30 minutes or
+# about 4 hours per task; use more tasks (e.g. --array=0-399) to finish sooner. Each gene is logged in
 # OUT_DIR/transcript_query_logs/<gene>.log, whose last line is "exit=<code>". Genes with
 # such a line are skipped, so submitting the same command again resumes an interrupted run;
 # a gene without it is rebuilt from scratch. Genes without orthologs end with exit=1, as
