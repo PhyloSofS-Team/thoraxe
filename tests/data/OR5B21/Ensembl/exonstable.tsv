@@ -1,0 +1,2 @@
+GeneID	TranscriptID	ProteinID	Strand	ExonID	ExonRegionStart	ExonRegionEnd	ExonRank	cDNA_CodingStart	cDNA_CodingEnd	GenomicCodingStart	GenomicCodingEnd	StartPhase	EndPhase
+ENSG00000198283	ENST00000360374	ENSP00000353537	-1	ENSE00001309281	58506807	58508105	1	1	930	58507176	58508105	0	-1

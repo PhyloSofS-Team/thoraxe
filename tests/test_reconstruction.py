@@ -140,3 +140,15 @@ def test_normalize_user_phases():
     transcript_info.normalize_user_phases(data)
     assert data['StartPhase'].tolist() == [-1, 0, 2, -1, 0, 0]
     assert data['EndPhase'].tolist() == [0, 2, -1, -1, 0, 0]
+
+
+def test_single_coding_exon_with_utr():
+    """The only coding exon is cut at both ends of its CDS.
+
+    OR5B21: the only coding exon has a 3'UTR (phases 0/-1).
+    """
+    trx_data = _read('OR5B21')
+    own = _own_proteins(trx_data)
+    assert list(own) == ['ENST00000360374']
+    protein = ''.join(str(seq) for seq in trx_data['ExonProteinSequence'])
+    assert protein.replace('*', '') == own['ENST00000360374']

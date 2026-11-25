@@ -503,6 +503,28 @@ def _is_incomplete_cds(row, start_exon, end_exon):
     return False
 
 
+def _genomic_cds(row):
+    """
+    Return the CDS of the exon cut at its genomic coding coordinates.
+
+    ExonSequence is the cDNA of the exon (reverse complement in strand -1),
+    so both UTR sides are removed whatever the exon phases.
+    """
+    if row['Strand'] == -1:
+        i = row['ExonRegionEnd'] - row['GenomicCodingEnd']
+        j = row['ExonRegionEnd'] - row['GenomicCodingStart'] + 1
+    else:
+        i = row['GenomicCodingStart'] - row['ExonRegionStart']
+        j = row['GenomicCodingEnd'] - row['ExonRegionStart'] + 1
+    return row['ExonSequence'][int(i):int(j)]
+
+
+def _has_utr(row):
+    """Return True if the exon cDNA is longer than its coding part."""
+    cds_len = row['cDNA_CodingEnd'] - row['cDNA_CodingStart'] + 1
+    return cds_len != len(row['ExonSequence'])
+
+
 def normalize_user_phases(data_frame):
     """
     Write the phases of user-added transcripts in the Ensembl convention.
@@ -569,23 +591,21 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
         row = row_list[row_index]
 
         if (row['StartPhase'] == -1) and (row['EndPhase'] == -1):
-            if row['Strand'] == -1:
-                i = row['ExonRegionEnd'] - row['GenomicCodingEnd']
-                j = row['ExonRegionEnd'] - row['GenomicCodingStart']
-                j += 1
-            else:
-                # TO DO: TEST IT!
-                i = row['GenomicCodingStart'] - row['ExonRegionStart']
-                j = row['GenomicCodingEnd'] - row['ExonRegionStart']
-                j += 1
-
-            cds_seq = row['ExonSequence'][i:j]
+            cds_seq = _genomic_cds(row)
 
         else:
-            cds_seq = _get_exon_cds(row['ExonSequence'],
-                                    row['cDNA_CodingStart'],
-                                    row['cDNA_CodingEnd'], start_exon,
-                                    end_exon)
+            if start_exon and end_exon and _has_utr(row):
+                # The only coding exon of the transcript, with UTR: cut both
+                # sides. _get_exon_cds would keep the last CDS-length bases
+                # (first exon), which is wrong when the exon has 3'UTR
+                # (e.g. phases 0/-1, or 0/0 in user-added transcripts).
+                # Sub-exon rows never get here: their cDNA is their CDS.
+                cds_seq = _genomic_cds(row)
+            else:
+                cds_seq = _get_exon_cds(row['ExonSequence'],
+                                        row['cDNA_CodingStart'],
+                                        row['cDNA_CodingEnd'], start_exon,
+                                        end_exon)
 
             # Ask for the start and end phases of the exon,
             # if the phases are different from 0, the shared codons are
@@ -616,6 +636,11 @@ def add_protein_seq(  # pylint: disable=too-many-branches,too-many-locals,too-ma
         # Look for signals of incomplete CDS :
         incomplete = True if cds_seq is None else _is_incomplete_cds(
             row, start_exon, end_exon)
+        # _is_incomplete_cds only looks at the end of an exon that is both
+        # first and last; check its start too, as for any first exon:
+        if (not incomplete and seq_column != "SubexonProteinSequence"
+                and start_exon and end_exon and row['StartPhase'] in {1, 2}):
+            incomplete = True
 
         if not incomplete:
             if (len(cds_seq) % 3) == 0:
