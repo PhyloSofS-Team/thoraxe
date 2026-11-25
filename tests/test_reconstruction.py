@@ -8,11 +8,15 @@ independently of add_protein_seq. The test genes hold human transcripts only
 protein.
 """
 import os
+import shutil
+import sys
 
 import numpy as np
 import pandas as pd
+import pytest
 from Bio.Seq import Seq
 
+import thoraxe
 from thoraxe import subexons
 from thoraxe import transcript_info
 
@@ -91,3 +95,29 @@ def test_merged_subexons_keep_own_protein():
     """
     trx_data = _read('LBX2')
     assert _subexon_proteins(trx_data) == _own_proteins(trx_data)
+
+
+@pytest.mark.skipif(shutil.which('ProGraphMSA') is None,
+                    reason='ProGraphMSA is not installed')
+def test_path_protein_is_own_protein(monkeypatch, tmp_path):
+    """The s-exon sequences along each path give the transcript's protein.
+
+    LBX2 (see test_merged_subexons_keep_own_protein).
+    """
+    out_dir = str(tmp_path / 'LBX2')
+    monkeypatch.setattr(
+        sys, 'argv',
+        ['thoraxe', '-i',
+         os.path.join(DATA, 'LBX2'), '-o', out_dir, '-y'])
+    assert thoraxe.main() is None
+    table = pd.read_csv(os.path.join(out_dir, 'thoraxe', 's_exon_table.csv'),
+                        keep_default_na=False)
+    table = table.sort_values(
+        ['TranscriptIDCluster', 'SubexonRank', 'S_exon_Rank'], kind='stable')
+    paths = {}
+    for cluster, rows in table.groupby('TranscriptIDCluster'):
+        protein = ''.join(rows['S_exon_Sequence']).replace('*', '')
+        for transcript in cluster.split('/'):
+            paths[transcript] = protein
+    own = _own_proteins(_read('LBX2'))
+    assert {transcript: paths[transcript] for transcript in own} == own
