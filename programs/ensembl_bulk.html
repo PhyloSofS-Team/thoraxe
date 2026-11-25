@@ -112,7 +112,17 @@ against the Ensembl checksums, and running the command again resumes an
 interrupted download. <cite>index</cite> then builds the indexes that <cite>transcript_query</cite>
 reads. With the decompressed genomes, a species takes about 3 GB (about
 0.55 TB for the 199 species).
-<code class="docutils literal notranslate"><span class="pre">scripts/ensembl_bulk.sbatch</span></code> runs both steps as one SLURM job.</p>
+On a SLURM cluster, <code class="docutils literal notranslate"><span class="pre">thoraxe/bulk_ensembl/ensembl_bulk.sbatch</span></code> runs both
+steps as one job, then <code class="docutils literal notranslate"><span class="pre">thoraxe/transcript_query/transcript_query_bulk.sbatch</span></code>
+builds the folders of many genes as a job array (by default, every
+protein-coding gene of the query species):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbatch</span> <span class="n">thoraxe</span><span class="o">/</span><span class="n">bulk_ensembl</span><span class="o">/</span><span class="n">ensembl_bulk</span><span class="o">.</span><span class="n">sbatch</span> <span class="mi">115</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ensembl_115</span>
+<span class="n">sbatch</span> <span class="n">thoraxe</span><span class="o">/</span><span class="n">transcript_query</span><span class="o">/</span><span class="n">transcript_query_bulk</span><span class="o">.</span><span class="n">sbatch</span> \
+    <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">ensembl_115_</span><span class="o">&lt;</span><span class="n">date</span><span class="o">&gt;</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">genes_115</span>
+</pre></div>
+</div>
+<p>The first job downloads into <code class="docutils literal notranslate"><span class="pre">/data/ensembl_115_downloading</span></code> and renames it
+with the date the download finished. Both jobs resume when submitted again.</p>
 <p><code class="docutils literal notranslate"><span class="pre">transcript_query</span> <span class="pre">--bulk-dir</span></code> writes the same files as <cite>transcript_query</cite>,
 with two expected differences: the order of sibling subtrees in <cite>tree.nh</cite> can
 differ, as it does between two REST queries, and <cite>sequences.fasta</cite> can contain
