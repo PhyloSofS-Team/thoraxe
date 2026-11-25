@@ -181,7 +181,11 @@ def _subexon_info(  # pylint: disable=too-many-locals
         'TargetCoverage',
         'PercentIdentity',
         'AlignedQuery',
-        'AlignedTarget'
+        'AlignedTarget',
+        # Used to choose a representative row deterministically (see
+        # alignment._create_subexon_index)
+        'Source',
+        'TSL'
     ]
 
     # cDNA_CodingStart and end are only needed for _get_exon_cds

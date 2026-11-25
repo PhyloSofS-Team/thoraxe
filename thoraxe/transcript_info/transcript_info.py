@@ -1,5 +1,7 @@
 """Functions that use pandas to read transcript information."""
 
+# pylint: disable=too-many-lines
+
 import logging
 
 from Bio import SeqIO
@@ -861,6 +863,24 @@ def store_cluster(  # pylint: disable=too-many-arguments
     return data_frame.insert(2, column_name, cluster_column)
 
 
+def _representative_rank(data_frame):
+    """
+    Return a key ranking the transcripts of an identical-protein cluster.
+
+    Ensembl transcripts come before user-added ones (add_transcripts writes
+    Source 'user', e.g. CHESS), then lower TSL (missing TSL last), then
+    TranscriptID. The representative is the smallest.
+    """
+    info = data_frame.drop_duplicates('TranscriptID').set_index('TranscriptID')
+    rank = {}
+    for tid in info.index:
+        source = info.at[tid, 'Source'] if 'Source' in info.columns else ''
+        tsl = info.at[tid, 'TSL'] if 'TSL' in info.columns else np.nan
+        tsl = 99.0 if pd.isna(tsl) else float(tsl)
+        rank[tid] = (str(source) == 'user', tsl, str(tid))
+    return lambda tid: rank.get(tid, (True, 99.0, str(tid)))
+
+
 def delete_identical_sequences(data_frame, seq_column='ExonProteinSequence'):
     """Delete identical sequences in place keeping only one."""
     _check_column_presence(data_frame, seq_column,
@@ -869,7 +889,8 @@ def delete_identical_sequences(data_frame, seq_column='ExonProteinSequence'):
     identical_sequences = find_identical_sequences(data_frame)
     store_cluster(data_frame, identical_sequences, 'TranscriptID',
                   'TranscriptIDCluster')
-    to_delete = clusters.set_to_delete(identical_sequences)
+    to_delete = clusters.set_to_delete(identical_sequences,
+                                       key=_representative_rank(data_frame))
     clusters.inform_about_deletions(
         to_delete,
         "Identical isoform sequences were found, keeping only one transcript:")
