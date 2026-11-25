@@ -81,3 +81,13 @@ def test_shared_exon_keeps_own_cds():
     own = _own_proteins(trx_data)
     assert len(own) == 2 and len(set(own.values())) == 2
     assert _subexon_proteins(trx_data) == own
+
+
+def test_merged_subexons_keep_own_protein():
+    """Each transcript keeps its own residues in a merged sub-exon.
+
+    LBX2: a codon split at a merged sub-exon boundary differs between
+    transcripts.
+    """
+    trx_data = _read('LBX2')
+    assert _subexon_proteins(trx_data) == _own_proteins(trx_data)

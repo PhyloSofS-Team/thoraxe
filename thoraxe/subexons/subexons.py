@@ -357,7 +357,8 @@ def update_to_merge_list(to_merge, subexon_1, subexon_2):
     return to_merge
 
 
-def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
+def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table,
+                            transcripts=None):
     """
     Take the exon information to find subexons to merge.
 
@@ -375,7 +376,10 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
         if (previous_row['SubexonIDCluster'] in subexons) and (
                 actual_row['SubexonIDCluster'] in subexons) and (
                     previous_row['TranscriptFraction'] ==
-                    actual_row['TranscriptFraction']):
+                    actual_row['TranscriptFraction']) and (
+                        transcripts is None or
+                        transcripts[previous_row['SubexonIDCluster']] ==
+                        transcripts[actual_row['SubexonIDCluster']]):
             to_merge = update_to_merge_list(to_merge,
                                             previous_row['SubexonIDCluster'],
                                             actual_row['SubexonIDCluster'])
@@ -392,6 +396,10 @@ def _fill_subexons_to_merge(subexons_to_merge, subexons, exon_table):
 def _find_subexons_to_merge(subexon_table, delim='/'):
     """Find non redundant and contiguous subexons."""
     subexons_to_merge = []
+    # Sub-exons are merged only when the same transcripts use them, so every
+    # transcript has all the pieces of a merged sub-exon.
+    transcripts = subexon_table.groupby('SubexonIDCluster')['TranscriptID'].agg(
+        frozenset).to_dict()
     subexons = [
         subexon for subexon in subexon_table['SubexonIDCluster'].unique()
         if delim not in subexon  # non-redundant subexons
@@ -409,7 +417,7 @@ def _find_subexons_to_merge(subexon_table, delim='/'):
             for exon_table in exon_tables:
                 if exon_table.shape[0] > 1:
                     subexon_index += _fill_subexons_to_merge(
-                        subexons_to_merge, subexons, exon_table)
+                        subexons_to_merge, subexons, exon_table, transcripts)
                     continue
         else:
             raise Exception(
@@ -537,21 +545,28 @@ def _merge_subexons(  # pylint: disable=too-many-locals
                                    ascending=True)
             assert len(transcript) == n_subexons
 
-            (merged_id, merged_dna, merged_protein, coding_start, coding_end,
-             start_phase, end_phase) = _merge_subexon_columns(transcript)
+            (merged_id, merged_dna, _, coding_start, coding_end, _,
+             _) = _merge_subexon_columns(transcript)
 
             # Pour chaque transcrit, recalculer old2new avec les rangs corrects
             for transcript_id, transcript_rows in subexon_table[group_mask].groupby('TranscriptID'):
                 transcript = transcript_rows.sort_values(by='SubexonRank', ascending=True)
-                
+                assert len(transcript) == n_subexons, transcript_id
+                # The ID, DNA and coordinates are shared; the protein and the
+                # phases are the transcript's own: a codon split at a sub-exon
+                # boundary can give a different residue in each transcript.
+                (_, _, own_protein, _, _, own_start_phase,
+                 own_end_phase) = _merge_subexon_columns(transcript)
+
                 old2new = {}
                 for index in range(1, n_subexons):
                     previous_row = transcript.iloc[index - 1, :]
                     actual_row = transcript.iloc[index, :]
                     _fill_with_new_subexon_data(old2new, previous_row, actual_row,
                                                 merged_id, merged_dna,
-                                                merged_protein, coding_start,
-                                                coding_end, start_phase, end_phase)
+                                                own_protein, coding_start,
+                                                coding_end, own_start_phase,
+                                                own_end_phase)
 
                 #for index in group_index:
                 # Appliquer old2new uniquement aux lignes de ce transcrit

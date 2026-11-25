@@ -1,0 +1,7 @@
+Species,Name,TranscriptID,Source,ExperimentSource,Biotype,Flags,Version
+homo_sapiens,LBX2-202,ENST00000377566,ensembl_havana,ensembl_havana_transcript_homo_sapiens,protein_coding,1 (assigned to previous version 8),9
+homo_sapiens,LBX2-203,ENST00000460508,ensembl_havana,ensembl_havana_transcript_homo_sapiens,protein_coding,1,3
+homo_sapiens,LBX2-201,ENST00000341396,havana,havana_homo_sapiens,protein_coding,3,2
+homo_sapiens,LBX2-205,ENST00000550249,havana,havana_homo_sapiens,protein_coding_CDS_not_defined,1,2
+homo_sapiens,LBX2-204,ENST00000479098,havana,havana_homo_sapiens,protein_coding_CDS_not_defined,5,1
+homo_sapiens,LBX2-206,ENST00000618878,havana,havana_homo_sapiens,retained_intron,NA,1
