@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thoraxe package &mdash; ThorAxe 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,6 +51,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">thoraxe package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.add_transcripts.html">thoraxe.add_transcripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html">thoraxe.bulk_ensembl package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_info.html">thoraxe.transcript_info package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_query.html">thoraxe.transcript_query package</a></li>
@@ -122,16 +122,149 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.add_sequences"><code class="docutils literal notranslate"><span class="pre">add_sequences()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.add_to_exontable"><code class="docutils literal notranslate"><span class="pre">add_to_exontable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.add_to_tsl"><code class="docutils literal notranslate"><span class="pre">add_to_tsl()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.check_input"><code class="docutils literal notranslate"><span class="pre">check_input()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.clean_dataframe"><code class="docutils literal notranslate"><span class="pre">clean_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.get_output_paths"><code class="docutils literal notranslate"><span class="pre">get_output_paths()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.merge_with_exontable"><code class="docutils literal notranslate"><span class="pre">merge_with_exontable()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.parse_command_line"><code class="docutils literal notranslate"><span class="pre">parse_command_line()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.read_exon_file"><code class="docutils literal notranslate"><span class="pre">read_exon_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.read_fasta"><code class="docutils literal notranslate"><span class="pre">read_fasta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.add_transcripts.html#thoraxe.add_transcripts.add_transcripts.read_transcript_file"><code class="docutils literal notranslate"><span class="pre">read_transcript_file()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="thoraxe.add_transcripts.html#module-thoraxe.add_transcripts">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="thoraxe.bulk_ensembl.html">thoraxe.bulk_ensembl package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.biomart">thoraxe.bulk_ensembl.biomart module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.ARCHIVE_HOSTS"><code class="docutils literal notranslate"><span class="pre">ARCHIVE_HOSTS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.ATTRIBUTES"><code class="docutils literal notranslate"><span class="pre">ATTRIBUTES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.HEADERS"><code class="docutils literal notranslate"><span class="pre">HEADERS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.biomart_host"><code class="docutils literal notranslate"><span class="pre">biomart_host()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.dataset_for_species"><code class="docutils literal notranslate"><span class="pre">dataset_for_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.download_species"><code class="docutils literal notranslate"><span class="pre">download_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.gene_datasets"><code class="docutils literal notranslate"><span class="pre">gene_datasets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.served_release"><code class="docutils literal notranslate"><span class="pre">served_release()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.biomart.xml_query"><code class="docutils literal notranslate"><span class="pre">xml_query()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.cli">thoraxe.bulk_ensembl.cli module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.cli.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.cli.parse_command_line"><code class="docutils literal notranslate"><span class="pre">parse_command_line()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.compara">thoraxe.bulk_ensembl.compara module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.DEFAULT_HOMOLOGY_SPECIES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_HOMOLOGY_SPECIES</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.build_homology_index"><code class="docutils literal notranslate"><span class="pre">build_homology_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.build_tree_index"><code class="docutils literal notranslate"><span class="pre">build_tree_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.homologies"><code class="docutils literal notranslate"><span class="pre">homologies()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.index_query_species"><code class="docutils literal notranslate"><span class="pre">index_query_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.missing_homology_species"><code class="docutils literal notranslate"><span class="pre">missing_homology_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.ortholog_species"><code class="docutils literal notranslate"><span class="pre">ortholog_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.compara.tree_newick"><code class="docutils literal notranslate"><span class="pre">tree_newick()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.download">thoraxe.bulk_ensembl.download module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan"><code class="docutils literal notranslate"><span class="pre">FtpPlan</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.add"><code class="docutils literal notranslate"><span class="pre">FtpPlan.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.add_compara"><code class="docutils literal notranslate"><span class="pre">FtpPlan.add_compara()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.add_species"><code class="docutils literal notranslate"><span class="pre">FtpPlan.add_species()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.checksums"><code class="docutils literal notranslate"><span class="pre">FtpPlan.checksums()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.core_dirs"><code class="docutils literal notranslate"><span class="pre">FtpPlan.core_dirs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.FtpPlan.run"><code class="docutils literal notranslate"><span class="pre">FtpPlan.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.bsd_sum"><code class="docutils literal notranslate"><span class="pre">bsd_sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.download"><code class="docutils literal notranslate"><span class="pre">download()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.fetch"><code class="docutils literal notranslate"><span class="pre">fetch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.list_dir"><code class="docutils literal notranslate"><span class="pre">list_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.parse_checksums"><code class="docutils literal notranslate"><span class="pre">parse_checksums()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.read_text"><code class="docutils literal notranslate"><span class="pre">read_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.download.release_url"><code class="docutils literal notranslate"><span class="pre">release_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.exons">thoraxe.bulk_ensembl.exons module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.exons.build_index"><code class="docutils literal notranslate"><span class="pre">build_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.exons.exon_table"><code class="docutils literal notranslate"><span class="pre">exon_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.index">thoraxe.bulk_ensembl.index module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.index.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.index.index_compara"><code class="docutils literal notranslate"><span class="pre">index_compara()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.index.index_species"><code class="docutils literal notranslate"><span class="pre">index_species()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.layout">thoraxe.bulk_ensembl.layout module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir"><code class="docutils literal notranslate"><span class="pre">BulkDir</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.compara_emf"><code class="docutils literal notranslate"><span class="pre">BulkDir.compara_emf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv"><code class="docutils literal notranslate"><span class="pre">BulkDir.compara_tsv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv_species"><code class="docutils literal notranslate"><span class="pre">BulkDir.compara_tsv_species()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.core_dir"><code class="docutils literal notranslate"><span class="pre">BulkDir.core_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.exons_db"><code class="docutils literal notranslate"><span class="pre">BulkDir.exons_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.exons_no_dataset"><code class="docutils literal notranslate"><span class="pre">BulkDir.exons_no_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.exons_raw"><code class="docutils literal notranslate"><span class="pre">BulkDir.exons_raw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.genome_fa"><code class="docutils literal notranslate"><span class="pre">BulkDir.genome_fa()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.genome_gz"><code class="docutils literal notranslate"><span class="pre">BulkDir.genome_gz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.gtf_db"><code class="docutils literal notranslate"><span class="pre">BulkDir.gtf_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.gtf_gz"><code class="docutils literal notranslate"><span class="pre">BulkDir.gtf_gz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.homologies_db"><code class="docutils literal notranslate"><span class="pre">BulkDir.homologies_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.info_path"><code class="docutils literal notranslate"><span class="pre">BulkDir.info_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.missing_indexes"><code class="docutils literal notranslate"><span class="pre">BulkDir.missing_indexes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.mysql_dir"><code class="docutils literal notranslate"><span class="pre">BulkDir.mysql_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.read_info"><code class="docutils literal notranslate"><span class="pre">BulkDir.read_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.ready_species"><code class="docutils literal notranslate"><span class="pre">BulkDir.ready_species()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.trees_db"><code class="docutils literal notranslate"><span class="pre">BulkDir.trees_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.tsl_tables_dir"><code class="docutils literal notranslate"><span class="pre">BulkDir.tsl_tables_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.BulkDir.write_info"><code class="docutils literal notranslate"><span class="pre">BulkDir.write_info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.EG_VERSION_OFFSET"><code class="docutils literal notranslate"><span class="pre">EG_VERSION_OFFSET</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.layout.eg_version"><code class="docutils literal notranslate"><span class="pre">eg_version()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.query">thoraxe.bulk_ensembl.query module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.query.QUERY_EXONS_LABEL"><code class="docutils literal notranslate"><span class="pre">QUERY_EXONS_LABEL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.query.get_orthologs"><code class="docutils literal notranslate"><span class="pre">get_orthologs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.query.resolve_gene"><code class="docutils literal notranslate"><span class="pre">resolve_gene()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.query.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.query.write_ensembl_version"><code class="docutils literal notranslate"><span class="pre">write_ensembl_version()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.sequences">thoraxe.bulk_ensembl.sequences module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.Genome"><code class="docutils literal notranslate"><span class="pre">Genome</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.Genome.close"><code class="docutils literal notranslate"><span class="pre">Genome.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.Genome.fetch"><code class="docutils literal notranslate"><span class="pre">Genome.fetch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.SpeciesSequences"><code class="docutils literal notranslate"><span class="pre">SpeciesSequences</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.SpeciesSequences.close"><code class="docutils literal notranslate"><span class="pre">SpeciesSequences.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.SpeciesSequences.exon_records"><code class="docutils literal notranslate"><span class="pre">SpeciesSequences.exon_records()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.build_fai"><code class="docutils literal notranslate"><span class="pre">build_fai()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.build_gtf_index"><code class="docutils literal notranslate"><span class="pre">build_gtf_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.decompress"><code class="docutils literal notranslate"><span class="pre">decompress()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.genes_named"><code class="docutils literal notranslate"><span class="pre">genes_named()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.sequences.reverse_complement"><code class="docutils literal notranslate"><span class="pre">reverse_complement()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl.tsl">thoraxe.bulk_ensembl.tsl module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.SpeciesTables"><code class="docutils literal notranslate"><span class="pre">SpeciesTables</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.SpeciesTables.rows"><code class="docutils literal notranslate"><span class="pre">SpeciesTables.rows()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.TablesCache"><code class="docutils literal notranslate"><span class="pre">TablesCache</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.TablesCache.get"><code class="docutils literal notranslate"><span class="pre">TablesCache.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.TablesCache.rows"><code class="docutils literal notranslate"><span class="pre">TablesCache.rows()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.bulk_ensembl.html#thoraxe.bulk_ensembl.tsl.build_tables"><code class="docutils literal notranslate"><span class="pre">build_tables()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.bulk_ensembl.html#module-thoraxe.bulk_ensembl">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a><ul>

@@ -1,0 +1,71 @@
+thoraxe.bulk\_ensembl package
+=============================
+
+Submodules
+----------
+
+thoraxe.bulk\_ensembl.biomart module
+------------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.biomart
+   :members:
+
+thoraxe.bulk\_ensembl.cli module
+--------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.cli
+   :members:
+
+thoraxe.bulk\_ensembl.compara module
+------------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.compara
+   :members:
+
+thoraxe.bulk\_ensembl.download module
+-------------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.download
+   :members:
+
+thoraxe.bulk\_ensembl.exons module
+----------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.exons
+   :members:
+
+thoraxe.bulk\_ensembl.index module
+----------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.index
+   :members:
+
+thoraxe.bulk\_ensembl.layout module
+-----------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.layout
+   :members:
+
+thoraxe.bulk\_ensembl.query module
+----------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.query
+   :members:
+
+thoraxe.bulk\_ensembl.sequences module
+--------------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.sequences
+   :members:
+
+thoraxe.bulk\_ensembl.tsl module
+--------------------------------
+
+.. automodule:: thoraxe.bulk_ensembl.tsl
+   :members:
+
+Module contents
+---------------
+
+.. automodule:: thoraxe.bulk_ensembl
+   :members:

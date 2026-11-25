@@ -30,6 +30,11 @@ For example, let's say you want to analyse *MAPK8* between human and mouse:
    stable ID** instead. For example: 
    ``transcript_query ENSG00000107643 --specieslist homo_sapiens,mus_musculus``
 
+.. tip::
+   To prepare many genes, download the Ensembl release once with
+   `ensembl_bulk`_ and run ``transcript_query`` with ``--bulk-dir``: every gene
+   then comes from the same release, without querying Ensembl gene by gene.
+
 
 [OPTIONAL] Add transcripts to the previously download data
 -----------------------------------------------------------
@@ -52,5 +57,6 @@ running `thoraxe -h`.
 .. _publication: https://doi.org/10.1101/2020.11.14.382820
 .. _transcript_query: https://phylosofs-team.github.io/thoraxe/programs/transcript_query.html
 .. _add_transcripts: https://phylosofs-team.github.io/thoraxe/programs/add_transcripts.html
+.. _ensembl_bulk: https://phylosofs-team.github.io/thoraxe/programs/ensembl_bulk.html
 .. _thoraxe: https://phylosofs-team.github.io/thoraxe/programs/thoraxe.html
 .. _YouTube tutorial: https://www.youtube.com/watch?v=Z96985kX-uY

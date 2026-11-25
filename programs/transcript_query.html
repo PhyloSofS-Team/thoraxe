@@ -1,26 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>transcript_query &mdash; ThorAxe 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="add_transcripts" href="add_transcripts.html" />
+    <link rel="next" title="ensembl_bulk" href="ensembl_bulk.html" />
     <link rel="prev" title="thoraxe" href="thoraxe.html" /> 
 </head>
 
@@ -49,10 +48,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="programs.html">Command line programs</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="thoraxe.html">thoraxe</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">transcript_query</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="ensembl_bulk.html">ensembl_bulk</a></li>
 <li class="toctree-l2"><a class="reference internal" href="add_transcripts.html">add_transcripts</a></li>
 </ul>
 </li>
@@ -93,20 +93,20 @@ information needed for thoraxe.</p>
 </div></blockquote>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">transcript_query</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SPECIES</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">ORTHOLOGY</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
-                        <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
+                        <span class="p">[</span><span class="o">--</span><span class="n">bulk</span><span class="o">-</span><span class="nb">dir</span> <span class="n">BULK_DIR</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span>
                         <span class="n">genename</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading"></a></h2>
+<section id="positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>genename</kbd></dt>
 <dd><p>gene name in Ensembl (e.g. MAPK8) or the Ensembl Stable ID (e.g ENSG00000107643). Note that the Stable ID can not include a version number at the end.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading"></a></h2>
+<section id="named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h2>
 <dl class="option-list">
 <dt><kbd>-s, --species</kbd></dt>
 <dd><p>species to look for the gene name</p>
@@ -124,6 +124,10 @@ information needed for thoraxe.</p>
 <dd><p>Print detailed progress.</p>
 <p>Default: False</p>
 </dd>
+<dt><kbd>--bulk-dir</kbd></dt>
+<dd><p>Read Ensembl from this folder of bulk files, prepared with “ensembl_bulk download” and “ensembl_bulk index”, instead of the Ensembl REST API and BioMart. Without --specieslist, the species of the bulk folder are used.</p>
+<p>Default: “”</p>
+</dd>
 <dt><kbd>--version</kbd></dt>
 <dd><p>show program’s version number and exit</p>
 </dd>
@@ -137,7 +141,7 @@ Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>It is possible to get more transcripts and genes by allowing <cite>1:n</cite> or <cite>n:m</cite>
-orthology using the <cite>–orthology</cite> argument. However, <cite>thoraxe</cite> can not
+orthology using the <cite>--orthology</cite> argument. However, <cite>thoraxe</cite> can not
 ensure that the <em>s-exons</em> contain orthologous exonic regions under
 that setup.</p>
 </div>
@@ -148,7 +152,7 @@ that setup.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="thoraxe.html" class="btn btn-neutral float-left" title="thoraxe" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="add_transcripts.html" class="btn btn-neutral float-right" title="add_transcripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="ensembl_bulk.html" class="btn btn-neutral float-right" title="ensembl_bulk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

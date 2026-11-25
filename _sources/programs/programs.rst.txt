@@ -6,4 +6,5 @@ thoraxe
 
    thoraxe
    transcript_query
+   ensembl_bulk
    add_transcripts

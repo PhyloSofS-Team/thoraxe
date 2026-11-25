@@ -1,22 +1,21 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>thoraxe.transcript_info package &mdash; ThorAxe 0.1.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -52,6 +51,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="thoraxe.html">thoraxe package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="thoraxe.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.add_transcripts.html">thoraxe.add_transcripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.bulk_ensembl.html">thoraxe.bulk_ensembl package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">thoraxe.transcript_info package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_query.html">thoraxe.transcript_query package</a></li>
@@ -277,12 +277,12 @@ of the next one.</p>
 <p>Let X, y and z denote codon bases that belong to exons X, y and z.
 Let - denote intron bases.</p>
 <dl class="simple">
-<dt>0 - No interruption.</dt><dd><p>XXX——yyyzzz</p>
+<dt>0 - No interruption.</dt><dd><p>XXX------yyyzzz</p>
 </dd>
-<dt>1 - first codon’s first base is in the previous exon.</dt><dd><p>X——XXyyyzzz</p>
+<dt>1 - first codon’s first base is in the previous exon.</dt><dd><p>X------XXyyyzzz</p>
 </dd>
 <dt>2 - first codon’s first two bases are in the</dt><dd><p>previous exon.
-XX——Xyyyzzz</p>
+XX------Xyyyzzz</p>
 </dd>
 </dl>
 <p>NOTE: This function can not calculate a phase of -1.</p>
@@ -452,20 +452,20 @@ from multiple ESTs (Expressed Sequence Tags).</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data_frame</strong> – DataFrame that’s going to store the cluster column.</p></li>
-<li><p><strong>cluster_list</strong> – List of sets.</p></li>
-<li><p><strong>default_values</strong> – Name of existing DataFrame column that containts the default
+<li><p><strong>data_frame</strong> -- DataFrame that’s going to store the cluster column.</p></li>
+<li><p><strong>cluster_list</strong> -- List of sets.</p></li>
+<li><p><strong>default_values</strong> -- Name of existing DataFrame column that containts the default
 (string) values for the new column.</p></li>
-<li><p><strong>column_name</strong> – Name of the new column to add with the cluster information.</p></li>
-<li><p><strong>item2str</strong> – Function to map from cluster item to its representation in the
+<li><p><strong>column_name</strong> -- Name of the new column to add with the cluster information.</p></li>
+<li><p><strong>item2str</strong> -- Function to map from cluster item to its representation in the
 DataFrame (default: str)</p></li>
-<li><p><strong>getitem</strong> – Function to get the cluster item from the DataFrame row and the index
+<li><p><strong>getitem</strong> -- Function to get the cluster item from the DataFrame row and the index
 of the default_values column (default: default value).</p></li>
-<li><p><strong>delim</strong> – Character delimiting cluster items (default: ‘/’).</p></li>
+<li><p><strong>delim</strong> -- Character delimiting cluster items (default: ‘/’).</p></li>
 </ul>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cluster_list</span> <span class="o">=</span> <span class="p">[{</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store_cluster</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cluster_list</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>

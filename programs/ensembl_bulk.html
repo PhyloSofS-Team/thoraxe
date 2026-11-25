@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ensembl_bulk &mdash; ThorAxe 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="add_transcripts" href="add_transcripts.html" />
+    <link rel="prev" title="transcript_query" href="transcript_query.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ThorAxe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">Command line programs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="thoraxe.html">thoraxe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="transcript_query.html">transcript_query</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ensembl_bulk</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#download">download</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#index">index</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="add_transcripts.html">add_transcripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../output.html">Output description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">Module API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ThorAxe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="programs.html">thoraxe</a></li>
+      <li class="breadcrumb-item active">ensembl_bulk</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/programs/ensembl_bulk.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ensembl-bulk">
+<h1>ensembl_bulk<a class="headerlink" href="#ensembl-bulk" title="Permalink to this heading"></a></h1>
+<p><cite>ensembl_bulk</cite> prepares a folder of Ensembl bulk files that <cite>transcript_query</cite>
+reads with <code class="docutils literal notranslate"><span class="pre">--bulk-dir</span></code>, instead of querying the Ensembl REST API and BioMart
+gene by gene. All the inputs then come from one Ensembl release, whatever the
+date of the run, and building the input folder of a gene takes seconds:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ensembl_bulk</span> <span class="n">download</span> <span class="n">ensembl_115</span> <span class="o">--</span><span class="n">release</span> <span class="mi">115</span>
+<span class="n">ensembl_bulk</span> <span class="n">index</span> <span class="n">ensembl_115</span>
+<span class="n">transcript_query</span> <span class="n">ENSG00000107643</span> <span class="o">--</span><span class="n">bulk</span><span class="o">-</span><span class="nb">dir</span> <span class="n">ensembl_115</span> <span class="o">--</span><span class="n">orthology</span> <span class="mi">1</span><span class="p">:</span><span class="n">n</span>
+</pre></div>
+</div>
+<p><cite>download</cite> fetches the Compara gene trees and homologies, and, for each
+species, the GTF, the unmasked toplevel genome and part of the core database
+dump from the Ensembl FTP site, and one exon table from the BioMart archive
+site of the release. By default the species are the query species and every
+species with an ortholog of it, i.e. those <cite>transcript_query</cite> uses without
+<code class="docutils literal notranslate"><span class="pre">--specieslist</span></code>: 199 species and about 120 GB for human in Ensembl 115.
+<code class="docutils literal notranslate"><span class="pre">--specieslist</span></code> restricts the download to some species. Every file is checked
+against the Ensembl checksums, and running the command again resumes an
+interrupted download. <cite>index</cite> then builds the indexes that <cite>transcript_query</cite>
+reads. With the decompressed genomes, a species takes about 3 GB (about
+0.55 TB for the 199 species).
+<code class="docutils literal notranslate"><span class="pre">scripts/ensembl_bulk.sbatch</span></code> runs both steps as one SLURM job.</p>
+<p><code class="docutils literal notranslate"><span class="pre">transcript_query</span> <span class="pre">--bulk-dir</span></code> writes the same files as <cite>transcript_query</cite>,
+with two expected differences: the order of sibling subtrees in <cite>tree.nh</cite> can
+differ, as it does between two REST queries, and <cite>sequences.fasta</cite> can contain
+some exons of overlapping genes that the REST API omits, which <cite>thoraxe</cite> does
+not read. Without <code class="docutils literal notranslate"><span class="pre">--specieslist</span></code>, the species of the bulk folder are used.</p>
+<p><blockquote>
+<div><p>ensembl_bulk downloads and indexes the Ensembl bulk files that
+transcript_query reads with --bulk-dir, instead of querying the
+Ensembl REST API and BioMart gene by gene.
+Run “ensembl_bulk download”, then “ensembl_bulk index”.</p>
+</div></blockquote>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">ensembl_bulk</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">{</span><span class="n">download</span><span class="p">,</span><span class="n">index</span><span class="p">}</span> <span class="o">...</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h2>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>command</kbd></dt>
+<dd><p>Possible choices: download, index</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading"></a></h2>
+<dl class="option-list">
+<dt><kbd>--version</kbd></dt>
+<dd><p>show program’s version number and exit</p>
+</dd>
+</dl>
+</section>
+<section id="Sub-commands">
+<h2>Sub-commands<a class="headerlink" href="#Sub-commands" title="Permalink to this heading"></a></h2>
+<section id="download">
+<h3>download<a class="headerlink" href="#download" title="Permalink to this heading"></a></h3>
+<p>download the bulk files of an Ensembl release</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ensembl_bulk</span> <span class="n">download</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="n">RELEASE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">QUERY_SPECIES</span><span class="p">]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">homology</span><span class="o">-</span><span class="n">species</span> <span class="p">[</span><span class="n">HOMOLOGY_SPECIES</span> <span class="p">[</span><span class="n">HOMOLOGY_SPECIES</span> <span class="o">...</span><span class="p">]]]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">biomart</span><span class="o">-</span><span class="n">host</span> <span class="n">BIOMART_HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">WORKERS</span><span class="p">]</span>
+                      <span class="n">bulk_dir</span>
+</pre></div>
+</div>
+<section id="positional-arguments_repeat1">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat1" title="Permalink to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>bulk_dir</kbd></dt>
+<dd><p>bulk folder (created if needed)</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments_repeat1">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments_repeat1" title="Permalink to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>-l, --specieslist</kbd></dt>
+<dd><p>restrict the download to these species, as in transcript_query: a list separated by commas without spaces, or a file with one species per line. If empty, every species with an ortholog of the query species is downloaded. The query species is always added.</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>-r, --release</kbd></dt>
+<dd><p>Ensembl release, e.g. 115 (required the first time)</p>
+</dd>
+<dt><kbd>-s, --query-species</kbd></dt>
+<dd><p>species of the genes given to transcript_query (default: homo_sapiens)</p>
+</dd>
+<dt><kbd>--homology-species</kbd></dt>
+<dd><p>species whose Compara homology file is also read (default: those found for homo_sapiens in release 115; “ensembl_bulk index” tells if others are needed)</p>
+</dd>
+<dt><kbd>--biomart-host</kbd></dt>
+<dd><p>BioMart site serving the release (default: its Ensembl archive site)</p>
+</dd>
+<dt><kbd>-w, --workers</kbd></dt>
+<dd><p>parallel downloads (at most 4)</p>
+<p>Default: 4</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="index">
+<h3>index<a class="headerlink" href="#index" title="Permalink to this heading"></a></h3>
+<p>build the indexes that transcript_query --bulk-dir reads</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ensembl_bulk</span> <span class="n">index</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="n">SPECIESLIST</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">w</span> <span class="n">WORKERS</span><span class="p">]</span> <span class="n">bulk_dir</span>
+</pre></div>
+</div>
+<section id="positional-arguments_repeat2">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat2" title="Permalink to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>bulk_dir</kbd></dt>
+<dd><p>bulk folder</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments_repeat2">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments_repeat2" title="Permalink to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>-l, --specieslist</kbd></dt>
+<dd><p>species to index; all downloaded species if empty</p>
+<p>Default: “”</p>
+</dd>
+<dt><kbd>-w, --workers</kbd></dt>
+<dd><p>species indexed in parallel (a few GB of memory each)</p>
+<p>Default: 1</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+<p><blockquote>
+<div><p>It has been developed at LCQB (Laboratory of Computational and
+Quantitative Biology), UMR 7238 CNRS, Sorbonne Université.</p>
+</div></blockquote>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bulk mode was validated on Ensembl 115 by running <cite>thoraxe</cite> on 19
+species from REST and from bulk input folders, for the 23,262 human genes of
+a production run. Outputs were equivalent for 19,304 genes. Both sources
+found no 1:n ortholog in the 19 species for 61 genes and no ortholog at all
+for 3,855, and <cite>thoraxe</cite> failed on both for 9. Each of the 33 remaining
+genes had a defect in its REST download (corrupted or missing exon sequences
+of an ortholog, orthologs without exons, empty exon table) or made <cite>thoraxe</cite>
+fail on the extra species of the REST folder.</p>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transcript_query.html" class="btn btn-neutral float-left" title="transcript_query" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="add_transcripts.html" class="btn btn-neutral float-right" title="add_transcripts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,929 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>thoraxe.bulk_ensembl package &mdash; ThorAxe 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="thoraxe.subexons package" href="thoraxe.subexons.html" />
+    <link rel="prev" title="thoraxe.add_transcripts package" href="thoraxe.add_transcripts.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            ThorAxe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Quick Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">Command line programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../output.html">Output description</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="thoraxe.html">thoraxe package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="thoraxe.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.add_transcripts.html">thoraxe.add_transcripts package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">thoraxe.bulk_ensembl package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.subexons.html">thoraxe.subexons package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_info.html">thoraxe.transcript_info package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.transcript_query.html">thoraxe.transcript_query package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="thoraxe.utils.html">thoraxe.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe.thoraxe">thoraxe.thoraxe module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe.version">thoraxe.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="thoraxe.html#module-thoraxe">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ThorAxe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">thoraxe</a></li>
+          <li class="breadcrumb-item"><a href="thoraxe.html">thoraxe package</a></li>
+      <li class="breadcrumb-item active">thoraxe.bulk_ensembl package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/thoraxe.bulk_ensembl.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="thoraxe-bulk-ensembl-package">
+<h1>thoraxe.bulk_ensembl package<a class="headerlink" href="#thoraxe-bulk-ensembl-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-thoraxe.bulk_ensembl.biomart">
+<span id="thoraxe-bulk-ensembl-biomart-module"></span><h2>thoraxe.bulk_ensembl.biomart module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.biomart" title="Permalink to this heading"></a></h2>
+<p>biomart: download one exon table per species from the BioMart of a release.</p>
+<p>transcript_query asks BioMart for the exon table of each gene. Here the same
+query (same 14 attributes, same dataset) is sent once per species without the
+gene filter, to the BioMart of the requested release:</p>
+<ul class="simple">
+<li><p>the archive site of the release (<code class="docutils literal notranslate"><span class="pre">ARCHIVE_HOSTS</span></code>) or <code class="docutils literal notranslate"><span class="pre">--biomart-host</span></code>;</p></li>
+<li><p>a host is used only if its mart registry advertises “Ensembl Genes &lt;R&gt;”, so
+that a dump never silently comes from another release;</p></li>
+<li><p>the answer must end with BioMart’s completion stamp <code class="docutils literal notranslate"><span class="pre">[success]</span></code>, so that a
+truncated answer is never stored.</p></li>
+</ul>
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.ARCHIVE_HOSTS">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">ARCHIVE_HOSTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{112:</span> <span class="pre">'https://may2024.archive.ensembl.org',</span> <span class="pre">113:</span> <span class="pre">'https://oct2024.archive.ensembl.org',</span> <span class="pre">114:</span> <span class="pre">'https://may2025.archive.ensembl.org',</span> <span class="pre">115:</span> <span class="pre">'https://sep2025.archive.ensembl.org',</span> <span class="pre">116:</span> <span class="pre">'https://jun2026.archive.ensembl.org'}</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.ARCHIVE_HOSTS" title="Permalink to this definition"></a></dt>
+<dd><p>Archive site of each Ensembl release (https only).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.ATTRIBUTES">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">ATTRIBUTES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['ensembl_gene_id',</span> <span class="pre">'ensembl_transcript_id',</span> <span class="pre">'ensembl_peptide_id',</span> <span class="pre">'strand',</span> <span class="pre">'ensembl_exon_id',</span> <span class="pre">'exon_chrom_start',</span> <span class="pre">'exon_chrom_end',</span> <span class="pre">'rank',</span> <span class="pre">'cdna_coding_start',</span> <span class="pre">'cdna_coding_end',</span> <span class="pre">'genomic_coding_start',</span> <span class="pre">'genomic_coding_end',</span> <span class="pre">'phase',</span> <span class="pre">'end_phase']</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.ATTRIBUTES" title="Permalink to this definition"></a></dt>
+<dd><p>The BioMart attributes of transcript_query, in its order.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.HEADERS">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">HEADERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'User-Agent':</span> <span class="pre">'thoraxe-ensembl-bulk'}</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.HEADERS" title="Permalink to this definition"></a></dt>
+<dd><p>Some mirrors refuse the default python-requests User-Agent.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.biomart_host">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">biomart_host</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.biomart_host" title="Permalink to this definition"></a></dt>
+<dd><p>Return a BioMart host serving release (host if given, else the archive).</p>
+<p>Raise ValueError if the host serves another release.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.dataset_for_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">dataset_for_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.dataset_for_species" title="Permalink to this definition"></a></dt>
+<dd><p>BioMart gene dataset of species, as transcript_query names it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.download_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">download_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_dataset_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.download_species" title="Permalink to this definition"></a></dt>
+<dd><p>Download the exon table of species into raw_path (gzipped TSV).</p>
+<p>If the mart has no dataset for species, write no_dataset_path instead
+(transcript_query records such genes in errors.csv). Existing outputs are
+kept.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.gene_datasets">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">gene_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.gene_datasets" title="Permalink to this definition"></a></dt>
+<dd><p>Names of the gene datasets of the Ensembl mart of host.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.served_release">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">served_release</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.served_release" title="Permalink to this definition"></a></dt>
+<dd><p>Ensembl release advertised by the mart registry of host (None if none).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.biomart.xml_query">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.biomart.</span></span><span class="sig-name descname"><span class="pre">xml_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.biomart.xml_query" title="Permalink to this definition"></a></dt>
+<dd><p>Return the BioMart XML query of transcript_query, without gene filter.</p>
+<p>The completion stamp makes BioMart end a complete answer with [success].</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.cli">
+<span id="thoraxe-bulk-ensembl-cli-module"></span><h2>thoraxe.bulk_ensembl.cli module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.cli" title="Permalink to this heading"></a></h2>
+<p>cli: the ensembl_bulk program (download and index the bulk files).</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.cli.main">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.cli.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.cli.main" title="Permalink to this definition"></a></dt>
+<dd><p>Main function of ensembl_bulk.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.cli.parse_command_line">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.cli.</span></span><span class="sig-name descname"><span class="pre">parse_command_line</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.cli.parse_command_line" title="Permalink to this definition"></a></dt>
+<dd><p>Parse command line.</p>
+<p>It uses argparse to parse ensembl_bulk’s command line arguments and returns
+the argparse parser.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.compara">
+<span id="thoraxe-bulk-ensembl-compara-module"></span><h2>thoraxe.bulk_ensembl.compara module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.compara" title="Permalink to this heading"></a></h2>
+<p>compara: gene trees and orthologs from the Ensembl Compara bulk files.</p>
+<p>transcript_query asks, per gene,</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tree.nh</span></code>: REST <code class="docutils literal notranslate"><span class="pre">/genetree/member/id/&lt;species&gt;/&lt;gene&gt;?nh_format=full</span></code>;</p></li>
+<li><p>the orthologs: REST <code class="docutils literal notranslate"><span class="pre">/homology/id/&lt;species&gt;/&lt;gene&gt;</span></code>.</p></li>
+</ul>
+<p>Here both come from the <code class="docutils literal notranslate"><span class="pre">protein_default</span></code> collection of Compara:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Compara.&lt;R&gt;.protein_default.nh.emf.gz</span></code>: every gene tree (Newick) and its
+members, indexed in <code class="docutils literal notranslate"><span class="pre">trees.sqlite</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Compara.&lt;R&gt;.protein_default.homologies.tsv.gz</span></code>: the homology pairs of one
+species, indexed in <code class="docutils literal notranslate"><span class="pre">homologies.sqlite</span></code> for the query species.</p></li>
+</ul>
+<p>The homology file of a species does not hold all of its pairs: in release 115,
+the human file lacks every pair whose other gene belongs to
+cricetulus_griseus_picr, equus_caballus, mus_musculus, ovis_aries or sus_scrofa.
+Those pairs are only in the files of these species, with the human gene as
+homology partner. The index therefore reads the query species file and, in
+reverse, the files of the other downloaded species. <cite>missing_homology_species</cite>
+finds the species whose file is needed for a complete index.</p>
+<p>A tree from the EMF dump has the same leaves, labels and branch lengths as the
+REST tree; the order of sibling subtrees can differ, as it does between two
+REST calls.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.DEFAULT_HOMOLOGY_SPECIES">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_HOMOLOGY_SPECIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'homo_sapiens':</span> <span class="pre">['cricetulus_griseus_picr',</span> <span class="pre">'equus_caballus',</span> <span class="pre">'mus_musculus',</span> <span class="pre">'ovis_aries',</span> <span class="pre">'sus_scrofa']}</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.DEFAULT_HOMOLOGY_SPECIES" title="Permalink to this definition"></a></dt>
+<dd><p>Species whose homology file carries human pairs absent from the human file
+(Ensembl release 115, see the module documentation).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.build_homology_index">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">build_homology_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_tsv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_tsvs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.build_homology_index" title="Permalink to this definition"></a></dt>
+<dd><p>Index the homologies of query_species into db_path.</p>
+<p>Rows of query_tsv are read forward (gene_stable_id is the query gene). Rows
+of the other files are kept only when homology_species is query_species,
+and stored with the homology partner as query gene.
+Table: homology(gene_id, species, type, target_gene_id, target_species).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.build_tree_index">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">build_tree_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emf_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.build_tree_index" title="Permalink to this definition"></a></dt>
+<dd><p>Index the EMF Newick dump into db_path.</p>
+<p>Tables: members(gene_id, species, peptide_id, gene_name, tree_id) and
+trees(tree_id, newick).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.homologies">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">homologies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">homologies_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.homologies" title="Permalink to this definition"></a></dt>
+<dd><p>Return the homologies of gene_id as REST /homology/id returns them.</p>
+<p>Each element is a dict with ‘type’, ‘source’ and ‘target’ (‘species’ and
+‘id’), the fields that transcript_query uses. Index order.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.index_query_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">index_query_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">homologies_db</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.index_query_species" title="Permalink to this definition"></a></dt>
+<dd><p>Return the query species the homology index was built for.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.missing_homology_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">missing_homology_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trees_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">homologies_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.missing_homology_species" title="Permalink to this definition"></a></dt>
+<dd><p>Return the species that share a gene tree with a query_species gene but
+have no homology with it in the index (their homology file is needed).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.ortholog_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">ortholog_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_tsv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_tsvs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.ortholog_species" title="Permalink to this definition"></a></dt>
+<dd><p>Return the species with an ortholog of a query_species gene.</p>
+<p>These are the species that transcript_query can query without
+--specieslist: any orthology type, at least two name parts, no hybrid
+cattle. The homology files are read as in build_homology_index.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.compara.tree_newick">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.compara.</span></span><span class="sig-name descname"><span class="pre">tree_newick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trees_db</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.compara.tree_newick" title="Permalink to this definition"></a></dt>
+<dd><p>Return the Newick text of the gene tree containing gene_id (None if none).</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.download">
+<span id="thoraxe-bulk-ensembl-download-module"></span><h2>thoraxe.bulk_ensembl.download module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.download" title="Permalink to this heading"></a></h2>
+<p>download: fetch the bulk files of one Ensembl release.</p>
+<p>From the FTP site (<code class="docutils literal notranslate"><span class="pre">https://ftp.ensembl.org/pub/release-&lt;R&gt;/</span></code>), each file is
+checked against the CHECKSUMS file of its directory (BSD <code class="docutils literal notranslate"><span class="pre">sum</span></code>, as Ensembl
+publishes it):</p>
+<ul class="simple">
+<li><p>Compara: the protein_default gene trees (EMF) and the homology TSV of the
+query species and of the --homology-species;</p></li>
+<li><p>for each species: the complete GTF, the unmasked toplevel genome and the core
+database tables that tsl.csv needs. By default, the species are the query
+species and every species with an ortholog of it in the Compara homology
+files (199 species for homo_sapiens in Ensembl 115, about 120 GB).</p></li>
+</ul>
+<p>From BioMart: one exon table per species (see biomart).</p>
+<p>Existing files that match their checksum are kept, so an interrupted download
+can be resumed by running the same command again.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">FtpPlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan" title="Permalink to this definition"></a></dt>
+<dd><p>The FTP files of a bulk folder: (url, destination, expected checksum).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.add" title="Permalink to this definition"></a></dt>
+<dd><p>Add folder/name, saved as dest, with its CHECKSUMS next to it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.add_compara">
+<span class="sig-name descname"><span class="pre">add_compara</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.add_compara" title="Permalink to this definition"></a></dt>
+<dd><p>Compara gene trees and the homology TSV of each species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.add_species">
+<span class="sig-name descname"><span class="pre">add_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">core_dirs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.add_species" title="Permalink to this definition"></a></dt>
+<dd><p>GTF, genome and core database tables of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.checksums">
+<span class="sig-name descname"><span class="pre">checksums</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.checksums" title="Permalink to this definition"></a></dt>
+<dd><p>CHECKSUMS of an FTP folder (relative to the release), kept locally too.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.core_dirs">
+<span class="sig-name descname"><span class="pre">core_dirs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.core_dirs" title="Permalink to this definition"></a></dt>
+<dd><p>Core database dump folder of each species of the release.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.FtpPlan.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.FtpPlan.run" title="Permalink to this definition"></a></dt>
+<dd><p>Download every planned file; return {status: count}.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.bsd_sum">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">bsd_sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.bsd_sum" title="Permalink to this definition"></a></dt>
+<dd><p>BSD sum(1) of path: 16-bit rotating checksum and size in 1 KiB blocks.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.download">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">homology_species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">biomart_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.download" title="Permalink to this definition"></a></dt>
+<dd><p>Download the bulk files of species_list into the bulk folder.</p>
+<p>species_list None means every species with an ortholog of the query
+species in Compara, the species transcript_query uses without
+--specieslist; the query species is always added. homology_species are the
+species whose Compara homology TSV is read in reverse (see compara).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.fetch">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.fetch" title="Permalink to this definition"></a></dt>
+<dd><p>Download url into dest unless dest already has the expected checksum.</p>
+<p>Return ‘kept’ or ‘downloaded’. Raise if the download does not match.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.list_dir">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">list_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.list_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Return the names listed in an FTP folder (HTML index) at url.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.parse_checksums">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">parse_checksums</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.parse_checksums" title="Permalink to this definition"></a></dt>
+<dd><p>Return {file name: (checksum, blocks)} from a CHECKSUMS file.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parse_checksums</span><span class="p">(</span><span class="s1">&#39;45573 45635 a.gz&#39;</span><span class="p">)</span>
+<span class="go">{&#39;a.gz&#39;: (45573, 45635)}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.read_text">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">read_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.read_text" title="Permalink to this definition"></a></dt>
+<dd><p>Return the text at url.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.download.release_url">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.download.</span></span><span class="sig-name descname"><span class="pre">release_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.download.release_url" title="Permalink to this definition"></a></dt>
+<dd><p>Root of the FTP folder of an Ensembl release.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.exons">
+<span id="thoraxe-bulk-ensembl-exons-module"></span><h2>thoraxe.bulk_ensembl.exons module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.exons" title="Permalink to this heading"></a></h2>
+<p>exons: exonstable.tsv from the BioMart dump of each species.</p>
+<p>The dump of a species (biomart.download_species) holds the answer that
+transcript_query would get for each of its genes, one after the other. It is
+indexed by gene (first column) in <code class="docutils literal notranslate"><span class="pre">&lt;species&gt;.sqlite</span></code>, keeping the dump order,
+so that <cite>exon_table</cite> returns the text transcript_query writes for a gene.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.exons.build_index">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.exons.</span></span><span class="sig-name descname"><span class="pre">build_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.exons.build_index" title="Permalink to this definition"></a></dt>
+<dd><p>Index the BioMart dump raw_path into db_path.</p>
+<p>Tables: exons(c0..c13, the dump columns, rowid = dump order) and
+meta(key, value) with the dump header.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.exons.exon_table">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.exons.</span></span><span class="sig-name descname"><span class="pre">exon_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.exons.exon_table" title="Permalink to this definition"></a></dt>
+<dd><p>Return the BioMart answer for gene_id (None if the gene has no rows).</p>
+<p>The header line is included if header is True. The caller applies
+transcript_query’s column renaming.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.index">
+<span id="thoraxe-bulk-ensembl-index-module"></span><h2>thoraxe.bulk_ensembl.index module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.index" title="Permalink to this heading"></a></h2>
+<p>index: build the indexes that transcript_query --bulk-dir reads.</p>
+<p>Each index is written to a temporary file and renamed when complete, and
+existing indexes are kept: running the command again resumes an interrupted
+run. Delete an index to rebuild it.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.index.index">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.index.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.index.index" title="Permalink to this definition"></a></dt>
+<dd><p>Build every index of the bulk folder.</p>
+<p>species_list defaults to the species of bulk_info.json. workers species are
+indexed in parallel (each one needs a few GB of memory).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.index.index_compara">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.index.</span></span><span class="sig-name descname"><span class="pre">index_compara</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.index.index_compara" title="Permalink to this definition"></a></dt>
+<dd><p>Build the gene tree and homology indexes of the bulk folder.</p>
+<p>The homology index is rebuilt when the downloaded homology files change.
+Raise if a species that shares gene trees with the query species has no
+homology in the index (its homology file has to be downloaded).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.index.index_species">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.index.</span></span><span class="sig-name descname"><span class="pre">index_species</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.index.index_species" title="Permalink to this definition"></a></dt>
+<dd><p>Build the tsl tables, exon table, genome and GTF indexes of species.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.layout">
+<span id="thoraxe-bulk-ensembl-layout-module"></span><h2>thoraxe.bulk_ensembl.layout module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.layout" title="Permalink to this heading"></a></h2>
+<p>layout: where each bulk file and index lives inside a bulk folder.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">bulk_info</span><span class="o">.</span><span class="n">json</span>                     <span class="n">release</span><span class="p">,</span> <span class="n">query</span> <span class="n">species</span> <span class="ow">and</span> <span class="n">species</span> <span class="nb">list</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">compara</span><span class="o">/</span><span class="n">emf</span><span class="o">/</span><span class="n">Compara</span><span class="o">.&lt;</span><span class="n">R</span><span class="o">&gt;.</span><span class="n">protein_default</span><span class="o">.</span><span class="n">nh</span><span class="o">.</span><span class="n">emf</span><span class="o">.</span><span class="n">gz</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">compara</span><span class="o">/</span><span class="n">tsv</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;/</span><span class="n">Compara</span><span class="o">.&lt;</span><span class="n">R</span><span class="o">&gt;.</span><span class="n">protein_default</span><span class="o">.</span><span class="n">homologies</span><span class="o">.</span><span class="n">tsv</span><span class="o">.</span><span class="n">gz</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">compara</span><span class="o">/</span><span class="n">index</span><span class="o">/</span><span class="n">trees</span><span class="o">.</span><span class="n">sqlite</span>         <span class="n">gene</span> <span class="n">trees</span> <span class="ow">and</span> <span class="n">their</span> <span class="n">members</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">compara</span><span class="o">/</span><span class="n">index</span><span class="o">/</span><span class="n">homologies</span><span class="o">.</span><span class="n">sqlite</span>    <span class="n">homologies</span> <span class="n">of</span> <span class="n">the</span> <span class="n">query</span> <span class="n">species</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">mysql</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;</span><span class="n">_core_</span><span class="o">&lt;</span><span class="n">R</span><span class="o">&gt;</span><span class="n">_</span><span class="o">&lt;</span><span class="n">N</span><span class="o">&gt;/</span>      <span class="n">core</span> <span class="n">database</span> <span class="n">dump</span> <span class="p">(</span><span class="n">some</span> <span class="n">tables</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">tables</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;/</span>                  <span class="n">transcripts</span><span class="o">.</span><span class="n">tsv</span><span class="p">,</span> <span class="n">genes</span><span class="o">.</span><span class="n">tsv</span> <span class="p">(</span><span class="n">tsl</span><span class="o">.</span><span class="n">csv</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">exons</span><span class="o">/</span><span class="n">raw</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;.</span><span class="n">tsv</span><span class="o">.</span><span class="n">gz</span>         <span class="n">BioMart</span> <span class="n">dump</span> <span class="n">of</span> <span class="n">the</span> <span class="n">species</span> <span class="n">dataset</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">exons</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;.</span><span class="n">sqlite</span>             <span class="n">the</span> <span class="n">dump</span> <span class="n">indexed</span> <span class="n">by</span> <span class="n">gene</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">gtf</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;/&lt;</span><span class="n">Species</span><span class="o">&gt;.&lt;</span><span class="n">assembly</span><span class="o">&gt;.&lt;</span><span class="n">R</span><span class="o">&gt;.</span><span class="n">gtf</span><span class="o">.</span><span class="n">gz</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">genome</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;/&lt;</span><span class="n">Species</span><span class="o">&gt;.&lt;</span><span class="n">assembly</span><span class="o">&gt;.</span><span class="n">dna</span><span class="o">.</span><span class="n">toplevel</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">gz</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">genome_fa</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;/</span>               <span class="n">decompressed</span> <span class="n">genome</span> <span class="o">+</span> <span class="o">.</span><span class="n">fai</span> <span class="n">index</span>
+<span class="o">&lt;</span><span class="n">bulk</span><span class="o">&gt;/</span><span class="n">index</span><span class="o">/&lt;</span><span class="n">species</span><span class="o">&gt;.</span><span class="n">exons</span><span class="o">.</span><span class="n">sqlite</span>       <span class="n">GTF</span> <span class="n">genes</span> <span class="ow">and</span> <span class="n">exons</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;R&gt;</span></code> is the Ensembl release. Species built by Ensembl Genomes (from release
+116: caenorhabditis_elegans, drosophila_melanogaster, saccharomyces_cerevisiae)
+also carry its release number <code class="docutils literal notranslate"><span class="pre">&lt;EG&gt;</span></code>: <code class="docutils literal notranslate"><span class="pre">&lt;species&gt;_core_&lt;EG&gt;_&lt;R&gt;_&lt;N&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&lt;Species&gt;.&lt;assembly&gt;.&lt;EG&gt;.gtf.gz</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.layout.</span></span><span class="sig-name descname"><span class="pre">BulkDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_species</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir" title="Permalink to this definition"></a></dt>
+<dd><p>Paths of one bulk folder (see the module documentation).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.compara_emf">
+<span class="sig-name descname"><span class="pre">compara_emf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.compara_emf" title="Permalink to this definition"></a></dt>
+<dd><p>Compara gene trees (Newick EMF dump).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv">
+<span class="sig-name descname"><span class="pre">compara_tsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv" title="Permalink to this definition"></a></dt>
+<dd><p>Compara homologies of one species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv_species">
+<span class="sig-name descname"><span class="pre">compara_tsv_species</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.compara_tsv_species" title="Permalink to this definition"></a></dt>
+<dd><p>Species with a downloaded Compara homology file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.core_dir">
+<span class="sig-name descname"><span class="pre">core_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.core_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Core database dump folder of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.exons_db">
+<span class="sig-name descname"><span class="pre">exons_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.exons_db" title="Permalink to this definition"></a></dt>
+<dd><p>SQLite index of the BioMart dump of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.exons_no_dataset">
+<span class="sig-name descname"><span class="pre">exons_no_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.exons_no_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Marker written when BioMart has no gene dataset for species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.exons_raw">
+<span class="sig-name descname"><span class="pre">exons_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.exons_raw" title="Permalink to this definition"></a></dt>
+<dd><p>BioMart dump of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.genome_fa">
+<span class="sig-name descname"><span class="pre">genome_fa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.genome_fa" title="Permalink to this definition"></a></dt>
+<dd><p>Decompressed genome of species (indexed with a .fai file).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.genome_gz">
+<span class="sig-name descname"><span class="pre">genome_gz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.genome_gz" title="Permalink to this definition"></a></dt>
+<dd><p>Unmasked toplevel genome of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.gtf_db">
+<span class="sig-name descname"><span class="pre">gtf_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.gtf_db" title="Permalink to this definition"></a></dt>
+<dd><p>SQLite index of the GTF genes and exons of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.gtf_gz">
+<span class="sig-name descname"><span class="pre">gtf_gz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.gtf_gz" title="Permalink to this definition"></a></dt>
+<dd><p>Complete GTF of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.homologies_db">
+<span class="sig-name descname"><span class="pre">homologies_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.homologies_db" title="Permalink to this definition"></a></dt>
+<dd><p>SQLite index of the homologies of the query species.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.info_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info_path</span></span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.info_path" title="Permalink to this definition"></a></dt>
+<dd><p>Path of bulk_info.json.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.missing_indexes">
+<span class="sig-name descname"><span class="pre">missing_indexes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.missing_indexes" title="Permalink to this definition"></a></dt>
+<dd><p>Return the indexes of species that are not built yet (empty if ready).</p>
+<p>A BioMart species without gene dataset counts as ready: its genes get
+recorded in errors.csv, as transcript_query does.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.mysql_dir">
+<span class="sig-name descname"><span class="pre">mysql_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.mysql_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Folder with the core database dumps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.read_info">
+<span class="sig-name descname"><span class="pre">read_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.read_info" title="Permalink to this definition"></a></dt>
+<dd><p>Return the content of bulk_info.json ({} if it does not exist).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.ready_species">
+<span class="sig-name descname"><span class="pre">ready_species</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.ready_species" title="Permalink to this definition"></a></dt>
+<dd><p>Species of the bulk folder whose indexes are all built.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.trees_db">
+<span class="sig-name descname"><span class="pre">trees_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.trees_db" title="Permalink to this definition"></a></dt>
+<dd><p>SQLite index of the gene trees.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.tsl_tables_dir">
+<span class="sig-name descname"><span class="pre">tsl_tables_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.tsl_tables_dir" title="Permalink to this definition"></a></dt>
+<dd><p>Transcript and gene tables of species, written by tsl.build_tables.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.BulkDir.write_info">
+<span class="sig-name descname"><span class="pre">write_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.BulkDir.write_info" title="Permalink to this definition"></a></dt>
+<dd><p>Update bulk_info.json with values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.EG_VERSION_OFFSET">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.layout.</span></span><span class="sig-name descname"><span class="pre">EG_VERSION_OFFSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">53</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.EG_VERSION_OFFSET" title="Permalink to this definition"></a></dt>
+<dd><p>Ensembl Genomes numbering of an Ensembl release, as REST /info/eg_version
+returns it (release 115 is EG 62).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.layout.eg_version">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.layout.</span></span><span class="sig-name descname"><span class="pre">eg_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">release</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.layout.eg_version" title="Permalink to this definition"></a></dt>
+<dd><p>Return the Ensembl Genomes version that transcript_query records.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">eg_version</span><span class="p">(</span><span class="mi">115</span><span class="p">)</span>
+<span class="go">62</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.query">
+<span id="thoraxe-bulk-ensembl-query-module"></span><h2>thoraxe.bulk_ensembl.query module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.query" title="Permalink to this heading"></a></h2>
+<p>query: transcript_query --bulk-dir, the &lt;gene&gt;/Ensembl/ folder from bulk files.</p>
+<p><cite>run</cite> follows transcript_query’s main step by step and writes the same files
+with the same writers; only the data source changes. The functions of
+transcript_query that filter orthologs, rename the exon table columns and
+write tsl.csv, sequences.fasta and errors.csv are reused as they are.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.query.QUERY_EXONS_LABEL">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.query.</span></span><span class="sig-name descname"><span class="pre">QUERY_EXONS_LABEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{args.species}:{args.genename}'</span></em><a class="headerlink" href="#thoraxe.bulk_ensembl.query.QUERY_EXONS_LABEL" title="Permalink to this definition"></a></dt>
+<dd><p>transcript_query labels the records of the queried gene with this literal
+text (it is not formatted); kept so that both modes write the same file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.query.get_orthologs">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.query.</span></span><span class="sig-name descname"><span class="pre">get_orthologs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.query.get_orthologs" title="Permalink to this definition"></a></dt>
+<dd><p>Bulk version of transcript_query.get_orthologs.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.query.resolve_gene">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.query.</span></span><span class="sig-name descname"><span class="pre">resolve_gene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.query.resolve_gene" title="Permalink to this definition"></a></dt>
+<dd><p>Return the Ensembl gene id of genename (a gene name or an Ensembl id).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.query.run">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.query.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.query.run" title="Permalink to this definition"></a></dt>
+<dd><p>Write &lt;genename&gt;/Ensembl/ from the bulk folder args.bulk_dir.</p>
+<p>args are transcript_query’s parsed arguments.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.query.write_ensembl_version">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.query.</span></span><span class="sig-name descname"><span class="pre">write_ensembl_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">release</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.query.write_ensembl_version" title="Permalink to this definition"></a></dt>
+<dd><p>Write ensembl_version.csv as transcript_query.save_ensembl_version does.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.sequences">
+<span id="thoraxe-bulk-ensembl-sequences-module"></span><h2>thoraxe.bulk_ensembl.sequences module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.sequences" title="Permalink to this heading"></a></h2>
+<p>sequences: sequences.fasta from the genome FASTA and the GTF of each species.</p>
+<p>transcript_query writes one record per exon returned by REST
+<code class="docutils literal notranslate"><span class="pre">/overlap/id/&lt;gene&gt;?feature=exon</span></code> (every exon, of any gene and biotype, that
+overlaps the gene), with the sequence from REST <code class="docutils literal notranslate"><span class="pre">/sequence/id</span></code> and the
+description <code class="docutils literal notranslate"><span class="pre">&lt;coord_system&gt;:&lt;assembly&gt;:&lt;seq_region&gt;:&lt;start&gt;:&lt;end&gt;:&lt;strand&gt;</span></code>.</p>
+<p>Here the exons and the gene spans come from the GTF (indexed in SQLite) and the
+sequences from the unmasked toplevel genome, decompressed once and indexed with
+a samtools-compatible <code class="docutils literal notranslate"><span class="pre">.fai</span></code> file. The sequence of an exon is the genomic
+slice of its span, reverse complemented on the minus strand (whole exon,
+UTRs included). The coordinate system and assembly of each sequence region come
+from the genome FASTA headers.</p>
+<p>Bulk files hold every exon, whereas REST <code class="docutils literal notranslate"><span class="pre">/sequence/id</span></code> silently skips some
+exon ids (e.g. of some lncRNA genes overlapping the queried gene). The extra
+records do not change thoraxe’s results: thoraxe only reads the exons listed in
+exonstable.tsv.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.Genome">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">Genome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fa_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.Genome" title="Permalink to this definition"></a></dt>
+<dd><p>Random access to an indexed genome FASTA.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.Genome.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.Genome.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close the FASTA file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.Genome.fetch">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.Genome.fetch" title="Permalink to this definition"></a></dt>
+<dd><p>Return the forward strand sequence of name:start-end (1-based, inclusive).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.SpeciesSequences">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">SpeciesSequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fa_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gtf_db</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.SpeciesSequences" title="Permalink to this definition"></a></dt>
+<dd><p>Genome and GTF index of one species, opened once for many genes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.SpeciesSequences.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.SpeciesSequences.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close the genome and the GTF index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.SpeciesSequences.exon_records">
+<span class="sig-name descname"><span class="pre">exon_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.SpeciesSequences.exon_records" title="Permalink to this definition"></a></dt>
+<dd><p>Return the sequences.fasta records of gene_id.</p>
+<p>Each record is a dict with ‘id’, ‘desc’ and ‘seq’ (the fields of the
+REST answer that transcript_query writes) and ‘label’. Raise KeyError
+if the gene is not in the GTF.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.build_fai">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">build_fai</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fa_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.build_fai" title="Permalink to this definition"></a></dt>
+<dd><p>Index fa_path: write &lt;fa&gt;.regions and &lt;fa&gt;.fai.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.fai</span></code> (name, length, offset, line bases, line width) is the samtools
+index. <code class="docutils literal notranslate"><span class="pre">.regions</span></code> keeps <code class="docutils literal notranslate"><span class="pre">coord_system:assembly</span></code> of each sequence, from
+the third word of its FASTA header. <code class="docutils literal notranslate"><span class="pre">.fai</span></code> is written last: it marks the
+genome as indexed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.build_gtf_index">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">build_gtf_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gtf_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.build_gtf_index" title="Permalink to this definition"></a></dt>
+<dd><p>Index the genes and exons of a GTF file into db_path.</p>
+<p>Tables: gene(gene_id, seq, start, end, strand, biotype, name) and
+exon(exon_id, seq, start, end, strand), one row per exon id.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.decompress">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">decompress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gz_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fa_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.decompress" title="Permalink to this definition"></a></dt>
+<dd><p>Decompress gz_path into fa_path.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.genes_named">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">genes_named</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.genes_named" title="Permalink to this definition"></a></dt>
+<dd><p>Return the ids of the genes called name in the GTF (case-insensitive).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.sequences.reverse_complement">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.sequences.</span></span><span class="sig-name descname"><span class="pre">reverse_complement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.sequences.reverse_complement" title="Permalink to this definition"></a></dt>
+<dd><p>Return the reverse complement of a DNA sequence.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reverse_complement</span><span class="p">(</span><span class="s1">&#39;AACGTN&#39;</span><span class="p">)</span>
+<span class="go">&#39;NACGTT&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl.tsl">
+<span id="thoraxe-bulk-ensembl-tsl-module"></span><h2>thoraxe.bulk_ensembl.tsl module<a class="headerlink" href="#module-thoraxe.bulk_ensembl.tsl" title="Permalink to this heading"></a></h2>
+<p>tsl: the rows of tsl.csv from the core database dump.</p>
+<p>transcript_query writes, for every queried gene, one tsl.csv row per transcript
+returned by REST <code class="docutils literal notranslate"><span class="pre">/overlap/id/&lt;gene&gt;?feature=transcript</span></code>: every current
+transcript of any gene (any biotype) that overlaps the gene on the same
+sequence region. The eight columns come from these REST fields:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>column</p></th>
+<th class="head"><p>REST field</p></th>
+<th class="head"><p>core database</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Species</p></td>
+<td><p>(queried species)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>external_name</p></td>
+<td><p>xref.display_label</p></td>
+</tr>
+<tr class="row-even"><td><p>TranscriptID</p></td>
+<td><p>id</p></td>
+<td><p>transcript.stable_id</p></td>
+</tr>
+<tr class="row-odd"><td><p>Source</p></td>
+<td><p>source</p></td>
+<td><p>transcript.source</p></td>
+</tr>
+<tr class="row-even"><td><p>ExperimentSource</p></td>
+<td><p>logic_name</p></td>
+<td><p>analysis.logic_name</p></td>
+</tr>
+<tr class="row-odd"><td><p>Biotype</p></td>
+<td><p>biotype</p></td>
+<td><p>transcript.biotype</p></td>
+</tr>
+<tr class="row-even"><td><p>Flags</p></td>
+<td><p>transcript_support_level</p></td>
+<td><p>transcript_attrib (code TSL)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Version</p></td>
+<td><p>version</p></td>
+<td><p>transcript.version</p></td>
+</tr>
+</tbody>
+</table>
+<p>The core database dump is the only bulk file with all eight (the GTF has no
+logic_name). Missing values are written as NA. The TSL value loses its “tsl”
+prefix (“tsl1 (assigned to previous version 8)” becomes
+“1 (assigned to previous version 8)”), as in REST. Rows are sorted by the
+internal transcript_id, the order of the REST answer.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.SpeciesTables">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.tsl.</span></span><span class="sig-name descname"><span class="pre">SpeciesTables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tables_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.SpeciesTables" title="Permalink to this definition"></a></dt>
+<dd><p>The tables of one species, loaded for overlap queries.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.SpeciesTables.rows">
+<span class="sig-name descname"><span class="pre">rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.SpeciesTables.rows" title="Permalink to this definition"></a></dt>
+<dd><p>Return the tsl.csv rows of gene_id as dicts (REST field names).</p>
+<p>Every current transcript overlapping the gene on its sequence region,
+in internal transcript_id order. Empty if gene_id is not a current gene.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.TablesCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.tsl.</span></span><span class="sig-name descname"><span class="pre">TablesCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bulk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.TablesCache" title="Permalink to this definition"></a></dt>
+<dd><p>Keep the tables of the last <cite>size</cite> species in memory.</p>
+<p>The query species and one ortholog species at a time is enough: the
+orthologs of a gene are queried species by species.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.TablesCache.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.TablesCache.get" title="Permalink to this definition"></a></dt>
+<dd><p>Return the SpeciesTables of species.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.TablesCache.rows">
+<span class="sig-name descname"><span class="pre">rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">species</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.TablesCache.rows" title="Permalink to this definition"></a></dt>
+<dd><p>Return the tsl.csv rows of gene_id in species.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="thoraxe.bulk_ensembl.tsl.build_tables">
+<span class="sig-prename descclassname"><span class="pre">thoraxe.bulk_ensembl.tsl.</span></span><span class="sig-name descname"><span class="pre">build_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#thoraxe.bulk_ensembl.tsl.build_tables" title="Permalink to this definition"></a></dt>
+<dd><p>Write genes.tsv and transcripts.tsv of one species into out_dir.</p>
+<p>genes.tsv: gene_stable_id, seq_region_id, start, end (current genes).
+transcripts.tsv: TRANSCRIPT_COLUMNS (current transcripts), where db_id is
+the internal transcript_id.</p>
+</dd></dl>
+
+</section>
+<section id="module-thoraxe.bulk_ensembl">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-thoraxe.bulk_ensembl" title="Permalink to this heading"></a></h2>
+<p>bulk_ensembl: build transcript_query’s input folders from Ensembl bulk files.</p>
+<p><cite>transcript_query</cite> asks the Ensembl REST API and BioMart, gene by gene, for the
+files that <cite>thoraxe</cite> reads from <code class="docutils literal notranslate"><span class="pre">&lt;gene&gt;/Ensembl/</span></code>. This subpackage builds the
+same files from the release-wide files that Ensembl publishes on its FTP site
+and from one BioMart dump per species, downloaded once:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>file</p></th>
+<th class="head"><p>online source (transcript_query)</p></th>
+<th class="head"><p>bulk source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>tree.nh</p></td>
+<td><p>REST /genetree/member/id</p></td>
+<td><p>Compara EMF dump</p></td>
+</tr>
+<tr class="row-odd"><td><p>orthologs</p></td>
+<td><p>REST /homology/id</p></td>
+<td><p>Compara homology TSV</p></td>
+</tr>
+<tr class="row-even"><td><p>tsl.csv</p></td>
+<td><p>REST /overlap/id?feature=transcript</p></td>
+<td><p>core MySQL dump</p></td>
+</tr>
+<tr class="row-odd"><td><p>exonstable.tsv</p></td>
+<td><p>BioMart, one query per gene</p></td>
+<td><p>BioMart, one query
+per species</p></td>
+</tr>
+<tr class="row-even"><td><p>sequences.fasta</p></td>
+<td><p>REST /overlap/id?feature=exon and
+/sequence/id</p></td>
+<td><p>genome FASTA + GTF</p></td>
+</tr>
+<tr class="row-odd"><td><p>ensembl_version.csv</p></td>
+<td><p>REST /info/eg_version</p></td>
+<td><p>release number</p></td>
+</tr>
+</tbody>
+</table>
+<p>The bulk folder is prepared once with <code class="docutils literal notranslate"><span class="pre">ensembl_bulk</span> <span class="pre">download</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ensembl_bulk</span> <span class="pre">index</span></code>, then <code class="docutils literal notranslate"><span class="pre">transcript_query</span> <span class="pre">--bulk-dir</span> <span class="pre">&lt;folder&gt;</span></code> reads it.
+Every query is then local, so the inputs of a run do not depend on the state of
+the Ensembl servers at download time, and they always come from one release.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="thoraxe.add_transcripts.html" class="btn btn-neutral float-left" title="thoraxe.add_transcripts package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="thoraxe.subexons.html" class="btn btn-neutral float-right" title="thoraxe.subexons package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Diego Javier Zea, Hugues Richard &amp; Elodie Laine.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
