@@ -2,6 +2,7 @@
 
 import collections
 
+import numpy as np
 import pandas as pd
 
 from thoraxe import transcript_info
@@ -145,14 +146,15 @@ def _add_subexon_rank(subexon_df):
     return subexon_df
 
 
-def _get_info_from_row(row, columns):
-    """Return a dict with from column to value."""
-    return {col: getattr(row, col) for col in columns}
+def _subexon_info(gene_df, intervals):  # pylint: disable=too-many-locals
+    """
+    Return a pandas' DataFrame for subexons.
 
-
-def _subexon_info(  # pylint: disable=too-many-locals
-        gene_df, exon_df, intervals):
-    """Return a pandas' DataFrame for subexons."""
+    `intervals` come from disjoint_intervals over the coding bounds of every
+    row of `gene_df` (one row per transcript exon), with the row number as
+    component: each sub-exon is given only to the rows whose own coding
+    region covers it.
+    """
     # We are going to use transcript_info functions to transcribe and
     # merge subexons. Therefore, we are going to use the exon table column
     # names at the beginning, and then we are going to change these column
@@ -197,9 +199,11 @@ def _subexon_info(  # pylint: disable=too-many-locals
         column_to_delete
     }
 
+    exon_rows = gene_df.to_dict('records')
     for interval_number, interval in enumerate(intervals):
-        for exon_id in interval.components:
-            exon_row = exon_df.loc[exon_id]
+        for row_number in sorted(interval.components):
+            exon_row = exon_rows[row_number]
+            exon_id = exon_row['ExonID']
             seq = _get_subexon_seq(exon_row, interval)
             subexon_info = {
                 'SubexonID': exon_id + '_SE_' + str(interval_number),
@@ -226,11 +230,12 @@ def _subexon_info(  # pylint: disable=too-many-locals
                     'GenomicCodingStart': interval.end,
                     'GenomicCodingEnd': interval.start
                 })
-            for row in gene_df[gene_df['ExonID'] == exon_id].itertuples():
-                transcript_row_info = _get_info_from_row(row, columns_to_keep)
-                transcript_row_info.update(subexon_info)
-                for key, value in transcript_row_info.items():
-                    subexon_dict[key].append(value)
+            transcript_row_info = {
+                key: exon_row.get(key, np.nan) for key in columns_to_keep
+            }
+            transcript_row_info.update(subexon_info)
+            for key, value in transcript_row_info.items():
+                subexon_dict[key].append(value)
 
     subexon_df = pd.DataFrame.from_dict(subexon_dict)
     subexon_df = _add_subexon_rank(subexon_df)
@@ -578,15 +583,14 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
     subexon_data_frames = []
     for _, gene_df in transcript_data.groupby('GeneID'):
 
-        # We need the genomic coding coordinates and the sequence of each exon
-        exon_df = gene_df.drop_duplicates(subset='ExonID')
-        exon_df.set_index('ExonID', inplace=True)
-        exon_df = exon_df.sort_values(
-            by=['GenomicCodingStart', 'GenomicCodingEnd'])
-
-        intervals = disjoint_intervals(list(exon_df['GenomicCodingStart']),
-                                       list(exon_df['GenomicCodingEnd']),
-                                       list(exon_df.index))
+        # Every transcript exon keeps its own coding bounds: an exon shared by
+        # transcripts with different CDS starts/ends is cut at each of them,
+        # instead of taking the bounds of its first row.
+        gene_df = gene_df.sort_values(
+            by=['GenomicCodingStart', 'GenomicCodingEnd'], kind='stable')
+        intervals = disjoint_intervals(gene_df['GenomicCodingStart'].tolist(),
+                                       gene_df['GenomicCodingEnd'].tolist(),
+                                       list(range(len(gene_df))))
 
         intervals = [
             interval for interval in intervals if len(interval.components) > 0
@@ -594,7 +598,7 @@ def create_subexon_table(transcript_data, merge_non_redundant=True):
 
         intervals = sorted(intervals, key=lambda interval: interval.start)
 
-        subexon_df = _subexon_info(gene_df, exon_df, intervals)
+        subexon_df = _subexon_info(gene_df, intervals)
         subexon_data_frames.append(subexon_df)
 
     subexon_table = pd.concat(subexon_data_frames)
