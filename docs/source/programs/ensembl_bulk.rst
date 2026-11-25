@@ -23,7 +23,19 @@ against the Ensembl checksums, and running the command again resumes an
 interrupted download. `index` then builds the indexes that `transcript_query`
 reads. With the decompressed genomes, a species takes about 3 GB (about
 0.55 TB for the 199 species).
-``scripts/ensembl_bulk.sbatch`` runs both steps as one SLURM job.
+On a SLURM cluster, ``thoraxe/bulk_ensembl/ensembl_bulk.sbatch`` runs both
+steps as one job, then ``thoraxe/transcript_query/transcript_query_bulk.sbatch``
+builds the folders of many genes as a job array (by default, every
+protein-coding gene of the query species):
+
+::
+
+    sbatch thoraxe/bulk_ensembl/ensembl_bulk.sbatch 115 /data/ensembl_115
+    sbatch thoraxe/transcript_query/transcript_query_bulk.sbatch \
+        /data/ensembl_115_<date> /data/genes_115
+
+The first job downloads into ``/data/ensembl_115_downloading`` and renames it
+with the date the download finished. Both jobs resume when submitted again.
 
 ``transcript_query --bulk-dir`` writes the same files as `transcript_query`,
 with two expected differences: the order of sibling subtrees in `tree.nh` can

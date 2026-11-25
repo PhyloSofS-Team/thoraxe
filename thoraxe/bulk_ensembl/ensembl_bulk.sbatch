@@ -1,7 +1,7 @@
 #!/bin/bash
 # Download and index the Ensembl bulk files of one release with ensembl_bulk, on SLURM.
 #
-#   sbatch [sbatch options] scripts/ensembl_bulk.sbatch RELEASE PREFIX [download options]
+#   sbatch [sbatch options] thoraxe/bulk_ensembl/ensembl_bulk.sbatch RELEASE PREFIX [download options]
 #
 # The files are downloaded into PREFIX_downloading, which is renamed PREFIX_<YYYYMMDD>
 # (the day the download finishes) before the indexes are built. Submitting the same
@@ -14,7 +14,7 @@
 # Environment: PYTHON, the Python interpreter where thoraxe is installed (default: python).
 #
 # Example:
-#   sbatch --output=ensembl116_%j.log scripts/ensembl_bulk.sbatch 116 /data/ensembl116
+#   sbatch --output=ensembl116_%j.log thoraxe/bulk_ensembl/ensembl_bulk.sbatch 116 /data/ensembl116
 #
 #SBATCH --job-name=ensembl_bulk
 #SBATCH --ntasks=1
@@ -24,7 +24,7 @@
 set -uo pipefail
 
 if [ $# -lt 2 ]; then
-  echo "usage: sbatch scripts/ensembl_bulk.sbatch RELEASE PREFIX [download options]"
+  echo "usage: sbatch thoraxe/bulk_ensembl/ensembl_bulk.sbatch RELEASE PREFIX [download options]"
   exit 2
 fi
 RELEASE=$1
